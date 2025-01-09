@@ -379,6 +379,16 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 				display(writeBox);
 				return;
 			}
+			if (c == updateCmd) {
+				display(loadingAlert(), chatForm);
+				start(RUN_CHAT);
+				return;
+			}
+			if (c == backCmd) {
+				display(dialogsList, true);
+				chatForm = null;
+				return;
+			}
 		}
 		if (d == writeBox) {
 			if (c == sendCmd) {
@@ -395,6 +405,7 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 			if (c == List.SELECT_COMMAND) {
 				int i = ((List) d).getSelectedIndex();
 				if (i == -1 || running) return;
+				
 				String title = getName(currentChatPeer = dialogs.getObject(i).getString("id"), false, false);
 				chatForm = new Form(title == null ? "Chat" : title);
 				chatForm.addCommand(backCmd);
