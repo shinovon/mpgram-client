@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mtjMetadata jad="mpgram3.jad" version="2.0.1.201509042315">
-   <device group="KEmulator nnmod" name="KEmulator"/>
+   <device group="Nokia Symbian3 SDK v1.0 " name="SymbianDevice"/>
    <signing projectSpecific="false" signProject="false">
       <alias/>
    </signing>
    <configurations>
-      <configuration active="false" name="KEmulator">
+      <configuration active="true" name="KEmulator">
          <device group="KEmulator nnmod" name="KEmulator"/>
          <symbolSet name="KEmulator">
             <symbol name="NOKIAUI" value="1.6"/>
@@ -31,7 +31,7 @@
             <symbol name="JSR75" value="1.0"/>
          </symbolSet>
       </configuration>
-      <configuration active="true" name="SymbianDevice">
+      <configuration active="false" name="SymbianDevice">
          <device group="Nokia Symbian3 SDK v1.0 " name="SymbianDevice"/>
          <symbolSet name="SymbianDevice">
             <symbol name="NOKIAUI" value="1.4"/>
