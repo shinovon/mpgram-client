@@ -81,12 +81,12 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 		midlet = this;
 		display = Display.getDisplay(this);
 		
-		String p = System.getProperty("microedition.configuration");
-		if (p != null && p.indexOf("1.1") != -1) {
-			display.setCurrent(new Alert("", "Use mpgram web!", null, null));
-			start(RUN_TIMEOUT_EXIT);
-			return;
-		}
+//		String p = System.getProperty("microedition.configuration");
+//		if (p != null && p.indexOf("1.1") != -1) {
+//			display.setCurrent(new Alert("", "Use mpgram web!", null, null));
+//			start(RUN_TIMEOUT_EXIT);
+//			return;
+//		}
 		
 		exitCmd = new Command("Exit", Command.EXIT, 10);
 		backCmd = new Command("Back", Command.BACK, 10);
@@ -277,18 +277,16 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 										sb.append((voice = audio.getBoolean("voice", false)) ?
 												"(Voice: " : "(Audio: ");
 										
-										if (audio.has("artist")) sb.append(audio.getString("artist")).append(" - ");
-										
 										if (voice) {
-											int k = sb.length(),
-												t = audio.getInt("time", 0);
-											sb.append(t / 60);
-											if (sb.length()-k < 2) sb.insert(k, '0');
+											int t = audio.getInt("time", 0);
 											
-											sb.append(':')
-											.append(t % 60);
-											if (sb.length()-k < 5) sb.insert(3 + k, '0');
+											sb.append(t / 60);
+											if (sb.length() < 10) sb.insert(8, '0');
+											
+											sb.append(':').append(t % 60);
+											if (sb.length() < 13) sb.insert(11, '0');
 										} else {
+											if (audio.has("artist")) sb.append(audio.getString("artist")).append(" - ");
 											sb.append(audio.getString("title",
 													media.getString("name", "Unknown")));
 										}
@@ -567,7 +565,7 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 		HttpConnection hc = null;
 		InputStream in = null;
 		try {
-			hc = open(instance.concat("api.php?v=3&method=").concat(url));
+			hc = open(instance.concat("api.php?v=4&method=").concat(url));
 			hc.setRequestMethod("GET");
 			int c;
 			if ((c = hc.getResponseCode()) >= 400 && c != 500) {
