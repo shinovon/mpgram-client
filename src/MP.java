@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.TimeZone;
+import java.util.Vector;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
@@ -13,10 +14,10 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Image;
-import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextBox;
@@ -26,17 +27,61 @@ import javax.microedition.rms.RecordStore;
 
 import cc.nnproject.json.JSONArray;
 import cc.nnproject.json.JSONObject;
+import cc.nnproject.json.JSONStream;
 
 public class MP extends MIDlet implements CommandListener, Runnable {
 
-	private static final int RUN_AUTH = 1;
-	private static final int RUN_DIALOGS = 2;
-	private static final int RUN_CHAT = 3;
 	private static final int RUN_SEND = 4;
 	private static final int RUN_BACKGROUND = 5;
+	private static final int RUN_AVATARS = 6;
+	private static final int RUN_UPDATES = 7;
+	private static final int RUN_LOAD_FORM = 8;
+	private static final int RUN_VALIDATE_AUTH = 9;
 	
+	private static final String SETTINGS_RECORDNAME = "mp4config";
+	private static final String AUTH_RECORDNAME = "mp4user";
+	
+	private static final String DEFAULT_INSTANCE_URL = "http://mp2.nnchan.ru/";
+	
+	private static final String API_VERSION = "5";
+	
+	static final Font largePlainFont = Font.getFont(0, 0, Font.SIZE_LARGE);
+	static final Font medPlainFont = Font.getFont(0, 0, Font.SIZE_MEDIUM);
+	static final Font medBoldFont = Font.getFont(0, Font.STYLE_BOLD, Font.SIZE_MEDIUM);
+	static final Font medItalicFont = Font.getFont(0, Font.STYLE_ITALIC, Font.SIZE_MEDIUM);
+	static final Font medItalicBoldFont = Font.getFont(0, Font.STYLE_BOLD | Font.STYLE_ITALIC, Font.SIZE_MEDIUM);
+	static final Font smallPlainFont = Font.getFont(0, 0, Font.SIZE_SMALL);
+	static final Font smallBoldFont = Font.getFont(0, Font.STYLE_BOLD, Font.SIZE_SMALL);
+	static final Font smallItalicFont = Font.getFont(0, Font.STYLE_ITALIC, Font.SIZE_SMALL);
+
+	static final IllegalStateException cancelException = new IllegalStateException("cancel");
+	
+	// midp lifecycle
 	private static MP midlet;
 	private static Display display;
+	static Displayable current;
+
+	private static String version;
+
+	// localization
+	static String[] L;
+	
+	// settings
+	private static String instance = DEFAULT_INSTANCE_URL;
+	private static int tzOffset;
+	private static boolean showMedia;
+	private static boolean avatars;
+	static boolean useLoadingForm;
+
+	// threading
+	private static int run;
+	private static Object runParam;
+//	private static int running;
+	private static boolean avatarsRunning;
+	private static boolean updatesRunning;
+	
+	// auth
+	private static String user;
 
 	// commands
 	private static Command authCmd;
@@ -45,35 +90,20 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 	private static Command writeCmd;
 	private static Command sendCmd;
 	private static Command updateCmd;
+	private static Command cancelCmd;
 	
 	// ui
-	private static Form authForm;
-	private static List dialogsList;
-	private static Form chatForm;
-	private static TextBox writeBox;
-	private static Form initForm;
+	private static Form mainForm;
+	static Form loadingForm;
+	private static Vector formHistory = new Vector();
 
 	// ui elements
-	private static TextField tokenField;
+//	private static TextField tokenField;
+//	
+//	private static JSONArray dialogs;
 
-	// threading
-	private static boolean running;
-	private static int run;
-	
-	// settings
-	private static String user;
-	private static String instance = "http://mp2.nnchan.ru/";
-	private static int tzOffset;
-	private static boolean showMedia;
-	
-	private static String version;
-	
-	private static JSONArray dialogs;
-	
 	private static JSONObject usersCache;
 	private static JSONObject chatsCache;
-	
-	private static String currentChatPeer;
 
 	protected void destroyApp(boolean u) {
 	}
@@ -84,9 +114,43 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 	protected void startApp()  {
 		if (midlet != null) return;
 		midlet = this;
+		
 		display = Display.getDisplay(this);
 		
 		version = getAppProperty("MIDlet-Version");
+		
+		// load settings
+		try {
+			RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORDNAME, false);
+			JSONObject j = JSONObject.parseObject(new String(r.getRecord(1), "UTF-8"));
+			r.closeRecordStore();
+			
+			// TODO
+		} catch (Exception ignored) {}
+		
+		// load auth
+		try {
+			RecordStore r = RecordStore.openRecordStore(AUTH_RECORDNAME, false);
+			JSONObject j = JSONObject.parseObject(new String(r.getRecord(1), "UTF-8"));
+			r.closeRecordStore();
+
+			// TODO
+		} catch (Exception ignored) {}
+		
+		// load locale TODO
+//		(L = new String[220])[0] = "mpgram";
+//		try {
+//			loadLocale(lang);
+//		} catch (Exception e) {
+//			try {
+//				loadLocale(lang = "en");
+//			} catch (Exception e2) {
+//				// crash on fail
+//				throw new RuntimeException(e2.toString());
+//			}
+//		}
+		
+		// commands
 		
 		exitCmd = new Command("Exit", Command.EXIT, 10);
 		backCmd = new Command("Back", Command.BACK, 10);
@@ -94,356 +158,132 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 		writeCmd = new Command("Write", Command.SCREEN, 2);
 		sendCmd = new Command("Send", Command.OK, 1);
 		updateCmd = new Command("Update", Command.SCREEN, 3);
+		cancelCmd = new Command("Cancel", Command.CANCEL, 1);
 		
-		initForm = new Form("mpgram");
-		initForm.append("Loading");
-		display(initForm);
+		loadingForm = new Form("mpgram");
+		loadingForm.append("Loading");
+		loadingForm.addCommand(cancelCmd);
+		loadingForm.setCommandListener(this);
 		
-		try {
-			RecordStore r = RecordStore.openRecordStore("mpgramuser", false);
-			user = new String(r.getRecord(1));
-			r.closeRecordStore();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		Form f = new Form("mpgram");
+		f.append("Loading");
+		display(f);
 		
 		try {
 			tzOffset = TimeZone.getDefault().getRawOffset() / 1000;
 		} catch (Throwable e) {} // just to be sure
 		
-		if (user == null) {
-			display(authForm());
-		} else {
-			start(RUN_AUTH);
-		}
+//		if (user == null) {
+//			display(authForm());
+//		} else {
+//			start(RUN_AUTH);
+//		}
 		
-		start(RUN_BACKGROUND);
+		if (user == null) {
+			
+			return;
+		} else {
+		
+			run = RUN_VALIDATE_AUTH;
+			run();
+		}
+
+		start(RUN_AVATARS, null);
 	}
 	
 	public void run() {
 		int run;
+		Object param;
 		synchronized (this) {
 			run = MP.run;
+			param = MP.runParam;
 			notify();
 		}
-		running = true;
+		System.out.println("run " + run + " " + param);
+//		running++;
 		switch (run) {
-		case RUN_AUTH: {
+		case RUN_VALIDATE_AUTH: {
+			display(loadingAlert("Authorizing"), null);
+			
 			try {
-				if (tokenField != null) user = tokenField.getString();
-				api("checkAuth");
+				api("me");
 				
-				usersCache = new JSONObject();
-				chatsCache = new JSONObject();
+				if (updatesRunning) break;
+				start(RUN_UPDATES, null);
+			} catch (APIException e) {
 				
-				dialogsList = new List("Dialogs", List.IMPLICIT);
-				dialogsList.addCommand(exitCmd);
-				dialogsList.addCommand(List.SELECT_COMMAND);
-				dialogsList.setCommandListener(this);
-				dialogsList.setFitPolicy(List.TEXT_WRAP_ON);
+			} catch (IOException e) {
 				
-				display(dialogsList);
-				
-				try {
-					RecordStore.deleteRecordStore("mpgramuser");
-				} catch (Exception ignored) {}
-				try {
-					RecordStore r = RecordStore.openRecordStore("mpgramuser", true);
-					byte[] b = user.getBytes();
-					r.addRecord(b, 0, b.length);
-					r.closeRecordStore();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				display(errorAlert(e.toString()), authForm());
 				break;
 			}
-		}
-		case RUN_DIALOGS: {
-			try {
-				List list = dialogsList;
-				list.deleteAll();
-				JSONObject j = api("getDialogs&limit=15&fields=dialogs,users,chats");
-				dialogs = j.getArray("dialogs");
-				
-				JSONObject chats = j.getNullableObject("chats");
-				JSONObject users = j.getNullableObject("users");
-				fillPeersCache(users, chats);
-				
-				JSONObject msgs = j.getNullableObject("messages");
-				
-				for (int i = 0, l = dialogs.size(); i < l; ++i) {
-					JSONObject dialog = dialogs.getObject(i);
-					String id = dialog.getString("id");
-					
-					String title = "";
-					String m = "";
-					
-					JSONObject p;
-					if (id.charAt(0) == '-') {
-						p = chats.getNullableObject(id);
-						if (p != null) title = p.getString("title");
-					} else {
-						p = users.getNullableObject(id);
-						if (p != null) title = getName(p);
-					}
-
-					JSONObject msg = msgs.getObject(id);
-					if (msg != null) {
-						m = oneLine(msg.getString("text", ""));
-					}
-					
-					dialogsList.append(title.concat("\n").concat(m), null);
-				}
-				
-				if (dialogsList == list) {
-					display(list);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				display(errorAlert(e.toString()), dialogsList);
-			}
 			break;
 		}
-		case RUN_CHAT: {
-			try {
-				String title = getName(currentChatPeer, false, false);
-				Form f = chatForm = new Form(title == null ? "Chat" : title);
-				f.addCommand(backCmd);
-				f.addCommand(writeCmd);
-				f.addCommand(updateCmd);
-				f.setCommandListener(this);
-				
-				if (writeBox != null) {
-					writeBox.setString("");
-				}
-				StringBuffer sb = new StringBuffer();
-				sb.append("getHistory&peer=").append(currentChatPeer);
-				if (showMedia) sb.append("&include_media");
-				
-				JSONObject j = api(sb.toString());
-				
-				JSONObject chats = j.getNullableObject("chats");
-				JSONObject users = j.getNullableObject("users");
-				fillPeersCache(users, chats);
-				
-				JSONArray msgs = j.getArray("messages");
-				
-				title = getShortName(currentChatPeer);
-				
-				long time, lastTime = 0;
-				Calendar c = Calendar.getInstance();
-
-				String label;
-				String type;
-				for (int i = 0, l = msgs.size(); i < l; ++i) {
-					JSONObject msg = msgs.getObject(i);
-					time = msg.getLong("date") + tzOffset;
-					if (time == 0 || (time / 86400 != lastTime / 86400)) {
-						c.setTime(new Date((time - tzOffset) * 1000L));
-						sb.setLength(0);
-						sb.append(c.get(Calendar.DAY_OF_MONTH));
-						if (sb.length() < 2) sb.insert(0, '0');
-						
-						sb.append('.')
-						.append(c.get(Calendar.MONTH) + 1);
-						if (sb.length() < 5) sb.insert(3, '0');
-						
-						sb.append('.')
-						.append(c.get(Calendar.YEAR));
-						f.append(new StringItem(null, sb.toString()));
-					}
-					lastTime = time;
-					
-					sb.setLength(0);
-					
-					sb.append(' ')
-					.append((time / 3600) % 24);
-					if (sb.length() < 3) sb.insert(1, '0');
-					
-					sb.append(':')
-					.append((time / 60) % 60);
-					if (sb.length() < 6) sb.insert(4, '0');
-					
-					label = sb.insert(0, msg.has("from_id") ? getName(msg.getString("from_id")) : title).toString();
-					
-					sb.setLength(0);
-					if (msg.has("fwd")) sb.append("(Forwarded) ");
-					if (msg.has("reply")) sb.append("(Reply)\n");
-					if (msg.has("action")) {
-						sb.append("(Action)");
-					} else {
-						sb.append(msg.getString("text", ""));
-						if (sb.length() != 0) sb.append('\n');
-						
-						JSONObject media;
-						if (msg.has("media")) {
-							if (showMedia
-									&& (media = msg.getNullableObject("media")) != null
-									&& (type = media.getNullableString("type")) != null) {
-								if ("photo".equals(type)) {
-									sb.append("(Photo)");
-								} else if ("document".equals(type)) {
-									if (media.has("audio")) {
-										JSONObject audio = media.getObject("audio");
-										boolean voice;
-										sb.append((voice = audio.getBoolean("voice", false)) ?
-												"(Voice: " : "(Audio: ");
-										
-										if (voice) {
-											int t = audio.getInt("time", 0);
-											
-											sb.append(t / 60);
-											if (sb.length() < 10) sb.insert(8, '0');
-											
-											sb.append(':').append(t % 60);
-											if (sb.length() < 13) sb.insert(11, '0');
-										} else {
-											if (audio.has("artist")) sb.append(audio.getString("artist")).append(" - ");
-											sb.append(audio.getString("title",
-													media.getString("name", "Unknown")));
-										}
-										sb.append(")");
-									} else {
-										sb.append("(Document: ")
-										.append(media.getString("name", "Unknown"))
-										.append(")");
-									}
-								} else {
-									sb.append("(Media)");
-								}
-							} else sb.append("(Media)");
-						}
-					}
-					f.append(new StringItem(label, sb.append('\n').toString()));
-				}
-				if (f == chatForm) display(chatForm);
-			} catch (Exception e) {
-				e.printStackTrace();
-				display(errorAlert(e.toString()), chatForm);
-			}
-			break;
-		}
-		case RUN_SEND: {
-			try {
-				String s = writeBox.getString();
-				writeBox.setString("");
-				
-				api("sendMessage&peer=".concat(currentChatPeer).concat("&text=").concat(url(s)));
-				
-				display(chatForm);
-				MP.run = RUN_CHAT;
-				run();
-				return;
-			} catch (Exception e) {
-				e.printStackTrace();
-				display(errorAlert(e.toString()), chatForm);
-			}
-			break;
-		}
-		case RUN_BACKGROUND: {
+		case RUN_UPDATES: {
 			// TODO
+			if (updatesRunning) break;
+			updatesRunning = true;
+			try {
+				while (true) {
+					
+					Thread.sleep(30000L);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			break;
+		}
+		case RUN_AVATARS: {
+			if (avatarsRunning) break;
+			avatarsRunning = true;
+			try {
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			break;
 		}
 		}
-		running = false;
+//		running--;
 	}
 
-	Thread start(int i) {
+	Thread start(int i, Object param) {
 		Thread t = null;
 		try {
 			synchronized(this) {
 				run = i;
+				runParam = param;
 				(t = new Thread(this)).start();
 				wait();
 			}
 		} catch (Exception e) {}
 		return t;
 	}
-	
-	private void addBackgroundTask(Object a) {
-		// TODO
-	}
 
 	public void commandAction(Command c, Displayable d) {
-		if (d == chatForm) {
-			if (c == writeCmd) {
-				if (writeBox == null) {
-					writeBox = new TextBox("Write", "", 500, TextField.ANY);
-					writeBox.addCommand(backCmd);
-					writeBox.addCommand(sendCmd);
-					writeBox.setCommandListener(this);
-				}
-				display(writeBox);
-				return;
-			}
-			if (c == updateCmd) {
-				display(loadingAlert(), chatForm);
-				start(RUN_CHAT);
-				return;
-			}
-			if (c == backCmd) {
-				display(dialogsList, true);
-				chatForm = null;
-				return;
-			}
-		}
-		if (d == writeBox) {
-			if (c == sendCmd) {
-				display(loadingAlert(), chatForm);
-				start(RUN_SEND);
-				return;
-			}
-			if (c == backCmd) {
-				display(chatForm, true);
-				return;
-			}
-		}
-		if (d == dialogsList) {
-			if (c == List.SELECT_COMMAND) {
-				int i = ((List) d).getSelectedIndex();
-				if (i == -1 || running) return;
-				
-				String title = getName(currentChatPeer = dialogs.getObject(i).getString("id"), false, false);
-				chatForm = new Form(title == null ? "Chat" : title);
-				chatForm.addCommand(backCmd);
-				chatForm.addCommand(writeCmd);
-				chatForm.setCommandListener(this);
-				display(loadingAlert(), dialogsList);
-				
-				start(RUN_CHAT);
-				return;
-			}
-		}
-		if (d == authForm) {
-			if (c == authCmd) {
-				start(RUN_AUTH);
-				return;
-			}
-		}
 		if (c == backCmd) {
-			display(null);
+			if (formHistory.size() == 0) {
+				display(null, true);
+				return;
+			}
+			Displayable p = null;
+			synchronized (formHistory) {
+				int i = formHistory.size();
+				while (i-- != 0) {
+					if (formHistory.elementAt(i) == d) {
+						break;
+					}
+				}
+				if (i > 0) {
+					p = (Displayable) formHistory.elementAt(i - 1);
+					formHistory.removeElementAt(i);
+				}
+			}
+			display(p, true);
 			return;
 		}
 		if (c == exitCmd) {
 			notifyDestroyed();
 		}
-	}
-
-	private Form authForm() {
-		if (authForm != null) return authForm;
-		
-		authForm = new Form("Auth");
-		authForm.addCommand(authCmd);
-		authForm.addCommand(exitCmd);
-		authForm.setCommandListener(this);
-		
-		tokenField = new TextField("User session", "", 200, TextField.ANY);
-		authForm.append(tokenField);
-		
-		return authForm;
 	}
 
 	private static void fillPeersCache(JSONObject users, JSONObject chats) {
@@ -468,8 +308,6 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 			}
 		}
 	}
-
-	// utils
 	
 	private static String oneLine(String s) {
 		if (s == null) return null;
@@ -574,22 +412,40 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 
 	static void display(Displayable d, boolean back) {
 		if (d instanceof Alert) {
-			display.setCurrent((Alert) d, dialogsList != null ? (Displayable) dialogsList : authForm != null ? authForm : initForm);
+			display.setCurrent((Alert) d, mainForm);
 			return;
 		}
-		if (d == null)
-			d = dialogsList != null ? (Displayable) dialogsList : authForm != null ? authForm : initForm;
-		display.setCurrent(d);
+		if (d == loadingForm) {
+			display.setCurrent(d);
+			return;
+		}
+		if (d == null || d == mainForm) {
+			d = mainForm;
+			
+			formHistory.removeAllElements();
+		}
+		Displayable p = display.getCurrent();
+		if (p == loadingForm) p = current;
+		display.setCurrent(current = d);
+		if (p == null || p == d) return;
+		
+		if (p instanceof MPForm) {
+			((MPForm) p).closed(back);
+		}
+		// push to history
+		if (!back && d != mainForm && (formHistory.isEmpty() || formHistory.lastElement() != d)) {
+			formHistory.addElement(d);
+		}
 	}
 
-	private static Alert errorAlert(String text) {
+	static Alert errorAlert(String text) {
 		Alert a = new Alert("");
 		a.setType(AlertType.ERROR);
 		a.setString(text);
 		a.setTimeout(3000);
 		return a;
 	}
-	
+
 	private static Alert infoAlert(String text) {
 		Alert a = new Alert("");
 		a.setType(AlertType.CONFIRMATION);
@@ -597,27 +453,36 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 		a.setTimeout(1500);
 		return a;
 	}
-	
-	private static Alert loadingAlert() {
-		Alert a = new Alert("", "Loading", null, null);
+
+	private static Alert loadingAlert(String s) {
+		Alert a = new Alert("", s, null, null);
+		a.setCommandListener(midlet);
+		a.addCommand(Alert.DISMISS_COMMAND);
 		a.setIndicator(new Gauge(null, false, Gauge.INDEFINITE, Gauge.CONTINUOUS_RUNNING));
-		a.setTimeout(30000);
+		a.setTimeout(Alert.FOREVER);
 		return a;
 	}
 	
-	private static JSONObject api(String url) throws IOException {
-		JSONObject res;
+	private static Object api(String url) throws IOException {
+		Object res;
 
 		HttpConnection hc = null;
 		InputStream in = null;
 		try {
-			hc = open(instance.concat("api.php?v=4&method=").concat(url));
+			hc = openHttpConnection(instance.concat("api.php?v=" + API_VERSION + "&method=").concat(url));
 			hc.setRequestMethod("GET");
-			int c;
-			if ((c = hc.getResponseCode()) >= 400 && c != 500) {
-				throw new IOException("HTTP ".concat(Integer.toString(c)));
+			
+			int c = hc.getResponseCode();
+			try {
+				res = JSONStream.getStream(in = hc.openInputStream()).nextValue();
+			} catch (RuntimeException e) {
+				if (c >= 400) {
+					throw new APIException(url, c, null);
+				} else throw e;
 			}
-			res = JSONObject.parseObject(readUtf(in = hc.openInputStream(), (int) hc.getLength()));
+			if (c >= 400 || (res instanceof JSONObject && ((JSONObject) res).has("error"))) {
+				throw new APIException(url, c, res);
+			}
 		} finally {
 			if (in != null) try {
 				in.close();
@@ -626,10 +491,35 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 				hc.close();
 			} catch (IOException e) {}
 		}
-		System.out.println(res);
-		// хендлить ошибки апи
-		if (res.has("error")) {
-			throw new RuntimeException("API error: ".concat(res.getString("error")).concat("\nURL: ").concat(url));
+		System.out.println(res instanceof JSONObject ?
+				((JSONObject) res).format(0) : res instanceof JSONArray ?
+						((JSONArray) res).format(0) : res);
+		return res;
+	}
+
+	static JSONStream apiStream(String url) throws IOException {
+		JSONStream res = null;
+
+		HttpConnection hc = null;
+		InputStream in = null;
+		try {
+			hc = openHttpConnection(instance.concat("api.php?v=" + API_VERSION + "&method=").concat(url));
+			hc.setRequestMethod("GET");
+			
+			int c = hc.getResponseCode();
+			if (c >= 400) {
+				throw new APIException(url, c, null);
+			}
+			res = JSONStream.getStream(hc);
+		} finally {
+			if (res == null) {
+				if (in != null) try {
+					in.close();
+				} catch (IOException e) {}
+				if (hc != null) try {
+					hc.close();
+				} catch (IOException e) {}
+			}
 		}
 		return res;
 	}
@@ -677,7 +567,7 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 		HttpConnection hc = null;
 		InputStream in = null;
 		try {
-			hc = open(url);
+			hc = openHttpConnection(url);
 			hc.setRequestMethod("GET");
 			int r;
 			if ((r = hc.getResponseCode()) >= 400) {
@@ -695,9 +585,9 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 		}
 	}
 	
-	private static HttpConnection open(String url) throws IOException {
+	private static HttpConnection openHttpConnection(String url) throws IOException {
 		HttpConnection hc = (HttpConnection) Connector.open(url);
-		hc.setRequestProperty("User-Agent", "mpgram3/".concat(version));
+		hc.setRequestProperty("User-Agent", "mpgram4/".concat(version));
 		if (user != null) {
 			hc.setRequestProperty("X-mpgram-user", user);
 		}
@@ -705,7 +595,10 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 	}
 	
 	public static String url(String url) {
-		StringBuffer sb = new StringBuffer();
+		return appendUrl(new StringBuffer(), url).toString();
+	}
+
+	public static StringBuffer appendUrl(StringBuffer sb, String url) {
 		char[] chars = url.toCharArray();
 		for (int i = 0; i < chars.length; i++) {
 			int c = chars[i];
@@ -721,22 +614,38 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 					|| c == 41) {
 				sb.append((char) c);
 			} else if (c <= 127) {
-				sb.append(hex(c));
+				sb.append('%');
+				byte b = (byte) c;
+				sb.append(Integer.toHexString(b >> 4 & 0xf));
+				sb.append(Integer.toHexString(b & 0xf));
 			} else if (c <= 2047) {
-				sb.append(hex(0xC0 | c >> 6));
-				sb.append(hex(0x80 | c & 0x3F));
+				sb.append('%');
+				byte b = (byte) (0xC0 | c >> 6);
+				sb.append(Integer.toHexString(b >> 4 & 0xf));
+				sb.append(Integer.toHexString(b & 0xf));
+				
+				sb.append('%');
+				b = (byte) (0x80 | c & 0x3F);
+				sb.append(Integer.toHexString(b >> 4 & 0xf));
+				sb.append(Integer.toHexString(b & 0xf));
 			} else {
-				sb.append(hex(0xE0 | c >> 12));
-				sb.append(hex(0x80 | c >> 6 & 0x3F));
-				sb.append(hex(0x80 | c & 0x3F));
+				sb.append('%');
+				byte b = (byte) (0xE0 | c >> 12);
+				sb.append(Integer.toHexString(b >> 4 & 0xf));
+				sb.append(Integer.toHexString(b & 0xf));
+				
+				sb.append('%');
+				b = (byte) (0x80 | c >> 6 & 0x3F);
+				sb.append(Integer.toHexString(b >> 4 & 0xf));
+				sb.append(Integer.toHexString(b & 0xf));
+				
+				sb.append('%');
+				b = (byte) (0x80 | c & 0x3F);
+				sb.append(Integer.toHexString(b >> 4 & 0xf));
+				sb.append(Integer.toHexString(b & 0xf));
 			}
 		}
-		return sb.toString();
-	}
-
-	private static String hex(int i) {
-		String s = Integer.toHexString(i);
-		return "%".concat(s.length() < 2 ? "0" : "").concat(s);
+		return sb;
 	}
 
 }

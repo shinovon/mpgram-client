@@ -21,6 +21,8 @@ SOFTWARE.
 */
 package cc.nnproject.json;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -47,7 +49,7 @@ public class JSONArray {
 	 * @deprecated Compatibility with org.json
 	 */
 	public JSONArray(String str) {
-		JSONArray tmp = JSONObject.parseArray(str); // FIXME
+		JSONArray tmp = JSONObject.parseArray(str);
 		elements = tmp.elements;
 		count = tmp.count;
 	}
@@ -432,6 +434,8 @@ public class JSONArray {
 				s.append(((JSONArray) v).build());
 			} else if (v instanceof String) {
 				s.append("\"").append(JSONObject.escape_utf8((String) v)).append("\"");
+			} else if (v instanceof String[]){
+				s.append(((String[]) v)[0]);
 			} else if (v == JSONObject.json_null) {
 				s.append((String) null);
 			} else {
@@ -444,6 +448,82 @@ public class JSONArray {
 		}
 		s.append("]");
 		return s.toString();
+	}
+
+	public String format(int l) {
+		int size = count;
+		if (size == 0)
+			return "[]";
+		String t = "";
+		for (int i = 0; i < l; i++) {
+			t = t.concat("  ");
+		}
+		String t2 = t.concat("  ");
+		StringBuffer s = new StringBuffer("[\n");
+		s.append(t2);
+		int i = 0;
+		while (i < size) {
+			Object v = elements[i];
+			if (v instanceof String[])
+				v = elements[i] = JSONObject.parseJSON(((String[]) v)[0]);
+			if (v instanceof JSONObject) {
+				s.append(((JSONObject) v).format(l + 1));
+			} else if (v instanceof JSONArray) {
+				s.append(((JSONArray) v).format(l + 1));
+			} else if (v instanceof String) {
+				s.append("\"").append(JSONObject.escape_utf8((String) v)).append("\"");
+			} else if (v == JSONObject.json_null) {
+				s.append((String) null);
+			} else {
+				s.append(v);
+			}
+			i++;
+			if (i < size) {
+				s.append(",\n").append(t2);
+			}
+		}
+		if (l > 0) {
+			s.append("\n").append(t).append("]");
+		} else {
+			s.append("\n]");
+		}
+		return s.toString();
+	}
+	
+	public void write(OutputStream out) throws IOException {
+		int size = count;
+		out.write((byte) '[');
+		if (size == 0) {
+			out.write((byte) ']');
+			return;
+		}
+		int i = 0;
+		while (i < size) {
+			Object v = elements[i];
+			if (v instanceof JSONObject) {
+				((JSONObject) v).write(out);
+			} else if (v instanceof JSONArray) {
+				((JSONArray) v).write(out);
+			} else if (v instanceof String) {
+				out.write((byte) '"');
+				JSONObject.writeString(out, (String) v);
+				out.write((byte) '"');
+			} else if (v instanceof String[]) {
+				out.write((((String[]) v)[0]).getBytes("UTF-8"));
+			} else if (v == JSONObject.json_null) {
+				out.write((byte) 'n');
+				out.write((byte) 'u');
+				out.write((byte) 'l');
+				out.write((byte) 'l');
+			} else {
+				out.write(String.valueOf(v).getBytes("UTF-8"));
+			}
+			i++;
+			if (i < size) {
+				out.write((byte) ',');
+			}
+		}
+		out.write((byte) '}');
 	}
 
 	public Enumeration elements() {

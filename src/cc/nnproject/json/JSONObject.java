@@ -21,6 +21,8 @@ SOFTWARE.
 */
 package cc.nnproject.json;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -216,9 +218,6 @@ public class JSONObject {
 		return table.get(name) == json_null;
 	}
 	
-	/**
-	 * @deprecated
-	 */
 	public void put(String name, Object obj) {
 		table.put(name, getJSON(obj));
 	}
@@ -343,6 +342,92 @@ public class JSONObject {
 		s.append("}");
 		return s.toString();
 	}
+	
+	public void write(OutputStream out) throws IOException {
+		out.write((byte) '{');
+		if (size() == 0) {
+			out.write((byte) '}');
+			return;
+		}
+		Enumeration keys = table.keys();
+		while (true) {
+			String k = (String) keys.nextElement();
+			out.write((byte) '"');
+			writeString(out, k.toString());
+			out.write((byte) '"');
+			out.write((byte) ':');
+			Object v = table.get(k);
+			if (v instanceof JSONObject) {
+				((JSONObject) v).write(out);
+			} else if (v instanceof JSONArray) {
+				((JSONArray) v).write(out);
+			} else if (v instanceof String) {
+				out.write((byte) '"');
+				writeString(out, (String) v);
+				out.write((byte) '"');
+			} else if (v instanceof String[]) {
+				out.write((((String[]) v)[0]).getBytes("UTF-8"));
+			} else if (v == json_null) {
+				out.write((byte) 'n');
+				out.write((byte) 'u');
+				out.write((byte) 'l');
+				out.write((byte) 'l');
+			} else {
+				out.write(String.valueOf(v).getBytes("UTF-8"));
+			}
+			if (!keys.hasMoreElements()) {
+				break;
+			}
+			out.write((byte) ',');
+		}
+		out.write((byte) '}');
+	}
+
+	public static void writeString(OutputStream out, String s) throws IOException {
+		int len = s.length();
+		for (int i = 0; i < len; ++i) {
+			char c = s.charAt(i);
+			switch (c) {
+			case '"':
+			case '\\':
+				out.write((byte) '\\');
+				out.write((byte) c);
+				break;
+			case '\b':
+				out.write((byte) '\\');
+				out.write((byte) 'b');
+				break;
+			case '\f':
+				out.write((byte) '\\');
+				out.write((byte) 'f');
+				break;
+			case '\n':
+				out.write((byte) '\\');
+				out.write((byte) 'n');
+				break;
+			case '\r':
+				out.write((byte) '\\');
+				out.write((byte) 'r');
+				break;
+			case '\t':
+				out.write((byte) '\\');
+				out.write((byte) 't');
+				break;
+			default:
+				if (c < 32 || c > 255) {
+					String u = Integer.toHexString(c);
+					out.write((byte) '\\');
+					out.write((byte) 'u');
+					for (int z = u.length(); z < 4; z++) {
+						out.write((byte) '0');
+					}
+					out.write(u.getBytes());
+				} else {
+					out.write((byte) c);
+				}
+			}
+		}
+	}
 
 	public Enumeration keys() {
 		return table.keys();
@@ -400,7 +485,7 @@ public class JSONObject {
 		if (text == null || text.length() <= 1)
 			throw new RuntimeException("JSON: Empty text");
 		if (text.charAt(0) != '{')
-			throw new RuntimeException("JSON: Not JSON object");
+			throw new RuntimeException("JSON: Not JSON object: " + text);
 		return (JSONObject) parseJSON(text);
 	}
 
@@ -425,10 +510,12 @@ public class JSONObject {
 		return obj;
 	}
 
-	static Object parseJSON(String str) {
+	public static Object parseJSON(String str) {
 		char first = str.charAt(0);
-		int length = str.length() - 1;
-		char last = str.charAt(length);
+		int length;
+		char last = str.charAt(length = str.length() - 1);
+		if (last <= ' ')
+			last = (str = str.trim()).charAt(length = str.length() - 1);
 		switch(first) {
 		case '"': { // string
 			if (last != '"')
@@ -684,7 +771,7 @@ public class JSONObject {
 		throw new RuntimeException("JSON: Cast to int failed: " + o);
 	}
 
-	static long getLong(Object o) {
+	public static long getLong(Object o) {
 		try {
 			if (o instanceof String[])
 				return Long.parseLong(((String[]) o)[0]);
@@ -696,5 +783,48 @@ public class JSONObject {
 				return ((Double) o).longValue();
 		} catch (Throwable e) {}
 		throw new RuntimeException("JSON: Cast to long failed: " + o);
+	}
+
+	public String format(int l) {
+		int size = size();
+		if (size == 0)
+			return "{}";
+		String t = "";
+		for (int i = 0; i < l; i++) {
+			t = t.concat("  ");
+		}
+		String t2 = t.concat("  ");
+		StringBuffer s = new StringBuffer("{\n");
+		s.append(t2);
+		Enumeration keys = table.keys();
+		int i = 0;
+		while (keys.hasMoreElements()) {
+			String k = (String) keys.nextElement();
+			s.append("\"").append(k).append("\": ");
+			Object v = get(k);
+			if (v instanceof String[])
+				table.put(k, v = parseJSON(((String[]) v)[0]));
+			if (v instanceof JSONObject) {
+				s.append(((JSONObject) v).format(l + 1));
+			} else if (v instanceof JSONArray) {
+				s.append(((JSONArray) v).format(l + 1));
+			} else if (v instanceof String) {
+				s.append("\"").append(escape_utf8((String) v)).append("\"");
+			} else if (v == json_null) {
+				s.append((String) null);
+			} else {
+				s.append(v);
+			}
+			i++;
+			if (i < size) {
+				s.append(",\n").append(t2);
+			}
+		}
+		if (l > 0) {
+			s.append("\n").append(t).append("}");
+		} else {
+			s.append("\n}");
+		}
+		return s.toString();
 	}
 }
