@@ -100,6 +100,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command updateCmd;
 
 	private static Command okCmd;
+	private static Command nextCmd;
 	private static Command cancelCmd;
 	
 	// ui
@@ -187,6 +188,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		updateCmd = new Command("Update", Command.SCREEN, 3);
 		
 		okCmd = new Command("Ok", Command.OK, 1);
+		nextCmd = new Command("Next", Command.OK, 1);
 		cancelCmd = new Command("Cancel", Command.CANCEL, 2);
 		
 		loadingForm = new Form("mpgram");
@@ -201,8 +203,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		try {
 			tzOffset = TimeZone.getDefault().getRawOffset() / 1000;
 		} catch (Throwable e) {} // just to be sure
-		
-		System.out.println("user: " + user);
 		
 		if (user == null) {
 			display(mainDisplayable = initialAuthForm());
@@ -332,7 +332,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	}
 	
 	public void commandAction(Command c, Item item) {
-		
+		if (c == peerItemCmd) {
+			String id = (String) ((MPForm) current).ids.get(item);
+			if (id == null) return;
+			openChat(id);
+			
+			return;
+		}
 	}
 
 	private static void writeAuth() {

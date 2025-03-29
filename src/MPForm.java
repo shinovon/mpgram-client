@@ -2,6 +2,7 @@
  * Copyright (c) 2025 Arman Jussupgaliyev
  */
 import java.io.InterruptedIOException;
+import java.util.Hashtable;
 
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Item;
@@ -11,6 +12,7 @@ public abstract class MPForm extends Form {
 
 	boolean loaded, finished, canceled;
 	Thread thread;
+	Hashtable ids;
 
 	public MPForm(String title) {
 		super(title);

@@ -1,3 +1,5 @@
+import java.util.Hashtable;
+
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.StringItem;
 
@@ -27,6 +29,8 @@ public class ChatForm extends MPForm {
 		JSONObject j = (JSONObject) MP.api(sb.toString());
 		
 		if (thread != this.thread) throw MP.cancelException;
+		
+		ids = new Hashtable();
 		
 		MP.fillPeersCache(j.getNullableObject("users"), j.getNullableObject("chats"));
 		

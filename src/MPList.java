@@ -4,7 +4,6 @@
 import java.io.InterruptedIOException;
 
 import javax.microedition.lcdui.Image;
-import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.Ticker;
 
