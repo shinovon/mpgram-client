@@ -15,6 +15,9 @@ public abstract class MPList extends List {
 
 	public MPList(String title, int listType) {
 		super(title, listType);
+		addCommand(List.SELECT_COMMAND);
+		setSelectCommand(List.SELECT_COMMAND);
+		setCommandListener(MP.midlet);
 	}
 	
 	// TODO
@@ -68,9 +71,9 @@ public abstract class MPList extends List {
 		return append(text, image);
 	}
 
-	int safeInsert(Thread thread, int n, String text, Image image) {
+	void safeInsert(Thread thread, int n, String text, Image image) {
 		if (thread != this.thread) throw MP.cancelException;
-		return insert(n, text, image);
+		insert(n, text, image);
 	}
 	
 	abstract void loadInternal(Thread thread) throws Exception;
@@ -78,5 +81,7 @@ public abstract class MPList extends List {
 	void closed(boolean destroy) {
 		if (destroy) cancel();
 	}
+	
+	abstract void select(int i);
 
 }

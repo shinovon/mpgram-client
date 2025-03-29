@@ -1,7 +1,5 @@
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.TimeZone;
 import java.util.Vector;
@@ -18,10 +16,9 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Image;
+import javax.microedition.lcdui.Item;
+import javax.microedition.lcdui.ItemCommandListener;
 import javax.microedition.lcdui.List;
-import javax.microedition.lcdui.StringItem;
-import javax.microedition.lcdui.TextBox;
-import javax.microedition.lcdui.TextField;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.rms.RecordStore;
 
@@ -29,14 +26,14 @@ import cc.nnproject.json.JSONArray;
 import cc.nnproject.json.JSONObject;
 import cc.nnproject.json.JSONStream;
 
-public class MP extends MIDlet implements CommandListener, Runnable {
+public class MP extends MIDlet implements CommandListener, ItemCommandListener, Runnable {
 
-	private static final int RUN_SEND = 4;
-	private static final int RUN_BACKGROUND = 5;
+	private static final int RUN_SEND_MESSAGE = 4;
+	private static final int RUN_VALIDATE_AUTH = 5;
 	private static final int RUN_AVATARS = 6;
 	private static final int RUN_UPDATES = 7;
 	private static final int RUN_LOAD_FORM = 8;
-	private static final int RUN_VALIDATE_AUTH = 9;
+	private static final int RUN_LOAD_LIST = 9;
 	
 	private static final String SETTINGS_RECORDNAME = "mp4config";
 	private static final String AUTH_RECORDNAME = "mp4user";
@@ -57,7 +54,7 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 	static final IllegalStateException cancelException = new IllegalStateException("cancel");
 	
 	// midp lifecycle
-	private static MP midlet;
+	static MP midlet;
 	private static Display display;
 	static Displayable current;
 
@@ -71,6 +68,7 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 	private static int tzOffset;
 	private static boolean showMedia;
 	private static boolean avatars;
+	private static boolean symbianJrt;
 	static boolean useLoadingForm;
 
 	// threading
@@ -82,18 +80,30 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 	
 	// auth
 	private static String user;
+	private static int userState;
 
 	// commands
-	private static Command authCmd;
 	private static Command exitCmd;
-	private static Command backCmd;
-	private static Command writeCmd;
-	private static Command sendCmd;
-	private static Command updateCmd;
+	static Command backCmd;
+
+	private static Command settingsCmd;
+	private static Command aboutCmd;
+	
+	private static Command authCmd;
+	private static Command authNewSessionCmd;
+	private static Command authImportSessionCmd;
+
+	static Command peerItemCmd;
+	
+	static Command writeCmd;
+	static Command sendCmd;
+	static Command updateCmd;
+
+	private static Command okCmd;
 	private static Command cancelCmd;
 	
 	// ui
-	private static Form mainForm;
+	private static Displayable mainDisplayable;
 	static Form loadingForm;
 	private static Vector formHistory = new Vector();
 
@@ -102,8 +112,8 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 //	
 //	private static JSONArray dialogs;
 
-	private static JSONObject usersCache;
-	private static JSONObject chatsCache;
+	private static JSONObject usersCache = new JSONObject();
+	private static JSONObject chatsCache = new JSONObject();
 
 	protected void destroyApp(boolean u) {
 	}
@@ -114,10 +124,16 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 	protected void startApp()  {
 		if (midlet != null) return;
 		midlet = this;
-		
+
+		version = getAppProperty("MIDlet-Version");
 		display = Display.getDisplay(this);
 		
-		version = getAppProperty("MIDlet-Version");
+		
+		String p = System.getProperty("microedition.platform");
+		symbianJrt = p != null && p.indexOf("platform=S60") != -1;
+		useLoadingForm = !symbianJrt &&
+				(System.getProperty("com.symbian.midp.serversocket.support") != null ||
+				System.getProperty("com.symbian.default.to.suite.icon") != null);
 		
 		// load settings
 		try {
@@ -134,11 +150,13 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 			JSONObject j = JSONObject.parseObject(new String(r.getRecord(1), "UTF-8"));
 			r.closeRecordStore();
 
-			// TODO
+			user = j.getString("user", user);
+			userState = j.getInt("userState", 0);
 		} catch (Exception ignored) {}
+	
 		
 		// load locale TODO
-//		(L = new String[220])[0] = "mpgram";
+//		(L = new String[200])[0] = "mpgram";
 //		try {
 //			loadLocale(lang);
 //		} catch (Exception e) {
@@ -154,11 +172,22 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 		
 		exitCmd = new Command("Exit", Command.EXIT, 10);
 		backCmd = new Command("Back", Command.BACK, 10);
-		authCmd = new Command("Auth", Command.OK, 1);
+		
+		settingsCmd = new Command("Settings", Command.SCREEN, 3);
+		aboutCmd = new Command("About", Command.SCREEN, 4);
+		
+		authCmd = new Command("Auth", Command.ITEM, 1);
+		authNewSessionCmd = new Command("New session", Command.SCREEN, 1);
+		authImportSessionCmd = new Command("Import session", Command.SCREEN, 2);
+		
+		peerItemCmd = new Command("Peer", Command.ITEM, 1);
+		
 		writeCmd = new Command("Write", Command.SCREEN, 2);
 		sendCmd = new Command("Send", Command.OK, 1);
 		updateCmd = new Command("Update", Command.SCREEN, 3);
-		cancelCmd = new Command("Cancel", Command.CANCEL, 1);
+		
+		okCmd = new Command("Ok", Command.OK, 1);
+		cancelCmd = new Command("Cancel", Command.CANCEL, 2);
 		
 		loadingForm = new Form("mpgram");
 		loadingForm.append("Loading");
@@ -167,28 +196,32 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 		
 		Form f = new Form("mpgram");
 		f.append("Loading");
-		display(f);
+		display(mainDisplayable = f);
 		
 		try {
 			tzOffset = TimeZone.getDefault().getRawOffset() / 1000;
 		} catch (Throwable e) {} // just to be sure
 		
-//		if (user == null) {
-//			display(authForm());
-//		} else {
-//			start(RUN_AUTH);
-//		}
+		System.out.println("user: " + user);
 		
 		if (user == null) {
-			
+			display(mainDisplayable = initialAuthForm());
 			return;
 		} else {
-		
 			run = RUN_VALIDATE_AUTH;
 			run();
 		}
 
 		start(RUN_AVATARS, null);
+		
+		ChatsList l = new ChatsList("Chats");
+		l.removeCommand(backCmd);
+		l.addCommand(backCmd);
+		l.addCommand(aboutCmd);
+		l.addCommand(settingsCmd);
+		
+		start(RUN_LOAD_LIST, mainDisplayable = l);
+		display(l);
 	}
 	
 	public void run() {
@@ -242,6 +275,14 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 			}
 			break;
 		}
+		case RUN_LOAD_FORM: {
+			((MPForm) param).load();
+			break;
+		}
+		case RUN_LOAD_LIST: {
+			((MPList) param).load();
+			break;
+		}
 		}
 //		running--;
 	}
@@ -260,6 +301,10 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 	}
 
 	public void commandAction(Command c, Displayable d) {
+		if (d instanceof MPList && c == List.SELECT_COMMAND) {
+			((MPList) d).select(((List) d).getSelectedIndex());
+			return;
+		}
 		if (c == backCmd) {
 			if (formHistory.size() == 0) {
 				display(null, true);
@@ -284,6 +329,27 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 		if (c == exitCmd) {
 			notifyDestroyed();
 		}
+	}
+	
+	public void commandAction(Command c, Item item) {
+		
+	}
+
+	private static void writeAuth() {
+		try {
+			RecordStore.deleteRecordStore(AUTH_RECORDNAME);
+		} catch (Exception ignored) {}
+		try {
+			JSONObject j = new JSONObject();
+			
+			j.put("user", user);
+			j.put("state", userState);
+			
+			byte[] b = j.toString().getBytes("UTF-8");
+			RecordStore r = RecordStore.openRecordStore(AUTH_RECORDNAME, true);
+			r.addRecord(b, 0, b.length);
+			r.closeRecordStore();
+		} catch (Exception e) {}
 	}
 	
 	static void queueAvatar(String id, Object target) {
@@ -401,10 +467,28 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 		return "Deleted";
 	}
 	
+	static Form initialAuthForm() {
+		Form f = new Form("Auth");
+		f.setCommandListener(midlet);
+		f.addCommand(exitCmd);
+		f.addCommand(settingsCmd);
+		
+		return f;
+	}
+	
+	static void openChat(String id) {
+		Form f = new ChatForm(id);
+		display(f);
+		midlet.start(RUN_LOAD_FORM, f);
+	}
+	
 	static void display(Alert a, Displayable d) {
 		if (d == null) {
 			display.setCurrent(a);
 			return;
+		}
+		if (display.getCurrent() != d) {
+			display(d);
 		}
 		display.setCurrent(a, d);
 	}
@@ -414,16 +498,17 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 	}
 
 	static void display(Displayable d, boolean back) {
+		System.out.println("display " + d);
 		if (d instanceof Alert) {
-			display.setCurrent((Alert) d, mainForm);
+			display.setCurrent((Alert) d, mainDisplayable);
 			return;
 		}
 		if (d == loadingForm) {
 			display.setCurrent(d);
 			return;
 		}
-		if (d == null || d == mainForm) {
-			d = mainForm;
+		if (d == null || d == mainDisplayable) {
+			d = mainDisplayable;
 			
 			formHistory.removeAllElements();
 		}
@@ -436,7 +521,7 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 			((MPForm) p).closed(back);
 		}
 		// push to history
-		if (!back && d != mainForm && (formHistory.isEmpty() || formHistory.lastElement() != d)) {
+		if (!back && d != mainDisplayable && (formHistory.isEmpty() || formHistory.lastElement() != d)) {
 			formHistory.addElement(d);
 		}
 	}

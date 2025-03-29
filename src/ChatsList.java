@@ -1,3 +1,5 @@
+import java.util.Vector;
+
 import javax.microedition.lcdui.List;
 
 import cc.nnproject.json.JSONArray;
@@ -6,6 +8,7 @@ import cc.nnproject.json.JSONObject;
 public class ChatsList extends MPList {
 	
 	int limit = 20;
+	Vector ids;
 
 	public ChatsList(String title) {
 		super(title, List.IMPLICIT);
@@ -14,9 +17,14 @@ public class ChatsList extends MPList {
 
 	void loadInternal(Thread thread) throws Exception {
 		// TODO folders
-		StringBuffer sb = new StringBuffer("getDialogs&");
 		
-		sb.append("limit=").append(limit);
+		deleteAll();
+		ids = new Vector();
+		
+		StringBuffer sb = new StringBuffer("getDialogs&");
+		if (limit != 0) {
+			sb.append("limit=").append(limit);
+		}
 		
 		JSONObject j = (JSONObject) MP.api(sb.toString());
 		
@@ -33,6 +41,8 @@ public class ChatsList extends MPList {
 			JSONObject dialog = dialogs.getObject(i);
 			String id = dialog.getString("id");
 			
+			ids.addElement(id);
+			
 			JSONObject message = messages.getObject(id);
 			String name = MP.getName(id);
 			
@@ -41,8 +51,8 @@ public class ChatsList extends MPList {
 			
 			if (message.getBoolean("out", false)) {
 				sb.append("You: ");
-			} else if (id.charAt(0) == '-') {
-				MP.appendOneLine(sb, MP.getShortName(message.getString("from_id")));
+			} else if (id.charAt(0) == '-' && message.has("from_id")) {
+				MP.appendOneLine(sb, MP.getShortName(message.getString("from_id"))).append(": ");
 			}
 			if (message.has("media")) {
 				sb.append("Media");
@@ -58,6 +68,14 @@ public class ChatsList extends MPList {
 			
 			MP.queueAvatar(id, new Object[] { this, new Integer(itemIdx) });
 		}
+	}
+	
+	void select(int i) {
+		if (i == -1) return;
+		String id = (String) ids.elementAt(i);
+		if (id == null) return;
+		
+		MP.openChat(id);
 	}
 
 }

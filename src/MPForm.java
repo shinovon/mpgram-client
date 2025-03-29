@@ -14,6 +14,8 @@ public abstract class MPForm extends Form {
 
 	public MPForm(String title) {
 		super(title);
+		addCommand(MP.backCmd);
+		setCommandListener(MP.midlet);
 	}
 	
 	void load() {
