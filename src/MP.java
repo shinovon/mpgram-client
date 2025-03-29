@@ -208,8 +208,8 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 			try {
 				api("me");
 				
-				if (updatesRunning) break;
-				start(RUN_UPDATES, null);
+//				if (updatesRunning) break;
+//				start(RUN_UPDATES, null);
 			} catch (APIException e) {
 				
 			} catch (IOException e) {
@@ -285,8 +285,12 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 			notifyDestroyed();
 		}
 	}
+	
+	static void queueAvatar(String id, Object target) {
+		// TODO
+	}
 
-	private static void fillPeersCache(JSONObject users, JSONObject chats) {
+	static void fillPeersCache(JSONObject users, JSONObject chats) {
 		if (users != null && usersCache != null) {
 			if (usersCache.size() > 200) {
 				usersCache.clear();
@@ -309,9 +313,8 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 		}
 	}
 	
-	private static String oneLine(String s) {
-		if (s == null) return null;
-		StringBuffer sb = new StringBuffer();
+	static StringBuffer appendOneLine(StringBuffer sb, String s) {
+		if (s == null) return sb;
 		int i = 0, l = s.length();
 		while (i < l && i < 64) {
 			char c = s.charAt(i++);
@@ -319,18 +322,18 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 			if (c != '\n') sb.append(c);
 			else sb.append(' ');
 		}
-		return sb.toString();
+		return sb;
 	}
 	
-	private static String getName(String id) {
+	static String getName(String id) {
 		return getName(id, false, true);
 	}
 	
-	private static String getShortName(String id) {
+	static String getShortName(String id) {
 		return getName(id, true, true);
 	}
 	
-	private static String getName(String id, boolean variant, boolean loadIfNeeded) {
+	static String getName(String id, boolean variant, boolean loadIfNeeded) {
 		String res;
 		if (id.charAt(0) == '-') {
 			res = chatsCache.getObject(id).getString("title");
@@ -346,7 +349,7 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 		return res;
 	}
 	
-	private static String getNameLater(String id, Object target, boolean variant) {
+	static String getNameLater(String id, Object target, boolean variant) {
 		String r = getName(id, variant, false);
 		if (r != null) {
 			return r;
@@ -355,7 +358,7 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 		return null;
 	}
 	
-	private static String getName(JSONObject p) {
+	static String getName(JSONObject p) {
 		if (p == null) return null;
 		if (p.has("title")) {
 			return p.getString("title");
@@ -463,7 +466,7 @@ public class MP extends MIDlet implements CommandListener, Runnable {
 		return a;
 	}
 	
-	private static Object api(String url) throws IOException {
+	static Object api(String url) throws IOException {
 		Object res;
 
 		HttpConnection hc = null;

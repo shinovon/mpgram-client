@@ -63,14 +63,14 @@ public abstract class MPList extends List {
 		thread = null;
 	}
 
-	void safeAppend(Thread thread, String text, Image image) {
+	int safeAppend(Thread thread, String text, Image image) {
 		if (thread != this.thread) throw MP.cancelException;
-		append(text, image);
+		return append(text, image);
 	}
 
-	void safeInsert(Thread thread, int n, Item item) {
+	int safeInsert(Thread thread, int n, String text, Image image) {
 		if (thread != this.thread) throw MP.cancelException;
-		insert(n, item);
+		return insert(n, text, image);
 	}
 	
 	abstract void loadInternal(Thread thread) throws Exception;
