@@ -48,18 +48,21 @@ public class ChatsList extends MPList {
 			JSONObject dialog = dialogs.getObject(i);
 			String id = dialog.getString("id");
 			ids.addElement(id);
+			JSONObject peer = MP.getPeer(id, false);
 			
 			sb.setLength(0);
-			String name = MP.getName(id, false);
+			String name = MP.getName(peer);
 			MP.appendOneLine(sb, name);
 			
 			JSONObject message = dialog.getObject("msg", null)/*messages.getObject(id)*/;
 			if (message != null) {
 				sb.append('\n');
-				if (message.getBoolean("out", false)) {
-					sb.append("You: ");
-				} else if (id.charAt(0) == '-' && message.has("from_id")) {
-					MP.appendOneLine(sb, MP.getName(message.getString("from_id"), true)).append(": ");
+				if (!peer.getBoolean("c", false)) {
+					if (message.getBoolean("out", false)) {
+						sb.append("You: ");
+					} else if (id.charAt(0) == '-' && message.has("from_id")) {
+						MP.appendOneLine(sb, MP.getName(message.getString("from_id"), true)).append(": ");
+					}
 				}
 				if (message.has("media")) {
 					sb.append("Media");
