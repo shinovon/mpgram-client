@@ -35,10 +35,9 @@ public class ChatsList extends MPList {
 		}
 		
 		JSONObject j = (JSONObject) MP.api(sb.toString());
+		MP.fillPeersCache(j);
 		
 		if (thread != this.thread) throw MP.cancelException;
-		
-		MP.fillPeersCache(j.getNullableObject("users"), j.getNullableObject("chats"));
 		
 		JSONArray dialogs = j.getArray("dialogs");
 		int l = dialogs.size();

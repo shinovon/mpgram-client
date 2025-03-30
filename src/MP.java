@@ -20,6 +20,7 @@ import javax.microedition.lcdui.ImageItem;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemCommandListener;
 import javax.microedition.lcdui.List;
+import javax.microedition.lcdui.Spacer;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextBox;
 import javax.microedition.lcdui.TextField;
@@ -80,7 +81,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static boolean useLoadingForm;
 	private static int avatarSize;
 	static boolean loadAvatars;
-	static boolean reverseChat = true;
+	static boolean reverseChat;
 
 	// threading
 	private static int run;
@@ -124,6 +125,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 
 	static Command writeCmd;
 	static Command chatInfoCmd;
+	static Command olderMessagesCmd;
+	static Command newerMessagesCmd;
 	static Command sendCmd;
 	static Command updateCmd;
 
@@ -247,6 +250,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		
 		writeCmd = new Command("Write", Command.SCREEN, 6);
 		chatInfoCmd = new Command("Chat info", Command.SCREEN, 7);
+		olderMessagesCmd = new Command("Older", Command.ITEM, 1);
+		newerMessagesCmd = new Command("Newer", Command.ITEM, 1);
 		sendCmd = new Command("Send", Command.OK, 1);
 		updateCmd = new Command("Update", Command.SCREEN, 3);
 		
@@ -543,10 +548,19 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			display(f);
 			return;
 		}
-		// chat form
-		if (c == writeCmd) {
-			display(writeForm(((ChatForm) d).id, null));
-			return;
+		{ // chat form
+			if (c == olderMessagesCmd || c == newerMessagesCmd) {
+				((ChatForm) d).paginate(c == olderMessagesCmd ? -1 : 1);
+				return;
+			}
+			if (c == chatInfoCmd) {
+				openProfile(((ChatForm) d).id);
+				return;
+			}
+			if (c == writeCmd) {
+				display(writeForm(((ChatForm) d).id, null));
+				return;
+			}
 		}
 		{ // auth
 			if (c == authCmd) {
@@ -711,7 +725,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		if (c == itemChatInfoCmd) {
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
-			openChatInfo(s[0]);
+			openProfile(s[0]);
 			return;
 		}
 		if (c == replyMsgCmd) {
@@ -728,6 +742,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 			copy("", (String) ((MPForm) current).urls.get(s[1]));
+			return;
+		}
+		if (c == richTextLinkCmd) {
+			String url = (String) ((MPForm) current).urls.get(item);
+			if (url == null) url = ((StringItem) item).getText();
+			
+			openUrl(url);
 			return;
 		}
 		commandAction(c, display.getCurrent());
@@ -761,7 +782,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 	}
 
-	static void fillPeersCache(JSONObject users, JSONObject chats) {
+	static void fillPeersCache(JSONObject r) {
+		JSONObject users = r.getObject("users", null);
 		if (users != null && usersCache != null) {
 			if (usersCache.size() > 200) {
 				usersCache.clear();
@@ -769,9 +791,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			for (Enumeration e = users.keys(); e.hasMoreElements(); ) {
 				String k = (String) e.nextElement();
 				if ("0".equals(k)) continue;
-				usersCache.put(k, (JSONObject) users.get(k));
+				JSONObject user = (JSONObject) users.get(k);
+				if (user.has("name")) usersCache.put(user.getString("name"), k);
+				usersCache.put(k, user);
 			}
 		}
+		JSONObject chats = r.getObject("chats", null);
 		if (chats != null && chatsCache != null) {
 			if (chatsCache.size() > 200) {
 				chatsCache.clear();
@@ -779,7 +804,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			for (Enumeration e = chats.keys(); e.hasMoreElements(); ) {
 				String k = (String) e.nextElement();
 				if ("0".equals(k)) continue;
-				chatsCache.put(k, (JSONObject) chats.get(k));
+				JSONObject chat = (JSONObject) chats.get(k);
+				if (chat.has("name")) usersCache.put(chat.getString("name"), k);
+				chatsCache.put(k, chat);
 			}
 		}
 	}
@@ -793,7 +820,46 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			if (c != '\n') sb.append(c);
 			else sb.append(' ');
 		}
+		if (i == 64) sb.append("..");
 		return sb;
+	}
+	
+	static JSONObject getPeer(String id, boolean now) {
+		if (id == null) return null;
+
+		Object o = id;
+		
+		try {
+			while (o instanceof String) {
+				if (id.charAt(0) == '-') {
+					o = chatsCache.get((String) o, null);
+				} else {
+					o = usersCache.get((String) o, null);
+				}
+			}
+			
+			if (o == null && now) {
+				Long.parseLong(id);
+				try {
+					fillPeersCache((JSONObject) api("getPeers&id=".concat(id)));
+				} catch (Exception ignored) {}
+				
+				if (id.charAt(0) == '-') {
+					o = chatsCache.getObject(id, null);
+				} else {
+					o = usersCache.getObject(id, null);
+				}
+			}
+		} catch (Exception e) {
+			// username
+			try {
+				o = (JSONObject) api("getPeer&id=".concat(id));
+			} catch (Exception e2) {
+				o = null;
+			}
+		}
+		
+		return (JSONObject) o;
 	}
 	
 	static String getName(String id, boolean variant) {
@@ -899,13 +965,209 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return f;
 	}
 	
+	static void openUrl(String url) {
+		if (!openDeepUrl(url)) {
+			midlet.browse(url);
+		}
+	}
+	
+	static boolean openDeepUrl(String url) {
+		if (url.startsWith("@")) {
+			openChat(url.substring(1));
+			return true;
+		}
+		int i;
+		String[] query = null;
+		boolean tg = false;
+		boolean profile = false;
+		String domain = null;
+		boolean phone = false;
+		boolean privat = false;
+		String messageId = null;
+		String thread = null;
+		String invite = null;
+		String start = null;
+		String text = null;
+		String slug = null;
+		
+		try {
+			if ((i = url.indexOf("t.me")) == 0 || i == 8) {
+				url = url.substring(i + 5);
+				if ((i = url.indexOf('#')) != -1) {
+					url = url.substring(0, i);
+				}
+				String[] s = split(url, '/');
+				
+				tg = true;
+				
+				if ((i = s[s.length - 1].indexOf('?')) != -1) {
+					query = split(s[s.length - 1].substring(i + 1), '&');
+					s[s.length - 1] = s[s.length - 1].substring(0, i);
+				}
+				if ("c".equals(s[0]) && s.length > 1) {
+					privat = true;
+					domain = s[1];
+					if (s.length == 2) {
+						messageId = s[1];
+					} else if (s.length == 3) {
+						thread = s[1];
+						messageId = s[2];
+					}
+				} else if (s.length == 1) {
+					domain = s[0];
+					if (domain.startsWith("+")) {
+						domain = domain.substring(1);
+						try {
+							Long.parseLong(domain);
+							phone = true;
+						} catch (Exception e) {
+							invite = domain;
+							domain = null;
+						}
+					}
+				} else if("addstickers".equals(s[0])) {
+					slug = s[1];
+				} else if("addemoji".equals(s[0])) {
+					slug = s[1];
+				} else if ("joinchat".equals(s[0])) {
+					invite = s[1];
+				} else if ("addlist".equals(s[0])) {
+					slug = s[1];
+				} else if ("proxy".equals(s[0])) {
+				} else if ("socks".equals(s[0])) {
+				} else if ("addtheme".equals(s[0])) {
+				} else if ("bg".equals(s[0])) {
+				} else if ("contact".equals(s[0])) {
+				} else if ("share".equals(s[0])) {
+				} else if ("m".equals(s[0])) {
+				} else if ("setlanguage".equals(s[0])) {
+				} else if ("invoice".equals(s[0])) {
+				} else if ("login".equals(s[0])) {
+				} else if ("confirmphone".equals(s[0])) {
+				} else if ("giftcode".equals(s[0])) {
+				} else {
+					domain = s[0];
+				}
+			} else if (url.startsWith("tg://")) {
+				url = url.substring(5);
+				if ((i = url.indexOf('#')) != -1) {
+					url = url.substring(0, i);
+				}
+				
+				if ((i = url.indexOf('?')) != -1) {
+					query = split(url.substring(i + 1), '&');
+					url = url.substring(0, i);
+				}
+				if (url.startsWith("settings")) {
+					return true;
+				} else if("resolve".equals(url)
+						|| "privatepost".equals(url)
+						|| "user".equals(url)
+						|| "join".equals(url)) {
+					tg = true;
+					privat = "privatepost".equals(url);
+//				} else if ("addlist".equals(url)) {
+//				} else if ("addstickers".equals(url)) {
+//				} else if ("addemoji".equals(url)) {
+				}
+			}
+			
+			if (tg) {
+				if (query != null) {
+					for (int n = 0; n < query.length; ++n) {
+						if ("profile".equals(query[n])) {
+							profile = true;
+							continue;
+						}
+						if (query[n].startsWith("thread=")) {
+							thread = query[n].substring(7);
+							continue;
+						}
+						if (query[n].startsWith("domain=")) {
+							domain = query[n].substring(7);
+							continue;
+						}
+						if (query[n].startsWith("phone=")) {
+							domain = query[n].substring(6);
+							phone = true;
+							continue;
+						}
+						if (query[n].startsWith("start=")) {
+							start = query[n].substring(6);
+							continue;
+						}
+						if (query[n].startsWith("id=")) {
+							domain = query[n].substring(3);
+							continue;
+						}
+						if (query[n].startsWith("text=")) {
+							text = query[n].substring(5);
+							continue;
+						}
+						if (query[n].startsWith("invite=")) {
+							invite = query[n].substring(7);
+							continue;
+						}
+						if (query[n].startsWith("slug=")) {
+							slug = query[n].substring(5);
+							continue;
+						}
+					}
+				}
+				
+				if (domain != null) {
+					if (phone) {
+						// TODO resolve number
+						return true;
+					} else {
+						if (profile) {
+							openProfile(domain);
+							
+							return true;
+						}
+						int msg = 0;
+						int topMsg = 0;
+						if (messageId != null) {
+							msg = Integer.parseInt(messageId);
+						}
+						if (thread != null) {
+							topMsg = Integer.parseInt(thread);
+						}
+						if (current instanceof ChatForm &&
+								(domain.equals(((ChatForm) current).id)
+								|| domain.equals(((ChatForm) current).username))) {
+							((ChatForm) current).openMessage(msg, topMsg);
+						} else {
+							Form f = new ChatForm(domain, null, msg, topMsg);
+							display(f);
+							midlet.start(RUN_LOAD_FORM, f);
+						}
+						return true;
+					}
+				} else if (invite != null) {
+					// TODO resolve invite
+					return true;
+				}
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		System.out.println("Unhandled deep link: " + url);
+		if (url.startsWith("tg://")) {
+			return true;
+		}
+		return false;
+	}
+	
 	static void openChat(String id) {
-		Form f = new ChatForm(id);
+		Form f = new ChatForm(id, null, 0, 0);
 		display(f);
 		midlet.start(RUN_LOAD_FORM, f);
 	}
 	
-	static void openChatInfo(String id) {
+	static void openProfile(String id) {
 		Form f = new ChatInfoForm(id);
 		display(f);
 		midlet.start(RUN_LOAD_FORM, f);
@@ -987,6 +1249,17 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		a.setTimeout(Alert.FOREVER);
 		return a;
 	}
+
+	void browse(String url) {
+		try {
+			if (url.indexOf(':') == -1) {
+				url = "http://".concat(url);
+			}
+			if (platformRequest(url)) notifyDestroyed();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 	static Object api(String url) throws IOException {
 		Object res;
@@ -1030,9 +1303,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				hc.close();
 			} catch (IOException e) {}
 		}
-		System.out.println(res instanceof JSONObject ?
-				((JSONObject) res).format(0) : res instanceof JSONArray ?
-						((JSONArray) res).format(0) : res);
+//		System.out.println(res instanceof JSONObject ?
+//				((JSONObject) res).format(0) : res instanceof JSONArray ?
+//						((JSONArray) res).format(0) : res);
 		return res;
 	}
 
@@ -1120,6 +1393,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			if (user != null) {
 				hc.setRequestProperty("X-mpgram-user", user);
 			}
+			hc.setRequestProperty("X-mpgram-unicode", "1");
 			hc.setRequestProperty("X-mpgram-app-version", version);
 			if (instancePassword != null) {
 				hc.setRequestProperty("X-mpgram-instance-password", instancePassword);
@@ -1193,6 +1467,24 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		if (n < 10) {
 			return "0".concat(Integer.toString(n));
 		} else return Integer.toString(n);
+	}
+
+	static String[] split(String str, char d) {
+		int i = str.indexOf(d);
+		if (i == -1)
+			return new String[] {str};
+		Vector v = new Vector();
+		v.addElement(str.substring(0, i));
+		while (i != -1) {
+			str = str.substring(i + 1);
+			if ((i = str.indexOf(d)) != -1)
+				v.addElement(str.substring(0, i));
+			i = str.indexOf(d);
+		}
+		v.addElement(str);
+		String[] r = new String[v.size()];
+		v.copyInto(r);
+		return r;
 	}
 	
 	private static final int
@@ -1290,20 +1582,129 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return flush(form, thread, text.substring(lastOffset), insert, state);
 	}
 	
-	private static int flush(MPForm form, Thread thread, String text, int insert, int[] state) {
-		StringItem s = new StringItem(null, text);
-		s.setFont(getFont(state));
-		if (state[RT_URL] != 0) {
+	static int flush(MPForm form, Thread thread, String text, int insert, int[] state) {
+		if (text.length() == 0) return insert;
+		
+		StringBuffer sb = new StringBuffer(text);
+		int space = 0;
+		while (sb.length() != 0 && sb.charAt(sb.length() - 1) == ' ') {
+			sb.setLength(sb.length() - 1);
+			space ++;
+		}
+		text = sb.toString();
+		Font f = getFont(state);
+		StringItem s;
+		
+		// find links
+		if ((state == null || (state[RT_PRE] == 0 && state[RT_URL] == 0))
+				&& (text.indexOf("http://") != -1 || text.indexOf("https://") != -1
+				|| text.indexOf('#') != -1|| text.indexOf('@') != -1)) {
+			int i, j, k, d = 0;
+			while (true) {
+				boolean b = false;
+				i = text.indexOf("://", d);
+				j = text.indexOf('#', d);
+				k = text.indexOf('@', d);
+				if (i == -1 && j == -1 && k == -1) break;
+				
+				if (k != -1 && (j == -1 || j > k)) {
+					j = k;
+				}
+				if (j != -1 && (i == -1 || i > j)) {
+					i = j;
+				} else b = i != -1;
+				
+				if (b) {
+					b: {
+						boolean https;
+						char c;
+						if (i < 4 || ((https = text.charAt(i - 1) != 'p')
+								&& (i < 5 || text.charAt(i - 1) != 's'))
+							|| (i != (j = https ? 5 : 4)
+							&& (c = text.charAt(i - j - 1)) > ' ' && c != '(')) {
+							break b;
+						}
+						j = i - j;
+						boolean valid = false;
+						int len = text.length();
+						for (k = j; k < len; ++k) {
+							c = text.charAt(k);
+							if (c <= ' ' || c == ',') break;
+							if (c == '.') valid = true;
+						}
+						if (!valid) break b;
+						
+						if (i != 0) {
+							s = new StringItem(null, text.substring(0, j));
+							s.setFont(f);
+							form.safeInsert(thread, insert++, s);
+						}
+						s = new StringItem(null, text.substring(j, k));
+						s.setFont(f);
+						s.setDefaultCommand(richTextLinkCmd);
+						s.setItemCommandListener(midlet);
+						form.safeInsert(thread, insert++, s);
+						
+						text = text.substring(k);
+						d = 0;
+						continue;
+					}
+					d = i + 3;
+				} else {
+					b: {
+						char c;
+						if (i != 0 && (c = text.charAt(i - 1)) > ' ' && c != '(') {
+							break b;
+						}
+						b = text.charAt(i) == '@';
+						int len = text.length();
+						for (k = i + 1; k < len && k < i + 10; ++k) {
+							c = text.charAt(k);
+							if (c <= ' ' || c == ')' || c == ',' || c == '.') break;
+							if (!b && (c < '0' || c > '9')) break b;
+						}
+						if (k == i + 10 || k == i + 1) break b;
+						if (i != 0) {
+							s = new StringItem(null, text.substring(0, i));
+							s.setFont(f);
+							form.safeInsert(thread, insert++, s);
+						}
+						s = new StringItem(null, text.substring(i, k));
+						s.setFont(f);
+						s.setDefaultCommand(richTextLinkCmd);
+						s.setItemCommandListener(midlet);
+						form.safeInsert(thread, insert++, s);
+						
+						text = text.substring(k);
+						d = 0;
+						continue;
+					}
+					d = i + 1;
+				}
+			}
+		}
+		
+		s = new StringItem(null, text);
+		s.setFont(f);
+		if (state != null && state[RT_URL] != 0) {
 			form.urls.put(s, richTextUrl);
 			s.setDefaultCommand(richTextLinkCmd);
 			s.setItemCommandListener(midlet);
 		}
-		form.safeInsert(thread, insert++, s);
+		
+		if (text.length() != 0) {
+			form.safeInsert(thread, insert++, s);
+		}
+		
+		while (space-- != 0) {
+			form.safeInsert(thread, insert++, new Spacer(f.charWidth(' '), f.getBaselinePosition()));
+		}
 		
 		return insert;
 	}
 
 	private static Font getFont(int[] state) {
+		if (state == null) return smallPlainFont;
 		int face = 0, style = 0, size = Font.SIZE_SMALL;
 		if (state[RT_PRE] != 0) {
 			face = Font.FACE_MONOSPACE;
