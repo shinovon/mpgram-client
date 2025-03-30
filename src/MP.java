@@ -261,6 +261,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 
 		start(RUN_AVATARS, null);
+
+		if (loadAvatars && symbianJrt) {
+			start(RUN_AVATARS, null);
+		}
 		
 		ChatsList l = chatsList = new ChatsList("Chats", 0);
 		l.removeCommand(backCmd);
@@ -397,6 +401,55 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				start(RUN_LOAD_LIST, foldersList);
 			}
 			display(foldersList);
+		}
+		if (c == aboutCmd) {
+			Form f = new Form("About");
+			f.addCommand(backCmd);
+			f.setCommandListener(this);
+			
+			try {
+				f.append(new ImageItem(null, Image.createImage("/g.png"), Item.LAYOUT_LEFT, null));
+			} catch (Exception ignored) {}
+			
+			StringItem s;
+			s = new StringItem(null, "MPGram v".concat(version));
+			s.setFont(largePlainFont);
+			s.setLayout(Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_VCENTER | Item.LAYOUT_LEFT);
+			f.append(s);
+			
+			s = new StringItem(null, "mpgram 4th");
+			s.setFont(Font.getDefaultFont());
+			s.setLayout(Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_NEWLINE_BEFORE);
+			f.append(s);
+
+			s = new StringItem("Developer", "shinovon");
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			f.append(s);
+
+			s = new StringItem("Author", "twsparkle");
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			s.setItemCommandListener(this);
+			f.append(s);
+
+			s = new StringItem("GitHub", "github.com/shinovon");
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			s.setItemCommandListener(this);
+			f.append(s);
+
+			s = new StringItem("Web", "nnproject.cc");
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			s.setItemCommandListener(this);
+			f.append(s);
+
+			s = new StringItem("Donate", "boosty.to/nnproject/donate");
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			f.append(s);
+
+			s = new StringItem("Chat", "t.me/nnmidletschat");
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			f.append(s);
+			display(f);
+			return;
 		}
 		if (c == refreshCmd) {
 			if (d instanceof MPForm) {
