@@ -38,16 +38,17 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static final int RUN_UPDATES = 7;
 	static final int RUN_LOAD_FORM = 8;
 	static final int RUN_LOAD_LIST = 9;
+	static final int RUN_AUTH = 10;
 	
 	private static final String SETTINGS_RECORDNAME = "mp4config";
 	private static final String AUTH_RECORDNAME = "mp4user";
 	
 	private static final String DEFAULT_INSTANCE_URL = "http://mp2.nnchan.ru/";
-	private static final String API_URL = "api.php";
-	private static final String AVA_URL = "ava.php";
+	static final String API_URL = "api.php";
+	static final String AVA_URL = "ava.php";
 	private static final String FILE_URL = "file.php";
 	
-	private static final String API_VERSION = "5";
+	static final String API_VERSION = "5";
 	
 	static final Font largePlainFont = Font.getFont(0, 0, Font.SIZE_LARGE);
 	static final Font medPlainFont = Font.getFont(0, 0, Font.SIZE_MEDIUM);
@@ -71,10 +72,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static String[] L;
 	
 	// settings
-	private static String instanceUrl = DEFAULT_INSTANCE_URL;
+	static String instanceUrl = DEFAULT_INSTANCE_URL;
 	private static String instancePassword;
 	private static int tzOffset;
-	private static boolean showMedia;
 	private static boolean avatars;
 	private static boolean symbianJrt;
 	static boolean useLoadingForm;
@@ -86,8 +86,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static int run;
 	private static Object runParam;
 //	private static int running;
-	private static boolean avatarsRunning;
-	private static boolean updatesRunning;
 	
 	private static Object avatarsLoadLock = new Object();
 	private static Vector avatarsToLoad = new Vector();
@@ -105,6 +103,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static Command aboutCmd;
 	
 	private static Command authCmd;
+	static Command authNextCmd;
+	private static Command authCodeCmd;
+	private static Command authPasswordCmd;
 	private static Command authNewSessionCmd;
 	private static Command authImportSessionCmd;
 
@@ -127,7 +128,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command updateCmd;
 
 	static Command okCmd;
-	static Command nextCmd;
 	static Command cancelCmd;
 	
 	// ui
@@ -135,6 +135,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Form loadingForm;
 	static ChatsList chatsList;
 	static FoldersList foldersList;
+	private static Form settingsForm;
 	private static Vector formHistory = new Vector();
 
 	// ui elements
@@ -171,7 +172,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		// TODO refuse to run in j2me loader
 		
 		avatarSize = Math.min(display.getBestImageHeight(Display.LIST_ELEMENT), display.getBestImageWidth(Display.LIST_ELEMENT));
-		if (avatarSize < 4) avatarSize = 16;
+		if (avatarSize < 8) avatarSize = 16;
 		else if (avatarSize > 120) avatarSize = 120;
 		
 		try {
@@ -184,7 +185,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			JSONObject j = JSONObject.parseObject(new String(r.getRecord(1), "UTF-8"));
 			r.closeRecordStore();
 			
-			// TODO
+			reverseChat = j.getBoolean("reverseChat", reverseChat);
+			avatars = j.getBoolean("avatars", avatars);
+			avatarSize = j.getInt("avatarSize", avatarSize);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -194,7 +197,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			r.closeRecordStore();
 
 			user = j.getString("user", user);
-			userState = j.getInt("userState", 0);
+			userState = j.getInt("state", 0);
+			phone = j.getString("phone", null);
+			instanceUrl = j.getString("url", instanceUrl);
+			instancePassword = j.getString("instPass", instancePassword);
 		} catch (Exception ignored) {}
 	
 		
@@ -220,6 +226,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		aboutCmd = new Command("About", Command.SCREEN, 6);
 		
 		authCmd = new Command("Auth", Command.ITEM, 1);
+		authNextCmd = new Command("Next", Command.OK, 1);
+		authCodeCmd = new Command("Next", Command.OK, 1);
+		authPasswordCmd = new Command("Next", Command.OK, 1);
 		authNewSessionCmd = new Command("New session", Command.SCREEN, 1);
 		authImportSessionCmd = new Command("Import session", Command.SCREEN, 2);
 
@@ -242,7 +251,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		updateCmd = new Command("Update", Command.SCREEN, 3);
 		
 		okCmd = new Command("Ok", Command.OK, 1);
-		nextCmd = new Command("Next", Command.OK, 1);
 		cancelCmd = new Command("Cancel", Command.CANCEL, 2);
 		
 		loadingForm = new Form("mpgram");
@@ -253,14 +261,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		Form f = new Form("mpgram");
 		f.append("Loading");
 		display(mainDisplayable = f);
-		
-		if (user == null) {
-			display(mainDisplayable = initialAuthForm());
-			return;
-		} else {
-			run = RUN_VALIDATE_AUTH;
-			run();
-		}
 
 		start(RUN_AVATARS, null);
 
@@ -268,9 +268,16 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			start(RUN_AVATARS, null);
 		}
 		
-		ChatsList l = mainChatsList();
-		start(RUN_LOAD_LIST, l);
-		display(mainDisplayable = l);
+		if (user == null || userState < 3) {
+			display(mainDisplayable = initialAuthForm());
+		} else {
+			run = RUN_VALIDATE_AUTH;
+			run();
+			
+			ChatsList l = mainChatsList();
+			start(RUN_LOAD_LIST, l);
+			display(mainDisplayable = l);
+		}
 	}
 	
 	public void run() {
@@ -289,33 +296,24 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			
 			try {
 				api("me");
+				userState = 4;
 				
 				if (param != null) {
 					ChatsList l = mainChatsList();
 					start(RUN_LOAD_LIST, l);
 					display(mainDisplayable = l);
+					writeAuth();
 				}
-//				if (updatesRunning) break;
-//				start(RUN_UPDATES, null);
 			} catch (APIException e) {
-				user = null;
-				display(errorAlert(e.toString()), mainDisplayable = initialAuthForm());
+				if (e.code == 401) {
+					userState = 0;
+					user = null;
+					display(errorAlert(e.toString()), mainDisplayable = initialAuthForm());
+					break;
+				}
+				display(errorAlert(e.toString()), null);
 			} catch (IOException e) {
 				display(errorAlert(e.toString()), null);
-			}
-			break;
-		}
-		case RUN_UPDATES: {
-			// TODO
-			if (updatesRunning) break;
-			updatesRunning = true;
-			try {
-				while (true) {
-					
-					Thread.sleep(30000L);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
 			break;
 		}
@@ -375,6 +373,85 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			((MPList) param).load();
 			break;
 		}
+		case RUN_AUTH: {
+			StringBuffer sb = new StringBuffer();
+			try {
+				if (param instanceof CaptchaForm) {
+					sb.append(user == null ? "initLogin" : "phoneLogin")
+						.append("&captcha_id=").append(((CaptchaForm) param).id)
+						.append("&captcha_key=");
+					appendUrl(sb, ((CaptchaForm) param).field.getString());
+					
+					JSONObject j = (JSONObject) api(sb.toString());
+					String res = j.getString("res");
+					if (j.has("user")) {
+						user = j.getString("user");
+					}
+					if (res.indexOf("captcha") != -1) {
+						// TODO
+						display(errorAlert(res), null);
+						((CaptchaForm) param).load();
+						break;
+					}
+					if (!"code_sent".equals(res)) {
+						userState = 1;
+						display(errorAlert(res), null);
+						break;
+					}
+					
+					TextBox t = new TextBox("Code", "", 5, TextField.NUMERIC);
+					t.addCommand(authCodeCmd);
+					t.setCommandListener(this);
+				} else {
+					if (userState == 2) {
+						// cloud password
+						sb.append("complete2faLogin&password=");
+						appendUrl(sb, (String) param);
+					
+						JSONObject j = (JSONObject) api(sb.toString());
+						String res = j.getString("res");
+						if (j.has("user")) {
+							user = j.getString("user");
+						}
+						
+						if (!"1".equals(res)) {
+							display(errorAlert(res), null);
+							break;
+						}
+					} else {
+						// code
+						sb.append("completePhoneLogin&code=").append((String) param);
+					
+						JSONObject j = (JSONObject) api(sb.toString());
+						String res = j.getString("res");
+						if (j.has("user")) {
+							user = j.getString("user");
+						}
+						if ("password".equals(res)) {
+							userState = 2;
+							TextBox t = new TextBox("Cloud password", "", 5, TextField.NUMERIC);
+							t.addCommand(authPasswordCmd);
+							t.setCommandListener(this);
+							writeAuth();
+							break;
+						}
+						if (!"1".equals(res)) {
+							display(errorAlert(res), null);
+							break;
+						}
+					}
+					
+					// auth complete
+					userState = 3;
+					run = RUN_VALIDATE_AUTH;
+					run();
+				}
+
+			} catch (Exception e) {
+				display(errorAlert(e.toString()), null);
+			}
+			break;
+		}
 		}
 //		running--;
 	}
@@ -393,16 +470,29 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	}
 
 	public void commandAction(Command c, Displayable d) {
-		if (d instanceof MPList && c == List.SELECT_COMMAND) {
-			((MPList) d).select(((List) d).getSelectedIndex());
-			return;
-		}
-		if (c == foldersCmd) {
-			if (foldersList == null) {
-				foldersList = new FoldersList();
-				start(RUN_LOAD_LIST, foldersList);
+		{ // chats list
+			if (c == archiveCmd) {
+				chatsList.changeFolder(1);
 			}
-			display(foldersList);
+			if (c == foldersCmd) {
+				if (foldersList == null) {
+					foldersList = new FoldersList();
+					start(RUN_LOAD_LIST, foldersList);
+				}
+				display(foldersList);
+			}
+		}
+		if (c == settingsCmd) {
+			// TODO
+			if (settingsForm == null) {
+				Form f = new Form("Settings");
+				f.addCommand(backCmd);
+				f.setCommandListener(this);
+				
+				settingsForm = f;
+			}
+			
+			display(settingsForm);
 		}
 		if (c == aboutCmd) {
 			Form f = new Form("About");
@@ -453,20 +543,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			display(f);
 			return;
 		}
-		if (c == refreshCmd) {
-			if (d instanceof MPForm) {
-				((MPForm) d).cancel();
-				((MPForm) d).load();
-				return;
-			}
-			if (d instanceof MPList) {
-				((MPList) d).cancel();
-				((MPList) d).load();
-				return;
-			}
-				
-			return;
-		}
+		// chat form
 		if (c == writeCmd) {
 			display(writeForm(((ChatForm) d).id, null));
 			return;
@@ -474,6 +551,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		{ // auth
 			if (c == authCmd) {
 				if (d instanceof TextBox) {
+					// user code
 					user = ((TextBox) d).getString();
 					if (user.length() < 32) {
 						display(errorAlert(""), null);
@@ -485,6 +563,16 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					start(RUN_VALIDATE_AUTH, user);
 					return;
 				}
+				instanceUrl = instanceField.getString();
+				if ((instancePassword = instancePasswordField.getString()).length() == 0) {
+					instancePassword = null;
+				}
+				
+				if (instanceUrl == null || instanceUrl.length() < 6 || !instanceUrl.startsWith("http")) {
+					display(errorAlert(""), null);
+				}
+				writeAuth();
+				
 				Alert a = new Alert("", "Choose authorization method", null, null);
 				a.addCommand(authImportSessionCmd);
 				a.addCommand(authNewSessionCmd);
@@ -503,15 +591,18 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 			if (c == authNewSessionCmd) {
+				user = null;
+				userState = 0;
+				
 				TextBox t = new TextBox("Phone number", phone == null ? "" : phone, 30, TextField.PHONENUMBER);
 				t.addCommand(cancelCmd);
-				t.addCommand(nextCmd);
+				t.addCommand(authNextCmd);
 				t.setCommandListener(this);
 				
 				display(t);
 				return;
 			}
-			if (c == nextCmd) {
+			if (c == authNextCmd) {
 				if (d instanceof TextBox) {
 					// phone number
 					phone = ((TextBox) d).getString();
@@ -520,14 +611,69 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						return;
 					}
 					writeAuth();
-					
+
+					display(loadingAlert("Waiting for server response.."), null);
 					CaptchaForm f = new CaptchaForm();
 					start(RUN_LOAD_FORM, f);
-					display(f);
+					return;
+				}
+				if (d instanceof CaptchaForm) {
+					// captcha
+					String key = ((CaptchaForm) d).field.getString();
+					if (key.length() < 4) {
+						display(errorAlert(""), null);
+						return;
+					}
+					display(loadingAlert("Waiting for server response.."), null);
+					start(RUN_AUTH, d);
 					return;
 				}
 				return;
 			}
+			if (c == authCodeCmd) {
+				// code
+				String code = ((TextBox) d).getString();
+				if (code.length() < 5) {
+					display(errorAlert(""), null);
+					return;
+				}
+
+				display(loadingAlert("Waiting for server response.."), null);
+				start(RUN_AUTH, code);
+				return;
+			}
+			if (c == authPasswordCmd) {
+				// password
+				String pass = ((TextBox) d).getString();
+				if (pass.length() == 0) {
+					display(errorAlert(""), null);
+					return;
+				}
+
+				display(loadingAlert("Waiting for server response.."), null);
+				start(RUN_AUTH, pass);
+				return;
+			}
+		}
+		if (c == List.SELECT_COMMAND) {
+			if (d instanceof MPList) {
+				((MPList) d).select(((List) d).getSelectedIndex());
+				return;
+			}
+			return;
+		}
+		if (c == refreshCmd) {
+			if (d instanceof MPForm) {
+				((MPForm) d).cancel();
+				((MPForm) d).load();
+				return;
+			}
+			if (d instanceof MPList) {
+				((MPList) d).cancel();
+				((MPList) d).load();
+				return;
+			}
+			return;
 		}
 		if (c == backCmd || c == cancelCmd) {
 			if (formHistory.size() == 0) {
@@ -597,6 +743,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			j.put("user", user);
 			j.put("state", userState);
 			j.put("phone", phone);
+			j.put("url", instanceUrl);
+			j.put("instPass", instancePassword);
 			
 			byte[] b = j.toString().getBytes("UTF-8");
 			RecordStore r = RecordStore.openRecordStore(AUTH_RECORDNAME, true);
@@ -727,13 +875,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		instanceField = t;
 		f.append(t);
 		
-		t = new TextField("Instance URL", instanceUrl, 200, TextField.URL);
+		t = new TextField("Instance Password", instancePassword, 200, TextField.NON_PREDICTIVE);
 		instancePasswordField = t;
 		f.append(t);
 		
 		StringItem s = new StringItem(null, "Auth", StringItem.BUTTON);
 		s.setDefaultCommand(authCmd);
 		s.setItemCommandListener(midlet);
+		s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+		f.append(s);
 		
 		return f;
 	}
@@ -913,7 +1063,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return res;
 	}
 
-	private static Image getImage(String url) throws IOException {
+	static Image getImage(String url) throws IOException {
 		byte[] b = get(url);
 		return Image.createImage(b, 0, b.length);
 	}
