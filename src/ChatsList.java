@@ -53,7 +53,7 @@ public class ChatsList extends MPList {
 			ids.addElement(id);
 			
 			JSONObject message = dialog.getObject("msg")/*messages.getObject(id)*/;
-			String name = MP.getName(id);
+			String name = MP.getName(id, false);
 			
 			sb.setLength(0);
 			MP.appendOneLine(sb, name).append('\n');
@@ -61,7 +61,7 @@ public class ChatsList extends MPList {
 			if (message.getBoolean("out", false)) {
 				sb.append("You: ");
 			} else if (id.charAt(0) == '-' && message.has("from_id")) {
-				MP.appendOneLine(sb, MP.getShortName(message.getString("from_id"))).append(": ");
+				MP.appendOneLine(sb, MP.getName(message.getString("from_id"), true)).append(": ");
 			}
 			if (message.has("media")) {
 				sb.append("Media");

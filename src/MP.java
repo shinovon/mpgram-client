@@ -79,7 +79,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static boolean symbianJrt;
 	static boolean useLoadingForm;
 	private static int avatarSize;
-	static boolean loadAvatars = true;
+	static boolean loadAvatars;
 
 	// threading
 	private static int run;
@@ -117,8 +117,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command forwardMsgCmd;
 	static Command copyMsgCmd;
 	static Command richTextLinkCmd;
-	
+
 	static Command writeCmd;
+	static Command chatInfoCmd;
 	static Command sendCmd;
 	static Command updateCmd;
 
@@ -217,10 +218,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		itemChatInfoCmd = new Command("Profile", Command.ITEM, 2);
 		replyMsgCmd = new Command("Reply", Command.ITEM, 3);
 		forwardMsgCmd = new Command("Forward", Command.ITEM, 4);
-		copyMsgCmd = new Command("Copy", Command.ITEM, 5);
+		copyMsgCmd = new Command("Copy message", Command.ITEM, 5);
 		richTextLinkCmd = new Command("Link", Command.ITEM, 1);
 		
 		writeCmd = new Command("Write", Command.SCREEN, 6);
+		chatInfoCmd = new Command("Chat info", Command.SCREEN, 7);
 		sendCmd = new Command("Send", Command.OK, 1);
 		updateCmd = new Command("Update", Command.SCREEN, 3);
 		
@@ -516,26 +518,17 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return sb;
 	}
 	
-	static String getName(String id) {
-		return getName(id, false, true);
-	}
-	
-	static String getShortName(String id) {
-		return getName(id, true, true);
-	}
-	
-	static String getName(String id, boolean variant, boolean loadIfNeeded) {
+	static String getName(String id, boolean variant) {
 		String res;
+		JSONObject o;
 		if (id.charAt(0) == '-') {
-			res = chatsCache.getObject(id).getString("t");
+			o = chatsCache.getObject(id, null);
+			if (o == null) return null;
+			res = o.getString("t");
 		} else {
-			JSONObject o = usersCache.getObject(id);
+			o = usersCache.getObject(id, null);
+			if (o == null) return null;
 			res = variant ? getShortName(o) : getName(o);
-		}
-		if (res == null) {
-			if (!loadIfNeeded) return null;
-			// TODO put to load queue
-			throw new RuntimeException("Not implemented");
 		}
 		return res;
 	}
@@ -717,9 +710,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				hc.close();
 			} catch (IOException e) {}
 		}
-//		System.out.println(res instanceof JSONObject ?
-//				((JSONObject) res).format(0) : res instanceof JSONArray ?
-//						((JSONArray) res).format(0) : res);
+		System.out.println(res instanceof JSONObject ?
+				((JSONObject) res).format(0) : res instanceof JSONArray ?
+						((JSONArray) res).format(0) : res);
 		return res;
 	}
 
@@ -881,6 +874,19 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return sb;
 	}
 	
+	static StringBuffer appendTime(StringBuffer sb, long date) {
+		date = (date + tzOffset) / 60;
+		return sb.append(n(((int) date / 60) % 24))
+				.append(':')
+				.append(n((int) date % 60));
+	}
+	
+	static String n(int n) {
+		if (n < 10) {
+			return "0".concat(Integer.toString(n));
+		} else return Integer.toString(n);
+	}
+	
 	private static final int
 			RT_BOLD = 0,
 			RT_ITALIC = 1,
@@ -891,7 +897,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			RT_URL = 6;
 
 	static void wrapRichText(MPForm form, Thread thread, String text, JSONArray entities) {
-		System.out.println(entities.format(0));
 		wrapRichText(form, thread, text, entities, new int[8]);
 	}
 	
@@ -928,7 +933,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		int lastOffset = 0;
 		for (int i = 0; i < len; ++i) {
 			JSONObject entity = entities.getObject(i);
-			System.out.println(entity.format(0));
 			if (entity.getInt("offset") > lastOffset) {
 				flush(form, thread, text.substring(lastOffset, entity.getInt("offset")), state);
 			} else if (entity.getInt("offset") < lastOffset) {
@@ -939,12 +943,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			String type = entity.getString("_");
 			if ("messageEntityUrl".equals(type)) {
 				state[RT_URL] ++;
-				richTextUrl = entity.getString("url");
-				wrapRichNestedText(form, thread, entityText, entity, entities, state);
+				flush(form, thread, richTextUrl = entityText, state);
 				state[RT_URL] --;
 			} else if ("messageEntityTextUrl".equals(type)) {
 				state[RT_URL] ++;
-				flush(form, thread, richTextUrl = entityText, state);
+				richTextUrl = entity.getString("url");
+				wrapRichNestedText(form, thread, entityText, entity, entities, state);
 				state[RT_URL] --;
 			} else if ("messageEntityBold".equals(type)) {
 				state[RT_BOLD] ++;

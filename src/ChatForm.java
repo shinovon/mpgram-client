@@ -15,6 +15,8 @@ public class ChatForm extends MPForm {
 	public ChatForm(String id) {
 		super(id);
 		addCommand(MP.refreshCmd);
+		addCommand(MP.writeCmd);
+		addCommand(MP.chatInfoCmd);
 		this.id = id;
 	}
 
@@ -36,7 +38,7 @@ public class ChatForm extends MPForm {
 		
 		MP.fillPeersCache(j.getNullableObject("users"), j.getNullableObject("chats"));
 		
-		setTitle(MP.getName(id));
+		setTitle(MP.getName(id, false));
 		
 		JSONArray messages = j.getArray("messages");
 		int l = messages.size();
@@ -47,12 +49,19 @@ public class ChatForm extends MPForm {
 			JSONObject message = messages.getObject(i);
 			
 			String id = message.getString("id");
-			String fromId = message.has("from_id") ? message.getString("from_id") : id;
+			String fromId = message.has("from_id") ? message.getString("from_id") : this.id;
 			boolean out = message.getBoolean("out", false);
 			
-			s = new StringItem(null, MP.getShortName(fromId));
-			s.addCommand(MP.itemChatCmd);
-			s.addCommand(MP.itemChatInfoCmd);
+			sb.setLength(0);
+			sb.append(out ? "You" : MP.getName(fromId, true));
+			MP.appendTime(sb.append(' '), message.getLong("date"));
+			
+			
+			s = new StringItem(null, sb.toString());
+			s.setFont(MP.smallBoldFont);
+			if (!out) {
+				s.addCommand(MP.itemChatInfoCmd);
+			}
 			s.addCommand(MP.replyMsgCmd);
 			s.addCommand(MP.forwardMsgCmd);
 			
