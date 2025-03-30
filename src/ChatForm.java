@@ -210,7 +210,7 @@ public class ChatForm extends MPForm {
 				s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 				safeInsert(thread, insert++, s);
 			}
-			safeInsert(thread, insert++, new Spacer(10, 6));
+			safeInsert(thread, insert++, new Spacer(10, 8));
 			
 //			if (MP.reverseChat ? (i-- == 0) : (++i == l)) break;
 		}

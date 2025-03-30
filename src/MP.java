@@ -385,7 +385,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					sb.append(user == null ? "initLogin" : "phoneLogin")
 						.append("&captcha_id=").append(((CaptchaForm) param).id)
 						.append("&captcha_key=");
-					appendUrl(sb, ((CaptchaForm) param).field.getString());
+					appendUrl(sb, ((CaptchaForm) param).field.getString())
+					.append("&phone=");
+					appendUrl(sb, phone);
 					
 					JSONObject j = (JSONObject) api(sb.toString());
 					String res = j.getString("res");
@@ -403,24 +405,32 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						display(errorAlert(res), null);
 						break;
 					}
-					
+
+					writeAuth();
 					TextBox t = new TextBox("Code", "", 5, TextField.NUMERIC);
 					t.addCommand(authCodeCmd);
 					t.setCommandListener(this);
+					display(t);
 				} else {
 					if (userState == 2) {
 						// cloud password
 						sb.append("complete2faLogin&password=");
 						appendUrl(sb, (String) param);
 					
-						JSONObject j = (JSONObject) api(sb.toString());
-						String res = j.getString("res");
-						if (j.has("user")) {
-							user = j.getString("user");
-						}
-						
-						if (!"1".equals(res)) {
-							display(errorAlert(res), null);
+						try {
+							JSONObject j = (JSONObject) api(sb.toString());
+							String res = j.getString("res");
+							if (j.has("user")) {
+								user = j.getString("user");
+							}
+							
+							if (!"1".equals(res)) {
+								display(errorAlert(res), null);
+								break;
+							}
+						} catch (APIException e) {
+							commandAction(backCmd, current);
+							display(errorAlert(e.toString()), null);
 							break;
 						}
 					} else {
@@ -434,10 +444,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						}
 						if ("password".equals(res)) {
 							userState = 2;
+							writeAuth();
 							TextBox t = new TextBox("Cloud password", "", 5, TextField.NUMERIC);
 							t.addCommand(authPasswordCmd);
 							t.setCommandListener(this);
-							writeAuth();
+							display(t);
 							break;
 						}
 						if (!"1".equals(res)) {
@@ -1183,6 +1194,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 	static void display(Alert a, Displayable d) {
 		if (d == null) {
+			if (display.getCurrent() instanceof Alert) {
+				display.setCurrent(a, current);
+				return;
+			}
 			display.setCurrent(a);
 			return;
 		}

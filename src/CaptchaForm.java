@@ -22,7 +22,7 @@ public class CaptchaForm extends MPForm {
 		id = ((JSONObject) MP.api("initLogin")).getString("captcha_id");
 		
 		Image img = MP.getImage(MP.instanceUrl.concat(MP.API_URL + "?v=" + MP.API_VERSION
-				+ "&methods=getCaptchaImg&captcha_id=".concat(id)));
+				+ "&method=getCaptchaImg&captcha_id=".concat(id)));
 		
 		ImageItem imgItem = new ImageItem("", img, 0, null);
 		append(imgItem);

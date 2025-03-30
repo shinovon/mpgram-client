@@ -47,32 +47,32 @@ public class ChatsList extends MPList {
 		for (int i = 0; i < l && thread == this.thread; ++i) {
 			JSONObject dialog = dialogs.getObject(i);
 			String id = dialog.getString("id");
-			
 			ids.addElement(id);
 			
-			JSONObject message = dialog.getObject("msg")/*messages.getObject(id)*/;
-			String name = MP.getName(id, false);
-			
 			sb.setLength(0);
-			MP.appendOneLine(sb, name).append('\n');
+			String name = MP.getName(id, false);
+			MP.appendOneLine(sb, name);
 			
-			if (message.getBoolean("out", false)) {
-				sb.append("You: ");
-			} else if (id.charAt(0) == '-' && message.has("from_id")) {
-				MP.appendOneLine(sb, MP.getName(message.getString("from_id"), true)).append(": ");
-			}
-			if (message.has("media")) {
-				sb.append("Media");
-			} else if (message.has("fwd")) {
-				sb.append("Forwarded message");
-			} else  if (message.has("act")) {
-				sb.append("Action");
-			} else {
-				MP.appendOneLine(sb, message.getString("text"));
+			JSONObject message = dialog.getObject("msg", null)/*messages.getObject(id)*/;
+			if (message != null) {
+				sb.append('\n');
+				if (message.getBoolean("out", false)) {
+					sb.append("You: ");
+				} else if (id.charAt(0) == '-' && message.has("from_id")) {
+					MP.appendOneLine(sb, MP.getName(message.getString("from_id"), true)).append(": ");
+				}
+				if (message.has("media")) {
+					sb.append("Media");
+				} else if (message.has("fwd")) {
+					sb.append("Forwarded message");
+				} else  if (message.has("act")) {
+					sb.append("Action");
+				} else {
+					MP.appendOneLine(sb, message.getString("text"));
+				}
 			}
 			
 			int itemIdx = safeAppend(thread, sb.toString(), null);
-			
 			MP.queueAvatar(id, new Object[] { this, new Integer(itemIdx) });
 		}
 	}
