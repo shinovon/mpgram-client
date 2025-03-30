@@ -21,7 +21,6 @@ public class ChatForm extends MPForm {
 	}
 
 	void loadInternal(Thread thread) throws Exception {
-		// TODO
 		deleteAll();
 		
 		StringBuffer sb = new StringBuffer("getHistory&media=1&peer=");
@@ -44,18 +43,19 @@ public class ChatForm extends MPForm {
 		int l = messages.size();
 		
 		StringItem s;
-		
-		for (int i = 0; i < l && thread == this.thread; ++i) {
+		StringItem last = null;
+		int i = MP.reverseChat ? (l - 1) : 0;
+		while (thread == this.thread) {
 			JSONObject message = messages.getObject(i);
 			
 			String id = message.getString("id");
 			String fromId = message.has("from_id") ? message.getString("from_id") : this.id;
 			boolean out = message.getBoolean("out", false);
+			String text = message.getString("text", null);
 			
 			sb.setLength(0);
 			sb.append(out ? "You" : MP.getName(fromId, true));
 			MP.appendTime(sb.append(' '), message.getLong("date"));
-			
 			
 			s = new StringItem(null, sb.toString());
 			s.setFont(MP.smallBoldFont);
@@ -64,6 +64,9 @@ public class ChatForm extends MPForm {
 			}
 			s.addCommand(MP.replyMsgCmd);
 			s.addCommand(MP.forwardMsgCmd);
+			if (text != null && text.length() != 0) {
+				s.addCommand(MP.copyMsgCmd);
+			}
 			
 			s.setDefaultCommand(MP.itemChatCmd);
 			s.setItemCommandListener(MP.midlet);
@@ -71,20 +74,62 @@ public class ChatForm extends MPForm {
 			safeAppend(thread, s);
 			urls.put(s, new String[] { fromId, id } );
 			
-			String text = message.getString("text", null);
+			if (i == 0) {
+				last = s;
+			}
+			
+			if (message.has("fwd")) {
+				// TODO
+				JSONObject fwd = message.getObject("fwd");
+				sb.setLength(0);
+				sb.append("Forwarded from ").append(MP.getName(fwd.getNullableString("from_id"), true));
+				s = new StringItem(null, sb.toString());
+				s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+				safeAppend(thread, s);
+				urls.put(s, new String[] { fwd.getNullableString("peer"), fwd.getNullableString("msg") } );
+			}
+			
+			if (message.has("reply")) {
+				// TODO
+				JSONObject reply = message.getObject("reply");
+				if (reply.has("from_id")) {
+					sb.setLength(0);
+					sb.append("Reply to ").append(MP.getName(reply.getString("from_id"), true));
+					s = new StringItem(null, sb.toString());
+					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					safeAppend(thread, s);
+					if (reply.has("peer") && !reply.isNull("peer")) {
+						urls.put(s, reply.getString("peer"));
+					}
+				}
+			}
+			
 			if (text != null && text.length() != 0) {
-				s.addCommand(MP.copyMsgCmd);
 				urls.put(id, text);
-				
 				if (message.has("entities")) {
-					MP.wrapRichText(this, thread, text, message.getArray("entities"));
+					MP.wrapRichText(this, thread, text, message.getArray("entities"), size());
 				} else {
 					s = new StringItem(null, text);
 					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					safeAppend(thread, s);
 				}
 			}
+			if (message.has("media")) {
+				s = new StringItem(null, "Media");
+				s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+				safeAppend(thread, s);
+			} else if (message.has("act")) {
+				s = new StringItem(null, "Action: " + message.getObject("act").getString("_"));
+				s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+				safeAppend(thread, s);
+			}
 			safeAppend(thread, new Spacer(10, 6));
+			
+			if (MP.reverseChat ? (i-- == 0) : (++i == l)) break;
+		}
+		
+		if (last != null) {
+			MP.display.setCurrentItem(last);
 		}
 	}
 

@@ -12,18 +12,17 @@ public class ChatsList extends MPList {
 	Vector ids;
 
 	public ChatsList(String title, int folder) {
-		super(title, List.IMPLICIT);
+		super(title);
 		this.folder = folder;
-		if (folder == 0) {
-			addCommand(MP.archiveCmd);
-		}
+//		if (folder == 0) {
+//			addCommand(MP.archiveCmd);
+//		}
+		addCommand(MP.foldersCmd);
 		addCommand(MP.refreshCmd);
 		setFitPolicy(List.TEXT_WRAP_ON);
 	}
 
 	void loadInternal(Thread thread) throws Exception {
-		// TODO folders
-		
 		deleteAll();
 		ids = new Vector();
 		
@@ -85,6 +84,12 @@ public class ChatsList extends MPList {
 		if (id == null) return;
 		
 		MP.openChat(id);
+	}
+	
+	void changeFolder(int folderId) {
+		cancel();
+		folder = folderId;
+		MP.midlet.start(MP.RUN_LOAD_LIST, this);
 	}
 
 }

@@ -12,8 +12,8 @@ public abstract class MPList extends List {
 	boolean loaded, finished, canceled;
 	Thread thread;
 
-	public MPList(String title, int listType) {
-		super(title, listType);
+	public MPList(String title) {
+		super(title, List.IMPLICIT);
 		addCommand(List.SELECT_COMMAND);
 		setSelectCommand(List.SELECT_COMMAND);
 		setCommandListener(MP.midlet);

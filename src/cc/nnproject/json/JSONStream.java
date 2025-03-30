@@ -528,7 +528,7 @@ public class JSONStream extends Reader {
 			}
 			if (c == 0 || (l != '\\' && c == '"')) break;
 			sb.append(c);
-			l = c;
+			l = l == '\\' ? 0 : c;
 		}
 		if (eof)
 			throw new IOException("nextString: Unexpected end");

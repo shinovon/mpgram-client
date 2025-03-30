@@ -32,12 +32,12 @@ import cc.nnproject.json.JSONStream;
 
 public class MP extends MIDlet implements CommandListener, ItemCommandListener, Runnable {
 
-	private static final int RUN_SEND_MESSAGE = 4;
-	private static final int RUN_VALIDATE_AUTH = 5;
-	private static final int RUN_AVATARS = 6;
-	private static final int RUN_UPDATES = 7;
-	private static final int RUN_LOAD_FORM = 8;
-	private static final int RUN_LOAD_LIST = 9;
+	static final int RUN_SEND_MESSAGE = 4;
+	static final int RUN_VALIDATE_AUTH = 5;
+	static final int RUN_AVATARS = 6;
+	static final int RUN_UPDATES = 7;
+	static final int RUN_LOAD_FORM = 8;
+	static final int RUN_LOAD_LIST = 9;
 	
 	private static final String SETTINGS_RECORDNAME = "mp4config";
 	private static final String AUTH_RECORDNAME = "mp4user";
@@ -62,7 +62,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 	// midp lifecycle
 	static MP midlet;
-	private static Display display;
+	static Display display;
 	static Displayable current;
 
 	private static String version;
@@ -80,6 +80,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static boolean useLoadingForm;
 	private static int avatarSize;
 	static boolean loadAvatars;
+	static boolean reverseChat = true;
 
 	// threading
 	private static int run;
@@ -110,6 +111,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command refreshCmd;
 	static Command archiveCmd;
 	static Command foldersCmd;
+	static Command contactsCmd;
+	static Command searchCmd;
 
 	static Command itemChatCmd;
 	static Command itemChatInfoCmd;
@@ -130,6 +133,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	// ui
 	private static Displayable mainDisplayable;
 	static Form loadingForm;
+	static ChatsList chatsList;
+	static FoldersList foldersList;
 	private static Vector formHistory = new Vector();
 
 	// ui elements
@@ -155,15 +160,21 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		version = getAppProperty("MIDlet-Version");
 		display = Display.getDisplay(this);
 		
-		
 		String p = System.getProperty("microedition.platform");
 		symbianJrt = p != null && p.indexOf("platform=S60") != -1;
 		useLoadingForm = !symbianJrt &&
 				(System.getProperty("com.symbian.midp.serversocket.support") != null ||
 				System.getProperty("com.symbian.default.to.suite.icon") != null);
 		
+		// TODO refuse to run in j2me loader
+		
 		avatarSize = Math.min(display.getBestImageHeight(Display.LIST_ELEMENT), display.getBestImageWidth(Display.LIST_ELEMENT));
 		if (avatarSize < 4) avatarSize = 16;
+		else if (avatarSize > 120) avatarSize = 120;
+		
+		try {
+			tzOffset = TimeZone.getDefault().getRawOffset() / 1000;
+		} catch (Throwable e) {} // just to be sure
 		
 		// load settings
 		try {
@@ -211,8 +222,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		authImportSessionCmd = new Command("Import session", Command.SCREEN, 2);
 
 		refreshCmd = new Command("Refresh", Command.SCREEN, 4);
-		archiveCmd = new Command("Archived chats", Command.SCREEN, 4);
+		archiveCmd = new Command("Archived chats", Command.SCREEN, 5);
 		foldersCmd = new Command("Folders", Command.SCREEN, 5);
+		contactsCmd = new Command("Contacts", Command.SCREEN, 6);
+		searchCmd = new Command("Search", Command.SCREEN, 7);
 		
 		itemChatCmd = new Command("Open chat", Command.ITEM, 1);
 		itemChatInfoCmd = new Command("Profile", Command.ITEM, 2);
@@ -239,10 +252,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		f.append("Loading");
 		display(mainDisplayable = f);
 		
-		try {
-			tzOffset = TimeZone.getDefault().getRawOffset() / 1000;
-		} catch (Throwable e) {} // just to be sure
-		
 		if (user == null) {
 			display(mainDisplayable = initialAuthForm());
 			return;
@@ -253,14 +262,14 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 
 		start(RUN_AVATARS, null);
 		
-		ChatsList l = new ChatsList("Chats", 0);
+		ChatsList l = chatsList = new ChatsList("Chats", 0);
 		l.removeCommand(backCmd);
-		l.addCommand(backCmd);
+		l.addCommand(exitCmd);
 		l.addCommand(aboutCmd);
 		l.addCommand(settingsCmd);
 		
-		start(RUN_LOAD_LIST, mainDisplayable = l);
-		display(l);
+		start(RUN_LOAD_LIST, l);
+		display(mainDisplayable = l);
 	}
 	
 	public void run() {
@@ -382,6 +391,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			((MPList) d).select(((List) d).getSelectedIndex());
 			return;
 		}
+		if (c == foldersCmd) {
+			if (foldersList == null) {
+				foldersList = new FoldersList();
+				start(RUN_LOAD_LIST, foldersList);
+			}
+			display(foldersList);
+		}
 		if (c == refreshCmd) {
 			if (d instanceof MPForm) {
 				((MPForm) d).cancel();
@@ -437,7 +453,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			// TODO
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
-			openChat(s[0]);
+			openChatInfo(s[0]);
 			return;
 		}
 		if (c == replyMsgCmd) {
@@ -519,6 +535,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	}
 	
 	static String getName(String id, boolean variant) {
+		if (id == null) return null;
 		String res;
 		JSONObject o;
 		if (id.charAt(0) == '-') {
@@ -604,6 +621,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		midlet.start(RUN_LOAD_FORM, f);
 	}
 	
+	static void openChatInfo(String id) {
+		Form f = new ChatInfoForm(id);
+		display(f);
+		midlet.start(RUN_LOAD_FORM, f);
+	}
+	
 	static void copy(String title, String text) {
 		// TODO use nokiaui?
 		TextBox t = new TextBox(title, text, text.length() + 1, TextField.UNEDITABLE);
@@ -628,7 +651,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	}
 
 	static void display(Displayable d, boolean back) {
-		System.out.println("display " + d);
 		if (d instanceof Alert) {
 			display.setCurrent((Alert) d, mainDisplayable);
 			return;
@@ -688,10 +710,24 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		HttpConnection hc = null;
 		InputStream in = null;
 		try {
-			hc = openHttpConnection(instanceUrl.concat(API_URL + "?v=" + API_VERSION + "&method=").concat(url));
+			String t = instanceUrl.concat(API_URL + "?v=" + API_VERSION + "&method=").concat(url);
+			hc = openHttpConnection(t);
 			hc.setRequestMethod("GET");
 			
 			int c = hc.getResponseCode();
+			if (c == 502) {
+				// repeat
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e.toString());
+				}
+				
+				hc = openHttpConnection(t);
+				hc.setRequestMethod("GET");
+				
+				c = hc.getResponseCode();
+			}
 			try {
 				res = JSONStream.getStream(in = hc.openInputStream()).nextValue();
 			} catch (RuntimeException e) {
@@ -896,11 +932,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			RT_SPOILER = 5,
 			RT_URL = 6;
 
-	static void wrapRichText(MPForm form, Thread thread, String text, JSONArray entities) {
-		wrapRichText(form, thread, text, entities, new int[8]);
+	static int wrapRichText(MPForm form, Thread thread, String text, JSONArray entities, int insert) {
+		return wrapRichText(form, thread, text, entities, insert, new int[8]);
 	}
 	
-	private static void wrapRichNestedText(MPForm form, Thread thread, String text, JSONObject entity, JSONArray allEntities, int[] state) {
+	private static int wrapRichNestedText(MPForm form, Thread thread, String text, JSONObject entity, JSONArray allEntities, int insert, int[] state) {
 		int off = entity.getInt("offset");
 		int len = entity.getInt("length");
 		JSONArray entities = new JSONArray();
@@ -922,19 +958,18 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		
 		if (entities.size() > 0) {
-			wrapRichText(form, thread, text, entities);
-			return;
+			return wrapRichText(form, thread, text, entities, insert, state);
 		}
-		flush(form, thread, text, state);
+		return flush(form, thread, text, insert, state);
 	}
 
-	private static String wrapRichText(MPForm form, Thread thread, String text, JSONArray entities, int[] state) {
+	private static int wrapRichText(MPForm form, Thread thread, String text, JSONArray entities, int insert, int[] state) {
 		int len = entities.size();
 		int lastOffset = 0;
 		for (int i = 0; i < len; ++i) {
 			JSONObject entity = entities.getObject(i);
 			if (entity.getInt("offset") > lastOffset) {
-				flush(form, thread, text.substring(lastOffset, entity.getInt("offset")), state);
+				insert = flush(form, thread, text.substring(lastOffset, entity.getInt("offset")), insert, state);
 			} else if (entity.getInt("offset") < lastOffset) {
 				continue;
 			}
@@ -943,36 +978,36 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			String type = entity.getString("_");
 			if ("messageEntityUrl".equals(type)) {
 				state[RT_URL] ++;
-				flush(form, thread, richTextUrl = entityText, state);
+				insert = flush(form, thread, richTextUrl = entityText, insert, state);
 				state[RT_URL] --;
 			} else if ("messageEntityTextUrl".equals(type)) {
 				state[RT_URL] ++;
 				richTextUrl = entity.getString("url");
-				wrapRichNestedText(form, thread, entityText, entity, entities, state);
+				insert = wrapRichNestedText(form, thread, entityText, entity, entities, insert, state);
 				state[RT_URL] --;
 			} else if ("messageEntityBold".equals(type)) {
 				state[RT_BOLD] ++;
-				wrapRichNestedText(form, thread, entityText, entity, entities, state);
+				insert = wrapRichNestedText(form, thread, entityText, entity, entities, insert, state);
 				state[RT_BOLD] --;
 			} else if ("messageEntityItalic".equals(type)) {
 				state[RT_ITALIC] ++;
-				wrapRichNestedText(form, thread, entityText, entity, entities, state);
+				insert = wrapRichNestedText(form, thread, entityText, entity, entities, insert, state);
 				state[RT_ITALIC] --;
 			} else if ("messageEntityCode".equals(type) || "messageEntityPre".equals(type)) {
 				state[RT_PRE] ++;
-				wrapRichNestedText(form, thread, entityText, entity, entities, state);
+				insert = wrapRichNestedText(form, thread, entityText, entity, entities, insert, state);
 				state[RT_PRE] --;
 			} else if ("messageEntityUnderline".equals(type)) {
 				state[RT_UNDERLINE] ++;
-				wrapRichNestedText(form, thread, entityText, entity, entities, state);
+				insert = wrapRichNestedText(form, thread, entityText, entity, entities, insert, state);
 				state[RT_UNDERLINE] --;
 			} else if ("messageEntityStrike".equals(type)) {
 				state[RT_STRIKE] ++;
-				wrapRichNestedText(form, thread, entityText, entity, entities, state);
+				insert = wrapRichNestedText(form, thread, entityText, entity, entities, insert, state);
 				state[RT_STRIKE] --;
 			} else if ("messageEntitySpoiler".equals(type)) {
 				state[RT_SPOILER] ++;
-				wrapRichNestedText(form, thread, entityText, entity, entities, state);
+				insert = wrapRichNestedText(form, thread, entityText, entity, entities, insert, state);
 				state[RT_SPOILER] --;
 			} else {
 				skipEntity = true;
@@ -980,12 +1015,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			lastOffset = entity.getInt("offset") + (skipEntity ? 0 : entity.getInt("length"));
 		}
 		
-		flush(form, thread, text.substring(lastOffset), state);
-		
-		return null;
+		return flush(form, thread, text.substring(lastOffset), insert, state);
 	}
 	
-	private static void flush(MPForm form, Thread thread, String text, int[] state) {
+	private static int flush(MPForm form, Thread thread, String text, int insert, int[] state) {
 		StringItem s = new StringItem(null, text);
 		s.setFont(getFont(state));
 		if (state[RT_URL] != 0) {
@@ -993,7 +1026,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			s.setDefaultCommand(richTextLinkCmd);
 			s.setItemCommandListener(midlet);
 		}
-		form.safeAppend(thread, s);
+		form.safeInsert(thread, insert++, s);
+		
+		return insert;
 	}
 
 	private static Font getFont(int[] state) {
