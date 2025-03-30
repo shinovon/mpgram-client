@@ -1,5 +1,6 @@
 import java.util.Hashtable;
 
+import javax.microedition.lcdui.ImageItem;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.Spacer;
 import javax.microedition.lcdui.StringItem;
@@ -26,6 +27,8 @@ public class ChatForm extends MPForm {
 	int firstMsgId, lastMsgId;
 	boolean endReached, hasOffset;
 	private int idOffset;
+	
+	private long group;
 	
 	public ChatForm(String id, String query, int message, int topMsg) {
 		super(id);
@@ -102,7 +105,7 @@ public class ChatForm extends MPForm {
 		urls = new Hashtable();
 		
 		StringItem s;
-		StringItem focus = null;
+		Item focus = null;
 		
 		int top = size();
 		
@@ -128,6 +131,7 @@ public class ChatForm extends MPForm {
 		
 		for (int i = l - 1; i >= 0 && thread == this.thread; --i) {
 			if (!MP.reverseChat) insert = top;
+			Item msgItem = null;
 			JSONObject message = messages.getObject(i);
 			
 			int id = message.getInt("id");
@@ -159,13 +163,17 @@ public class ChatForm extends MPForm {
 			s.setDefaultCommand(MP.itemChatCmd);
 			s.setItemCommandListener(MP.midlet);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-			safeInsert(thread, insert++, s);
-			urls.put(s, new String[] { fromId, idString } );
-			
-			if (this.messageId != 0 ? (messageId == id)
-					: (i == 0 ? ((endReached && dir == 0) || dir == -1) : (i == l - 1 ? (dir == 1) : false))) {
-				focus = s;
+			if (group == 0 || group != message.getLong("group", 0)) {
+				if (group != 0) {
+					Spacer sp = new Spacer(10, 8);
+					sp.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					safeInsert(thread, insert++, sp);
+				}
+				safeInsert(thread, insert++, s);
+				urls.put(s, new String[] { fromId, idString } );
+				msgItem = s;
 			}
+			group = message.getLong("group", 0);
 			
 			if (message.has("fwd")) {
 				// TODO
@@ -202,15 +210,60 @@ public class ChatForm extends MPForm {
 				}
 			}
 			if (message.has("media")) {
-				s = new StringItem(null, "Media");
-				s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-				safeInsert(thread, insert++, s);
+				if (!MP.showMedia || message.isNull("media")) {
+					s = new StringItem(null, "Media");
+					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					safeInsert(thread, insert++, s);
+				} else {
+					JSONObject media = message.getObject("media");
+					
+					String type = media.getString("type");
+					if (type.equals("undefined")) {
+						s = new StringItem(null, "Media");
+						s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						safeInsert(thread, insert++, s);
+					} else if (type.equals("poll")) {
+						// TODO
+					} else if (type.equals("geo")) {
+						// TODO
+					} else if (type.equals("webpage")) {
+						// TODO
+					} else if (type.equals("document")) {
+						// TODO
+					} else if (type.equals("photo")) {
+						ImageItem img = new ImageItem("", null, 0, "");
+						if (text != null && text.length() != 0) {
+							img.setLayout(Item.LAYOUT_NEWLINE_BEFORE);
+						}
+						safeInsert(thread, insert++, img);
+						if (msgItem == null) {
+							msgItem = img;
+						}
+						// FIXME
+						try {
+							img.setImage(MP.getImage(
+									(MP.instanceUrl + MP.FILE_URL + "?c=")
+									.concat(this.id)
+									.concat("&m=").concat(idString)
+									.concat("&p=rprev&s=120")
+									));
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
 			} else if (message.has("act")) {
 				s = new StringItem(null, "Action: " + message.getObject("act").getString("_"));
 				s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 				safeInsert(thread, insert++, s);
 			}
-			safeInsert(thread, insert++, new Spacer(10, 8));
+			if (this.messageId != 0 ? (messageId == id)
+					: (i == 0 ? ((endReached && dir == 0) || dir == -1) : (i == l - 1 ? (dir == 1) : false))) {
+				focus = msgItem;
+			}
+			if (group != 0) {
+				safeInsert(thread, insert++, new Spacer(10, 8));
+			}
 			
 //			if (MP.reverseChat ? (i-- == 0) : (++i == l)) break;
 		}
@@ -251,6 +304,14 @@ public class ChatForm extends MPForm {
 //			}
 		}
 		load();
+	}
+	
+	void reset() {
+		cancel();
+		dir = 0;
+		messageId = 0;
+		addOffset = 0;
+		offsetId = 0;
 	}
 
 }

@@ -47,7 +47,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static final String DEFAULT_INSTANCE_URL = "http://mp2.nnchan.ru/";
 	static final String API_URL = "api.php";
 	static final String AVA_URL = "ava.php";
-	private static final String FILE_URL = "file.php";
+	static final String FILE_URL = "file.php";
 	
 	static final String API_VERSION = "5";
 	
@@ -80,8 +80,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static boolean symbianJrt;
 	static boolean useLoadingForm;
 	private static int avatarSize;
-	static boolean loadAvatars;
-	static boolean reverseChat;
+	static boolean loadAvatars = true;
+	static boolean reverseChat = true;
+	static boolean showMedia = true;
 
 	// threading
 	private static int run;
@@ -191,6 +192,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			reverseChat = j.getBoolean("reverseChat", reverseChat);
 			avatars = j.getBoolean("avatars", avatars);
 			avatarSize = j.getInt("avatarSize", avatarSize);
+			showMedia = j.getBoolean("showMedia", showMedia);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -559,7 +561,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			display(f);
 			return;
 		}
-		{ // chat form
+		if (d instanceof ChatForm) { // chat form
+			if (c == refreshCmd) {
+				((ChatForm) d).reset();
+				((MPForm) d).load();
+				return;
+			}
 			if (c == olderMessagesCmd || c == newerMessagesCmd) {
 				((ChatForm) d).paginate(c == olderMessagesCmd ? -1 : 1);
 				return;
