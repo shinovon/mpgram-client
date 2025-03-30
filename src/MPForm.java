@@ -12,7 +12,7 @@ public abstract class MPForm extends Form {
 
 	boolean loaded, finished, canceled;
 	Thread thread;
-	Hashtable ids;
+	Hashtable urls;
 
 	public MPForm(String title) {
 		super(title);

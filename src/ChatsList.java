@@ -8,10 +8,16 @@ import cc.nnproject.json.JSONObject;
 public class ChatsList extends MPList {
 	
 	int limit = 20;
+	int folder = -1;
 	Vector ids;
 
-	public ChatsList(String title) {
+	public ChatsList(String title, int folder) {
 		super(title, List.IMPLICIT);
+		this.folder = folder;
+		if (folder == 0) {
+			addCommand(MP.archiveCmd);
+		}
+		addCommand(MP.refreshCmd);
 		setFitPolicy(List.TEXT_WRAP_ON);
 	}
 
@@ -21,9 +27,12 @@ public class ChatsList extends MPList {
 		deleteAll();
 		ids = new Vector();
 		
-		StringBuffer sb = new StringBuffer("getDialogs&");
+		StringBuffer sb = new StringBuffer("getDialogs");
 		if (limit != 0) {
-			sb.append("limit=").append(limit);
+			sb.append("&limit=").append(limit);
+		}
+		if (folder != -1) {
+			sb.append("&f=").append(folder);
 		}
 		
 		JSONObject j = (JSONObject) MP.api(sb.toString());
@@ -35,7 +44,7 @@ public class ChatsList extends MPList {
 		JSONArray dialogs = j.getArray("dialogs");
 		int l = dialogs.size();
 		
-		JSONObject messages = j.getObject("messages");
+//		JSONObject messages = j.getObject("messages");
 		
 		for (int i = 0; i < l && thread == this.thread; ++i) {
 			JSONObject dialog = dialogs.getObject(i);
@@ -43,7 +52,7 @@ public class ChatsList extends MPList {
 			
 			ids.addElement(id);
 			
-			JSONObject message = messages.getObject(id);
+			JSONObject message = dialog.getObject("msg")/*messages.getObject(id)*/;
 			String name = MP.getName(id);
 			
 			sb.setLength(0);
