@@ -126,9 +126,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command sendCmd;
 	static Command updateCmd;
 
-	private static Command okCmd;
-	private static Command nextCmd;
-	private static Command cancelCmd;
+	static Command okCmd;
+	static Command nextCmd;
+	static Command cancelCmd;
 	
 	// ui
 	private static Displayable mainDisplayable;
@@ -139,7 +139,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 
 	// ui elements
 //	private static TextField tokenField;
-//	
+	private static TextField instanceField;
+	private static TextField instancePasswordField;
+	
 //	private static JSONArray dialogs;
 
 	private static JSONObject usersCache = new JSONObject();
@@ -266,12 +268,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			start(RUN_AVATARS, null);
 		}
 		
-		ChatsList l = chatsList = new ChatsList("Chats", 0);
-		l.removeCommand(backCmd);
-		l.addCommand(exitCmd);
-		l.addCommand(aboutCmd);
-		l.addCommand(settingsCmd);
-		
+		ChatsList l = mainChatsList();
 		start(RUN_LOAD_LIST, l);
 		display(mainDisplayable = l);
 	}
@@ -293,13 +290,18 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			try {
 				api("me");
 				
+				if (param != null) {
+					ChatsList l = mainChatsList();
+					start(RUN_LOAD_LIST, l);
+					display(mainDisplayable = l);
+				}
 //				if (updatesRunning) break;
 //				start(RUN_UPDATES, null);
 			} catch (APIException e) {
-				
+				user = null;
+				display(errorAlert(e.toString()), mainDisplayable = initialAuthForm());
 			} catch (IOException e) {
-				
-				break;
+				display(errorAlert(e.toString()), null);
 			}
 			break;
 		}
@@ -317,7 +319,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			break;
 		}
-		case RUN_AVATARS: { // avatars loading TODO
+		case RUN_AVATARS: { // avatars loading
 			try {
 				while (true) {
 					synchronized (avatarsLoadLock) {
@@ -469,7 +471,65 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			display(writeForm(((ChatForm) d).id, null));
 			return;
 		}
-		if (c == backCmd) {
+		{ // auth
+			if (c == authCmd) {
+				if (d instanceof TextBox) {
+					user = ((TextBox) d).getString();
+					if (user.length() < 32) {
+						display(errorAlert(""), null);
+						return;
+					}
+					writeAuth();
+					
+					display(loadingAlert("Waiting for server response.."), null);
+					start(RUN_VALIDATE_AUTH, user);
+					return;
+				}
+				Alert a = new Alert("", "Choose authorization method", null, null);
+				a.addCommand(authImportSessionCmd);
+				a.addCommand(authNewSessionCmd);
+				a.setCommandListener(this);
+				
+				display(a, null);
+				return;
+			}
+			if (c == authImportSessionCmd) {
+				TextBox t = new TextBox("User code", user == null ? "" : user, 200, TextField.NON_PREDICTIVE);
+				t.addCommand(cancelCmd);
+				t.addCommand(authCmd);
+				t.setCommandListener(this);
+				
+				display(t);
+				return;
+			}
+			if (c == authNewSessionCmd) {
+				TextBox t = new TextBox("Phone number", phone == null ? "" : phone, 30, TextField.PHONENUMBER);
+				t.addCommand(cancelCmd);
+				t.addCommand(nextCmd);
+				t.setCommandListener(this);
+				
+				display(t);
+				return;
+			}
+			if (c == nextCmd) {
+				if (d instanceof TextBox) {
+					// phone number
+					phone = ((TextBox) d).getString();
+					if (phone.length() < 10 && !phone.startsWith("+")) {
+						display(errorAlert(""), null);
+						return;
+					}
+					writeAuth();
+					
+					CaptchaForm f = new CaptchaForm();
+					start(RUN_LOAD_FORM, f);
+					display(f);
+					return;
+				}
+				return;
+			}
+		}
+		if (c == backCmd || c == cancelCmd) {
 			if (formHistory.size() == 0) {
 				display(null, true);
 				return;
@@ -503,7 +563,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			return;
 		}
 		if (c == itemChatInfoCmd) {
-			// TODO
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 			openChatInfo(s[0]);
@@ -525,6 +584,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			copy("", (String) ((MPForm) current).urls.get(s[1]));
 			return;
 		}
+		commandAction(c, display.getCurrent());
 	}
 
 	private static void writeAuth() {
@@ -536,6 +596,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			
 			j.put("user", user);
 			j.put("state", userState);
+			j.put("phone", phone);
 			
 			byte[] b = j.toString().getBytes("UTF-8");
 			RecordStore r = RecordStore.openRecordStore(AUTH_RECORDNAME, true);
@@ -646,13 +707,33 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return "Deleted";
 	}
 	
+	static ChatsList mainChatsList() {
+		ChatsList l = chatsList = new ChatsList("Chats", 0);
+		l.removeCommand(backCmd);
+		l.addCommand(exitCmd);
+		l.addCommand(aboutCmd);
+		l.addCommand(settingsCmd);
+		return l;
+	}
+	
 	static Form initialAuthForm() {
 		Form f = new Form("Auth");
-		f.setCommandListener(midlet);
 		f.addCommand(exitCmd);
+		f.addCommand(aboutCmd);
 		f.addCommand(settingsCmd);
+		f.setCommandListener(midlet);
 		
-		// TODO
+		TextField t = new TextField("Instance URL", instanceUrl, 200, TextField.URL);
+		instanceField = t;
+		f.append(t);
+		
+		t = new TextField("Instance URL", instanceUrl, 200, TextField.URL);
+		instancePasswordField = t;
+		f.append(t);
+		
+		StringItem s = new StringItem(null, "Auth", StringItem.BUTTON);
+		s.setDefaultCommand(authCmd);
+		s.setItemCommandListener(midlet);
 		
 		return f;
 	}
@@ -857,18 +938,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		byte[] res = new byte[count];
 		System.arraycopy(buf, 0, res, 0, count);
 		return res;
-	}
-	
-	private static String readUtf(InputStream in, int i) throws IOException {
-		byte[] buf = new byte[i <= 0 ? 1024 : i];
-		i = 0;
-		int j;
-		while ((j = in.read(buf, i, buf.length - i)) != -1) {
-			if ((i += j) >= buf.length) {
-				System.arraycopy(buf, 0, buf = new byte[i + 2048], 0, i);
-			}
-		}
-		return new String(buf, 0, i, "UTF-8");
 	}
 	
 	private static byte[] get(String url) throws IOException {
