@@ -136,7 +136,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command olderMessagesCmd;
 	static Command newerMessagesCmd;
 	static Command sendCmd;
-	static Command updateCmd;
 
 	static Command okCmd;
 	static Command cancelCmd;
@@ -254,9 +253,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		authNewSessionCmd = new Command("New session", Command.SCREEN, 1);
 		authImportSessionCmd = new Command("Import session", Command.SCREEN, 2);
 
-		refreshCmd = new Command("Refresh", Command.SCREEN, 4);
+		foldersCmd = new Command("Folders", Command.SCREEN, 4);
+		refreshCmd = new Command("Refresh", Command.SCREEN, 5);
 		archiveCmd = new Command("Archived chats", Command.SCREEN, 5);
-		foldersCmd = new Command("Folders", Command.SCREEN, 5);
 		contactsCmd = new Command("Contacts", Command.SCREEN, 6);
 		searchCmd = new Command("Search", Command.SCREEN, 7);
 		
@@ -273,7 +272,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		olderMessagesCmd = new Command("Older", Command.ITEM, 1);
 		newerMessagesCmd = new Command("Newer", Command.ITEM, 1);
 		sendCmd = new Command("Send", Command.OK, 1);
-		updateCmd = new Command("Update", Command.SCREEN, 3);
 		
 		okCmd = new Command("Ok", Command.OK, 1);
 		cancelCmd = new Command("Cancel", Command.CANCEL, 2);
@@ -533,7 +531,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					
 					// auth complete
 					userState = 3;
-					run = RUN_VALIDATE_AUTH;
+					MP.run = RUN_VALIDATE_AUTH;
 					run();
 				}
 
@@ -1363,17 +1361,18 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		} else if (p instanceof MPList) {
 			((MPList) p).closed(back);
 		}
+		if (back) {
+			if (p instanceof MPForm || p instanceof MPList) {
+				imagesToLoad.removeAllElements();
+			}
+		}
+		
 		if (d instanceof MPForm) {
 			((MPForm) d).shown();
 		} else if (d instanceof MPList) {
 			((MPList) d).shown();
 		}
-		if (back) {
-			if (p instanceof MPForm || p instanceof MPList) {
-				imagesToLoad.removeAllElements();
-			}
-			return;
-		}
+		if (back) return;
 		// push to history
 		if (d != mainDisplayable && (formHistory.isEmpty() || formHistory.lastElement() != d)) {
 			formHistory.addElement(d);
