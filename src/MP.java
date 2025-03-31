@@ -854,7 +854,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			s.setLayout(Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_VCENTER | Item.LAYOUT_LEFT);
 			f.append(s);
 			
-			s = new StringItem(null, "mpgram 4th");
+			s = new StringItem(null, "Server-assisted Telegram client for J2ME, based on MPGram Web API.\n4th mpgram iteration.");
 			s.setFont(Font.getDefaultFont());
 			s.setLayout(Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_NEWLINE_BEFORE);
 			f.append(s);
@@ -884,6 +884,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 
 			s = new StringItem("Chat", "t.me/nnmidletschat");
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			s.setDefaultCommand(richTextLinkCmd);
+			s.setItemCommandListener(this);
 			f.append(s);
 			display(f);
 			return;
@@ -964,7 +966,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			return;
 		}
 		if (c == richTextLinkCmd) {
-			String url = (String) ((MPForm) current).urls.get(item);
+			String url = null;
+			try {
+				url = (String) ((MPForm) current).urls.get(item);
+			} catch (Exception ignored) {}
 			if (url == null) url = ((StringItem) item).getText();
 			
 			openUrl(url);
@@ -1269,9 +1274,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							domain = null;
 						}
 					}
-				} else if("addstickers".equals(s[0])) {
+				} else if ("addstickers".equals(s[0])) {
 					slug = s[1];
-				} else if("addemoji".equals(s[0])) {
+				} else if ("addemoji".equals(s[0])) {
 					slug = s[1];
 				} else if ("joinchat".equals(s[0])) {
 					invite = s[1];
@@ -1304,7 +1309,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				}
 				if (url.startsWith("settings")) {
 					return true;
-				} else if("resolve".equals(url)
+				} else if ("resolve".equals(url)
 						|| "privatepost".equals(url)
 						|| "user".equals(url)
 						|| "join".equals(url)) {
@@ -1779,7 +1784,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			if (e == entity) continue;
 			if (e.getInt("offset") >= off && e.getInt("offset")+e.getInt("length") <= off+len) {
 				JSONObject ne = new JSONObject();
-				for(Enumeration en = e.keys(); en.hasMoreElements(); ) {
+				for (Enumeration en = e.keys(); en.hasMoreElements(); ) {
 					String k = (String) en.nextElement();
 					ne.put(k, e.get(k));
 				}
