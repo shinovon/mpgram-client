@@ -845,7 +845,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			f.setCommandListener(this);
 			
 			try {
-				f.append(new ImageItem(null, Image.createImage("/g.png"), Item.LAYOUT_LEFT, null));
+				f.append(new ImageItem(null, Image.createImage("/m.png"), Item.LAYOUT_LEFT, null));
 			} catch (Exception ignored) {}
 			
 			StringItem s;
@@ -1166,7 +1166,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	}
 	
 	static ChatsList mainChatsList() {
-		ChatsList l = chatsList = new ChatsList("Chats", 0);
+		ChatsList l = chatsList = new ChatsList("mpgram", 0);
 		l.removeCommand(backCmd);
 		l.addCommand(exitCmd);
 		l.addCommand(aboutCmd);
