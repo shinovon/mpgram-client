@@ -29,6 +29,7 @@ public class ChatInfoForm extends MPForm {
 		
 		JSONObject fullInfo = (JSONObject) MP.api("getFullInfo&id=".concat(id));
 		
+		// TODO
 		append(fullInfo.format(0));
 	}
 

@@ -13,6 +13,7 @@ public class ChatForm extends MPForm {
 	String id;
 	String username;
 	String query;
+	String startBot;
 	
 	int limit = 20;
 	int addOffset = 0;
@@ -35,6 +36,7 @@ public class ChatForm extends MPForm {
 		addCommand(MP.refreshCmd);
 		addCommand(MP.writeCmd);
 		addCommand(MP.chatInfoCmd);
+		addCommand(MP.searchCmd);
 		this.id = id;
 		this.query = query;
 		this.messageId = message;
@@ -57,6 +59,10 @@ public class ChatForm extends MPForm {
 
 			setTitle(MP.getName(id, false));
 			info = true;
+		}
+		
+		if (startBot != null) {
+			
 		}
 
 		if (query != null || topMsgId != 0) {

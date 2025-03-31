@@ -76,7 +76,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static String instanceUrl = DEFAULT_INSTANCE_URL;
 	private static String instancePassword;
 	private static int tzOffset;
-	private static boolean avatars;
 	private static boolean symbianJrt;
 	static boolean useLoadingForm;
 	private static int avatarSize;
@@ -190,7 +189,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			r.closeRecordStore();
 			
 			reverseChat = j.getBoolean("reverseChat", reverseChat);
-			avatars = j.getBoolean("avatars", avatars);
+			loadAvatars = j.getBoolean("loadAvatars", loadAvatars);
 			avatarSize = j.getInt("avatarSize", avatarSize);
 			showMedia = j.getBoolean("showMedia", showMedia);
 		} catch (Exception ignored) {}
@@ -488,7 +487,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	}
 
 	public void commandAction(Command c, Displayable d) {
-		{ // chats list
+		if (d instanceof ChatsList) { // chats list
 			if (c == archiveCmd) {
 				chatsList.changeFolder(1);
 			}
@@ -499,67 +498,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				}
 				display(foldersList);
 			}
-		}
-		if (c == settingsCmd) {
-			// TODO
-			if (settingsForm == null) {
-				Form f = new Form("Settings");
-				f.addCommand(backCmd);
-				f.setCommandListener(this);
-				
-				settingsForm = f;
-			}
-			
-			display(settingsForm);
-		}
-		if (c == aboutCmd) {
-			Form f = new Form("About");
-			f.addCommand(backCmd);
-			f.setCommandListener(this);
-			
-			try {
-				f.append(new ImageItem(null, Image.createImage("/g.png"), Item.LAYOUT_LEFT, null));
-			} catch (Exception ignored) {}
-			
-			StringItem s;
-			s = new StringItem(null, "MPGram v".concat(version));
-			s.setFont(largePlainFont);
-			s.setLayout(Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_VCENTER | Item.LAYOUT_LEFT);
-			f.append(s);
-			
-			s = new StringItem(null, "mpgram 4th");
-			s.setFont(Font.getDefaultFont());
-			s.setLayout(Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_NEWLINE_BEFORE);
-			f.append(s);
-
-			s = new StringItem("Developer", "shinovon");
-			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
-			f.append(s);
-
-			s = new StringItem("Author", "twsparkle");
-			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
-			s.setItemCommandListener(this);
-			f.append(s);
-
-			s = new StringItem("GitHub", "github.com/shinovon");
-			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
-			s.setItemCommandListener(this);
-			f.append(s);
-
-			s = new StringItem("Web", "nnproject.cc");
-			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
-			s.setItemCommandListener(this);
-			f.append(s);
-
-			s = new StringItem("Donate", "boosty.to/nnproject/donate");
-			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
-			f.append(s);
-
-			s = new StringItem("Chat", "t.me/nnmidletschat");
-			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
-			f.append(s);
-			display(f);
-			return;
 		}
 		if (d instanceof ChatForm) { // chat form
 			if (c == refreshCmd) {
@@ -577,6 +515,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			if (c == writeCmd) {
 				display(writeForm(((ChatForm) d).id, null));
+				return;
+			}
+			if (c == searchCmd) {
+				// TODO
 				return;
 			}
 		}
@@ -686,6 +628,87 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				start(RUN_AUTH, pass);
 				return;
 			}
+		}
+		{ // settings
+			if (c == settingsCmd) {
+				// TODO
+				if (settingsForm == null) {
+					Form f = new Form("Settings");
+					f.addCommand(backCmd);
+					f.setCommandListener(this);
+					
+					settingsForm = f;
+				}
+				
+				display(settingsForm);
+				return;
+			}
+			if (c == backCmd && d == settingsForm) {
+				try {
+					RecordStore.deleteRecordStore(SETTINGS_RECORDNAME);
+				} catch (Exception e) {}
+				try {
+					JSONObject j = new JSONObject();
+					j.put("reverseChat", reverseChat);
+					j.put("loadAvatars", loadAvatars);
+					j.put("avatarSize", avatarSize);
+					j.put("showMedia", showMedia);
+					
+					byte[] b = j.toString().getBytes("UTF-8");
+					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORDNAME, true);
+					r.addRecord(b, 0, b.length);
+					r.closeRecordStore();
+				} catch (Exception e) {}
+			}
+		}
+		if (c == aboutCmd) {
+			Form f = new Form("About");
+			f.addCommand(backCmd);
+			f.setCommandListener(this);
+			
+			try {
+				f.append(new ImageItem(null, Image.createImage("/g.png"), Item.LAYOUT_LEFT, null));
+			} catch (Exception ignored) {}
+			
+			StringItem s;
+			s = new StringItem(null, "MPGram v".concat(version));
+			s.setFont(largePlainFont);
+			s.setLayout(Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_VCENTER | Item.LAYOUT_LEFT);
+			f.append(s);
+			
+			s = new StringItem(null, "mpgram 4th");
+			s.setFont(Font.getDefaultFont());
+			s.setLayout(Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_NEWLINE_BEFORE);
+			f.append(s);
+
+			s = new StringItem("Developer", "shinovon");
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			f.append(s);
+
+			s = new StringItem("Author", "twsparkle");
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			s.setItemCommandListener(this);
+			f.append(s);
+
+			s = new StringItem("GitHub", "github.com/shinovon");
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			s.setItemCommandListener(this);
+			f.append(s);
+
+			s = new StringItem("Web", "nnproject.cc");
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			s.setItemCommandListener(this);
+			f.append(s);
+
+			s = new StringItem("Donate", "boosty.to/nnproject/donate");
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			f.append(s);
+
+			s = new StringItem("Chat", "t.me/nnmidletschat");
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			f.append(s);
+			display(f);
+			return;
 		}
 		if (c == List.SELECT_COMMAND) {
 			if (d instanceof MPList) {
@@ -984,12 +1007,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	}
 	
 	static void openUrl(String url) {
-		if (!openDeepUrl(url)) {
+		if (!handleDeepLink(url)) {
 			midlet.browse(url);
 		}
 	}
 	
-	static boolean openDeepUrl(String url) {
+	static boolean handleDeepLink(String url) {
 		if (url.startsWith("@")) {
 			openChat(url.substring(1));
 			return true;
@@ -1156,7 +1179,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 								|| domain.equals(((ChatForm) current).username))) {
 							((ChatForm) current).openMessage(msg, topMsg);
 						} else {
-							Form f = new ChatForm(domain, null, msg, topMsg);
+							ChatForm f = new ChatForm(domain, null, msg, topMsg);
+							if (start != null) {
+								f.startBot = start;
+							}
 							display(f);
 							midlet.start(RUN_LOAD_FORM, f);
 						}
