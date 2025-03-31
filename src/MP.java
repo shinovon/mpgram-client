@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.TimeZone;
 import java.util.Vector;
 
@@ -35,14 +36,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 
 	static final int RUN_SEND_MESSAGE = 4;
 	static final int RUN_VALIDATE_AUTH = 5;
-	static final int RUN_AVATARS = 6;
+	static final int RUN_IMAGES = 6;
 	static final int RUN_UPDATES = 7;
 	static final int RUN_LOAD_FORM = 8;
 	static final int RUN_LOAD_LIST = 9;
 	static final int RUN_AUTH = 10;
 	
-	private static final String SETTINGS_RECORDNAME = "mp4config";
-	private static final String AUTH_RECORDNAME = "mp4user";
+	private static final String SETTINGS_RECORD_NAME = "mp4config";
+	private static final String AUTH_RECORD_NAME = "mp4user";
+	private static final String AVATAR_RECORD_PREFIX = "mpA";
 	
 	private static final String DEFAULT_INSTANCE_URL = "http://mp2.nnchan.ru/";
 	static final String API_URL = "api.php";
@@ -79,17 +81,22 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static boolean symbianJrt;
 	static boolean useLoadingForm;
 	private static int avatarSize;
+	private static int photoSize = 120;
 	static boolean loadAvatars = true;
+	static boolean loadThumbs = true;
 	static boolean reverseChat = true;
 	static boolean showMedia = true;
+	static int avatarsCache = 3; // 0 - off, 1 - hashtable, 2 - storage, 3 - both
+	static boolean threadedImages;
+	static int avatarsCacheThreshold = 20;
 
 	// threading
 	private static int run;
 	private static Object runParam;
 //	private static int running;
 	
-	private static Object avatarsLoadLock = new Object();
-	private static Vector avatarsToLoad = new Vector();
+	private static Object imagesLoadLock = new Object();
+	private static Vector imagesToLoad = new Vector(); // TODO hashtable?
 	
 	// auth
 	private static String user;
@@ -122,6 +129,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command forwardMsgCmd;
 	static Command copyMsgCmd;
 	static Command richTextLinkCmd;
+	static Command openImageCmd;
 
 	static Command writeCmd;
 	static Command chatInfoCmd;
@@ -151,6 +159,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static JSONObject usersCache = new JSONObject();
 	private static JSONObject chatsCache = new JSONObject();
 	
+	private static Hashtable imagesCache = new Hashtable();
+	
 	private static String richTextUrl;
 
 	protected void destroyApp(boolean u) {
@@ -166,11 +176,17 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		version = getAppProperty("MIDlet-Version");
 		display = Display.getDisplay(this);
 		
+		Form f = new Form("mpgram");
+		f.append("Loading");
+		display.setCurrent(mainDisplayable = f);
+		
 		String p = System.getProperty("microedition.platform");
 		symbianJrt = p != null && p.indexOf("platform=S60") != -1;
 		useLoadingForm = !symbianJrt &&
 				(System.getProperty("com.symbian.midp.serversocket.support") != null ||
 				System.getProperty("com.symbian.default.to.suite.icon") != null);
+		
+		threadedImages = symbianJrt;
 		
 		// TODO refuse to run in j2me loader
 		
@@ -178,13 +194,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		if (avatarSize < 8) avatarSize = 16;
 		else if (avatarSize > 120) avatarSize = 120;
 		
+		photoSize = Math.min(f.getWidth(), f.getHeight()) / 3;
+		
 		try {
 			tzOffset = TimeZone.getDefault().getRawOffset() / 1000;
 		} catch (Throwable e) {} // just to be sure
 		
 		// load settings
 		try {
-			RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORDNAME, false);
+			RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, false);
 			JSONObject j = JSONObject.parseObject(new String(r.getRecord(1), "UTF-8"));
 			r.closeRecordStore();
 			
@@ -196,7 +214,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		
 		// load auth
 		try {
-			RecordStore r = RecordStore.openRecordStore(AUTH_RECORDNAME, false);
+			RecordStore r = RecordStore.openRecordStore(AUTH_RECORD_NAME, false);
 			JSONObject j = JSONObject.parseObject(new String(r.getRecord(1), "UTF-8"));
 			r.closeRecordStore();
 
@@ -248,6 +266,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		forwardMsgCmd = new Command("Forward", Command.ITEM, 4);
 		copyMsgCmd = new Command("Copy message", Command.ITEM, 5);
 		richTextLinkCmd = new Command("Link", Command.ITEM, 1);
+		openImageCmd = new Command("View image", Command.ITEM, 1);
 		
 		writeCmd = new Command("Write", Command.SCREEN, 6);
 		chatInfoCmd = new Command("Chat info", Command.SCREEN, 7);
@@ -263,15 +282,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		loadingForm.append("Loading");
 		loadingForm.addCommand(cancelCmd);
 		loadingForm.setCommandListener(this);
-		
-		Form f = new Form("mpgram");
-		f.append("Loading");
-		display(mainDisplayable = f);
 
-		start(RUN_AVATARS, null);
+		start(RUN_IMAGES, null);
 
-		if (loadAvatars && symbianJrt) {
-			start(RUN_AVATARS, null);
+		if (threadedImages) {
+			start(RUN_IMAGES, null);
+			start(RUN_IMAGES, null);
 		}
 		
 		if (user == null || userState < 3) {
@@ -323,20 +339,20 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			break;
 		}
-		case RUN_AVATARS: { // avatars loading
+		case RUN_IMAGES: { // avatars loading
 			try {
 				while (true) {
-					synchronized (avatarsLoadLock) {
-						avatarsLoadLock.wait();
+					synchronized (imagesLoadLock) {
+						imagesLoadLock.wait();
 					}
 					Thread.sleep(200);
-					while (avatarsToLoad.size() > 0) {
+					while (imagesToLoad.size() > 0) {
 						Object[] o = null;
 						
 						try {
-							synchronized (avatarsLoadLock) {
-								o = (Object[]) avatarsToLoad.elementAt(0);
-								avatarsToLoad.removeElementAt(0);
+							synchronized (imagesLoadLock) {
+								o = (Object[]) imagesToLoad.elementAt(0);
+								imagesToLoad.removeElementAt(0);
 							}
 						} catch (Exception e) {
 							continue;
@@ -344,14 +360,71 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						
 						if (o == null) continue;
 						
-						String id = (String) o[0];
+						Object src = (Object) o[0];
 						Object target = o[1];
 						
-						if (id == null) continue;
+						if (src == null) continue;
 						
 						try {
-							Image img = getImage(instanceUrl + AVA_URL + "?a&c=" + id + "&p=r" + avatarSize);
-								
+							String url;
+							Image img = null;
+							String recordName = null;
+							if (src instanceof String) {
+								recordName = AVATAR_RECORD_PREFIX + avatarSize + "r" + (String) src;
+								url = instanceUrl + AVA_URL + "?a&c=" + ((String) src) + "&p=r" + avatarSize;
+
+								// load avatar from cache
+								if ((avatarsCache & 1) == 1 && imagesCache.containsKey(src)) {
+									img = (Image) imagesCache.get(src);
+								} else if ((avatarsCache & 2) == 2) {
+									try {
+										RecordStore r = RecordStore.openRecordStore(recordName, false);
+										try {
+											byte[] b = r.getRecord(1);
+											img = Image.createImage(b, 0, b.length);
+										} finally {
+											r.closeRecordStore();
+										}
+									} catch (Exception ignored) {}
+								}
+							} else if (src instanceof String[]) {
+								String peer = ((String[]) src)[0];
+								String id = ((String[]) src)[1];
+								url = instanceUrl + FILE_URL + "?a&c=" + peer + "&m=" + id + "&p=rprev&s=" + photoSize;
+							} else {
+								continue;
+							}
+							if (img == null) {
+								byte[] b = get(url);
+								if (recordName != null) {
+									// save avatar to storage cache
+									if ((avatarsCache & 2) == 2) {
+										try {
+											RecordStore.deleteRecordStore(recordName);
+										} catch (Exception ignored) {}
+										try {
+											RecordStore r = RecordStore.openRecordStore(recordName, true);
+											try {
+												r.addRecord(b, 0, b.length);
+											} finally {
+												r.closeRecordStore();
+											}
+										} catch (Exception ignored) {}
+									}
+								}
+								img = Image.createImage(b, 0, b.length);
+							}
+							
+							if (img == null) continue;
+							
+							// save avatar to hashtable cache
+							if (recordName != null && (avatarsCache & 1) == 1) {
+								if (imagesCache.size() > avatarsCacheThreshold) {
+									imagesCache.clear();
+								}
+								imagesCache.put(src, img);
+							}
+							
 							if (target instanceof ImageItem) {
 								((ImageItem) target).setImage(img);
 							} else if (target instanceof Object[]) {
@@ -514,7 +587,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 			if (c == writeCmd) {
-				display(writeForm(((ChatForm) d).id, null));
+				display(writeForm(((ChatForm) d).id, null, ""));
 				return;
 			}
 			if (c == searchCmd) {
@@ -645,7 +718,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			if (c == backCmd && d == settingsForm) {
 				try {
-					RecordStore.deleteRecordStore(SETTINGS_RECORDNAME);
+					RecordStore.deleteRecordStore(SETTINGS_RECORD_NAME);
 				} catch (Exception e) {}
 				try {
 					JSONObject j = new JSONObject();
@@ -655,7 +728,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					j.put("showMedia", showMedia);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
-					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORDNAME, true);
+					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
 					r.addRecord(b, 0, b.length);
 					r.closeRecordStore();
 				} catch (Exception e) {}
@@ -760,19 +833,19 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		if (c == itemChatCmd) {
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
-			openChat(s[0]);
+			openChat(s[2]);
 			return;
 		}
 		if (c == itemChatInfoCmd) {
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
-			openProfile(s[0]);
+			openProfile(s[2]);
 			return;
 		}
 		if (c == replyMsgCmd) {
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
-			display(writeForm(((ChatForm) current).id, s[1]));
+			display(writeForm(((ChatForm) current).id, s[1], ""));
 			return;
 		}
 		if (c == forwardMsgCmd) {
@@ -792,12 +865,16 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			openUrl(url);
 			return;
 		}
+		if (c == openImageCmd) {
+			// TODO
+			return;
+		}
 		commandAction(c, display.getCurrent());
 	}
 
 	private static void writeAuth() {
 		try {
-			RecordStore.deleteRecordStore(AUTH_RECORDNAME);
+			RecordStore.deleteRecordStore(AUTH_RECORD_NAME);
 		} catch (Exception ignored) {}
 		try {
 			JSONObject j = new JSONObject();
@@ -809,7 +886,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			j.put("instPass", instancePassword);
 			
 			byte[] b = j.toString().getBytes("UTF-8");
-			RecordStore r = RecordStore.openRecordStore(AUTH_RECORDNAME, true);
+			RecordStore r = RecordStore.openRecordStore(AUTH_RECORD_NAME, true);
 			r.addRecord(b, 0, b.length);
 			r.closeRecordStore();
 		} catch (Exception e) {}
@@ -817,9 +894,26 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 	static void queueAvatar(String id, Object target) {
 		if (target == null || id == null || !loadAvatars) return;
-		synchronized (avatarsLoadLock) {
-			avatarsToLoad.addElement(new Object[] { id, target });
-			avatarsLoadLock.notifyAll();
+		
+		JSONObject peer = getPeer(id, false);
+		if (peer != null) {
+			if (!peer.has("p")) {
+				return;
+			}
+			id = peer.getString("id");
+		}
+		
+		synchronized (imagesLoadLock) {
+			imagesToLoad.addElement(new Object[] { id, target });
+			imagesLoadLock.notifyAll();
+		}
+	}
+	
+	static void queueImage(Object src, Object target) {
+		if (target == null || src == null || !loadThumbs) return;
+		synchronized (imagesLoadLock) {
+			imagesToLoad.addElement(new Object[] { src, target });
+			imagesLoadLock.notifyAll();
 		}
 	}
 
@@ -892,7 +986,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				}
 			}
 		} catch (Exception e) {
-			// username
+			// username not in cache
 			try {
 				o = (JSONObject) api("getPeer&id=".concat(id));
 			} catch (Exception e2) {
@@ -995,7 +1089,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return f;
 	}
 	
-	static Form writeForm(String id, String reply) {
+	static Form writeForm(String id, String reply, String text) {
 		Form f = new Form("Write");
 		f.setCommandListener(midlet);
 		f.addCommand(backCmd);
@@ -1257,7 +1351,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			d = mainDisplayable;
 			
 			formHistory.removeAllElements();
-			avatarsToLoad.removeAllElements();
+			imagesToLoad.removeAllElements();
 		}
 		Displayable p = display.getCurrent();
 		if (p == loadingForm) p = current;
@@ -1266,9 +1360,22 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		
 		if (p instanceof MPForm) {
 			((MPForm) p).closed(back);
+		} else if (p instanceof MPList) {
+			((MPList) p).closed(back);
+		}
+		if (d instanceof MPForm) {
+			((MPForm) d).shown();
+		} else if (d instanceof MPList) {
+			((MPList) d).shown();
+		}
+		if (back) {
+			if (p instanceof MPForm || p instanceof MPList) {
+				imagesToLoad.removeAllElements();
+			}
+			return;
 		}
 		// push to history
-		if (!back && d != mainDisplayable && (formHistory.isEmpty() || formHistory.lastElement() != d)) {
+		if (d != mainDisplayable && (formHistory.isEmpty() || formHistory.lastElement() != d)) {
 			formHistory.addElement(d);
 		}
 	}
@@ -1561,7 +1668,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				JSONObject ne = new JSONObject();
 				for(Enumeration en = e.keys(); en.hasMoreElements(); ) {
 					String k = (String) en.nextElement();
-					ne.put(k, ne.get(k));
+					ne.put(k, e.get(k));
 				}
 				
 				ne.put("offset", ne.getInt("offset") - off);

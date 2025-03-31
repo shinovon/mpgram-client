@@ -1,5 +1,7 @@
+import java.util.Enumeration;
 import java.util.Vector;
 
+import javax.microedition.lcdui.ImageItem;
 import javax.microedition.lcdui.List;
 
 import cc.nnproject.json.JSONArray;
@@ -92,6 +94,14 @@ public class ChatsList extends MPList {
 		cancel();
 		folder = folderId;
 		MP.midlet.start(MP.RUN_LOAD_LIST, this);
+	}
+	
+	void shown() {
+		if (!loaded || ids == null) return;
+		for (int i = ids.size() - 1; i >= 0; i--) {
+			if (getImage(i) != null) continue; // TODO break?
+			MP.queueAvatar((String) ids.elementAt(i), new Object[] { this, new Integer(i) });
+		}
 	}
 
 }

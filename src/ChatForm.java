@@ -1,3 +1,4 @@
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 import javax.microedition.lcdui.ImageItem;
@@ -150,6 +151,7 @@ public class ChatForm extends MPForm {
 			String fromId = message.has("from_id") ? message.getString("from_id") : this.id;
 			boolean out = message.getBoolean("out", false);
 			String text = message.getString("text", null);
+			String[] key = new String[] { this.id, idString, fromId };
 			
 			sb.setLength(0);
 			sb.append(out && !broadcast ? "You" : MP.getName(fromId, true));
@@ -176,7 +178,7 @@ public class ChatForm extends MPForm {
 					safeInsert(thread, insert++, sp);
 				}
 				safeInsert(thread, insert++, s);
-				urls.put(s, new String[] { fromId, idString } );
+				urls.put(s, key);
 				msgItem = s;
 			}
 			group = message.getLong("group", 0);
@@ -241,20 +243,13 @@ public class ChatForm extends MPForm {
 						if (text != null && text.length() != 0) {
 							img.setLayout(Item.LAYOUT_NEWLINE_BEFORE);
 						}
+						img.setDefaultCommand(MP.openImageCmd);
+						img.setItemCommandListener(MP.midlet);
+						urls.put(img, key);
 						safeInsert(thread, insert++, img);
+						MP.queueImage(key, img);
 						if (msgItem == null) {
 							msgItem = img;
-						}
-						// FIXME
-						try {
-							img.setImage(MP.getImage(
-									(MP.instanceUrl + MP.FILE_URL + "?c=")
-									.concat(this.id)
-									.concat("&m=").concat(idString)
-									.concat("&p=rprev&s=120")
-									));
-						} catch (Exception e) {
-							e.printStackTrace();
 						}
 					}
 				}
@@ -281,7 +276,6 @@ public class ChatForm extends MPForm {
 	}
 
 	public void openMessage(int msg, int topMsg) {
-		// TODO
 		cancel();
 		this.messageId = msg;
 		this.topMsgId = topMsg;
@@ -318,6 +312,16 @@ public class ChatForm extends MPForm {
 		messageId = 0;
 		addOffset = 0;
 		offsetId = 0;
+	}
+	
+	void shown() {
+		if (!loaded || urls == null) return;
+		for (Enumeration en = urls.keys(); en.hasMoreElements(); ) {
+			Object key = en.nextElement();
+			if (key instanceof ImageItem && ((ImageItem) key).getImage() == null) {
+				MP.queueImage(key, urls.get(key));
+			}
+		}
 	}
 
 }

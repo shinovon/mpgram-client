@@ -84,5 +84,7 @@ public abstract class MPForm extends Form {
 	void closed(boolean destroy) {
 		if (destroy) cancel();
 	}
+	
+	void shown() {}
 
 }

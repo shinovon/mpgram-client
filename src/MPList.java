@@ -82,5 +82,7 @@ public abstract class MPList extends List {
 	}
 	
 	abstract void select(int i);
+	
+	void shown() {}
 
 }
