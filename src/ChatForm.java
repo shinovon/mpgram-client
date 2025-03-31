@@ -63,7 +63,7 @@ public class ChatForm extends MPForm {
 		}
 		
 		if (startBot != null) {
-			
+			// TODO
 		}
 
 		if (query != null || topMsgId != 0) {

@@ -9,6 +9,8 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
+import javax.microedition.lcdui.Choice;
+import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
@@ -116,6 +118,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static Command authPasswordCmd;
 	private static Command authNewSessionCmd;
 	private static Command authImportSessionCmd;
+	private static Command logoutCmd;
 
 	static Command refreshCmd;
 	static Command archiveCmd;
@@ -130,12 +133,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command copyMsgCmd;
 	static Command richTextLinkCmd;
 	static Command openImageCmd;
+	static Command callItemCmd;
 
 	static Command writeCmd;
 	static Command chatInfoCmd;
 	static Command olderMessagesCmd;
 	static Command newerMessagesCmd;
 	static Command sendCmd;
+	
+	static Command callCmd;
 
 	static Command okCmd;
 	static Command cancelCmd;
@@ -161,6 +167,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static Hashtable imagesCache = new Hashtable();
 	
 	private static String richTextUrl;
+	private ChoiceGroup imagesChoice;
+	private ChoiceGroup avaCacheChoice;
+	private Gauge avaCacheGauge;
+	private ChoiceGroup uiChoice;
+	private Gauge photoSizeGauge;
 
 	protected void destroyApp(boolean u) {
 	}
@@ -209,6 +220,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			loadAvatars = j.getBoolean("loadAvatars", loadAvatars);
 			avatarSize = j.getInt("avatarSize", avatarSize);
 			showMedia = j.getBoolean("showMedia", showMedia);
+			photoSize = j.getInt("photoSize", photoSize);
+			loadThumbs = j.getBoolean("loadThumbs", loadThumbs);
+			threadedImages = j.getBoolean("threadedImages", threadedImages);
+			avatarsCache = j.getInt("avatarsCache", avatarsCache);
+			avatarsCacheThreshold = j.getInt("avatarsCacheThreshold", avatarsCacheThreshold);
+			useLoadingForm = j.getBoolean("useLoadingForm", useLoadingForm);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -252,6 +269,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		authPasswordCmd = new Command("Next", Command.OK, 1);
 		authNewSessionCmd = new Command("New session", Command.SCREEN, 1);
 		authImportSessionCmd = new Command("Import session", Command.SCREEN, 2);
+		logoutCmd = new Command("Logout", Command.ITEM, 1);
 
 		foldersCmd = new Command("Folders", Command.SCREEN, 4);
 		refreshCmd = new Command("Refresh", Command.SCREEN, 5);
@@ -266,12 +284,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		copyMsgCmd = new Command("Copy message", Command.ITEM, 5);
 		richTextLinkCmd = new Command("Link", Command.ITEM, 1);
 		openImageCmd = new Command("View image", Command.ITEM, 1);
+		callItemCmd = new Command("Call", Command.ITEM, 1);
 		
 		writeCmd = new Command("Write", Command.SCREEN, 6);
 		chatInfoCmd = new Command("Chat info", Command.SCREEN, 7);
 		olderMessagesCmd = new Command("Older", Command.ITEM, 1);
 		newerMessagesCmd = new Command("Newer", Command.ITEM, 1);
 		sendCmd = new Command("Send", Command.OK, 1);
+		
+		callCmd = new Command("Call", Command.SCREEN, 5);
 		
 		okCmd = new Command("Ok", Command.OK, 1);
 		cancelCmd = new Command("Cancel", Command.CANCEL, 2);
@@ -581,7 +602,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 			if (c == chatInfoCmd) {
-				openProfile(((ChatForm) d).id);
+				openProfile(((ChatForm) d).id, (ChatForm) d);
 				return;
 			}
 			if (c == writeCmd) {
@@ -707,6 +728,66 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					Form f = new Form("Settings");
 					f.addCommand(backCmd);
 					f.setCommandListener(this);
+					StringItem s;
+					
+					s = new StringItem(null, "UI");
+					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					s.setFont(largePlainFont);
+					f.append(s);
+					
+					uiChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
+							"Reversed chat",
+							"Show media"
+					}, null);
+					uiChoice.setSelectedIndex(0, reverseChat);
+					uiChoice.setSelectedIndex(1, showMedia);
+					uiChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(uiChoice);
+					
+					photoSizeGauge = new Gauge("Thumbnails size", true, 64, photoSize / 8);
+					photoSizeGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(photoSizeGauge);
+					
+					s = new StringItem(null, "Behaviour");
+					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					s.setFont(largePlainFont);
+					f.append(s);
+					
+					imagesChoice = new ChoiceGroup("Images", Choice.MULTIPLE, new String[] {
+							"Load media thumbnails",
+							"Load avatars",
+							"Multi-threaded loading"
+					}, null);
+					imagesChoice.setSelectedIndex(0, loadThumbs);
+					imagesChoice.setSelectedIndex(1, loadAvatars);
+					imagesChoice.setSelectedIndex(2, threadedImages);
+					imagesChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(imagesChoice);
+
+					avaCacheChoice = new ChoiceGroup("Avatars caching", Choice.POPUP, new String[] {
+							"Disabled",
+							"Hold in RAM",
+							"Store",
+							"Hold in RAM & Store"
+					}, null);
+					avaCacheChoice.setSelectedIndex(avatarsCache, true);
+					avaCacheChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(avaCacheChoice);
+					
+					avaCacheGauge = new Gauge("Avatars cache threshold", true, 20, avatarsCacheThreshold / 5);
+					avaCacheGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(avaCacheGauge);
+					
+					s = new StringItem(null, "Authorization");
+					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					s.setFont(largePlainFont);
+					f.append(s);
+					
+					s = new StringItem(null, "Logout", Item.BUTTON);
+					s.setDefaultCommand(logoutCmd);
+					s.setItemCommandListener(this);
+					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(s);
 					
 					settingsForm = f;
 				}
@@ -715,6 +796,20 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 			if (c == backCmd && d == settingsForm) {
+				reverseChat = uiChoice.isSelected(0);
+				showMedia = uiChoice.isSelected(1);
+				
+				if ((photoSize = (photoSizeGauge.getValue() * 8)) < 16) {
+					photoSizeGauge.setValue((photoSize = 16) / 8);
+				}
+				
+				loadThumbs = imagesChoice.isSelected(0);
+				loadAvatars = imagesChoice.isSelected(1);
+				threadedImages = imagesChoice.isSelected(2);
+				
+				avatarsCache = avaCacheChoice.getSelectedIndex();
+				avatarsCacheThreshold = avaCacheGauge.getValue() * 5;
+				
 				try {
 					RecordStore.deleteRecordStore(SETTINGS_RECORD_NAME);
 				} catch (Exception e) {}
@@ -724,12 +819,24 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					j.put("loadAvatars", loadAvatars);
 					j.put("avatarSize", avatarSize);
 					j.put("showMedia", showMedia);
+					j.put("photoSize", photoSize);
+					j.put("loadThumbs", loadThumbs);
+					j.put("threadedImages", threadedImages);
+					j.put("avatarsCache", avatarsCache);
+					j.put("avatarsCacheThreshold", avatarsCacheThreshold);
+					j.put("useLoadingForm", useLoadingForm);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
 					r.addRecord(b, 0, b.length);
 					r.closeRecordStore();
 				} catch (Exception e) {}
+			}
+			if (c == logoutCmd) {
+				userState = 0;
+				display(mainDisplayable = initialAuthForm());
+				writeAuth();
+				return;
 			}
 		}
 		if (c == aboutCmd) {
@@ -837,7 +944,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		if (c == itemChatInfoCmd) {
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
-			openProfile(s[2]);
+			openProfile(s[2], null);
 			return;
 		}
 		if (c == replyMsgCmd) {
@@ -865,6 +972,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		if (c == openImageCmd) {
 			// TODO
+			return;
+		}
+		if (c == callItemCmd) {
+			browse("tel:".concat(((StringItem) item).getText()));
 			return;
 		}
 		commandAction(c, display.getCurrent());
@@ -1254,7 +1365,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						return true;
 					} else {
 						if (profile) {
-							openProfile(domain);
+							openProfile(domain, null);
 							
 							return true;
 						}
@@ -1303,8 +1414,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		midlet.start(RUN_LOAD_FORM, f);
 	}
 	
-	static void openProfile(String id) {
-		Form f = new ChatInfoForm(id);
+	static void openProfile(String id, ChatForm chatForm) {
+		if (chatForm == null && current instanceof ChatForm && id.equals(((ChatForm) current).id)) {
+			chatForm = (ChatForm) current;
+		}
+		Form f = new ChatInfoForm(id, chatForm);
 		display(f);
 		midlet.start(RUN_LOAD_FORM, f);
 	}
