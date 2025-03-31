@@ -263,7 +263,7 @@ public class ChatForm extends MPForm {
 				focus = msgItem;
 			}
 			if (group != 0) {
-				safeInsert(thread, insert++, new Spacer(10, 8));
+				safeInsert(thread, insert++, new Spacer(10, 12));
 			}
 			
 //			if (MP.reverseChat ? (i-- == 0) : (++i == l)) break;
