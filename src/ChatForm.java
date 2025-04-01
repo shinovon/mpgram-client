@@ -34,7 +34,6 @@ public class ChatForm extends MPForm {
 	public ChatForm(String id, String query, int message, int topMsg) {
 		super(id);
 		addCommand(MP.refreshCmd);
-//		addCommand(MP.writeCmd);
 		addCommand(MP.chatInfoCmd);
 //		addCommand(MP.searchCmd);
 		this.id = id;
@@ -70,11 +69,24 @@ public class ChatForm extends MPForm {
 					canDelete = adminRights.getBoolean("delete_messages", false);
 				}
 			}
+			
+			if (canWrite) {
+				addCommand(MP.writeCmd);
+			}
 			info = true;
 		}
 		
 		if (startBot != null) {
 			// TODO
+			try {
+				sb.append("startBot&id=").append(id);
+				MP.appendUrl(sb.append("&start="), startBot);
+				
+				MP.api(sb.toString());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			sb.setLength(0);
 		}
 
 		if (query != null || topMsgId != 0) {
@@ -185,11 +197,18 @@ public class ChatForm extends MPForm {
 			if (!out) {
 				s.addCommand(MP.itemChatInfoCmd);
 			}
-			s.addCommand(MP.replyMsgCmd);
+			if (canWrite) {
+				s.addCommand(MP.replyMsgCmd);
+			}
 			s.addCommand(MP.forwardMsgCmd);
+			s.addCommand(MP.messageLinkCmd);
 			if (text != null && text.length() != 0) {
 				s.addCommand(MP.copyMsgCmd);
 			}
+			// TODO
+//			if (canDelete) {
+//				s.addCommand(MP.deleteMsgCmd);
+//			}
 			
 			s.setDefaultCommand(MP.itemChatCmd);
 			s.setItemCommandListener(MP.midlet);

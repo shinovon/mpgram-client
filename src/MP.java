@@ -132,17 +132,21 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command replyMsgCmd;
 	static Command forwardMsgCmd;
 	static Command copyMsgCmd;
+	static Command messageLinkCmd;
+	static Command deleteMsgCmd;
+	
 	static Command richTextLinkCmd;
 	static Command openImageCmd;
 	static Command callItemCmd;
-	static Command deleteMessageCmd;
 	static Command documentCmd;
 
 	static Command writeCmd;
 	static Command chatInfoCmd;
 	static Command olderMessagesCmd;
 	static Command newerMessagesCmd;
+	
 	static Command sendCmd;
+	static Command openTextBoxCmd;
 	
 	static Command callCmd;
 
@@ -157,24 +161,30 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static Form settingsForm;
 	private static Vector formHistory = new Vector();
 
-	// ui elements
-//	private static TextField tokenField;
+	// auth items
 	private static TextField instanceField;
 	private static TextField instancePasswordField;
 	
-//	private static JSONArray dialogs;
+	// settings items
+	private static ChoiceGroup imagesChoice;
+	private static ChoiceGroup avaCacheChoice;
+	private static Gauge avaCacheGauge;
+	private static ChoiceGroup uiChoice;
+	private static Gauge photoSizeGauge;
+	
+	// write items
+	private static TextField messageField;
 
+	// cache
 	private static JSONObject usersCache = new JSONObject();
 	private static JSONObject chatsCache = new JSONObject();
-	
 	private static Hashtable imagesCache = new Hashtable();
 	
+	// temp
 	private static String richTextUrl;
-	private ChoiceGroup imagesChoice;
-	private ChoiceGroup avaCacheChoice;
-	private Gauge avaCacheGauge;
-	private ChoiceGroup uiChoice;
-	private Gauge photoSizeGauge;
+	private static String writeTo;
+	private static String replyTo;
+	private static String edit;
 
 	protected void destroyApp(boolean u) {
 	}
@@ -285,17 +295,21 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		replyMsgCmd = new Command("Reply", Command.ITEM, 3);
 		forwardMsgCmd = new Command("Forward", Command.ITEM, 4);
 		copyMsgCmd = new Command("Copy message", Command.ITEM, 5);
+		messageLinkCmd = new Command("Copy message link", Command.ITEM, 7);
+		deleteMsgCmd = new Command("Delete", Command.ITEM, 8);
+		
 		richTextLinkCmd = new Command("Link", Command.ITEM, 1);
 		openImageCmd = new Command("View image", Command.ITEM, 1);
 		callItemCmd = new Command("Call", Command.ITEM, 1);
-		deleteMessageCmd = new Command("Delete", Command.ITEM, 1);
 		documentCmd = new Command("Download", Command.ITEM, 1);
 		
 		writeCmd = new Command("Write message", Command.SCREEN, 6);
 		chatInfoCmd = new Command("Chat info", Command.SCREEN, 7);
 		olderMessagesCmd = new Command("Older", Command.ITEM, 1);
 		newerMessagesCmd = new Command("Newer", Command.ITEM, 1);
+		
 		sendCmd = new Command("Send", Command.OK, 1);
+		openTextBoxCmd = new Command("Open text box", Command.ITEM, 1);
 		
 		callCmd = new Command("Call", Command.SCREEN, 5);
 		
@@ -577,6 +591,26 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			break;
 		}
+		case RUN_SEND_MESSAGE: {
+			try {
+				StringBuffer sb = new StringBuffer(edit != null ? "editMessage" : "sendMessage");
+				sb.append("&peer=").append(writeTo);
+				if (edit != null) {
+					sb.append("&id=").append(edit);
+				}
+				if (replyTo != null) {
+					sb.append("&reply=").append(replyTo);
+				}
+				appendUrl(sb.append("&text="), (String) param);
+				api(sb.toString());
+				
+				commandAction(backCmd, current);
+				display(infoAlert("Sent"), current);
+			} catch (Exception e) {
+				display(errorAlert(e.toString()), current);
+			}
+			break;
+		}
 		}
 //		running--;
 	}
@@ -622,7 +656,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 			if (c == writeCmd) {
-				display(writeForm(((ChatForm) d).id, null, ""));
+				display(writeForm(((ChatForm) d).id, null, "", null));
 				return;
 			}
 			if (c == searchCmd) {
@@ -855,6 +889,26 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 		}
+		{ // write form commands
+			if (c == sendCmd) {
+				display(loadingAlert("Sending"), d);
+				start(RUN_SEND_MESSAGE, messageField.getString());
+				return;
+			}
+			if (c == openTextBoxCmd) {
+				TextBox t = new TextBox("Message", messageField.getString(), 500, TextField.NUMERIC);
+				t.addCommand(okCmd);
+				t.addCommand(cancelCmd);
+				t.setCommandListener(this);
+				display(t);
+				return;
+			}
+			if (c == okCmd) {
+				messageField.setString(((TextBox) d).getString());
+				
+				c = backCmd;
+			}
+		}
 		if (c == aboutCmd) {
 			Form f = new Form("About");
 			f.addCommand(backCmd);
@@ -968,7 +1022,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		if (c == replyMsgCmd) {
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
-			display(writeForm(((ChatForm) current).id, s[1], ""));
+			display(writeForm(((ChatForm) current).id, s[1], "", null));
 			return;
 		}
 		if (c == forwardMsgCmd) {
@@ -979,6 +1033,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 			copy("", (String) ((MPForm) current).urls.get(s[1]));
+			return;
+		}
+		if (c == messageLinkCmd) {
+			String[] s = (String[]) ((MPForm) current).urls.get(item);
+			if (s == null) return;
+			copy("", (((ChatForm) current).username != null ? "https://t.me/c/" : "https://t.me/") + s[0] + "/" + s[1]);
 			return;
 		}
 		if (c == richTextLinkCmd) {
@@ -1002,7 +1062,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			browse("tel:".concat(((StringItem) item).getText()));
 			return;
 		}
-		if (c == deleteMessageCmd) {
+		if (c == deleteMsgCmd) {
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 			display(loadingAlert("Loading"), current);
@@ -1236,13 +1296,23 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return f;
 	}
 	
-	static Form writeForm(String id, String reply, String text) {
-		Form f = new Form("Write");
+	static Form writeForm(String id, String reply, String text, String editId) {
+		writeTo = id;
+		replyTo = reply;
+		edit = editId;
+		
+		Form f = new Form(editId != null ? editId : reply != null ? "Reply" : "Write");
 		f.setCommandListener(midlet);
 		f.addCommand(backCmd);
 		f.addCommand(sendCmd);
 		
-		// TODO
+		TextField t = new TextField("Message", text, 500, TextField.ANY);
+		f.append(messageField = t);
+		
+		StringItem s = new StringItem(null, "...", Item.BUTTON);
+		s.setDefaultCommand(openTextBoxCmd);
+		s.setItemCommandListener(midlet);
+		f.append(s);
 		
 		return f;
 	}
