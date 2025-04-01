@@ -43,6 +43,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static final int RUN_LOAD_FORM = 8;
 	static final int RUN_LOAD_LIST = 9;
 	static final int RUN_AUTH = 10;
+	static final int RUN_DELETE_MESSAGE = 11;
 	
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
@@ -134,6 +135,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command richTextLinkCmd;
 	static Command openImageCmd;
 	static Command callItemCmd;
+	static Command deleteMessageCmd;
+	static Command documentCmd;
 
 	static Command writeCmd;
 	static Command chatInfoCmd;
@@ -285,8 +288,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		richTextLinkCmd = new Command("Link", Command.ITEM, 1);
 		openImageCmd = new Command("View image", Command.ITEM, 1);
 		callItemCmd = new Command("Call", Command.ITEM, 1);
+		deleteMessageCmd = new Command("Delete", Command.ITEM, 1);
+		documentCmd = new Command("Download", Command.ITEM, 1);
 		
-		writeCmd = new Command("Write", Command.SCREEN, 6);
+		writeCmd = new Command("Write message", Command.SCREEN, 6);
 		chatInfoCmd = new Command("Chat info", Command.SCREEN, 7);
 		olderMessagesCmd = new Command("Older", Command.ITEM, 1);
 		newerMessagesCmd = new Command("Newer", Command.ITEM, 1);
@@ -409,7 +414,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							} else if (src instanceof String[]) {
 								String peer = ((String[]) src)[0];
 								String id = ((String[]) src)[1];
-								url = instanceUrl + FILE_URL + "?a&c=" + peer + "&m=" + id + "&p=rprev&s=" + photoSize;
+								String p = ((String[]) src)[3];
+								url = instanceUrl + FILE_URL + "?a&c=" + peer + "&m=" + id + "&p=" + p + "&s=" + photoSize;
 							} else {
 								continue;
 							}
@@ -558,6 +564,16 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 
 			} catch (Exception e) {
 				display(errorAlert(e.toString()), null);
+			}
+			break;
+		}
+		case RUN_DELETE_MESSAGE: {
+			try {
+				// TODO
+				
+				display(infoAlert("Deleted"), current);
+			} catch (Exception e) {
+				display(errorAlert(e.toString()), current);
 			}
 			break;
 		}
@@ -723,7 +739,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		{ // settings
 			if (c == settingsCmd) {
-				// TODO
 				if (settingsForm == null) {
 					Form f = new Form("Settings");
 					f.addCommand(backCmd);
@@ -796,6 +811,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 			if (c == backCmd && d == settingsForm) {
+				// apply and save settings
 				reverseChat = uiChoice.isSelected(0);
 				showMedia = uiChoice.isSelected(1);
 				
@@ -977,10 +993,27 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		if (c == openImageCmd) {
 			// TODO
+			String[] s = (String[]) ((MPForm) current).urls.get(item);
+			if (s == null) return;
+			browse(instanceUrl + FILE_URL + "?c=" + s[0] + "&m=" + s[1] + "&user=" + user);
 			return;
 		}
 		if (c == callItemCmd) {
 			browse("tel:".concat(((StringItem) item).getText()));
+			return;
+		}
+		if (c == deleteMessageCmd) {
+			String[] s = (String[]) ((MPForm) current).urls.get(item);
+			if (s == null) return;
+			display(loadingAlert("Loading"), current);
+			start(RUN_DELETE_MESSAGE, s[1]);
+			return;
+		}
+		if (c == documentCmd) {
+			// TODO
+			String[] s = (String[]) ((MPForm) current).urls.get(item);
+			if (s == null) return;
+			browse(instanceUrl + FILE_URL + "?c=" + s[0] + "&m=" + s[1] + "&user=" + user);
 			return;
 		}
 		commandAction(c, display.getCurrent());
@@ -1256,11 +1289,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				if ("c".equals(s[0]) && s.length > 1) {
 					privat = true;
 					domain = s[1];
-					if (s.length == 2) {
-						messageId = s[1];
-					} else if (s.length == 3) {
-						thread = s[1];
+					if (s.length == 3) {
 						messageId = s[2];
+					} else if (s.length == 4) {
+						thread = s[2];
+						messageId = s[3];
 					}
 				} else if (s.length == 1) {
 					domain = s[0];
@@ -1294,8 +1327,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				} else if ("login".equals(s[0])) {
 				} else if ("confirmphone".equals(s[0])) {
 				} else if ("giftcode".equals(s[0])) {
+				} else if ("boost".equals(s[0])) {
 				} else {
 					domain = s[0];
+					if (s.length == 2) {
+						messageId = s[1];
+					} else if (s.length == 3) {
+						thread = s[1];
+						messageId = s[2];
+					}
 				}
 			} else if (url.startsWith("tg://")) {
 				url = url.substring(5);
@@ -1361,6 +1401,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							slug = query[n].substring(5);
 							continue;
 						}
+						if (query[n].startsWith("post=")) {
+							messageId = query[n].substring(5);
+							continue;
+						}
 					}
 				}
 				
@@ -1376,9 +1420,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						}
 						int msg = 0;
 						int topMsg = 0;
-						if (messageId != null) {
-							msg = Integer.parseInt(messageId);
-						}
+						try {
+							if (messageId != null) {
+								msg = Integer.parseInt(messageId);
+							}
+						} catch (Exception ignored) {}
 						if (thread != null) {
 							topMsg = Integer.parseInt(thread);
 						}
