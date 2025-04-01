@@ -43,11 +43,10 @@ public abstract class MPList extends List {
 		if (loaded) return;
 		loaded = true;
 		canceled = finished = false;
-		
+
+		setTicker(new Ticker("Loading.."));
 		if (MP.useLoadingForm) {
 			MP.display(MP.loadingForm);
-		} else {
-			setTicker(new Ticker("Loading.."));
 		}
 		Thread thread = this.thread = Thread.currentThread();
 		try {

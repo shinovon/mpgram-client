@@ -401,9 +401,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			run = RUN_VALIDATE_AUTH;
 			run();
 			
-			ChatsList l = mainChatsList();
-			start(RUN_LOAD_LIST, l);
-			display(mainDisplayable = l);
+			openLoad(mainDisplayable = mainChatsList());
 		}
 	}
 	
@@ -426,9 +424,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				userState = 4;
 				
 				if (param != null) {
-					ChatsList l = mainChatsList();
-					start(RUN_LOAD_LIST, l);
-					display(mainDisplayable = l);
+					openLoad(mainDisplayable = mainChatsList());
 					writeAuth();
 				}
 			} catch (APIException e) {
@@ -692,9 +688,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					break;
 				}
 				
-				Form f = new ChatInfoForm(id, (String) param, getNameRaw(rawPeer), "chatInvitePeek".equals(type) ? 2 : 3);
-				display(f);
-				midlet.start(RUN_LOAD_FORM, f);
+				openLoad(new ChatInfoForm(id, (String) param, getNameRaw(rawPeer), "chatInvitePeek".equals(type) ? 2 : 3));
 			} catch (Exception e) {
 				display(errorAlert(e.toString()), current);
 			}
@@ -753,8 +747,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			if (c == foldersCmd) {
 				if (foldersList == null) {
-					foldersList = new FoldersList();
-					start(RUN_LOAD_LIST, foldersList);
+					openLoad(foldersList = new FoldersList());
 				}
 				display(foldersList);
 				return;
@@ -870,8 +863,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					writeAuth();
 
 					display(loadingAlert("Waiting for server response.."), null);
-					CaptchaForm f = new CaptchaForm();
-					start(RUN_LOAD_FORM, f);
+					openLoad(new CaptchaForm());
 					return;
 				}
 				if (d instanceof CaptchaForm) {
@@ -1308,9 +1300,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 			
-			ChatForm f = new ChatForm(s[0], null, Integer.parseInt(s[1]), 0);
-			display(f);
-			start(RUN_LOAD_FORM, f);
+			openLoad(new ChatForm(s[0], null, Integer.parseInt(s[1]), 0));
 			return;
 		}
 		commandAction(c, display.getCurrent());
@@ -1784,8 +1774,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							if (start != null) {
 								f.startBot = start;
 							}
-							display(f);
-							midlet.start(RUN_LOAD_FORM, f);
+							openLoad(f);
 						}
 						return true;
 					}
@@ -1809,18 +1798,14 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	}
 	
 	static void openChat(String id) {
-		Form f = new ChatForm(id, null, 0, 0);
-		display(f);
-		midlet.start(RUN_LOAD_FORM, f);
+		openLoad(new ChatForm(id, null, 0, 0));
 	}
 	
 	static void openProfile(String id, ChatForm chatForm, int mode) {
 		if (chatForm == null && current instanceof ChatForm && id.equals(((ChatForm) current).id)) {
 			chatForm = (ChatForm) current;
 		}
-		Form f = new ChatInfoForm(id, chatForm, mode);
-		display(f);
-		midlet.start(RUN_LOAD_FORM, f);
+		openLoad(new ChatInfoForm(id, chatForm, mode));
 	}
 	
 	static void copy(String title, String text) {
@@ -1829,6 +1814,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		t.addCommand(backCmd);
 		t.setCommandListener(midlet);
 		display(t);
+	}
+	
+	static void openLoad(Displayable d) {
+		display(d);
+		midlet.start(d instanceof MPList ? RUN_LOAD_LIST : RUN_LOAD_FORM, d);
 	}
 	
 	static void display(Alert a, Displayable d) {
