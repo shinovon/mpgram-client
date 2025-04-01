@@ -284,6 +284,7 @@ public class ChatForm extends MPForm {
 					s.setItemCommandListener(MP.midlet);
 					urls.put(s, new String[] { fwd.getString("peer"), fwd.getString("msg") } );
 				}
+				space = true;
 			}
 			
 			if (message.has("reply")) {
@@ -322,6 +323,7 @@ public class ChatForm extends MPForm {
 					
 					urls.put(s, new String[] { reply.getString("peer", null), reply.getString("id", null) });
 				}
+				space = true;
 			}
 			
 			// text
@@ -332,6 +334,7 @@ public class ChatForm extends MPForm {
 				} else {
 					insert = MP.flush(this, thread, text, insert, null);
 				}
+				space = true;
 			}
 			
 			// media
@@ -373,6 +376,7 @@ public class ChatForm extends MPForm {
 						if (msgItem == null) {
 							msgItem = s;
 						}
+						space = true;
 					} else if (type.equals("document")) {
 						sb.setLength(0);
 						if (!media.has("title") && (t = media.getString("name", null)) != null && t.length() != 0) {
@@ -422,6 +426,7 @@ public class ChatForm extends MPForm {
 								msgItem = s;
 							}
 						}
+						space = true;
 					} else if (type.equals("photo")) {
 						ImageItem img = new ImageItem("", null, 0, "");
 						img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP
@@ -438,7 +443,6 @@ public class ChatForm extends MPForm {
 						if (msgItem == null) {
 							msgItem = img;
 						}
-						space = false;
 					}
 				}
 			} else if (message.has("act")) {
@@ -446,12 +450,13 @@ public class ChatForm extends MPForm {
 				s = new StringItem(null, "Action: " + message.getObject("act").getString("_"));
 				s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 				safeInsert(thread, insert++, s);
+				space = true;
 			}
 			if (this.messageId != 0 ? (messageId == id)
 					: (i == 0 ? ((endReached && dir == 0) || dir == -1) : (i == l - 1 ? (dir == 1) : false))) {
 				focus = msgItem;
 			}
-			if (space) {
+			if (group == 0 || space) {
 				Spacer sp = new Spacer(10, 8);
 				sp.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 				safeInsert(thread, insert++, sp);

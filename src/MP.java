@@ -253,7 +253,14 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		
 		threadedImages = symbianJrt;
 		
-		// TODO refuse to run in j2me loader
+		try {
+			Class.forName("javax.microedition.shell.MicroActivity");
+			f.deleteAll();
+			f.addCommand(exitCmd);
+			f.setCommandListener(midlet);
+			f.append("J2ME Loader is not supported.");
+			return;
+		} catch (Exception ignored) {}
 		
 		avatarSize = Math.min(display.getBestImageHeight(Display.LIST_ELEMENT), display.getBestImageWidth(Display.LIST_ELEMENT));
 		if (avatarSize < 8) avatarSize = 16;
