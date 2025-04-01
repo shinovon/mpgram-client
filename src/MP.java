@@ -619,7 +619,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						if ("password".equals(res)) {
 							userState = 2;
 							writeAuth();
-							TextBox t = new TextBox("Cloud password", "", 100, TextField.NUMERIC);
+							TextBox t = new TextBox("Cloud password", "", 100, TextField.NON_PREDICTIVE);
 							t.addCommand(authPasswordCmd);
 							t.setCommandListener(this);
 							display(t);
