@@ -91,7 +91,9 @@ public class ChatForm extends MPForm {
 				}
 			}
 			
-			if (canWrite) {
+			if (left) {
+				addCommand(MP.joinChatCmd);
+			} else if (canWrite) {
 				addCommand(MP.writeCmd);
 			}
 			info = true;
@@ -193,6 +195,7 @@ public class ChatForm extends MPForm {
 		int insert = top;
 		long lastDate = 0;
 		long group = 0;
+		boolean space = false;
 		
 		for (int i = l - 1; i >= 0 && thread == this.thread; --i) {
 			if (!MP.reverseChat) insert = top;
@@ -258,6 +261,7 @@ public class ChatForm extends MPForm {
 				safeInsert(thread, insert++, s);
 				urls.put(s, key);
 				msgItem = s;
+				space = true;
 			}
 			group = message.getLong("group", 0);
 			
@@ -421,7 +425,8 @@ public class ChatForm extends MPForm {
 					} else if (type.equals("photo")) {
 						ImageItem img = new ImageItem("", null, 0, "");
 						img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP
-								| ((text != null && text.length() != 0 || !MP.reverseChat) ? Item.LAYOUT_NEWLINE_BEFORE : 0));
+								| ((text != null && text.length() != 0 || !MP.reverseChat) ?
+										(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER) : 0));
 						img.setDefaultCommand(MP.openImageCmd);
 						img.setItemCommandListener(MP.midlet);
 						safeInsert(thread, insert++, img);
@@ -433,6 +438,7 @@ public class ChatForm extends MPForm {
 						if (msgItem == null) {
 							msgItem = img;
 						}
+						space = false;
 					}
 				}
 			} else if (message.has("act")) {
@@ -445,8 +451,10 @@ public class ChatForm extends MPForm {
 					: (i == 0 ? ((endReached && dir == 0) || dir == -1) : (i == l - 1 ? (dir == 1) : false))) {
 				focus = msgItem;
 			}
-			if (group == 0) {
-				safeInsert(thread, insert++, new Spacer(10, 10));
+			if (space) {
+				Spacer sp = new Spacer(10, 8);
+				sp.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+				safeInsert(thread, insert++, sp);
 			}
 		}
 		

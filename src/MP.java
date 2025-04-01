@@ -352,11 +352,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		callItemCmd = new Command("Call", Command.ITEM, 1);
 		documentCmd = new Command("Download", Command.ITEM, 1);
 		
-		writeCmd = new Command("Write message", Command.SCREEN, 6);
+		writeCmd = new Command("Write message", Command.SCREEN, 5);
+		latestCmd = new Command("Refresh", Command.SCREEN, 6);
 		chatInfoCmd = new Command("Chat info", Command.SCREEN, 7);
 		olderMessagesCmd = new Command("Older", Command.ITEM, 1);
 		newerMessagesCmd = new Command("Newer", Command.ITEM, 1);
-		latestCmd = new Command("Refresh", Command.SCREEN, 5);
 		
 		sendCmd = new Command("Send", Command.OK, 1);
 		openTextBoxCmd = new Command("Open text box", Command.ITEM, 1);
@@ -364,8 +364,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		callCmd = new Command("Call", Command.SCREEN, 5);
 		openChatCmd = new Command("Open chat", Command.SCREEN, 1);
 		acceptInviteCmd = new Command("Join", Command.ITEM, 1);
-		joinChatCmd = new Command("Join", Command.ITEM, 1);
-		leaveChatCmd = new Command("Leave", Command.ITEM, 1);
+		joinChatCmd = new Command("Join group", Command.SCREEN, 1);
+		leaveChatCmd = new Command("Leave group", Command.ITEM, 1);
 		
 		okCmd = new Command("Ok", Command.OK, 1);
 		cancelCmd = new Command("Cancel", Command.CANCEL, 2);
