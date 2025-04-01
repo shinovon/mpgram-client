@@ -353,9 +353,7 @@ public class ChatForm extends MPForm {
 						}
 					} else if (type.equals("photo")) {
 						ImageItem img = new ImageItem("", null, 0, "");
-						if (text != null && text.length() != 0) {
-							img.setLayout(Item.LAYOUT_NEWLINE_BEFORE);
-						}
+						img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | (text != null && text.length() != 0 ? 0 : Item.LAYOUT_NEWLINE_BEFORE));
 						img.setDefaultCommand(MP.openImageCmd);
 						img.setItemCommandListener(MP.midlet);
 						safeInsert(thread, insert++, img);
