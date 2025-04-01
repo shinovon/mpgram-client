@@ -206,13 +206,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	// settings items
 	private static ChoiceGroup imagesChoice;
 	private static ChoiceGroup avaCacheChoice;
-	private static Gauge avaCacheGauge;
 	private static ChoiceGroup uiChoice;
+	private static ChoiceGroup behChoice;
+	private static Gauge avaCacheGauge;
 	private static Gauge photoSizeGauge;
 	private static Gauge profileCacheGauge;
 	private static Gauge chatsGauge;
 	private static Gauge msgsGauge;
-
 	
 	// write items
 	private static TextField messageField;
@@ -945,6 +945,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					s.setFont(largePlainFont);
 					f.append(s);
 					
+					behChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
+							"Wait for page to load"
+					}, null);
+					behChoice.setSelectedIndex(0, useLoadingForm);
+					behChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(behChoice);
+					
 					imagesChoice = new ChoiceGroup("Images", Choice.MULTIPLE, new String[] {
 							"Load media thumbnails",
 							"Load avatars",
@@ -1011,6 +1018,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				if ((messagesLimit = msgsGauge.getValue()) < 5) {
 					msgsGauge.setValue(messagesLimit = 5);
 				}
+				
+				useLoadingForm = behChoice.isSelected(0);
 				
 				loadThumbs = imagesChoice.isSelected(0);
 				loadAvatars = imagesChoice.isSelected(1);
