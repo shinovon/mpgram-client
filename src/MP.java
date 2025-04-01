@@ -896,7 +896,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 			if (c == openTextBoxCmd) {
-				TextBox t = new TextBox("Message", messageField.getString(), 500, TextField.NUMERIC);
+				TextBox t = new TextBox("Message", messageField.getString(), 500, TextField.ANY);
 				t.addCommand(okCmd);
 				t.addCommand(cancelCmd);
 				t.setCommandListener(this);
