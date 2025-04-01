@@ -203,7 +203,9 @@ public class ChatForm extends MPForm {
 				s.addCommand(MP.replyMsgCmd);
 			}
 			s.addCommand(MP.forwardMsgCmd);
-			s.addCommand(MP.messageLinkCmd);
+			if (this.id.charAt(0) == '-') {
+				s.addCommand(MP.messageLinkCmd);
+			}
 			if (text != null && text.length() != 0) {
 				s.addCommand(MP.copyMsgCmd);
 			}
