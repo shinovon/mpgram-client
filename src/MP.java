@@ -72,7 +72,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
-	private static final String AVATAR_RECORD_PREFIX = "mpA";
+	private static final String AVATAR_RECORD_PREFIX = "mcA";
 	
 	private static final String DEFAULT_INSTANCE_URL = "http://mp2.nnchan.ru/";
 	static final String API_URL = "api.php";
@@ -119,6 +119,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static int avatarsCacheThreshold = 20;
 	static int chatsLimit = 20;
 	static int messagesLimit = 20;
+	static int profilesCacheThreshold = 200;
 
 	// threading
 	private static int run;
@@ -147,7 +148,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static Command authPasswordCmd;
 	private static Command authNewSessionCmd;
 	private static Command authImportSessionCmd;
+	
 	private static Command logoutCmd;
+	private static Command clearCacheCmd;
 
 	static Command refreshCmd;
 	static Command archiveCmd;
@@ -206,6 +209,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static Gauge avaCacheGauge;
 	private static ChoiceGroup uiChoice;
 	private static Gauge photoSizeGauge;
+	private static Gauge profileCacheGauge;
+	private static Gauge chatsGauge;
+	private static Gauge msgsGauge;
+
 	
 	// write items
 	private static TextField messageField;
@@ -220,7 +227,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static String writeTo;
 	private static String replyTo;
 	private static String edit;
-
+	
 	protected void destroyApp(boolean u) {
 	}
 
@@ -276,6 +283,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			useLoadingForm = j.getBoolean("useLoadingForm", useLoadingForm);
 			chatsLimit = j.getInt("chatsLimit", chatsLimit);
 			messagesLimit = j.getInt("messagesLimit", messagesLimit);
+			profilesCacheThreshold = j.getInt("profilesCacheThreshold", profilesCacheThreshold);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -319,7 +327,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		authPasswordCmd = new Command("Next", Command.OK, 1);
 		authNewSessionCmd = new Command("New session", Command.SCREEN, 1);
 		authImportSessionCmd = new Command("Import session", Command.SCREEN, 2);
+		
 		logoutCmd = new Command("Logout", Command.ITEM, 1);
+		clearCacheCmd = new Command("Clear cache", Command.ITEM, 1);
 
 		foldersCmd = new Command("Folders", Command.SCREEN, 4);
 		refreshCmd = new Command("Refresh", Command.SCREEN, 5);
@@ -726,6 +736,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		if (d instanceof ChatsList) { // chats list commands
 			if (c == archiveCmd) {
 				chatsList.changeFolder(1);
+				return;
 			}
 			if (c == foldersCmd) {
 				if (foldersList == null) {
@@ -733,6 +744,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					start(RUN_LOAD_LIST, foldersList);
 				}
 				display(foldersList);
+				return;
 			}
 		}
 		if (d instanceof ChatForm) { // chat form commands
@@ -913,6 +925,14 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					photoSizeGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(photoSizeGauge);
 					
+					chatsGauge = new Gauge("Chats count", true, 50, chatsLimit);
+					chatsGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(chatsGauge);
+					
+					msgsGauge = new Gauge("Messages count", true, 50, messagesLimit);
+					msgsGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(msgsGauge);
+					
 					s = new StringItem(null, "Behaviour");
 					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					s.setFont(largePlainFont);
@@ -943,6 +963,16 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					avaCacheGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(avaCacheGauge);
 					
+					profileCacheGauge = new Gauge("Profiles cache threshold", true, 30, profilesCacheThreshold / 10);
+					profileCacheGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(profileCacheGauge);
+					
+					s = new StringItem(null, "Clear cache", Item.BUTTON);
+					s.setDefaultCommand(clearCacheCmd);
+					s.setItemCommandListener(this);
+					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(s);
+					
 					s = new StringItem(null, "Authorization");
 					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					s.setFont(largePlainFont);
@@ -968,6 +998,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				if ((photoSize = (photoSizeGauge.getValue() * 8)) < 16) {
 					photoSizeGauge.setValue((photoSize = 16) / 8);
 				}
+				if ((chatsLimit = chatsGauge.getValue()) < 5) {
+					chatsGauge.setValue(chatsLimit = 5);
+				}
+				if ((messagesLimit = msgsGauge.getValue()) < 5) {
+					msgsGauge.setValue(messagesLimit = 5);
+				}
 				
 				loadThumbs = imagesChoice.isSelected(0);
 				loadAvatars = imagesChoice.isSelected(1);
@@ -975,6 +1011,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				
 				avatarsCache = avaCacheChoice.getSelectedIndex();
 				avatarsCacheThreshold = avaCacheGauge.getValue() * 5;
+				profilesCacheThreshold = profileCacheGauge.getValue() * 10;
 				
 				try {
 					RecordStore.deleteRecordStore(SETTINGS_RECORD_NAME);
@@ -993,6 +1030,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					j.put("useLoadingForm", useLoadingForm);
 					j.put("chatsLimit", chatsLimit);
 					j.put("messagesLimit", messagesLimit);
+					j.put("profilesCacheThreshold", profilesCacheThreshold);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
@@ -1004,6 +1042,23 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				userState = 0;
 				display(mainDisplayable = initialAuthForm());
 				writeAuth();
+				return;
+			}
+			if (c == clearCacheCmd) {
+				try {
+					String[] s = RecordStore.listRecordStores();
+					for (int i = 0; i < s.length; ++i) {
+						if (s[i].startsWith(AVATAR_RECORD_PREFIX)) {
+							try {
+								RecordStore.deleteRecordStore(s[i]);
+							} catch (Exception ignored) {}
+						}
+					}
+				} catch (Exception ignored) {}
+				usersCache.clear();
+				chatsCache.clear();
+				imagesCache.clear();
+				commandAction(backCmd, d);
 				return;
 			}
 		}
@@ -1270,7 +1325,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static void fillPeersCache(JSONObject r) {
 		JSONObject users = r.getObject("users", null);
 		if (users != null && usersCache != null) {
-			if (usersCache.size() > 200) {
+			if (usersCache.size() > profilesCacheThreshold) {
 				usersCache.clear();
 			}
 			for (Enumeration e = users.keys(); e.hasMoreElements(); ) {
@@ -1283,7 +1338,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		JSONObject chats = r.getObject("chats", null);
 		if (chats != null && chatsCache != null) {
-			if (chatsCache.size() > 200) {
+			if (chatsCache.size() > profilesCacheThreshold) {
 				chatsCache.clear();
 			}
 			for (Enumeration e = chats.keys(); e.hasMoreElements(); ) {
@@ -1846,7 +1901,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			hc.setRequestMethod("GET");
 			
 			int c = hc.getResponseCode();
-			if (c == 502) {
+			if (c == 502 || c == 504) {
 				// repeat
 				try {
 					Thread.sleep(3000);
