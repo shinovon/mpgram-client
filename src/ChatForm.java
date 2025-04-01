@@ -193,7 +193,7 @@ public class ChatForm extends MPForm {
 		}
 		
 		int insert = top;
-		long lastDate = 0;
+//		long lastDate = 0;
 		long group = 0;
 		boolean space = false;
 		
@@ -225,7 +225,7 @@ public class ChatForm extends MPForm {
 			
 			sb.setLength(0);
 			sb.append(out && !broadcast ? "You" : MP.getName(fromId, true));
-			MP.appendTime(sb.append(' '), lastDate = message.getLong("date"));
+			MP.appendTime(sb.append(' '), /*lastDate = */message.getLong("date"));
 			
 			s = new StringItem(null, sb.toString());
 			s.setFont(MP.smallBoldFont);

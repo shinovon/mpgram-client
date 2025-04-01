@@ -1586,13 +1586,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		boolean profile = false;
 		String domain = null;
 		boolean phone = false;
-		boolean privat = false;
+//		boolean privat = false;
 		String messageId = null;
 		String thread = null;
 		String invite = null;
 		String start = null;
-		String text = null;
-		String slug = null;
+//		String text = null;
+//		String slug = null;
 		
 		try {
 			if ((i = url.indexOf("t.me")) == 0 || i == 8) {
@@ -1609,7 +1609,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					s[s.length - 1] = s[s.length - 1].substring(0, i);
 				}
 				if ("c".equals(s[0]) && s.length > 1) {
-					privat = true;
+//					privat = true;
 					domain = s[1];
 					if (s.length == 3) {
 						messageId = s[2];
@@ -1630,13 +1630,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						}
 					}
 				} else if ("addstickers".equals(s[0])) {
-					slug = s[1];
+//					slug = s[1];
 				} else if ("addemoji".equals(s[0])) {
-					slug = s[1];
+//					slug = s[1];
 				} else if ("joinchat".equals(s[0])) {
-					invite = s[1];
+//					invite = s[1];
 				} else if ("addlist".equals(s[0])) {
-					slug = s[1];
+//					slug = s[1];
 				} else if ("proxy".equals(s[0])) {
 				} else if ("socks".equals(s[0])) {
 				} else if ("addtheme".equals(s[0])) {
@@ -1676,7 +1676,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						|| "user".equals(url)
 						|| "join".equals(url)) {
 					tg = true;
-					privat = "privatepost".equals(url);
+//					privat = "privatepost".equals(url);
 //				} else if ("addlist".equals(url)) {
 //				} else if ("addstickers".equals(url)) {
 //				} else if ("addemoji".equals(url)) {
@@ -1712,7 +1712,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							continue;
 						}
 						if (query[n].startsWith("text=")) {
-							text = query[n].substring(5);
+//							text = query[n].substring(5);
 							continue;
 						}
 						if (query[n].startsWith("invite=")) {
@@ -1720,7 +1720,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							continue;
 						}
 						if (query[n].startsWith("slug=")) {
-							slug = query[n].substring(5);
+//							slug = query[n].substring(5);
 							continue;
 						}
 						if (query[n].startsWith("post=")) {
