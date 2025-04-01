@@ -221,8 +221,8 @@ public class ChatForm extends MPForm {
 			s.setDefaultCommand(MP.itemChatCmd);
 			s.setItemCommandListener(MP.midlet);
 			s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-			if (group == 0 || group != message.getLong("group", 0)) {
-				if (group != 0) {
+			if (group == 0 || group != message.getLong("group", 0) || !MP.reverseChat) {
+				if (group != 0 && !MP.reverseChat) {
 					Spacer sp = new Spacer(10, 8);
 					sp.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					safeInsert(thread, insert++, sp);
@@ -300,7 +300,7 @@ public class ChatForm extends MPForm {
 						
 						s = new StringItem(null, sb.toString());
 						s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-						s.setFont(MP.smallBoldFont);
+						s.setFont(MP.smallItalicFont);
 						s.setDefaultCommand(MP.richTextLinkCmd);
 						s.setItemCommandListener(MP.midlet);
 						safeInsert(thread, insert++, s);
@@ -348,7 +348,7 @@ public class ChatForm extends MPForm {
 						} else {
 							s = new StringItem(null, sb.toString());
 							s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-							s.setFont(MP.smallBoldFont);
+							s.setFont(MP.smallItalicFont);
 							s.setDefaultCommand(MP.documentCmd);
 							s.setItemCommandListener(MP.midlet);
 							safeInsert(thread, insert++, s);
@@ -361,7 +361,8 @@ public class ChatForm extends MPForm {
 						}
 					} else if (type.equals("photo")) {
 						ImageItem img = new ImageItem("", null, 0, "");
-						img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | (text != null && text.length() != 0 ? 0 : Item.LAYOUT_NEWLINE_BEFORE));
+						img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP
+								| ((text != null && text.length() != 0 || !MP.reverseChat) ? Item.LAYOUT_NEWLINE_BEFORE : 0));
 						img.setDefaultCommand(MP.openImageCmd);
 						img.setItemCommandListener(MP.midlet);
 						safeInsert(thread, insert++, img);
@@ -385,8 +386,8 @@ public class ChatForm extends MPForm {
 					: (i == 0 ? ((endReached && dir == 0) || dir == -1) : (i == l - 1 ? (dir == 1) : false))) {
 				focus = msgItem;
 			}
-			if (group != 0) {
-				safeInsert(thread, insert++, new Spacer(10, 12));
+			if (group == 0) {
+				safeInsert(thread, insert++, new Spacer(10, 10));
 			}
 			
 //			if (MP.reverseChat ? (i-- == 0) : (++i == l)) break;
