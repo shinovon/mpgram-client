@@ -157,6 +157,15 @@ public class ChatForm extends MPForm {
 		int l = messages.size();
 		urls = new Hashtable();
 		
+		try {
+			sb.setLength(0);
+			sb.append("readMessages?peer=").append(id)
+			.append("&max=").append(messages.getObject(0).getString("id"));
+			if (topMsgId != 0) {
+				sb.append("&thread=").append(topMsgId);
+			}
+		} catch (Exception ignored) {}
+		
 		StringItem s;
 		String t;
 		Item focus = null;
