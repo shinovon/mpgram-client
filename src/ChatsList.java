@@ -7,7 +7,7 @@ import cc.nnproject.json.JSONObject;
 
 public class ChatsList extends MPList {
 	
-	int limit = 20;
+	int limit = MP.chatsLimit;
 	int folder = -1;
 	Vector ids;
 

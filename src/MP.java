@@ -92,6 +92,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static int avatarsCache = 3; // 0 - off, 1 - hashtable, 2 - storage, 3 - both
 	static boolean threadedImages;
 	static int avatarsCacheThreshold = 20;
+	static int chatsLimit = 20;
+	static int messagesLimit = 20;
 
 	// threading
 	private static int run;
@@ -241,6 +243,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			avatarsCache = j.getInt("avatarsCache", avatarsCache);
 			avatarsCacheThreshold = j.getInt("avatarsCacheThreshold", avatarsCacheThreshold);
 			useLoadingForm = j.getBoolean("useLoadingForm", useLoadingForm);
+			chatsLimit = j.getInt("chatsLimit", chatsLimit);
+			messagesLimit = j.getInt("messagesLimit", messagesLimit);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -879,6 +883,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					j.put("avatarsCache", avatarsCache);
 					j.put("avatarsCacheThreshold", avatarsCacheThreshold);
 					j.put("useLoadingForm", useLoadingForm);
+					j.put("chatsLimit", chatsLimit);
+					j.put("messagesLimit", messagesLimit);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);

@@ -16,7 +16,7 @@ public class ChatForm extends MPForm {
 	String query;
 	String startBot;
 	
-	int limit = 20;
+	int limit = MP.messagesLimit;
 	int addOffset = 0;
 	int offsetId = 0;
 	
