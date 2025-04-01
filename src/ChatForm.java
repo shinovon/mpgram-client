@@ -57,7 +57,7 @@ public class ChatForm extends MPForm {
 		super(id);
 		addCommand(MP.latestCmd);
 		addCommand(MP.chatInfoCmd);
-//		addCommand(MP.searchCmd);
+		addCommand(MP.searchCmd);
 		this.id = id;
 		this.query = query;
 		this.messageId = message;
@@ -78,7 +78,7 @@ public class ChatForm extends MPForm {
 			id = peer.getString("id");
 			username = peer.getString("name", null);
 
-			setTitle(title = MP.getName(id, false));
+			title = MP.getName(id, false);
 
 			canWrite = !broadcast;
 			if (id.charAt(0) == '-') {
@@ -99,6 +99,7 @@ public class ChatForm extends MPForm {
 			}
 			info = true;
 		}
+		setTitle(title);
 		
 		boolean selfChat = MP.selfId.equals(id);
 		
@@ -114,21 +115,21 @@ public class ChatForm extends MPForm {
 			}
 			sb.setLength(0);
 		}
-
-		if (query != null || topMsgId != 0) {
-			sb.append("searchMessages");
-			if (query != null) {
-				setTitle("Search - ".concat(title));
-				MP.appendUrl(sb.append("q="), query);
-			}
-		} else {
-			sb.append("getHistory");
-		}
 		
 		if (messageId != 0) {
 			// message to focus
 			offsetId = messageId;
 			addOffset = -1;
+		}
+
+		if (query != null || topMsgId != 0) {
+			sb.append("searchMessages");
+			if (query != null) {
+				setTitle("Search - ".concat(title));
+				MP.appendUrl(sb.append("&q="), query);
+			}
+		} else {
+			sb.append("getHistory");
 		}
 		
 		sb.append("&media=1&peer=").append(id);

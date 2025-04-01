@@ -773,9 +773,27 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 			if (c == searchCmd) {
-				// TODO
+				TextBox t = new TextBox("Search", "", 200, TextField.ANY);
+				t.addCommand(cancelCmd);
+				t.addCommand(searchCmd);
+				t.setCommandListener(this);
+				
+				display(t);
 				return;
 			}
+			if (c == backCmd && ((ChatForm) d).query != null) {
+				// close search
+				((ChatForm) current).reset();
+				start(RUN_LOAD_FORM, current);
+				return;
+			}
+		}
+		if (d instanceof TextBox && c == searchCmd) {
+			commandAction(backCmd, d);
+			((ChatForm) current).reset();
+			((ChatForm) current).query = ((TextBox) d).getString();
+			start(RUN_LOAD_FORM, current);
+			return;
 		}
 		if (d instanceof ChatInfoForm) { // profile commands
 			if (c == callCmd) {
