@@ -1097,7 +1097,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			s.setLayout(Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_VCENTER | Item.LAYOUT_LEFT);
 			f.append(s);
 			
-			s = new StringItem(null, "Server-assisted Telegram client for J2ME, based on MPGram Web API.\n4th mpgram iteration.");
+			s = new StringItem(null, "Server-assisted Telegram client for J2ME, based on MPGram Web API.");
 			s.setFont(Font.getDefaultFont());
 			s.setLayout(Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_NEWLINE_BEFORE);
 			f.append(s);
@@ -1113,16 +1113,20 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 
 			s = new StringItem("GitHub", "github.com/shinovon");
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			s.setDefaultCommand(richTextLinkCmd);
 			s.setItemCommandListener(this);
 			f.append(s);
 
 			s = new StringItem("Web", "nnproject.cc");
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			s.setDefaultCommand(richTextLinkCmd);
 			s.setItemCommandListener(this);
 			f.append(s);
 
 			s = new StringItem("Donate", "boosty.to/nnproject/donate");
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			s.setDefaultCommand(richTextLinkCmd);
+			s.setItemCommandListener(this);
 			f.append(s);
 
 			s = new StringItem("Chat", "t.me/nnmidletschat");
