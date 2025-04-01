@@ -76,6 +76,8 @@ public class ChatForm extends MPForm {
 			info = true;
 		}
 		
+		boolean selfChat = MP.selfId.equals(id);
+		
 		if (startBot != null) {
 			// TODO
 			try {
@@ -209,6 +211,10 @@ public class ChatForm extends MPForm {
 //			if (canDelete) {
 //				s.addCommand(MP.deleteMsgCmd);
 //			}
+			if (out || selfChat) {
+//				s.addCommand(MP.deleteMsgCmd);
+				s.addCommand(MP.editMsgCmd);
+			}
 			
 			s.setDefaultCommand(MP.itemChatCmd);
 			s.setItemCommandListener(MP.midlet);

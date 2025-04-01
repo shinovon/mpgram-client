@@ -23,11 +23,10 @@ public abstract class MPForm extends Form {
 	void load() {
 		if (loaded) return;
 		canceled = finished = false;
-		
+
+		setTicker(new Ticker("Loading.."));
 		if (MP.useLoadingForm) {
 			MP.display(MP.loadingForm);
-		} else {
-			setTicker(new Ticker("Loading.."));
 		}
 		Thread thread = this.thread = Thread.currentThread();
 		try {

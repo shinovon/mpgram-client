@@ -105,6 +105,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static String user;
 	private static int userState;
 	private static String phone;
+	static String selfId;
 
 	// commands
 	private static Command exitCmd;
@@ -134,6 +135,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command copyMsgCmd;
 	static Command messageLinkCmd;
 	static Command deleteMsgCmd;
+	static Command editMsgCmd;
 	
 	static Command richTextLinkCmd;
 	static Command openImageCmd;
@@ -297,6 +299,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		copyMsgCmd = new Command("Copy message", Command.ITEM, 5);
 		messageLinkCmd = new Command("Copy message link", Command.ITEM, 7);
 		deleteMsgCmd = new Command("Delete", Command.ITEM, 8);
+		editMsgCmd = new Command("Edit", Command.ITEM, 9);
 		
 		richTextLinkCmd = new Command("Link", Command.ITEM, 1);
 		openImageCmd = new Command("View image", Command.ITEM, 1);
@@ -355,7 +358,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			display(loadingAlert("Authorizing"), null);
 			
 			try {
-				api("me");
+				selfId = ((JSONObject) api("me")).getString("id");
 				userState = 4;
 				
 				if (param != null) {
@@ -605,6 +608,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				api(sb.toString());
 				
 				commandAction(backCmd, current);
+				commandAction(refreshCmd, current);
 				display(infoAlert("Sent"), current);
 			} catch (Exception e) {
 				display(errorAlert(e.toString()), current);
@@ -1038,7 +1042,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		if (c == messageLinkCmd) {
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
-			copy("", (((ChatForm) current).username != null ? "https://t.me/c/" : "https://t.me/") + s[0] + "/" + s[1]);
+			StringBuffer sb = new StringBuffer("https://t.me/"); 
+			String username = ((ChatForm) current).username;
+			if (s[0].charAt(0) == '-' && username == null) {
+				sb.append("c/");
+			}
+			sb.append(username != null ? username : s[0]).append('/').append(s[1]);
+			copy("", sb.toString());
 			return;
 		}
 		if (c == richTextLinkCmd) {
@@ -1074,6 +1084,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 			browse(instanceUrl + FILE_URL + "?c=" + s[0] + "&m=" + s[1] + "&user=" + user);
+			return;
+		}
+		if (c == editMsgCmd) {
+			String[] s = (String[]) ((MPForm) current).urls.get(item);
+			if (s == null) return;
+			display(writeForm(s[0], null, (String) ((MPForm) current).urls.get(s[1]), s[1]));
 			return;
 		}
 		commandAction(c, display.getCurrent());
