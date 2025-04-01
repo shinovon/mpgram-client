@@ -28,21 +28,43 @@ public class ChatInfoForm extends MPForm {
 
 	String id;
 	String phone;
+	String invite;
 	ChatForm chatForm;
+	int mode; // 0 - chat info or profile by id, 1 - phone, 2 - invite peek, 3 - invite
 	
-	public ChatInfoForm(String id, ChatForm chatForm) {
+	public ChatInfoForm(String id, ChatForm chatForm, int mode) {
 		super(id);
 		this.id = id;
 		this.chatForm = chatForm;
+		this.mode = mode;
+		if (chatForm == null && mode != 3) {
+			addCommand(MP.openChatCmd);
+		}
+	}
+	
+	public ChatInfoForm(String id, String invite, String title, int mode) {
+		super(title);
+		this.id = id;
+		this.mode = mode;
 	}
 
 	void loadInternal(Thread thread) throws Exception {
-		JSONObject peer = MP.getPeer(id, true);
-		
-		id = peer.getString("id");
+		JSONObject rawPeer = null;
+		String name = null;
+		if (mode == 0) {
+			JSONObject peer = MP.getPeer(id, true);
+			id = peer.getString("id");
+			setTitle(name = MP.getName(peer));
+		} else if (mode == 1) {
+			JSONObject r = ((JSONObject) MP.api("resolvePhone&phone=".concat(id))).getObject("res");
+			MP.fillPeersCache(r);
+			
+			rawPeer = r.getArray("users").getObject(0);
+			id = rawPeer.getString("id");
+			setTitle(name = MP.getNameRaw(rawPeer));
+		}
+
 		boolean isUser = id.charAt(0) != '-';
-		String name = MP.getName(peer);
-		setTitle(name);
 		
 		StringItem s;
 		
@@ -51,13 +73,15 @@ public class ChatInfoForm extends MPForm {
 		s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 		append(s);
 		
-		JSONObject fullInfo = (JSONObject) MP.api("getFullInfo&id=".concat(id));
-		JSONObject full = fullInfo.getObject("full");
+		JSONObject full = null;
+		if (mode != 3) {
+			JSONObject fullInfo = (JSONObject) MP.api("getFullInfo&id=".concat(id));
+			full = fullInfo.getObject("full");
+		}
 		
 		if (isUser) {
-			JSONObject user = fullInfo.getObject("User");
-			if (user.has("phone")) {
-				phone = "+".concat(user.getString("phone"));
+			if (rawPeer.has("phone")) {
+				phone = "+".concat(rawPeer.getString("phone"));
 				addCommand(MP.callCmd);
 				
 				s = new StringItem("Phone number", phone);
@@ -76,41 +100,54 @@ public class ChatInfoForm extends MPForm {
 				append(s);
 			}
 			
-			if (user.has("username")) {
-				s = new StringItem("Username", "@".concat(user.getString("username")));
+			if (rawPeer.has("username")) {
+				s = new StringItem("Username", "@".concat(rawPeer.getString("username")));
 				s.setFont(MP.medPlainFont);
 				s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 				s.setItemCommandListener(MP.midlet);
 				append(s);
 			}
 		} else {
-			JSONObject chat = fullInfo.getObject("Chat");
+			if (mode != 3) {
+				if (full.has("participants_count")) {
+					s = new StringItem(null, full.getString("participants_count").concat(" members"));
+					s.setFont(MP.medPlainFont);
+					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					s.setItemCommandListener(MP.midlet);
+					append(s);
+				}
+				
+				if (full.has("about")) {
+					s = new StringItem("About", full.getString("about"));
+					s.setFont(MP.medPlainFont);
+					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					s.setItemCommandListener(MP.midlet);
+					append(s);
+				}
+				
+				if (rawPeer.has("username")) {
+					s = new StringItem("Link", "t.me/".concat(rawPeer.getString("username")));
+					s.setFont(MP.medPlainFont);
+					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					s.setItemCommandListener(MP.midlet);
+					append(s);
+				}
+			}
 			
-			if (full.has("participants_count")) {
-				s = new StringItem(null, full.getString("participants_count").concat(" members"));
-				s.setFont(MP.medPlainFont);
-				s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+			if (mode != 0) {
+				s = new StringItem(null, mode == 2 ? "View group" : "Join group", Item.BUTTON);
+				s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+				s.setDefaultCommand(mode == 2 ? MP.openChatCmd : MP.acceptInviteCmd);
+				s.setItemCommandListener(MP.midlet);
+				append(s);
+			} else {
+				boolean left = rawPeer.getBoolean("left", false);
+				s = new StringItem(null, left ? "Join group" : "Leave group", Item.BUTTON);
+				s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+				s.setDefaultCommand(left ? MP.joinChatCmd : MP.leaveChatCmd);
 				s.setItemCommandListener(MP.midlet);
 				append(s);
 			}
-			
-			if (full.has("about")) {
-				s = new StringItem("About", full.getString("about"));
-				s.setFont(MP.medPlainFont);
-				s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-				s.setItemCommandListener(MP.midlet);
-				append(s);
-			}
-			
-			if (chat.has("username")) {
-				s = new StringItem("Link", "t.me/".concat(chat.getString("username")));
-				s.setFont(MP.medPlainFont);
-				s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-				s.setItemCommandListener(MP.midlet);
-				append(s);
-			}
-			
-			// TODO leave
 		}
 	}
 

@@ -65,6 +65,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static final int RUN_LOAD_LIST = 9;
 	static final int RUN_AUTH = 10;
 	static final int RUN_DELETE_MESSAGE = 11;
+	static final int RUN_RESOLVE_INVITE = 12;
+	static final int RUN_IMPORT_INVITE = 13;
+	static final int RUN_JOIN_CHANNEL = 14;
+	static final int RUN_LEAVE_CHANNEL = 15;
 	
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
@@ -159,6 +163,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command messageLinkCmd;
 	static Command deleteMsgCmd;
 	static Command editMsgCmd;
+	static Command gotoMsgCmd;
 	
 	static Command richTextLinkCmd;
 	static Command openImageCmd;
@@ -169,11 +174,16 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command chatInfoCmd;
 	static Command olderMessagesCmd;
 	static Command newerMessagesCmd;
+	static Command latestCmd;
 	
 	static Command sendCmd;
 	static Command openTextBoxCmd;
 	
 	static Command callCmd;
+	static Command openChatCmd;
+	static Command acceptInviteCmd;
+	static Command joinChatCmd;
+	static Command leaveChatCmd;
 
 	static Command okCmd;
 	static Command cancelCmd;
@@ -325,6 +335,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		messageLinkCmd = new Command("Copy message link", Command.ITEM, 7);
 		deleteMsgCmd = new Command("Delete", Command.ITEM, 8);
 		editMsgCmd = new Command("Edit", Command.ITEM, 9);
+		gotoMsgCmd = new Command("Go to", Command.ITEM, 1);
 		
 		richTextLinkCmd = new Command("Link", Command.ITEM, 1);
 		openImageCmd = new Command("View image", Command.ITEM, 1);
@@ -335,11 +346,16 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		chatInfoCmd = new Command("Chat info", Command.SCREEN, 7);
 		olderMessagesCmd = new Command("Older", Command.ITEM, 1);
 		newerMessagesCmd = new Command("Newer", Command.ITEM, 1);
+		latestCmd = new Command("Refresh", Command.SCREEN, 5);
 		
 		sendCmd = new Command("Send", Command.OK, 1);
 		openTextBoxCmd = new Command("Open text box", Command.ITEM, 1);
 		
 		callCmd = new Command("Call", Command.SCREEN, 5);
+		openChatCmd = new Command("Open chat", Command.SCREEN, 1);
+		acceptInviteCmd = new Command("Join", Command.ITEM, 1);
+		joinChatCmd = new Command("Join", Command.ITEM, 1);
+		leaveChatCmd = new Command("Leave", Command.ITEM, 1);
 		
 		okCmd = new Command("Ok", Command.OK, 1);
 		cancelCmd = new Command("Cancel", Command.CANCEL, 2);
@@ -611,8 +627,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		case RUN_DELETE_MESSAGE: {
 			try {
-				// TODO
-				
+				String[] s = (String[]) param;
+				MP.api("deleteMessage&peer=".concat(s[0].concat("&id=").concat(s[1])));
+
+				commandAction(refreshCmd, current);
 				display(infoAlert("Deleted"), current);
 			} catch (Exception e) {
 				display(errorAlert(e.toString()), current);
@@ -633,8 +651,55 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				api(sb.toString());
 				
 				commandAction(backCmd, current);
-				commandAction(refreshCmd, current);
+				commandAction(latestCmd, current);
 				display(infoAlert("Sent"), current);
+			} catch (Exception e) {
+				display(errorAlert(e.toString()), current);
+			}
+			break;
+		}
+		case RUN_RESOLVE_INVITE: {
+			try {
+				JSONObject r = ((JSONObject) MP.api("checkChatInvite&id=".concat((String) param))).getObject("res");
+				JSONObject rawPeer = r.getObject("chat");
+				String id = rawPeer.getString("id");
+				String type = r.getString("_");
+				if ("chatInviteAlready".equals(type)) {
+					openChat(id);
+					break;
+				}
+				
+				Form f = new ChatInfoForm(id, (String) param, getNameRaw(rawPeer), "chatInvitePeek".equals(type) ? 2 : 3);
+				display(f);
+				midlet.start(RUN_LOAD_FORM, f);
+			} catch (Exception e) {
+				display(errorAlert(e.toString()), current);
+			}
+			break;
+		}
+		case RUN_IMPORT_INVITE: {
+			try {
+				ChatInfoForm d = (ChatInfoForm) param;
+				MP.api("importChatInvite&id=".concat(d.invite));
+				
+				commandAction(backCmd, current);
+				openChat(d.id);
+			} catch (Exception e) {
+				display(errorAlert(e.toString()), current);
+			}
+			break;
+		}
+		case RUN_JOIN_CHANNEL: 
+		case RUN_LEAVE_CHANNEL: {
+			try {
+				MP.api((run == RUN_JOIN_CHANNEL ? "join" : "leave").concat("channel&id=").concat((String) param));
+				
+				if (run == RUN_JOIN_CHANNEL) {
+					commandAction(backCmd, current);
+					openChat((String) param);
+				} else {
+					commandAction(refreshCmd, current);
+				}
 			} catch (Exception e) {
 				display(errorAlert(e.toString()), current);
 			}
@@ -658,7 +723,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	}
 
 	public void commandAction(Command c, Displayable d) {
-		if (d instanceof ChatsList) { // chats list
+		if (d instanceof ChatsList) { // chats list commands
 			if (c == archiveCmd) {
 				chatsList.changeFolder(1);
 			}
@@ -670,8 +735,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				display(foldersList);
 			}
 		}
-		if (d instanceof ChatForm) { // chat form
-			if (c == refreshCmd) {
+		if (d instanceof ChatForm) { // chat form commands
+			if (c == latestCmd) {
 				((ChatForm) d).reset();
 				((MPForm) d).load();
 				return;
@@ -681,7 +746,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 			if (c == chatInfoCmd) {
-				openProfile(((ChatForm) d).id, (ChatForm) d);
+				openProfile(((ChatForm) d).id, (ChatForm) d, 0);
 				return;
 			}
 			if (c == writeCmd) {
@@ -693,7 +758,29 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 		}
-		{ // auth
+		if (d instanceof ChatInfoForm) { // profile commands
+			if (c == callCmd) {
+				browse("tel:".concat(((ChatInfoForm) d).phone));
+				return;
+			}
+			if (c == openChatCmd) {
+				openChat(((ChatInfoForm) d).id);
+				return;
+			}
+			if (c == acceptInviteCmd) {
+				start(RUN_IMPORT_INVITE, d);
+				return;
+			}
+			if (c == joinChatCmd) {
+				start(RUN_JOIN_CHANNEL, ((ChatInfoForm) d).id);
+				return;
+			}
+			if (c == leaveChatCmd) {
+				start(RUN_LEAVE_CHANNEL, ((ChatInfoForm) d).id);
+				return;
+			}
+		}
+		{ // auth commands
 			if (c == authCmd) {
 				if (d instanceof TextBox) {
 					// user code
@@ -1047,7 +1134,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		if (c == itemChatInfoCmd) {
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
-			openProfile(s[2], null);
+			openProfile(s[2], null, 0);
 			return;
 		}
 		if (c == replyMsgCmd) {
@@ -1103,7 +1190,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 			display(loadingAlert("Loading"), current);
-			start(RUN_DELETE_MESSAGE, s[1]);
+			start(RUN_DELETE_MESSAGE, s);
 			return;
 		}
 		if (c == documentCmd) {
@@ -1117,6 +1204,19 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 			display(writeForm(s[0], null, (String) ((MPForm) current).urls.get(s[1]), s[1]));
+			return;
+		}
+		if (c == gotoMsgCmd) {
+			String[] s = (String[]) ((MPForm) current).urls.get(item);
+			if (s == null) return;
+			if (s[0] == null || s[0].equals(((ChatForm) current).id)) {
+				((ChatForm) current).openMessage(s[1], -1);
+				return;
+			}
+			
+			ChatForm f = new ChatForm(s[0], null, Integer.parseInt(s[1]), 0);
+			display(f);
+			start(RUN_LOAD_FORM, f);
 			return;
 		}
 		commandAction(c, display.getCurrent());
@@ -1248,15 +1348,25 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	}
 	
 	static String getName(String id, boolean variant) {
+		return getName(id, variant, true);
+	}
+	
+	static String getName(String id, boolean variant, boolean now) {
 		if (id == null) return null;
 		String res;
 		JSONObject o;
 		if (id.charAt(0) == '-') {
 			o = chatsCache.getObject(id, null);
+			if (o == null) {
+				o = getPeer(id, now);
+			}
 			if (o == null) return null;
 			res = o.getString("t");
 		} else {
 			o = usersCache.getObject(id, null);
+			if (o == null) {
+				o = getPeer(id, now);
+			}
 			if (o == null) return null;
 			res = variant ? getShortName(o) : getName(o);
 		}
@@ -1271,6 +1381,30 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		
 		String fn = p.getString("fn");
 		String ln = p.getString("ln");
+		
+		if (fn != null && ln != null) {
+			return fn.concat(" ").concat(ln);
+		}
+		
+		if (ln != null) {
+			return ln;
+		}
+		
+		if (fn != null) {
+			return fn;
+		}
+		
+		return "Deleted";
+	}
+	
+	static String getNameRaw(JSONObject p) {
+		if (p == null) return null;
+		if (p.has("title")) {
+			return p.getString("title");
+		}
+		
+		String fn = p.getString("first_name");
+		String ln = p.getString("last_name");
 		
 		if (fn != null && ln != null) {
 			return fn.concat(" ").concat(ln);
@@ -1523,28 +1657,34 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				
 				if (domain != null) {
 					if (phone) {
-						// TODO resolve number
+						//  resolve number
+						openProfile(invite, null, 2);
+						
 						return true;
 					} else {
 						if (profile) {
-							openProfile(domain, null);
+							openProfile(domain, null, 0);
 							
 							return true;
 						}
 						int msg = 0;
 						int topMsg = 0;
-						try {
-							if (messageId != null) {
+						if (messageId != null) {
+							try {
 								msg = Integer.parseInt(messageId);
+							} catch (Exception e) {
+								messageId = null;
 							}
-						} catch (Exception ignored) {}
+						}
 						if (thread != null) {
-							topMsg = Integer.parseInt(thread);
+							try {
+								topMsg = Integer.parseInt(thread);
+							} catch (Exception ignored) {}
 						}
 						if (current instanceof ChatForm &&
 								(domain.equals(((ChatForm) current).id)
 								|| domain.equals(((ChatForm) current).username))) {
-							((ChatForm) current).openMessage(msg, topMsg);
+							((ChatForm) current).openMessage(messageId, topMsg);
 						} else {
 							ChatForm f = new ChatForm(domain, null, msg, topMsg);
 							if (start != null) {
@@ -1556,7 +1696,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						return true;
 					}
 				} else if (invite != null) {
-					// TODO resolve invite
+					// resolve invite
+					openProfile(invite, null, 1);
+					
 					return true;
 				}
 				
@@ -1578,11 +1720,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		midlet.start(RUN_LOAD_FORM, f);
 	}
 	
-	static void openProfile(String id, ChatForm chatForm) {
+	static void openProfile(String id, ChatForm chatForm, int mode) {
 		if (chatForm == null && current instanceof ChatForm && id.equals(((ChatForm) current).id)) {
 			chatForm = (ChatForm) current;
 		}
-		Form f = new ChatInfoForm(id, chatForm);
+		Form f = new ChatInfoForm(id, chatForm, mode);
 		display(f);
 		midlet.start(RUN_LOAD_FORM, f);
 	}
@@ -1597,7 +1739,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 	static void display(Alert a, Displayable d) {
 		if (d == null) {
-			if (display.getCurrent() instanceof Alert) {
+			if (display.getCurrent() instanceof Alert && current != null) {
 				display.setCurrent(a, current);
 				return;
 			}

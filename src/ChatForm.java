@@ -54,7 +54,7 @@ public class ChatForm extends MPForm {
 	
 	public ChatForm(String id, String query, int message, int topMsg) {
 		super(id);
-		addCommand(MP.refreshCmd);
+		addCommand(MP.latestCmd);
 		addCommand(MP.chatInfoCmd);
 //		addCommand(MP.searchCmd);
 		this.id = id;
@@ -217,29 +217,27 @@ public class ChatForm extends MPForm {
 			
 			s = new StringItem(null, sb.toString());
 			s.setFont(MP.smallBoldFont);
-			if (!out) {
-				s.addCommand(MP.itemChatInfoCmd);
-			}
 			if (canWrite) {
 				s.addCommand(MP.replyMsgCmd);
 			}
-			s.addCommand(MP.forwardMsgCmd);
+//			s.addCommand(MP.forwardMsgCmd);
 			if (this.id.charAt(0) == '-') {
 				s.addCommand(MP.messageLinkCmd);
 			}
 			if (text != null && text.length() != 0) {
 				s.addCommand(MP.copyMsgCmd);
 			}
-			// TODO
-//			if (canDelete) {
-//				s.addCommand(MP.deleteMsgCmd);
-//			}
 			if (out || selfChat) {
-//				s.addCommand(MP.deleteMsgCmd);
+				s.addCommand(MP.deleteMsgCmd);
 				s.addCommand(MP.editMsgCmd);
+			} else {
+				s.setDefaultCommand(MP.itemChatCmd);
+				s.addCommand(MP.itemChatInfoCmd);
+				if (canDelete) {
+					s.addCommand(MP.deleteMsgCmd);
+				}
 			}
 			
-			s.setDefaultCommand(MP.itemChatCmd);
 			s.setItemCommandListener(MP.midlet);
 			s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			if (group == 0 || group != message.getLong("group", 0) || !MP.reverseChat) {
@@ -255,31 +253,62 @@ public class ChatForm extends MPForm {
 			group = message.getLong("group", 0);
 			
 			if (message.has("fwd")) {
-				// TODO
 				JSONObject fwd = message.getObject("fwd");
+				
 				sb.setLength(0);
-				sb.append("Forwarded from ").append(MP.getName(fwd.getNullableString("from_id"), true));
+				if ((t = fwd.getString("from_name", null)) == null) {
+					t = MP.getName(fwd.getString("from_id", null), true);
+				}
+				sb.append("Forwarded from ").append(t);
+				
 				s = new StringItem(null, sb.toString());
+				s.setFont(MP.smallItalicFont);
 				s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 				safeInsert(thread, insert++, s);
-				urls.put(s, new String[] { fwd.getNullableString("peer"), fwd.getNullableString("msg") } );
+
+				if (fwd.has("peer") && fwd.has("msg")) {
+					s.setDefaultCommand(MP.gotoMsgCmd);
+					s.setItemCommandListener(MP.midlet);
+					urls.put(s, new String[] { fwd.getString("peer"), fwd.getString("msg") } );
+				}
 			}
 			
 			if (message.has("reply")) {
-				// TODO
-//				JSONObject reply = message.getObject("reply");
-//				if (reply.has("msg")) {
-//					JSONObject replyMsg = reply.getObject("msg");
-//					sb.setLength(0);
-//					sb.append("Reply to ").append(MP.getName(replyMsg.getString("from_id"), true));
-//					s = new StringItem(null, sb.toString());
-//					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-//					s.setFont(MP.smallItalicFont);
-//					safeInsert(thread, insert++, s);
-//					if (reply.has("peer") && !reply.isNull("peer")) {
-//						urls.put(s, reply.getString("peer"));
-//					}
-//				}
+				JSONObject reply = message.getObject("reply");
+				sb.setLength(0);
+				if (reply.has("msg")) {
+					JSONObject replyMsg = reply.getObject("msg");
+					JSONObject replyFwd;
+					if ((t = MP.getName(replyMsg.getString("from_id", null), true, true)) == null
+							&& replyMsg.has("fwd") && (replyFwd = replyMsg.getObject("fwd")).getBoolean("s", false)) {
+						if ((t = replyFwd.getString("from_name", null)) == null) {
+							t = MP.getName(replyFwd.getString("from_id", null), true);
+						}
+					}
+					if (t != null) {
+						sb.append("Reply to ").append(t);
+					}
+					
+					sb.append("\n> ");
+					if (reply.has("quote")) {
+						sb.append(reply.getString("quote"));
+					} else {
+						if ((t = replyMsg.getString("text", null)) != null) {
+							MP.appendOneLine(sb, t);
+						} else if (replyMsg.has("media")) {
+							sb.append("Media");
+						}
+					}
+					
+					s = new StringItem(null, sb.toString());
+					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					s.setFont(MP.smallItalicFont);
+					s.setDefaultCommand(MP.gotoMsgCmd);
+					s.setItemCommandListener(MP.midlet);
+					safeInsert(thread, insert++, s);
+					
+					urls.put(s, new String[] { reply.getString("peer", null), reply.getString("id", null) });
+				}
 			}
 			
 			// text
@@ -410,8 +439,6 @@ public class ChatForm extends MPForm {
 			if (group == 0) {
 				safeInsert(thread, insert++, new Spacer(10, 10));
 			}
-			
-//			if (MP.reverseChat ? (i-- == 0) : (++i == l)) break;
 		}
 		
 		if (focus != null) {
@@ -420,10 +447,31 @@ public class ChatForm extends MPForm {
 		}
 	}
 
-	public void openMessage(int msg, int topMsg) {
+	public void openMessage(String msg, int topMsg) {
+		if (urls != null && urls.contains(msg)) { // TODO doesn't work
+			Item focus = null;
+			for (Enumeration en = urls.keys(); en.hasMoreElements(); ) {
+				Object key = en.nextElement();
+				if (!(key instanceof StringItem))
+					continue;
+				Object value = urls.get(key);
+				if (!(value instanceof String[])
+						|| ((String[]) value).length != 4
+						|| (!msg.equals(((String[]) value)[1])))
+					continue;
+				
+				focus = (Item) key;
+				break;
+			}
+			System.out.println(focus);
+			if (focus != null) {
+				MP.display.setCurrentItem(focus);
+				return;
+			}
+		}
 		cancel();
-		this.messageId = msg;
-		this.topMsgId = topMsg;
+		this.messageId = Integer.parseInt(msg);
+		if (topMsg != -1) this.topMsgId = topMsg;
 		load();
 	}
 	
@@ -463,7 +511,7 @@ public class ChatForm extends MPForm {
 		if (!loaded || urls == null) return;
 		for (Enumeration en = urls.keys(); en.hasMoreElements(); ) {
 			Object key = en.nextElement();
-			if (key instanceof ImageItem
+			if (!(key instanceof ImageItem)
 					|| ((ImageItem) key).getImage() != null)
 				continue;
 			MP.queueImage(key, urls.get(key));
