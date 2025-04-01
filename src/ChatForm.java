@@ -463,10 +463,7 @@ public class ChatForm extends MPForm {
 			}
 		}
 		
-		if (focus != null) {
-			MP.display(this);
-			MP.display.setCurrentItem(focus);
-		}
+		super.focusOnFinish = focus;
 	}
 
 	public void openMessage(String msg, int topMsg) {
@@ -530,7 +527,7 @@ public class ChatForm extends MPForm {
 	}
 	
 	void shown() {
-		if (!loaded || urls == null) return;
+		if (!finished || urls == null) return;
 		for (Enumeration en = urls.keys(); en.hasMoreElements(); ) {
 			Object key = en.nextElement();
 			if (!(key instanceof ImageItem)

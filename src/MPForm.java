@@ -31,6 +31,7 @@ public abstract class MPForm extends Form {
 	boolean loaded, finished, canceled;
 	Thread thread;
 	Hashtable urls;
+	Item focusOnFinish;
 
 	public MPForm(String title) {
 		super(title);
@@ -40,6 +41,7 @@ public abstract class MPForm extends Form {
 	
 	void load() {
 		if (loaded) return;
+		loaded = true;
 		canceled = finished = false;
 
 		setTicker(new Ticker("Loading.."));
@@ -54,6 +56,10 @@ public abstract class MPForm extends Form {
 			finished = true;
 			if (MP.useLoadingForm && MP.current == this) {
 				MP.display(this);
+				if (focusOnFinish != null) {
+					MP.display.setCurrentItem(focusOnFinish);
+					focusOnFinish = null;
+				}
 			}
 		} catch (InterruptedException e) {
 		} catch (InterruptedIOException e) {

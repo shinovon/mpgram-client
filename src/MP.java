@@ -248,9 +248,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		
 		String p = System.getProperty("microedition.platform");
 		symbianJrt = p != null && p.indexOf("platform=S60") != -1;
-		useLoadingForm = !symbianJrt &&
+		useLoadingForm = !symbianJrt /*&&
 				(System.getProperty("com.symbian.midp.serversocket.support") != null ||
-				System.getProperty("com.symbian.default.to.suite.icon") != null);
+				System.getProperty("com.symbian.default.to.suite.icon") != null)*/;
 		
 		threadedImages = symbianJrt;
 		
@@ -1080,6 +1080,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				usersCache.clear();
 				chatsCache.clear();
 				imagesCache.clear();
+				imagesToLoad.removeAllElements();
 				commandAction(backCmd, d);
 				return;
 			}
@@ -1850,7 +1851,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			d = mainDisplayable;
 			
 			formHistory.removeAllElements();
-			imagesToLoad.removeAllElements();
+			if (back) imagesToLoad.removeAllElements();
 		}
 		Displayable p = display.getCurrent();
 		if (p == loadingForm) p = current;
@@ -1888,7 +1889,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return a;
 	}
 
-	private static Alert infoAlert(String text) {
+	static Alert infoAlert(String text) {
 		Alert a = new Alert("");
 		a.setType(AlertType.CONFIRMATION);
 		a.setString(text);

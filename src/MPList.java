@@ -41,6 +41,7 @@ public abstract class MPList extends List {
 	
 	void load() {
 		if (loaded) return;
+		loaded = true;
 		canceled = finished = false;
 		
 		if (MP.useLoadingForm) {
