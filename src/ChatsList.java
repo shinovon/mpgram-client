@@ -109,8 +109,9 @@ public class ChatsList extends MPList {
 		MP.openChat(id);
 	}
 	
-	void changeFolder(int folderId) {
+	void changeFolder(int folderId, String title) {
 		cancel();
+		setTitle(title.concat(" - mpgram"));
 		folder = folderId;
 		MP.midlet.start(MP.RUN_LOAD_LIST, this);
 	}

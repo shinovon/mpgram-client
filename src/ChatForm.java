@@ -36,6 +36,7 @@ public class ChatForm extends MPForm {
 	String username;
 	String query;
 	String startBot;
+	String title;
 	
 	int limit = MP.messagesLimit;
 	int addOffset = 0;
@@ -77,7 +78,7 @@ public class ChatForm extends MPForm {
 			id = peer.getString("id");
 			username = peer.getString("name", null);
 
-			setTitle(MP.getName(id, false));
+			setTitle(title = MP.getName(id, false));
 
 			canWrite = !broadcast;
 			if (id.charAt(0) == '-') {
@@ -116,7 +117,10 @@ public class ChatForm extends MPForm {
 
 		if (query != null || topMsgId != 0) {
 			sb.append("searchMessages");
-			if (query != null) MP.appendUrl(sb.append("q="), query);
+			if (query != null) {
+				setTitle("Search - ".concat(title));
+				MP.appendUrl(sb.append("q="), query);
+			}
 		} else {
 			sb.append("getHistory");
 		}
@@ -289,41 +293,43 @@ public class ChatForm extends MPForm {
 			
 			if (message.has("reply")) {
 				JSONObject reply = message.getObject("reply");
-				sb.setLength(0);
-				if (reply.has("msg")) {
-					JSONObject replyMsg = reply.getObject("msg");
-					JSONObject replyFwd;
-					if ((t = MP.getName(replyMsg.getString("from_id", null), true, true)) == null
-							&& replyMsg.has("fwd") && (replyFwd = replyMsg.getObject("fwd")).getBoolean("s", false)) {
-						if ((t = replyFwd.getString("from_name", null)) == null) {
-							t = MP.getName(replyFwd.getString("from_id", null), true);
+				if (topMsgId == 0 || reply.getInt("id") != topMsgId) {
+					sb.setLength(0);
+					if (reply.has("msg")) {
+						JSONObject replyMsg = reply.getObject("msg");
+						JSONObject replyFwd;
+						if ((t = MP.getName(replyMsg.getString("from_id", null), true, true)) == null
+								&& replyMsg.has("fwd") && (replyFwd = replyMsg.getObject("fwd")).getBoolean("s", false)) {
+							if ((t = replyFwd.getString("from_name", null)) == null) {
+								t = MP.getName(replyFwd.getString("from_id", null), true);
+							}
 						}
-					}
-					if (t != null) {
-						sb.append("Reply to ").append(t);
-					}
-					
-					sb.append("\n> ");
-					if (reply.has("quote")) {
-						sb.append(reply.getString("quote"));
-					} else {
-						if ((t = replyMsg.getString("text", null)) != null) {
-							MP.appendOneLine(sb, t);
-						} else if (replyMsg.has("media")) {
-							sb.append("Media");
+						if (t != null) {
+							sb.append("Reply to ").append(t);
 						}
+						
+						sb.append("\n> ");
+						if (reply.has("quote")) {
+							sb.append(reply.getString("quote"));
+						} else {
+							if ((t = replyMsg.getString("text", null)) != null) {
+								MP.appendOneLine(sb, t);
+							} else if (replyMsg.has("media")) {
+								sb.append("Media");
+							}
+						}
+						
+						s = new StringItem(null, sb.toString());
+						s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						s.setFont(MP.smallItalicFont);
+						s.setDefaultCommand(MP.gotoMsgCmd);
+						s.setItemCommandListener(MP.midlet);
+						safeInsert(thread, insert++, s);
+						
+						urls.put(s, new String[] { reply.getString("peer", null), reply.getString("id", null) });
 					}
-					
-					s = new StringItem(null, sb.toString());
-					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					s.setFont(MP.smallItalicFont);
-					s.setDefaultCommand(MP.gotoMsgCmd);
-					s.setItemCommandListener(MP.midlet);
-					safeInsert(thread, insert++, s);
-					
-					urls.put(s, new String[] { reply.getString("peer", null), reply.getString("id", null) });
+					space = true;
 				}
-				space = true;
 			}
 			
 			// text

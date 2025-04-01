@@ -743,7 +743,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	public void commandAction(Command c, Displayable d) {
 		if (d instanceof ChatsList) { // chats list commands
 			if (c == archiveCmd) {
-				chatsList.changeFolder(1);
+				chatsList.changeFolder(1, "Archive");
 				return;
 			}
 			if (c == foldersCmd) {

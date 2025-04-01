@@ -34,11 +34,9 @@ public class FoldersList extends MPList {
 
 	void loadInternal(Thread thread) throws Exception {
 		JSONObject j = (JSONObject) MP.api("getFolders");
-		if (hasArchive = j.getBoolean("archive", false)) {
-			safeAppend(thread, "Archive", null);
-		}
-		folders = j.getArray("folders", null);
+		JSONArray folders = j.getArray("folders", null);
 		if (folders != null) {
+			this.folders = folders;
 			int l = folders.size();
 			for (int i = 0; i < l; ++i) {
 				safeAppend(thread, folders.getObject(i).getString("t", "All chats"), null);
@@ -46,20 +44,20 @@ public class FoldersList extends MPList {
 		} else {
 			safeAppend(thread, "All chats", null);
 		}
+		if (hasArchive = j.getBoolean("archive", false)) {
+			safeAppend(thread, "Archive", null);
+		}
 	}
 
 	void select(int i) {
 		if (i == -1) return;
-		if (hasArchive) {
-			if (i == 0) {
-				MP.chatsList.changeFolder(1);
-				MP.midlet.commandAction(MP.backCmd, this);
-				return;
-			}
-			i--;
+		if (hasArchive && i == size() - 1) {
+			MP.chatsList.changeFolder(1, getString(i));
+			MP.midlet.commandAction(MP.backCmd, this);
+			return;
 		}
 		int folderId = folders == null ? 0 : folders.getObject(i).getInt("id", 0);
-		MP.chatsList.changeFolder(folderId);
+		MP.chatsList.changeFolder(folderId, getString(i));
 		MP.midlet.commandAction(MP.backCmd, this);
 	}
 
