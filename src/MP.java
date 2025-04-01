@@ -121,6 +121,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static int messagesLimit = 20;
 	static int profilesCacheThreshold = 200;
 	static boolean jsonStream = true;
+	static boolean parseRichtext = true;
+	static boolean parseLinks = true;
 
 	// threading
 	private static int run;
@@ -293,6 +295,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			messagesLimit = j.getInt("messagesLimit", messagesLimit);
 			profilesCacheThreshold = j.getInt("profilesCacheThreshold", profilesCacheThreshold);
 			jsonStream = j.getBoolean("jsonStream", jsonStream);
+			parseRichtext = j.getBoolean("parseRichtext", parseRichtext);
+			parseLinks = j.getBoolean("parseLinks", parseLinks);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -949,10 +953,14 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					
 					behChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
 							"Wait for page to load",
-							"Use JSONStream"
+							"Use JSONStream",
+							"Format text",
+							"Parse links"
 					}, null);
 					behChoice.setSelectedIndex(0, useLoadingForm);
 					behChoice.setSelectedIndex(1, jsonStream);
+					behChoice.setSelectedIndex(2, parseRichtext);
+					behChoice.setSelectedIndex(4, parseLinks);
 					behChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(behChoice);
 					
@@ -1053,6 +1061,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					j.put("messagesLimit", messagesLimit);
 					j.put("profilesCacheThreshold", profilesCacheThreshold);
 					j.put("jsonStream", jsonStream);
+					j.put("parseRichtext", parseRichtext);
+					j.put("parseLinks", parseLinks);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
@@ -2268,20 +2278,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		StringItem s;
 		
 		// find links
-		if ((state == null || (state[RT_PRE] == 0 && state[RT_URL] == 0))
+		if (parseLinks && (state == null || (state[RT_PRE] == 0 && state[RT_URL] == 0))
 				&& (text.indexOf("http://") != -1 || text.indexOf("https://") != -1
-				|| text.indexOf('#') != -1|| text.indexOf('@') != -1)) {
+				|| text.indexOf('@') != -1)) {
 			int i, j, k, d = 0;
 			while (true) {
 				boolean b = false;
 				i = text.indexOf("://", d);
-				j = text.indexOf('#', d);
-				k = text.indexOf('@', d);
-				if (i == -1 && j == -1 && k == -1) break;
-				
-				if (k != -1 && (j == -1 || j > k)) {
-					j = k;
-				}
+				j = text.indexOf('@', d);
+				if (i == -1 && j == -1) break;
 				if (j != -1 && (i == -1 || i > j)) {
 					i = j;
 				} else b = i != -1;
@@ -2367,9 +2372,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		if (text.length() != 0) {
 			form.safeInsert(thread, insert++, s);
 		}
-		
-		while (space-- != 0) {
-			form.safeInsert(thread, insert++, new Spacer(f.charWidth(' '), f.getBaselinePosition()));
+
+		if (space != 0) {
+			form.safeInsert(thread, insert++, new Spacer(f.charWidth(' ') * space, f.getBaselinePosition()));
 		}
 		
 		return insert;

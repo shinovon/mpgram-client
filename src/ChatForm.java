@@ -329,7 +329,7 @@ public class ChatForm extends MPForm {
 			// text
 			if (text != null && text.length() != 0) {
 				urls.put(idString, text);
-				if (message.has("entities")) {
+				if (MP.parseRichtext && message.has("entities")) {
 					insert = MP.wrapRichText(this, thread, text, message.getArray("entities"), insert);
 				} else {
 					insert = MP.flush(this, thread, text, insert, null);
