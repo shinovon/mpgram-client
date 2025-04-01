@@ -960,7 +960,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					behChoice.setSelectedIndex(0, useLoadingForm);
 					behChoice.setSelectedIndex(1, jsonStream);
 					behChoice.setSelectedIndex(2, parseRichtext);
-					behChoice.setSelectedIndex(4, parseLinks);
+					behChoice.setSelectedIndex(3, parseLinks);
 					behChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(behChoice);
 					
@@ -1033,6 +1033,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				
 				useLoadingForm = behChoice.isSelected(0);
 				jsonStream = behChoice.isSelected(1);
+				parseRichtext = behChoice.isSelected(2);
+				parseLinks = behChoice.isSelected(3);
 				
 				loadThumbs = imagesChoice.isSelected(0);
 				loadAvatars = imagesChoice.isSelected(1);
