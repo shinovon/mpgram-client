@@ -120,6 +120,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static int chatsLimit = 20;
 	static int messagesLimit = 20;
 	static int profilesCacheThreshold = 200;
+	static boolean jsonStream = true;
 
 	// threading
 	private static int run;
@@ -291,6 +292,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			chatsLimit = j.getInt("chatsLimit", chatsLimit);
 			messagesLimit = j.getInt("messagesLimit", messagesLimit);
 			profilesCacheThreshold = j.getInt("profilesCacheThreshold", profilesCacheThreshold);
+			jsonStream = j.getBoolean("jsonStream", jsonStream);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -946,9 +948,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					f.append(s);
 					
 					behChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
-							"Wait for page to load"
+							"Wait for page to load",
+							"Use JSONStream"
 					}, null);
 					behChoice.setSelectedIndex(0, useLoadingForm);
+					behChoice.setSelectedIndex(1, jsonStream);
 					behChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(behChoice);
 					
@@ -1020,6 +1024,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				}
 				
 				useLoadingForm = behChoice.isSelected(0);
+				jsonStream = behChoice.isSelected(1);
 				
 				loadThumbs = imagesChoice.isSelected(0);
 				loadAvatars = imagesChoice.isSelected(1);
@@ -1047,6 +1052,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					j.put("chatsLimit", chatsLimit);
 					j.put("messagesLimit", messagesLimit);
 					j.put("profilesCacheThreshold", profilesCacheThreshold);
+					j.put("jsonStream", jsonStream);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
@@ -1935,7 +1941,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				c = hc.getResponseCode();
 			}
 			try {
-				res = JSONStream.getStream(in = hc.openInputStream()).nextValue();
+				if (jsonStream) {
+					res = JSONStream.getStream(in = hc.openInputStream()).nextValue();
+				} else {
+					res = JSONObject.parseJSON(readUtf(in = hc.openInputStream(), (int) hc.getLength()));
+				}
 			} catch (RuntimeException e) {
 				if (c >= 400) {
 					throw new APIException(url, c, null);
@@ -1988,6 +1998,18 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Image getImage(String url) throws IOException {
 		byte[] b = get(url);
 		return Image.createImage(b, 0, b.length);
+	}
+	
+	private static String readUtf(InputStream in, int i) throws IOException {
+		byte[] buf = new byte[i <= 0 ? 1024 : i];
+		i = 0;
+		int j;
+		while ((j = in.read(buf, i, buf.length - i)) != -1) {
+			if ((i += j) >= buf.length) {
+				System.arraycopy(buf, 0, buf = new byte[i + 2048], 0, i);
+			}
+		}
+		return new String(buf, 0, i, "UTF-8");
 	}
 	
 	private static byte[] readBytes(InputStream inputStream, int initialSize, int bufferSize, int expandSize)
