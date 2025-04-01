@@ -1759,7 +1759,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				if (domain != null) {
 					if (phone) {
 						//  resolve number
-						openProfile(invite, null, 2);
+						openProfile(domain, null, 2);
 						
 						return true;
 					} else {
@@ -1797,7 +1797,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					}
 				} else if (invite != null) {
 					// resolve invite
-					openProfile(invite, null, 1);
+					midlet.start(RUN_RESOLVE_INVITE, invite);
 					
 					return true;
 				}
