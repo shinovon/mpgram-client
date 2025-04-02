@@ -179,7 +179,7 @@ public class ChatForm extends MPForm {
 		
 		int top = size();
 		
-		if (l == limit) {
+		if (l == limit && j.has("count")) {
 			s = new StringItem(null, "Older messages", Item.BUTTON);
 			s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			s.setDefaultCommand(MP.olderMessagesCmd);
