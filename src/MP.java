@@ -775,7 +775,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		case RUN_CHECK_OTA: {
 			try {
-				JSONObject j = JSONObject.parseObject(new String(get(OTA_URL), "UTF-8"));
+				JSONObject j = JSONObject.parseObject(new String(get(OTA_URL + "?v=" + version + "&l=" + lang), "UTF-8"));
 				if (j.getBoolean("update_available", false) && checkUpdates) {
 					updateUrl = j.getString("download_url");
 					Alert a = new Alert("", "", null, AlertType.INFO);
