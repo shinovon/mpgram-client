@@ -26,13 +26,13 @@ import javax.microedition.lcdui.TextField;
 
 import cc.nnproject.json.JSONObject;
 
-public class CaptchaForm extends MPForm {
+public class CaptchaForm extends MPForm implements LangConstants {
 	
 	TextField field;
 	String id;
 
 	public CaptchaForm() {
-		super("Captcha");
+		super(MP.L[Captcha]);
 		addCommand(MP.backCmd);
 		addCommand(MP.authNextCmd);
 	}
@@ -51,7 +51,7 @@ public class CaptchaForm extends MPForm {
 		field = new TextField("", "", 20, TextField.NON_PREDICTIVE);
 		append(field);
 		
-		StringItem s = new StringItem(null, "Next", StringItem.BUTTON);
+		StringItem s = new StringItem(null, MP.L[Next], StringItem.BUTTON);
 		s.setDefaultCommand(MP.authNextCmd);
 		s.setItemCommandListener(MP.midlet);
 		append(s);

@@ -24,7 +24,7 @@ import javax.microedition.lcdui.StringItem;
 
 import cc.nnproject.json.JSONObject;
 
-public class ChatInfoForm extends MPForm {
+public class ChatInfoForm extends MPForm implements LangConstants {
 
 	String id;
 	String phone;
@@ -50,6 +50,7 @@ public class ChatInfoForm extends MPForm {
 	}
 
 	void loadInternal(Thread thread) throws Exception {
+		StringBuffer sb = new StringBuffer();
 		JSONObject rawPeer = null;
 		String name = null;
 		if (mode == 0) {
@@ -57,7 +58,8 @@ public class ChatInfoForm extends MPForm {
 			id = peer.getString("id");
 			setTitle(name = MP.getName(peer));
 		} else if (mode == 1) {
-			JSONObject r = ((JSONObject) MP.api("resolvePhone&phone=".concat(id))).getObject("res");
+			sb.append("resolvePhone&phone=").append(id);
+			JSONObject r = ((JSONObject) MP.api(sb.toString())).getObject("res");
 			MP.fillPeersCache(r);
 			
 			rawPeer = r.getArray("users").getObject(0);
@@ -82,11 +84,30 @@ public class ChatInfoForm extends MPForm {
 		}
 		
 		if (isUser) {
+			if (rawPeer.has("status")) {
+				sb.setLength(0);
+				JSONObject status = rawPeer.getObject("status");
+				if ("userStatusOnline".equals(status.getString("_"))) {
+					sb.append(MP.L[Online]);
+				} else if(status.has("was_online")) {
+					sb.append(MP.L[LastSeen]);
+					sb.append(MP.localizeDate(status.getInt("was_online"), 1));
+				} else {
+					sb.append(MP.L[Offline]);
+				}
+				
+				s = new StringItem(null, sb.toString());
+				s.setFont(MP.medPlainFont);
+				s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+				s.setItemCommandListener(MP.midlet);
+				append(s);
+			}
+			
 			if (rawPeer.has("phone")) {
 				phone = "+".concat(rawPeer.getString("phone"));
 				addCommand(MP.callCmd);
 				
-				s = new StringItem("Phone number", phone);
+				s = new StringItem(MP.L[PhoneNumber], phone);
 				s.setFont(MP.medPlainFont);
 				s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 				s.addCommand(MP.callItemCmd);
@@ -95,7 +116,7 @@ public class ChatInfoForm extends MPForm {
 			}
 			
 			if (full.has("about")) {
-				s = new StringItem("About", full.getString("about"));
+				s = new StringItem(MP.L[About_User], full.getString("about"));
 				s.setFont(MP.medPlainFont);
 				s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 				s.setItemCommandListener(MP.midlet);
@@ -103,7 +124,7 @@ public class ChatInfoForm extends MPForm {
 			}
 			
 			if (rawPeer.has("username")) {
-				s = new StringItem("Username", "@".concat(rawPeer.getString("username")));
+				s = new StringItem(MP.L[Username], "@".concat(rawPeer.getString("username")));
 				s.setFont(MP.medPlainFont);
 				s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 				s.setItemCommandListener(MP.midlet);
@@ -117,7 +138,7 @@ public class ChatInfoForm extends MPForm {
 //				}
 				
 				if (full.has("participants_count")) {
-					s = new StringItem(null, full.getString("participants_count").concat(" members"));
+					s = new StringItem(null, MP.localizeAmount(full.getInt("participants_count"), _member));
 					s.setFont(MP.medPlainFont);
 					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					s.setItemCommandListener(MP.midlet);
@@ -125,7 +146,7 @@ public class ChatInfoForm extends MPForm {
 				}
 				
 				if (full.has("about")) {
-					s = new StringItem("About", full.getString("about"));
+					s = new StringItem(MP.L[About_Chat], full.getString("about"));
 					s.setFont(MP.medPlainFont);
 					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					s.setItemCommandListener(MP.midlet);
@@ -133,7 +154,7 @@ public class ChatInfoForm extends MPForm {
 				}
 				
 				if (rawPeer.has("username")) {
-					s = new StringItem("Link", "t.me/".concat(rawPeer.getString("username")));
+					s = new StringItem(MP.L[Link], "t.me/".concat(rawPeer.getString("username")));
 					s.setFont(MP.medPlainFont);
 					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					s.setItemCommandListener(MP.midlet);
@@ -142,7 +163,7 @@ public class ChatInfoForm extends MPForm {
 			}
 			
 			if (mode != 0) {
-				s = new StringItem(null, mode == 2 ? "View group" : "Join group", Item.BUTTON);
+				s = new StringItem(null, mode == 2 ? MP.L[ViewGroup] : MP.L[JoinGroup], Item.BUTTON);
 				s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 				s.setDefaultCommand(mode == 2 ? MP.openChatCmd : MP.acceptInviteCmd);
 				s.setItemCommandListener(MP.midlet);
@@ -154,7 +175,7 @@ public class ChatInfoForm extends MPForm {
 		if (full.has("pinned_msg_id")) {
 			this.pinnedMessageId = full.getInt("pinned_msg_id");
 			
-			s = new StringItem(null, "Go to pinned message");
+			s = new StringItem(null, MP.L[GoToPinnedMessage]);
 			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			s.setDefaultCommand(MP.gotoPinnedMsgCmd);
 			s.setItemCommandListener(MP.midlet);
@@ -162,13 +183,13 @@ public class ChatInfoForm extends MPForm {
 		}
 		
 		if (chatForm != null) {
-			s = new StringItem(null, "Search messages", Item.BUTTON);
+			s = new StringItem(null, MP.L[SearchMessages], Item.BUTTON);
 			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			s.setDefaultCommand(MP.searchCmd);
 			s.setItemCommandListener(MP.midlet);
 			append(s);
 			
-			s = new StringItem(null, "Chat media", Item.BUTTON);
+			s = new StringItem(null, MP.L[ChatMedia], Item.BUTTON);
 			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			s.setDefaultCommand(MP.chatMediaCmd);
 			s.setItemCommandListener(MP.midlet);
@@ -177,7 +198,7 @@ public class ChatInfoForm extends MPForm {
 		
 		if (!isUser) {
 			boolean left = rawPeer.getBoolean("left", false);
-			s = new StringItem(null, left ? "Join group" : "Leave group", Item.BUTTON);
+			s = new StringItem(null, left ? MP.L[JoinGroup] : MP.L[LeaveGroup], Item.BUTTON);
 			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			s.setDefaultCommand(left ? MP.joinChatCmd : MP.leaveChatCmd);
 			s.setItemCommandListener(MP.midlet);

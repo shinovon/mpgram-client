@@ -21,6 +21,9 @@ SOFTWARE.
 */
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.TimeZone;
@@ -55,7 +58,7 @@ import cc.nnproject.json.JSONArray;
 import cc.nnproject.json.JSONObject;
 import cc.nnproject.json.JSONStream;
 
-public class MP extends MIDlet implements CommandListener, ItemCommandListener, Runnable {
+public class MP extends MIDlet implements CommandListener, ItemCommandListener, Runnable, LangConstants {
 
 	static final int RUN_SEND_MESSAGE = 4;
 	static final int RUN_VALIDATE_AUTH = 5;
@@ -80,6 +83,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static final String FILE_URL = "file.php";
 	
 	static final String API_VERSION = "5";
+	
+	static final String[] LANGS = {
+		"en",
+		"ru",
+	};
 	
 	static final Font largePlainFont = Font.getFont(0, 0, Font.SIZE_LARGE);
 	static final Font medPlainFont = Font.getFont(0, 0, Font.SIZE_MEDIUM);
@@ -124,6 +132,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static boolean parseRichtext = true;
 	static boolean parseLinks = true;
 //	static long updatesDelay = 45000L;
+	static String lang = "en";
 
 	// threading
 	private static int run;
@@ -218,6 +227,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static ChoiceGroup avaCacheChoice;
 	private static ChoiceGroup uiChoice;
 	private static ChoiceGroup behChoice;
+	private static ChoiceGroup langChoice;
 	private static Gauge avaCacheGauge;
 	private static Gauge photoSizeGauge;
 	private static Gauge profileCacheGauge;
@@ -306,6 +316,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			jsonStream = j.getBoolean("jsonStream", jsonStream);
 			parseRichtext = j.getBoolean("parseRichtext", parseRichtext);
 			parseLinks = j.getBoolean("parseLinks", parseLinks);
+			lang = j.getString("lang", lang);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -322,83 +333,83 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		} catch (Exception ignored) {}
 	
 		
-		// load locale TODO
-//		(L = new String[200])[0] = "mpgram";
-//		try {
-//			loadLocale(lang);
-//		} catch (Exception e) {
-//			try {
-//				loadLocale(lang = "en");
-//			} catch (Exception e2) {
-//				// crash on fail
-//				throw new RuntimeException(e2.toString());
-//			}
-//		}
+		// load locale
+		(L = new String[200])[0] = "mpgram";
+		try {
+			loadLocale(lang);
+		} catch (Exception e) {
+			try {
+				loadLocale(lang = "en");
+			} catch (Exception e2) {
+				// crash on fail
+				throw new RuntimeException(e2.toString());
+			}
+		}
 		
 		// commands
 		
-		exitCmd = new Command("Exit", Command.EXIT, 15);
-		backCmd = new Command("Back", Command.BACK, 15);
+		exitCmd = new Command(L[Exit], Command.EXIT, 15);
+		backCmd = new Command(L[Back], Command.BACK, 15);
 		
-		settingsCmd = new Command("Settings", Command.SCREEN, 5);
-		aboutCmd = new Command("About", Command.SCREEN, 6);
+		settingsCmd = new Command(L[Settings], Command.SCREEN, 5);
+		aboutCmd = new Command(L[About], Command.SCREEN, 6);
 		
-		authCmd = new Command("Auth", Command.ITEM, 1);
-		authNextCmd = new Command("Next", Command.OK, 1);
-		authCodeCmd = new Command("Next", Command.OK, 1);
-		authPasswordCmd = new Command("Next", Command.OK, 1);
-		authNewSessionCmd = new Command("New session", Command.SCREEN, 1);
-		authImportSessionCmd = new Command("Import session", Command.SCREEN, 2);
+		authCmd = new Command(L[Auth], Command.ITEM, 1);
+		authNextCmd = new Command(L[Next], Command.OK, 1);
+		authCodeCmd = new Command(L[Next], Command.OK, 1);
+		authPasswordCmd = new Command(L[Next], Command.OK, 1);
+		authNewSessionCmd = new Command(L[NewSession], Command.SCREEN, 1);
+		authImportSessionCmd = new Command(L[ImportSession], Command.SCREEN, 2);
 		
-		logoutCmd = new Command("Logout", Command.ITEM, 1);
-		clearCacheCmd = new Command("Clear cache", Command.ITEM, 1);
+		logoutCmd = new Command(L[Logout], Command.ITEM, 1);
+		clearCacheCmd = new Command(L[ClearCache], Command.ITEM, 1);
 
-		foldersCmd = new Command("Folders", Command.SCREEN, 4);
-		refreshCmd = new Command("Refresh", Command.SCREEN, 5);
-		archiveCmd = new Command("Archived chats", Command.SCREEN, 8);
-		contactsCmd = new Command("Contacts", Command.SCREEN, 9);
-		searchCmd = new Command("Search", Command.SCREEN, 10);
+		foldersCmd = new Command(L[Folders], Command.SCREEN, 4);
+		refreshCmd = new Command(L[Refresh], Command.SCREEN, 5);
+		archiveCmd = new Command(L[ArchivedChats], Command.SCREEN, 8);
+		contactsCmd = new Command(L[Contacts], Command.SCREEN, 9);
+		searchCmd = new Command(L[Search], Command.SCREEN, 10);
 		
-		itemChatCmd = new Command("Open chat", Command.ITEM, 1);
-		itemChatInfoCmd = new Command("Profile", Command.ITEM, 2);
-		replyMsgCmd = new Command("Reply", Command.ITEM, 3);
-		forwardMsgCmd = new Command("Forward", Command.ITEM, 4);
-		copyMsgCmd = new Command("Copy message", Command.ITEM, 5);
-		messageLinkCmd = new Command("Copy message link", Command.ITEM, 7);
-		deleteMsgCmd = new Command("Delete", Command.ITEM, 8);
-		editMsgCmd = new Command("Edit", Command.ITEM, 9);
-		gotoMsgCmd = new Command("Go to", Command.ITEM, 1);
+		itemChatCmd = new Command(L[OpenChat], Command.ITEM, 1);
+		itemChatInfoCmd = new Command(L[Profile], Command.ITEM, 2);
+		replyMsgCmd = new Command(L[Reply], Command.ITEM, 3);
+		forwardMsgCmd = new Command(L[Forward], Command.ITEM, 4);
+		copyMsgCmd = new Command(L[CopyMessage], Command.ITEM, 5);
+		messageLinkCmd = new Command(L[CopyMessageLink], Command.ITEM, 7);
+		deleteMsgCmd = new Command(L[Delete], Command.ITEM, 8);
+		editMsgCmd = new Command(L[Edit], Command.ITEM, 9);
+		gotoMsgCmd = new Command(L[GoTo], Command.ITEM, 1);
 		
-		richTextLinkCmd = new Command("Link", Command.ITEM, 1);
-		openImageCmd = new Command("View image", Command.ITEM, 1);
-		callItemCmd = new Command("Call", Command.ITEM, 1);
-		documentCmd = new Command("Download", Command.ITEM, 1);
+		richTextLinkCmd = new Command(L[Link_Cmd], Command.ITEM, 1);
+		openImageCmd = new Command(L[ViewImage], Command.ITEM, 1);
+		callItemCmd = new Command(L[Call], Command.ITEM, 1);
+		documentCmd = new Command(L[Download], Command.ITEM, 1);
 		
-		writeCmd = new Command("Write message", Command.SCREEN, 5);
-		latestCmd = new Command("Refresh", Command.SCREEN, 6);
-		chatInfoCmd = new Command("Chat info", Command.SCREEN, 7);
-		olderMessagesCmd = new Command("Older", Command.ITEM, 1);
-		newerMessagesCmd = new Command("Newer", Command.ITEM, 1);
+		writeCmd = new Command(L[WriteMessage], Command.SCREEN, 5);
+		latestCmd = new Command(L[LatestMessages_Cmd], Command.SCREEN, 6);
+		chatInfoCmd = new Command(L[ChatInfo], Command.SCREEN, 7);
+		olderMessagesCmd = new Command(L[Older], Command.ITEM, 1);
+		newerMessagesCmd = new Command(L[Newer], Command.ITEM, 1);
 		
-		sendCmd = new Command("Send", Command.OK, 1);
-		openTextBoxCmd = new Command("Open text box", Command.ITEM, 1);
+		sendCmd = new Command(L[Send], Command.OK, 1);
+		openTextBoxCmd = new Command(L[OpenTextBox], Command.ITEM, 1);
 		
-		callCmd = new Command("Call", Command.SCREEN, 5);
-		openChatCmd = new Command("Open chat", Command.SCREEN, 1);
-		acceptInviteCmd = new Command("Join", Command.ITEM, 1);
-		joinChatCmd = new Command("Join group", Command.SCREEN, 1);
-		leaveChatCmd = new Command("Leave group", Command.ITEM, 1);
-		chatMediaCmd = new Command("Media", Command.ITEM, 1);
-		gotoPinnedMsgCmd = new Command("Go to", Command.ITEM, 1);
+		callCmd = new Command(L[Call], Command.SCREEN, 5);
+		openChatCmd = new Command(L[OpenChat], Command.SCREEN, 1);
+		acceptInviteCmd = new Command(L[Join], Command.ITEM, 1);
+		joinChatCmd = new Command(L[JoinGroup], Command.SCREEN, 1);
+		leaveChatCmd = new Command(L[LeaveGroup], Command.ITEM, 1);
+		chatMediaCmd = new Command(L[Media], Command.ITEM, 1);
+		gotoPinnedMsgCmd = new Command(L[GoTo], Command.ITEM, 1);
 		
-		okCmd = new Command("Ok", Command.OK, 1);
-		cancelCmd = new Command("Cancel", Command.CANCEL, 2);
+		okCmd = new Command(L[Ok], Command.OK, 1);
+		cancelCmd = new Command(L[Cancel], Command.CANCEL, 2);
 
-		nextPageCmd = new Command("Next page", Command.SCREEN, 6);
-		prevPageCmd = new Command("Prev page", Command.SCREEN, 7);
+		nextPageCmd = new Command(L[NextPage], Command.SCREEN, 6);
+		prevPageCmd = new Command(L[PrevPage], Command.SCREEN, 7);
 		
-		loadingForm = new Form("mpgram");
-		loadingForm.append("Loading");
+		loadingForm = new Form(L[mpgram]);
+		loadingForm.append(L[Loading]);
 		loadingForm.addCommand(cancelCmd);
 		loadingForm.setCommandListener(this);
 		
@@ -439,7 +450,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 //		running++;
 		switch (run) {
 		case RUN_VALIDATE_AUTH: {
-			display(loadingAlert("Authorizing"), null);
+			display(loadingAlert(L[Authorizing]), null);
 			
 			try {
 				selfId = ((JSONObject) api("me")).getString("id");
@@ -519,24 +530,31 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 								continue;
 							}
 							if (img == null) {
-								byte[] b = get(url);
-								if (recordName != null) {
-									// save avatar to storage cache
-									if ((avatarsCache & 2) == 2) {
-										try {
-											RecordStore.deleteRecordStore(recordName);
-										} catch (Exception ignored) {}
-										try {
-											RecordStore r = RecordStore.openRecordStore(recordName, true);
+								try {
+									byte[] b = get(url);
+									if (recordName != null) {
+										// save avatar to storage cache
+										if ((avatarsCache & 2) == 2) {
 											try {
-												r.addRecord(b, 0, b.length);
-											} finally {
-												r.closeRecordStore();
-											}
-										} catch (Exception ignored) {}
+												RecordStore.deleteRecordStore(recordName);
+											} catch (Exception ignored) {}
+											try {
+												RecordStore r = RecordStore.openRecordStore(recordName, true);
+												try {
+													r.addRecord(b, 0, b.length);
+												} finally {
+													r.closeRecordStore();
+												}
+											} catch (Exception ignored) {}
+										}
+									}
+									img = Image.createImage(b, 0, b.length);
+								} catch (Exception e) {
+									e.printStackTrace();
+									if (src instanceof String) {
+										img = ((String) src).charAt(0) == '-' ? chatDefaultImg : userDefaultImg;
 									}
 								}
-								img = Image.createImage(b, 0, b.length);
 							}
 							
 							if (img == null) continue;
@@ -596,7 +614,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					}
 
 					writeAuth();
-					TextBox t = new TextBox("Code", "", 5, TextField.NUMERIC);
+					TextBox t = new TextBox(L[Code], "", 5, TextField.NUMERIC);
 					t.addCommand(authCodeCmd);
 					t.setCommandListener(this);
 					display(t);
@@ -634,7 +652,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						if ("password".equals(res)) {
 							userState = 2;
 							writeAuth();
-							TextBox t = new TextBox("Cloud password", "", 100, TextField.NON_PREDICTIVE);
+							TextBox t = new TextBox(L[CloudPassword], "", 100, TextField.NON_PREDICTIVE);
 							t.addCommand(authPasswordCmd);
 							t.setCommandListener(this);
 							display(t);
@@ -663,7 +681,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				MP.api("deleteMessage&peer=".concat(s[0].concat("&id=").concat(s[1])));
 
 				commandAction(refreshCmd, current);
-				display(infoAlert("Deleted"), current);
+				display(infoAlert(L[MessageDeleted_Info]), current);
 			} catch (Exception e) {
 				display(errorAlert(e.toString()), current);
 			}
@@ -684,7 +702,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				
 				commandAction(backCmd, current);
 				commandAction(latestCmd, current);
-				display(infoAlert("Sent"), current);
+				display(infoAlert(L[MessageSent_Info]), current);
 			} catch (Exception e) {
 				display(errorAlert(e.toString()), current);
 			}
@@ -766,7 +784,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	public void commandAction(Command c, Displayable d) {
 		if (d instanceof ChatsList) { // chats list commands
 			if (c == archiveCmd) {
-				chatsList.changeFolder(1, "Archive");
+				chatsList.changeFolder(1, L[Archive]);
 				return;
 			}
 			if (c == foldersCmd) {
@@ -804,7 +822,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 			if (c == searchCmd) {
-				TextBox t = new TextBox("Search", "", 200, TextField.ANY);
+				TextBox t = new TextBox(L[Search], "", 200, TextField.ANY);
 				t.addCommand(cancelCmd);
 				t.addCommand(searchCmd);
 				t.setCommandListener(this);
@@ -853,7 +871,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 			if (c == searchCmd) {
-				TextBox t = new TextBox("Search", "", 200, TextField.ANY);
+				TextBox t = new TextBox(L[Search], "", 200, TextField.ANY);
 				t.addCommand(cancelCmd);
 				t.addCommand(searchCmd);
 				t.setCommandListener(this);
@@ -891,7 +909,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					}
 					writeAuth();
 					
-					display(loadingAlert("Waiting for server response.."), null);
+					display(loadingAlert(L[WaitingForServerResponse]), null);
 					start(RUN_VALIDATE_AUTH, user);
 					return;
 				}
@@ -905,7 +923,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				}
 				writeAuth();
 				
-				Alert a = new Alert("", "Choose authorization method", null, null);
+				Alert a = new Alert("", L[ChooseAuthMethod], null, null);
 				a.addCommand(authImportSessionCmd);
 				a.addCommand(authNewSessionCmd);
 				a.setCommandListener(this);
@@ -914,7 +932,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 			if (c == authImportSessionCmd) {
-				TextBox t = new TextBox("User code", user == null ? "" : user, 200, TextField.NON_PREDICTIVE);
+				TextBox t = new TextBox(L[SessionCode], user == null ? "" : user, 200, TextField.NON_PREDICTIVE);
 				t.addCommand(cancelCmd);
 				t.addCommand(authCmd);
 				t.setCommandListener(this);
@@ -926,7 +944,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				user = null;
 				userState = 0;
 				
-				TextBox t = new TextBox("Phone number", phone == null ? "" : phone, 30, TextField.PHONENUMBER);
+				TextBox t = new TextBox(L[PhoneNumber], phone == null ? "" : phone, 30, TextField.PHONENUMBER);
 				t.addCommand(cancelCmd);
 				t.addCommand(authNextCmd);
 				t.setCommandListener(this);
@@ -944,7 +962,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					}
 					writeAuth();
 
-					display(loadingAlert("Waiting for server response.."), null);
+					display(loadingAlert(L[WaitingForServerResponse]), null);
 					openLoad(new CaptchaForm());
 					return;
 				}
@@ -955,7 +973,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						display(errorAlert(""), null);
 						return;
 					}
-					display(loadingAlert("Waiting for server response.."), null);
+					display(loadingAlert(L[WaitingForServerResponse]), null);
 					start(RUN_AUTH, d);
 					return;
 				}
@@ -969,7 +987,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					return;
 				}
 
-				display(loadingAlert("Waiting for server response.."), null);
+				display(loadingAlert(L[WaitingForServerResponse]), null);
 				start(RUN_AUTH, code);
 				return;
 			}
@@ -981,7 +999,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					return;
 				}
 
-				display(loadingAlert("Waiting for server response.."), null);
+				display(loadingAlert(L[WaitingForServerResponse]), null);
 				start(RUN_AUTH, pass);
 				return;
 			}
@@ -989,47 +1007,57 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		{ // settings
 			if (c == settingsCmd) {
 				if (settingsForm == null) {
-					Form f = new Form("Settings");
+					Form f = new Form(L[Settings]);
 					f.addCommand(backCmd);
 					f.setCommandListener(this);
 					StringItem s;
 					
-					s = new StringItem(null, "UI");
+					s = new StringItem(null, L[UI]);
 					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					s.setFont(largePlainFont);
 					f.append(s);
 					
+					langChoice = new ChoiceGroup(L[Language], Choice.POPUP, LANGS, null);
+					for (int i = 0; i < LANGS.length; ++i) {
+						if (lang.equals(LANGS[i])) {
+							langChoice.setSelectedIndex(i, true);
+							break;
+						}
+					}
+					langChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(langChoice);
+					
 					uiChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
-							"Reversed chat",
-							"Show media"
+							L[ReversedChat],
+							L[ShowMedia]
 					}, null);
 					uiChoice.setSelectedIndex(0, reverseChat);
 					uiChoice.setSelectedIndex(1, showMedia);
 					uiChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(uiChoice);
 					
-					photoSizeGauge = new Gauge("Thumbnails size", true, 64, photoSize / 8);
+					photoSizeGauge = new Gauge(L[ThumbnailsSize], true, 64, photoSize / 8);
 					photoSizeGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(photoSizeGauge);
 					
-					chatsGauge = new Gauge("Chats count", true, 50, chatsLimit);
+					chatsGauge = new Gauge(L[ChatsCount], true, 50, chatsLimit);
 					chatsGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(chatsGauge);
 					
-					msgsGauge = new Gauge("Messages count", true, 50, messagesLimit);
+					msgsGauge = new Gauge(L[MessagesCount], true, 50, messagesLimit);
 					msgsGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(msgsGauge);
 					
-					s = new StringItem(null, "Behaviour");
+					s = new StringItem(null, L[Behaviour]);
 					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					s.setFont(largePlainFont);
 					f.append(s);
 					
 					behChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
-							"Wait for page to load",
-							"Use JSONStream",
-							"Format text",
-							"Parse links"
+							L[WaitForPageToLoad],
+							L[UseJSONStream],
+							L[FormatText],
+							L[ParseLinks]
 					}, null);
 					behChoice.setSelectedIndex(0, useLoadingForm);
 					behChoice.setSelectedIndex(1, jsonStream);
@@ -1038,10 +1066,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					behChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(behChoice);
 					
-					imagesChoice = new ChoiceGroup("Images", Choice.MULTIPLE, new String[] {
-							"Load media thumbnails",
-							"Load avatars",
-							"Multi-threaded loading"
+					imagesChoice = new ChoiceGroup(L[Images], Choice.MULTIPLE, new String[] {
+							L[LoadMediaThumbnails],
+							L[LoadAvatars],
+							L[MultiThreadedLoading]
 					}, null);
 					imagesChoice.setSelectedIndex(0, loadThumbs);
 					imagesChoice.setSelectedIndex(1, loadAvatars);
@@ -1049,36 +1077,36 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					imagesChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(imagesChoice);
 
-					avaCacheChoice = new ChoiceGroup("Avatars caching", Choice.POPUP, new String[] {
-							"Disabled",
-							"Hold in RAM",
-							"Store",
-							"Hold in RAM & Store"
+					avaCacheChoice = new ChoiceGroup(L[AvatarsCaching], Choice.POPUP, new String[] {
+							L[Disabled],
+							L[HoldInRAM],
+							L[Store],
+							L[HoldInRAMandStore]
 					}, null);
 					avaCacheChoice.setSelectedIndex(avatarsCache, true);
 					avaCacheChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(avaCacheChoice);
 					
-					avaCacheGauge = new Gauge("Avatars cache threshold", true, 20, avatarsCacheThreshold / 5);
+					avaCacheGauge = new Gauge(L[AvatarsCacheThreshold], true, 20, avatarsCacheThreshold / 5);
 					avaCacheGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(avaCacheGauge);
 					
-					profileCacheGauge = new Gauge("Profiles cache threshold", true, 30, profilesCacheThreshold / 10);
+					profileCacheGauge = new Gauge(L[ProfilesCacheThreshold], true, 30, profilesCacheThreshold / 10);
 					profileCacheGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(profileCacheGauge);
 					
-					s = new StringItem(null, "Clear cache", Item.BUTTON);
+					s = new StringItem(null, L[ClearCache], Item.BUTTON);
 					s.setDefaultCommand(clearCacheCmd);
 					s.setItemCommandListener(this);
 					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(s);
 					
-					s = new StringItem(null, "Authorization");
+					s = new StringItem(null, L[Authorization]);
 					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					s.setFont(largePlainFont);
 					f.append(s);
 					
-					s = new StringItem(null, "Logout", Item.BUTTON);
+					s = new StringItem(null, L[Logout], Item.BUTTON);
 					s.setDefaultCommand(logoutCmd);
 					s.setItemCommandListener(this);
 					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -1092,6 +1120,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			if (c == backCmd && d == settingsForm) {
 				// apply and save settings
+				lang = LANGS[langChoice.getSelectedIndex()];
+				
 				reverseChat = uiChoice.isSelected(0);
 				showMedia = uiChoice.isSelected(1);
 				
@@ -1139,6 +1169,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					j.put("jsonStream", jsonStream);
 					j.put("parseRichtext", parseRichtext);
 					j.put("parseLinks", parseLinks);
+					j.put("lang", lang);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
@@ -1173,12 +1204,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		{ // write form commands
 			if (c == sendCmd) {
-				display(loadingAlert("Sending"), d);
+				display(loadingAlert(L[Sending]), d);
 				start(RUN_SEND_MESSAGE, messageField.getString());
 				return;
 			}
 			if (c == openTextBoxCmd) {
-				TextBox t = new TextBox("Message", messageField.getString(), 500, TextField.ANY);
+				TextBox t = new TextBox(L[Message], messageField.getString(), 500, TextField.ANY);
 				t.addCommand(okCmd);
 				t.addCommand(cancelCmd);
 				t.setCommandListener(this);
@@ -1192,7 +1223,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 		}
 		if (c == aboutCmd) {
-			Form f = new Form("About");
+			Form f = new Form(L[About]);
 			f.addCommand(backCmd);
 			f.setCommandListener(this);
 			
@@ -1206,16 +1237,16 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			s.setLayout(Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_VCENTER | Item.LAYOUT_LEFT);
 			f.append(s);
 			
-			s = new StringItem(null, "Server-assisted Telegram client for J2ME, based on MPGram Web API.");
+			s = new StringItem(null, L[AboutText]);
 			s.setFont(Font.getDefaultFont());
 			s.setLayout(Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_NEWLINE_BEFORE);
 			f.append(s);
 
-			s = new StringItem("Developer", "shinovon");
+			s = new StringItem(L[Developer], "shinovon");
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 
-			s = new StringItem("Author", "twsparkle");
+			s = new StringItem(L[Author], "twsparkle");
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setItemCommandListener(this);
 			f.append(s);
@@ -1232,13 +1263,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			s.setItemCommandListener(this);
 			f.append(s);
 
-			s = new StringItem("Donate", "boosty.to/nnproject/donate");
+			s = new StringItem(MP.L[Donate], "boosty.to/nnproject/donate");
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
 			s.setItemCommandListener(this);
 			f.append(s);
 
-			s = new StringItem("Chat", "t.me/nnmidletschat");
+			s = new StringItem(MP.L[Chat], "t.me/nnmidletschat");
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
 			s.setItemCommandListener(this);
@@ -1357,7 +1388,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		if (c == deleteMsgCmd) {
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
-			display(loadingAlert("Loading"), current);
+			display(loadingAlert(L[Loading]), current);
 			start(RUN_DELETE_MESSAGE, s);
 			return;
 		}
@@ -1386,6 +1417,27 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			return;
 		}
 		commandAction(c, display.getCurrent());
+	}
+
+	private void loadLocale(String lang) throws IOException {
+		InputStreamReader r = new InputStreamReader(getClass().getResourceAsStream("/l/".concat(lang)), "UTF-8");
+		StringBuffer s = new StringBuffer();
+		int c;
+		int i = 1;
+		while ((c = r.read()) > 0) {
+			if (c == '\r') continue;
+			if (c == '\\') {
+				s.append((c = r.read()) == 'n' ? '\n' : (char) c);
+				continue;
+			}
+			if (c == '\n') {
+				L[i++] = s.toString();
+				s.setLength(0);
+				continue;
+			}
+			s.append((char) c);
+		}
+		r.close();
 	}
 
 	private static void writeAuth() {
@@ -1623,7 +1675,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	}
 	
 	static ChatsList mainChatsList() {
-		ChatsList l = chatsList = new ChatsList("mpgram", 0);
+		ChatsList l = chatsList = new ChatsList(L[mpgram], 0);
 		l.removeCommand(backCmd);
 		l.addCommand(exitCmd);
 		l.addCommand(aboutCmd);
@@ -1638,15 +1690,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		f.addCommand(settingsCmd);
 		f.setCommandListener(midlet);
 		
-		TextField t = new TextField("Instance URL", instanceUrl, 200, TextField.URL);
+		TextField t = new TextField(L[InstanceURL], instanceUrl, 200, TextField.URL);
 		instanceField = t;
 		f.append(t);
 		
-		t = new TextField("Instance Password", instancePassword, 200, TextField.NON_PREDICTIVE);
+		t = new TextField(L[InstancePassword], instancePassword, 200, TextField.NON_PREDICTIVE);
 		instancePasswordField = t;
 		f.append(t);
 		
-		StringItem s = new StringItem(null, "Auth", StringItem.BUTTON);
+		StringItem s = new StringItem(null, L[Auth_Btn], StringItem.BUTTON);
 		s.setDefaultCommand(authCmd);
 		s.setItemCommandListener(midlet);
 		s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -1660,12 +1712,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		replyTo = reply;
 		edit = editId;
 		
-		Form f = new Form(editId != null ? editId : reply != null ? "Reply" : "Write");
+		Form f = new Form(editId != null ? editId : reply != null ? L[Reply_Title] : L[Write_Title]);
 		f.setCommandListener(midlet);
 		f.addCommand(backCmd);
 		f.addCommand(sendCmd);
 		
-		TextField t = new TextField("Message", text, 500, TextField.ANY);
+		TextField t = new TextField(L[Message], text, 500, TextField.ANY);
 		f.append(messageField = t);
 		
 		StringItem s = new StringItem(null, "...", Item.BUTTON);
@@ -2233,6 +2285,108 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return sb.append(n(((int) date / 60) % 24))
 				.append(':')
 				.append(n((int) date % 60));
+	}
+
+	static String localizeAmount(int n, int i) {
+		boolean ru = "ru".equals(lang);
+		return Integer.toString(n).concat(L[n == 1 || (ru && n % 10 == 1 && n % 100 != 11) ?
+				i : (ru && (n % 10 > 4 || n % 10 < 2) ? (i + 2) : (i + 1))]);
+	}
+	
+	static String localizeDate(long date, int detailMode) {
+		long now = System.currentTimeMillis();
+		long d = (now - date) / 1000L;
+		boolean ru = "ru".equals(lang);
+		
+		if (detailMode != 0) {
+			if (d < 5) {
+				return L[Now];
+			}
+			
+			if (d < 60) {
+				if (d == 1 || (ru && d % 10 == 1 && d % 100 != 11))
+					return Integer.toString((int) d).concat(L[_secondAgo]);
+				if (ru && (d % 10 > 4 || d % 10 < 2))
+					return Integer.toString((int) d).concat(L[_secondsAgo2]);
+				return Integer.toString((int) d).concat(L[_secondsAgo]);
+			}
+			
+			if (d < 60 * 60) {
+				d /= 60L;
+				if (d == 1 || (ru && d % 10 == 1 && d % 100 != 11))
+					return Integer.toString((int) d).concat(L[_minuteAgo]);
+				if (ru && (d % 10 > 4 || d % 10 < 2))
+					return Integer.toString((int) d).concat(L[_minutesAgo2]);
+				return Integer.toString((int) d).concat(L[_minutesAgo]);
+			}
+			
+			if (d < 24 * 60 * 60) {
+				d /= 60 * 60L;
+				if (d == 1 || (ru && d % 10 == 1 && d % 100 != 11))
+					return Integer.toString((int) d).concat(L[_hourAgo]);
+				if (ru && (d % 10 > 4 || d % 10 < 2))
+					return Integer.toString((int) d).concat(L[_hoursAgo2]);
+				return Integer.toString((int) d).concat(L[_hoursAgo]);
+			}
+			
+			if (d < 7 * 24 * 60 * 60) {
+				d /= 24 * 60 * 60L;
+				if (d == 1) {
+					return L[Yesterday];
+				}
+				if (ru && d % 10 == 1 && d % 100 != 11)
+					return Integer.toString((int) d).concat(L[_dayAgo]);
+				if (ru && (d % 10 > 4 || d % 10 < 2))
+					return Integer.toString((int) d).concat(L[_daysAgo2]);
+				return Integer.toString((int) d).concat(L[_daysAgo]);
+			}
+
+			if (d < 28 * 24 * 60 * 60) {
+				d /= 7 * 24 * 60 * 60L;
+				if (d == 1)
+					return L[LastWeek];
+				if (ru && d % 10 == 1 && d % 100 != 11)
+					return Integer.toString((int) d).concat(L[_weekAgo]);
+				if (ru && (d % 10 > 4 || d % 10 < 2))
+					return Integer.toString((int) d).concat(L[_weeksAgo2]);
+				return Integer.toString((int) d).concat(L[_weeksAgo]);
+			}
+			
+			if (detailMode != 1) {
+				if (d < 365 * 24 * 60 * 60) {
+					d /= 30 * 24 * 60 * 60L;
+					if (d == 1)
+						return Integer.toString((int) d).concat(L[_monthAgo]);
+					if (ru && (d % 10 > 4 || d % 10 < 2))
+						return Integer.toString((int) d).concat(L[_monthsAgo2]);
+					return Integer.toString((int) d).concat(L[_monthsAgo]);
+				}
+				
+				d /= 365 * 24 * 60 * 60L;
+				if (d == 1) return Integer.toString((int) d).concat(L[_yearAgo]);
+				if (ru && (d % 10 > 4 || d % 10 < 2))
+					return Integer.toString((int) d).concat(L[_yearsAgo2]);
+				return Integer.toString((int) d).concat(L[_yearsAgo]);
+			}
+		}
+		
+		Calendar c = Calendar.getInstance();
+		int currentYear = c.get(Calendar.YEAR);
+		c.setTime(new Date(date));
+		
+		StringBuffer sb = new StringBuffer();
+		if (detailMode != 0) sb.append(L[on_Date]);
+		
+		if (!ru) sb.append(L[Jan + c.get(Calendar.MONTH)]).append(' ');
+		sb.append(c.get(Calendar.DAY_OF_MONTH));
+		if (ru) sb.append(' ').append(L[Jan + c.get(Calendar.MONTH)]);
+		
+		int year = c.get(Calendar.YEAR);
+		if (year != currentYear) {
+			sb.append(", ").append(year);
+		}
+		
+		return sb.toString();
 	}
 	
 	static String n(int n) {

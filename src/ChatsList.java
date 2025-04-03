@@ -26,7 +26,7 @@ import javax.microedition.lcdui.List;
 import cc.nnproject.json.JSONArray;
 import cc.nnproject.json.JSONObject;
 
-public class ChatsList extends MPList {
+public class ChatsList extends MPList implements LangConstants {
 	
 	int limit = MP.chatsLimit;
 	int folder = -1;
@@ -99,17 +99,17 @@ public class ChatsList extends MPList {
 				sb.append('\n');
 				if (!peer.getBoolean("c", false)) {
 					if (message.getBoolean("out", false)) {
-						sb.append("You: ");
+						sb.append(MP.L[You_Prefix]);
 					} else if (id.charAt(0) == '-' && message.has("from_id")) {
 						MP.appendOneLine(sb, MP.getName(message.getString("from_id"), true)).append(": ");
 					}
 				}
 				if (message.has("media")) {
-					sb.append("Media");
+					sb.append(MP.L[Media]);
 				} else if (message.has("fwd")) {
-					sb.append("Forwarded message");
+					sb.append(MP.L[ForwardedMessage]);
 				} else  if (message.has("act")) {
-					sb.append("Action");
+					sb.append(MP.L[Action]);
 				} else {
 					MP.appendOneLine(sb, message.getString("text"));
 				}

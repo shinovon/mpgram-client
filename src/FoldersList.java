@@ -22,13 +22,13 @@ SOFTWARE.
 import cc.nnproject.json.JSONArray;
 import cc.nnproject.json.JSONObject;
 
-public class FoldersList extends MPList {
+public class FoldersList extends MPList implements LangConstants {
 	
 	boolean hasArchive;
 	JSONArray folders;
 
 	public FoldersList() {
-		super("Folders");
+		super(MP.L[Folders]);
 		addCommand(MP.backCmd);
 	}
 
@@ -39,13 +39,13 @@ public class FoldersList extends MPList {
 			this.folders = folders;
 			int l = folders.size();
 			for (int i = 0; i < l; ++i) {
-				safeAppend(thread, folders.getObject(i).getString("t", "All chats"), null);
+				safeAppend(thread, folders.getObject(i).getString("t", MP.L[AllChats]), null);
 			}
 		} else {
-			safeAppend(thread, "All chats", null);
+			safeAppend(thread, MP.L[AllChats], null);
 		}
 		if (hasArchive = j.getBoolean("archive", false)) {
-			safeAppend(thread, "Archive", null);
+			safeAppend(thread, MP.L[Archive], null);
 		}
 	}
 
