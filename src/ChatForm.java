@@ -92,7 +92,7 @@ public class ChatForm extends MPForm implements LangConstants {
 
 			title = MP.getName(id, false);
 
-			if (mediaFilter != null) {
+			if (mediaFilter == null) {
 				canWrite = !broadcast;
 				if (id.charAt(0) == '-') {
 					JSONObject fullInfo = (JSONObject) MP.api("getFullInfo&id=".concat(id));
