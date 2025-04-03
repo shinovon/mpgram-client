@@ -82,7 +82,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static final String API_URL = "api.php";
 	static final String AVA_URL = "ava.php";
 	static final String FILE_URL = "file.php";
-	static final String OTA_URL = "http://nnprojetc.cc/mp/upd.php";
+	static final String OTA_URL = "http://nnproject.cc/mp/upd.php";
 	
 	static final String API_VERSION = "5";
 	
