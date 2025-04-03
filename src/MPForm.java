@@ -56,10 +56,10 @@ public abstract class MPForm extends Form {
 			finished = true;
 			if (MP.useLoadingForm && MP.current == this) {
 				MP.display(this);
-				if (focusOnFinish != null) {
-					MP.display.setCurrentItem(focusOnFinish);
-					focusOnFinish = null;
-				}
+			}
+			if (focusOnFinish != null) {
+				MP.display.setCurrentItem(focusOnFinish);
+				focusOnFinish = null;
 			}
 		} catch (InterruptedException e) {
 		} catch (InterruptedIOException e) {
