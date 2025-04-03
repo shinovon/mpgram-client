@@ -213,6 +213,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command nextPageCmd;
 	static Command prevPageCmd;
 	
+	private static Command updateCmd;
+	
 	// ui
 	private static Displayable mainDisplayable;
 	static Form loadingForm;
@@ -252,6 +254,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static String writeTo;
 	private static String replyTo;
 	private static String edit;
+	private static String updateUrl;
 	
 	protected void destroyApp(boolean u) {
 	}
@@ -410,6 +413,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 
 		nextPageCmd = new Command(L[NextPage], Command.SCREEN, 6);
 		prevPageCmd = new Command(L[PrevPage], Command.SCREEN, 7);
+		
+		updateCmd = new Command(L[Download], Command.OK, 1);
 		
 		loadingForm = new Form(L[mpgram]);
 		loadingForm.append(L[Loading]);
@@ -685,7 +690,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				MP.api("deleteMessage&peer=".concat(s[0].concat("&id=").concat(s[1])));
 
 				commandAction(refreshCmd, current);
-				display(infoAlert(L[MessageDeleted_Info]), current);
+				display(infoAlert(L[MessageDeleted_Alert]), current);
 			} catch (Exception e) {
 				display(errorAlert(e.toString()), current);
 			}
@@ -706,7 +711,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				
 				commandAction(backCmd, current);
 				commandAction(latestCmd, current);
-				display(infoAlert(L[MessageSent_Info]), current);
+				display(infoAlert(L[MessageSent_Alert]), current);
 			} catch (Exception e) {
 				display(errorAlert(e.toString()), current);
 			}
@@ -772,7 +777,14 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			try {
 				JSONObject j = JSONObject.parseObject(new String(get(OTA_URL), "UTF-8"));
 				if (j.getBoolean("update_available", false) && checkUpdates) {
-					// TODO
+					updateUrl = j.getString("download_url");
+					Alert a = new Alert("", "", null, AlertType.INFO);
+					a.setTimeout(-2);
+					a.setString(j.getString("message", L[UpdateAvailable_Alert]));
+					a.addCommand(cancelCmd);
+					a.addCommand(updateCmd);
+					a.setCommandListener(this);
+					display(a);
 				}
 			} catch (Exception ignored) {}
 			break;
@@ -1308,6 +1320,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				((MPList) d).load();
 				return;
 			}
+			return;
+		}
+		if (c == updateCmd) {
+			browse(updateUrl);
 			return;
 		}
 		if (c == backCmd || c == cancelCmd) {

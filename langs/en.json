@@ -147,8 +147,9 @@
 	"Write_Title": "Write",
 	"Message": "Message",
 	
-	"MessageSent_Info": "Message sent",
-	"MessageDeleted_Info": "Message deleted",
+	"MessageSent_Alert": "Message sent",
+	"MessageDeleted_Alert": "Message deleted",
+	"UpdateAvailable_Alert": "New update available",
 	
 	"ChatMedia_Title": "Media",
 	"Search_TitlePrefix": "Search - ",

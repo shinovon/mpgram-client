@@ -147,8 +147,9 @@
 	"Write_Title": "Сообщение",
 	"Message": "Сообщение",
 	
-	"MessageSent_Info": "Сообщение отправлено",
-	"MessageDeleted_Info": "Сообщение удалено",
+	"MessageSent_Alert": "Сообщение отправлено",
+	"MessageDeleted_Alert": "Сообщение удалено",
+	"UpdateAvailable_Alert": "Доступно обновление клиента",
 	
 	"ChatMedia_Title": "Медиафайлы",
 	"Search_TitlePrefix": "Поиск - ",
