@@ -31,6 +31,7 @@ public class ChatInfoForm extends MPForm {
 	String invite;
 	ChatForm chatForm;
 	int mode; // 0 - chat info or profile by id, 1 - phone, 2 - invite peek, 3 - invite
+	int pinnedMessageId;
 	
 	public ChatInfoForm(String id, ChatForm chatForm, int mode) {
 		super(id);
@@ -77,6 +78,7 @@ public class ChatInfoForm extends MPForm {
 		if (mode != 3) {
 			JSONObject fullInfo = (JSONObject) MP.api("getFullInfo&id=".concat(id));
 			full = fullInfo.getObject("full");
+			rawPeer = fullInfo.getObject(isUser ? "User" : "Chat");
 		}
 		
 		if (isUser) {
@@ -109,6 +111,11 @@ public class ChatInfoForm extends MPForm {
 			}
 		} else {
 			if (mode != 3) {
+				// TODO
+//				if (full.getBoolean("can_view_participants", false)) {
+//					addCommand(MP.chatMembersCmd);
+//				}
+				
 				if (full.has("participants_count")) {
 					s = new StringItem(null, full.getString("participants_count").concat(" members"));
 					s.setFont(MP.medPlainFont);
@@ -140,14 +147,41 @@ public class ChatInfoForm extends MPForm {
 				s.setDefaultCommand(mode == 2 ? MP.openChatCmd : MP.acceptInviteCmd);
 				s.setItemCommandListener(MP.midlet);
 				append(s);
-			} else {
-				boolean left = rawPeer.getBoolean("left", false);
-				s = new StringItem(null, left ? "Join group" : "Leave group", Item.BUTTON);
-				s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-				s.setDefaultCommand(left ? MP.joinChatCmd : MP.leaveChatCmd);
-				s.setItemCommandListener(MP.midlet);
-				append(s);
+				return;
 			}
+		}
+		
+		if (full.has("pinned_msg_id")) {
+			this.pinnedMessageId = full.getInt("pinned_msg_id");
+			
+			s = new StringItem(null, "Go to pinned message");
+			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+			s.setDefaultCommand(MP.gotoPinnedMsgCmd);
+			s.setItemCommandListener(MP.midlet);
+			append(s);
+		}
+		
+		if (chatForm != null) {
+			s = new StringItem(null, "Search messages", Item.BUTTON);
+			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+			s.setDefaultCommand(MP.searchCmd);
+			s.setItemCommandListener(MP.midlet);
+			append(s);
+			
+			s = new StringItem(null, "Chat media", Item.BUTTON);
+			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+			s.setDefaultCommand(MP.chatMediaCmd);
+			s.setItemCommandListener(MP.midlet);
+			append(s);
+		}
+		
+		if (!isUser) {
+			boolean left = rawPeer.getBoolean("left", false);
+			s = new StringItem(null, left ? "Join group" : "Leave group", Item.BUTTON);
+			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+			s.setDefaultCommand(left ? MP.joinChatCmd : MP.leaveChatCmd);
+			s.setItemCommandListener(MP.midlet);
+			append(s);
 		}
 	}
 

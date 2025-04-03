@@ -30,6 +30,8 @@ public class ChatsList extends MPList {
 	
 	int limit = MP.chatsLimit;
 	int folder = -1;
+//	long firstMsgDate, lastMsgDate;
+//	long offsetDate;
 	Vector ids;
 
 	public ChatsList(String title, int folder) {
@@ -54,6 +56,12 @@ public class ChatsList extends MPList {
 		if (folder != -1) {
 			sb.append("&f=").append(folder);
 		}
+//		if (offsetDate != 0) {
+//			sb.append("&offset_date=").append(offsetDate);
+//			addCommand(MP.prevPageCmd);
+//		} else {
+//			removeCommand(MP.prevPageCmd);
+//		}
 		
 		JSONObject j = (JSONObject) MP.api(sb.toString());
 		MP.fillPeersCache(j);
@@ -62,6 +70,12 @@ public class ChatsList extends MPList {
 		
 		JSONArray dialogs = j.getArray("dialogs");
 		int l = dialogs.size();
+		
+//		if (l == limit) {
+//			addCommand(MP.nextPageCmd);
+//		} else {
+//			removeCommand(MP.nextPageCmd);
+//		}
 		
 //		JSONObject messages = j.getObject("messages");
 		
@@ -77,6 +91,11 @@ public class ChatsList extends MPList {
 			
 			JSONObject message = dialog.getObject("msg", null)/*messages.getObject(id)*/;
 			if (message != null) {
+//				if (i == 0) {
+//					firstMsgDate = message.getLong("date");
+//				} else if (i == l - 1) {
+//					lastMsgDate = message.getLong("date");
+//				}
 				sb.append('\n');
 				if (!peer.getBoolean("c", false)) {
 					if (message.getBoolean("out", false)) {
@@ -97,6 +116,8 @@ public class ChatsList extends MPList {
 			}
 			
 			int itemIdx = safeAppend(thread, sb.toString(), null);
+			
+			if (!MP.loadAvatars) continue;
 			MP.queueAvatar(id, new Object[] { this, new Integer(itemIdx) });
 		}
 	}
@@ -112,9 +133,20 @@ public class ChatsList extends MPList {
 	void changeFolder(int folderId, String title) {
 		cancel();
 		setTitle(title.concat(" - mpgram"));
+//		offsetDate = 0;
 		folder = folderId;
 		MP.midlet.start(MP.RUN_LOAD_LIST, this);
 	}
+	
+//	void paginate(int dir) {
+//		if (dir == 1) {
+//			offsetDate = lastMsgDate;
+//		} else if (dir == -1) {
+//			offsetDate = firstMsgDate;
+//		} else {
+//			offsetDate = 0;
+//		}
+//	}
 	
 	void shown() {
 		if (!finished || ids == null) return;

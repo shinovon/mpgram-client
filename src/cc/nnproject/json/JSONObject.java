@@ -46,11 +46,8 @@ public class JSONObject {
 		this.table = table;
 	}
 
-	/**
-	 * @deprecated Compatibility with org.json
-	 */
 	public JSONObject(String str) {
-		table = parseObject(str).table; // FIXME
+		table = parseObject(str).table;
 	}
 	
 	public Object get(String name) {

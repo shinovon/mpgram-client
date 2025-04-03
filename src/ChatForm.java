@@ -37,6 +37,7 @@ public class ChatForm extends MPForm {
 	String query;
 	String startBot;
 	String title;
+	String mediaFilter;
 	
 	int limit = MP.messagesLimit;
 	int addOffset = 0;
@@ -53,15 +54,26 @@ public class ChatForm extends MPForm {
 	boolean endReached, hasOffset;
 	private int idOffset;
 	
+	boolean switched;
+	
 	public ChatForm(String id, String query, int message, int topMsg) {
 		super(id);
 		addCommand(MP.latestCmd);
 		addCommand(MP.chatInfoCmd);
-		addCommand(MP.searchCmd);
+//		addCommand(MP.searchCmd);
 		this.id = id;
 		this.query = query;
 		this.messageId = message;
 		this.topMsgId = topMsg;
+	}
+	
+	// create in media mode
+	public ChatForm(String id, String mediaFilter) {
+		super(id);
+		this.id = id;
+		if (mediaFilter == null) mediaFilter = "Photos";
+		this.mediaFilter = mediaFilter;
+		addCommand(MP.latestCmd);
 	}
 
 	void loadInternal(Thread thread) throws Exception {
@@ -80,31 +92,33 @@ public class ChatForm extends MPForm {
 
 			title = MP.getName(id, false);
 
-			canWrite = !broadcast;
-			if (id.charAt(0) == '-') {
-				JSONObject fullInfo = (JSONObject) MP.api("getFullInfo&id=".concat(id));
-				JSONObject chat = fullInfo.getObject("Chat");
-				
-				if (chat.has("admin_rights")) {
-					JSONObject adminRights = chat.getObject("admin_rights");
-					canWrite = !broadcast || adminRights.getBoolean("post_messages", false);
-					canDelete = adminRights.getBoolean("delete_messages", false);
+			if (mediaFilter != null) {
+				canWrite = !broadcast;
+				if (id.charAt(0) == '-') {
+					JSONObject fullInfo = (JSONObject) MP.api("getFullInfo&id=".concat(id));
+					JSONObject chat = fullInfo.getObject("Chat");
+					
+					if (chat.has("admin_rights")) {
+						JSONObject adminRights = chat.getObject("admin_rights");
+						canWrite = !broadcast || adminRights.getBoolean("post_messages", false);
+						canDelete = adminRights.getBoolean("delete_messages", false);
+					}
 				}
-			}
 			
-			if (left) {
-				addCommand(MP.joinChatCmd);
-			} else if (canWrite) {
-				addCommand(MP.writeCmd);
+				if (left) {
+					addCommand(MP.joinChatCmd);
+				} else if (canWrite) {
+					addCommand(MP.writeCmd);
+				}
 			}
 			info = true;
 		}
 		setTitle(title);
 		
 		boolean selfChat = MP.selfId.equals(id);
+		boolean reverse = MP.reverseChat && !"Photos".equals(mediaFilter);
 		
 		if (startBot != null) {
-			// TODO
 			try {
 				sb.append("startBot&id=").append(id);
 				MP.appendUrl(sb.append("&start="), startBot);
@@ -122,10 +136,16 @@ public class ChatForm extends MPForm {
 			addOffset = -1;
 		}
 
-		if (query != null || topMsgId != 0) {
+		if (query != null || topMsgId != 0 || mediaFilter != null) {
 			sb.append("searchMessages");
+			if (mediaFilter != null) {
+				sb.append("&filter=").append(mediaFilter);
+				setTitle("Media");
+			}
 			if (query != null) {
-				setTitle("Search - ".concat(title));
+				if (mediaFilter == null) {
+					setTitle("Search - ".concat(title));
+				}
 				MP.appendUrl(sb.append("&q="), query);
 			}
 		} else {
@@ -164,14 +184,17 @@ public class ChatForm extends MPForm {
 		int l = messages.size();
 		urls = new Hashtable();
 		
-		try {
-			sb.setLength(0);
-			sb.append("readMessages?peer=").append(id)
-			.append("&max=").append(messages.getObject(0).getString("id"));
-			if (topMsgId != 0) {
-				sb.append("&thread=").append(topMsgId);
-			}
-		} catch (Exception ignored) {}
+		if (query == null && l != 0) {
+			// mark messages as read
+			try {
+				sb.setLength(0);
+				sb.append("readMessages?peer=").append(id)
+				.append("&max=").append(messages.getObject(0).getString("id"));
+				if (topMsgId != 0) {
+					sb.append("&thread=").append(topMsgId);
+				}
+			} catch (Exception ignored) {}
+		}
 		
 		StringItem s;
 		String t;
@@ -184,8 +207,8 @@ public class ChatForm extends MPForm {
 			s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			s.setDefaultCommand(MP.olderMessagesCmd);
 			s.setItemCommandListener(MP.midlet);
-			safeInsert(thread, MP.reverseChat ? 0 : size(), s);
-			if (MP.reverseChat) top = size();
+			safeInsert(thread, reverse ? 0 : size(), s);
+			if (reverse) top = size();
 		}
 		
 		if (!endReached && hasOffset) {
@@ -193,8 +216,8 @@ public class ChatForm extends MPForm {
 			s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			s.setDefaultCommand(MP.newerMessagesCmd);
 			s.setItemCommandListener(MP.midlet);
-			safeInsert(thread, MP.reverseChat ? size() : 0, s);
-			if (!MP.reverseChat) top += 1;
+			safeInsert(thread, reverse ? size() : 0, s);
+			if (!reverse) top += 1;
 		}
 		
 		int insert = top;
@@ -203,7 +226,7 @@ public class ChatForm extends MPForm {
 		boolean space = false;
 		
 		for (int i = l - 1; i >= 0 && thread == this.thread; --i) {
-			if (!MP.reverseChat) insert = top;
+			if (!reverse) insert = top;
 			Item msgItem = null;
 			JSONObject message = messages.getObject(i);
 			
@@ -225,7 +248,7 @@ public class ChatForm extends MPForm {
 //				s.setFont(MP.medPlainFont);
 //				s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 //				safeInsert(thread, insert, s);
-//				if (MP.reverseChat) insert++;
+//				if (reverse) insert++;
 //			}
 			
 			sb.setLength(0);
@@ -234,9 +257,6 @@ public class ChatForm extends MPForm {
 			
 			s = new StringItem(null, sb.toString());
 			s.setFont(MP.smallBoldFont);
-			if (canWrite) {
-				s.addCommand(MP.replyMsgCmd);
-			}
 //			s.addCommand(MP.forwardMsgCmd);
 			if (this.id.charAt(0) == '-') {
 				s.addCommand(MP.messageLinkCmd);
@@ -244,21 +264,26 @@ public class ChatForm extends MPForm {
 			if (text != null && text.length() != 0) {
 				s.addCommand(MP.copyMsgCmd);
 			}
-			if (out || selfChat) {
-				s.addCommand(MP.deleteMsgCmd);
-				s.addCommand(MP.editMsgCmd);
-			} else {
-				s.setDefaultCommand(MP.itemChatCmd);
-				s.addCommand(MP.itemChatInfoCmd);
-				if (canDelete) {
+			if (mediaFilter == null) {
+				if (canWrite) {
+					s.addCommand(MP.replyMsgCmd);
+				}
+				if (out || selfChat) {
 					s.addCommand(MP.deleteMsgCmd);
+					s.addCommand(MP.editMsgCmd);
+				} else {
+					s.setDefaultCommand(MP.itemChatCmd);
+					s.addCommand(MP.itemChatInfoCmd);
+					if (canDelete) {
+						s.addCommand(MP.deleteMsgCmd);
+					}
 				}
 			}
 			
 			s.setItemCommandListener(MP.midlet);
 			s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-			if (group == 0 || group != message.getLong("group", 0) || !MP.reverseChat) {
-				if (group != 0 && !MP.reverseChat) {
+			if (group == 0 || group != message.getLong("group", 0) || !reverse) {
+				if (group != 0 && !reverse) {
 					Spacer sp = new Spacer(10, 8);
 					sp.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					safeInsert(thread, insert++, sp);
@@ -270,78 +295,80 @@ public class ChatForm extends MPForm {
 			}
 			group = message.getLong("group", 0);
 			
-			if (message.has("fwd")) {
-				JSONObject fwd = message.getObject("fwd");
-				
-				sb.setLength(0);
-				if ((t = fwd.getString("from_name", null)) == null) {
-					t = MP.getName(fwd.getString("from_id", null), true);
-				}
-				sb.append("Forwarded from ").append(t);
-				
-				s = new StringItem(null, sb.toString());
-				s.setFont(MP.smallItalicFont);
-				s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-				safeInsert(thread, insert++, s);
-
-				if (fwd.has("peer") && fwd.has("msg")) {
-					s.setDefaultCommand(MP.gotoMsgCmd);
-					s.setItemCommandListener(MP.midlet);
-					urls.put(s, new String[] { fwd.getString("peer"), fwd.getString("msg") } );
-				}
-				space = true;
-			}
-			
-			if (message.has("reply")) {
-				JSONObject reply = message.getObject("reply");
-				if (topMsgId == 0 || reply.getInt("id") != topMsgId) {
+			if (mediaFilter == null) {
+				if (message.has("fwd")) {
+					JSONObject fwd = message.getObject("fwd");
+					
 					sb.setLength(0);
-					if (reply.has("msg")) {
-						JSONObject replyMsg = reply.getObject("msg");
-						JSONObject replyFwd;
-						if ((t = MP.getName(replyMsg.getString("from_id", null), true, true)) == null
-								&& replyMsg.has("fwd") && (replyFwd = replyMsg.getObject("fwd")).getBoolean("s", false)) {
-							if ((t = replyFwd.getString("from_name", null)) == null) {
-								t = MP.getName(replyFwd.getString("from_id", null), true);
-							}
-						}
-						if (t != null) {
-							sb.append("Reply to ").append(t);
-						}
-						
-						sb.append("\n> ");
-						if (reply.has("quote")) {
-							sb.append(reply.getString("quote"));
-						} else {
-							if ((t = replyMsg.getString("text", null)) != null) {
-								MP.appendOneLine(sb, t);
-							} else if (replyMsg.has("media")) {
-								sb.append("Media");
-							}
-						}
-						
-						s = new StringItem(null, sb.toString());
-						s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-						s.setFont(MP.smallItalicFont);
+					if ((t = fwd.getString("from_name", null)) == null) {
+						t = MP.getName(fwd.getString("from_id", null), true);
+					}
+					sb.append("Forwarded from ").append(t);
+					
+					s = new StringItem(null, sb.toString());
+					s.setFont(MP.smallItalicFont);
+					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					safeInsert(thread, insert++, s);
+	
+					if (fwd.has("peer") && fwd.has("msg")) {
 						s.setDefaultCommand(MP.gotoMsgCmd);
 						s.setItemCommandListener(MP.midlet);
-						safeInsert(thread, insert++, s);
-						
-						urls.put(s, new String[] { reply.getString("peer", null), reply.getString("id", null) });
+						urls.put(s, new String[] { fwd.getString("peer"), fwd.getString("msg") } );
 					}
 					space = true;
 				}
-			}
-			
-			// text
-			if (text != null && text.length() != 0) {
-				urls.put(idString, text);
-				if (MP.parseRichtext && message.has("entities")) {
-					insert = MP.wrapRichText(this, thread, text, message.getArray("entities"), insert);
-				} else {
-					insert = MP.flush(this, thread, text, insert, null);
+				
+				if (message.has("reply")) {
+					JSONObject reply = message.getObject("reply");
+					if (topMsgId == 0 || reply.getInt("id") != topMsgId) {
+						sb.setLength(0);
+						if (reply.has("msg")) {
+							JSONObject replyMsg = reply.getObject("msg");
+							JSONObject replyFwd;
+							if ((t = MP.getName(replyMsg.getString("from_id", null), true, true)) == null
+									&& replyMsg.has("fwd") && (replyFwd = replyMsg.getObject("fwd")).getBoolean("s", false)) {
+								if ((t = replyFwd.getString("from_name", null)) == null) {
+									t = MP.getName(replyFwd.getString("from_id", null), true);
+								}
+							}
+							if (t != null) {
+								sb.append("Reply to ").append(t);
+							}
+							
+							sb.append("\n> ");
+							if (reply.has("quote")) {
+								sb.append(reply.getString("quote"));
+							} else {
+								if ((t = replyMsg.getString("text", null)) != null) {
+									MP.appendOneLine(sb, t);
+								} else if (replyMsg.has("media")) {
+									sb.append("Media");
+								}
+							}
+							
+							s = new StringItem(null, sb.toString());
+							s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+							s.setFont(MP.smallItalicFont);
+							s.setDefaultCommand(MP.gotoMsgCmd);
+							s.setItemCommandListener(MP.midlet);
+							safeInsert(thread, insert++, s);
+							
+							urls.put(s, new String[] { reply.getString("peer", null), reply.getString("id", null) });
+						}
+						space = true;
+					}
 				}
-				space = true;
+			
+				// text
+				if (text != null && text.length() != 0) {
+					urls.put(idString, text);
+					if (MP.parseRichtext && message.has("entities")) {
+						insert = MP.wrapRichText(this, thread, text, message.getArray("entities"), insert);
+					} else {
+						insert = MP.flush(this, thread, text, insert, null);
+					}
+					space = true;
+				}
 			}
 			
 			// media
@@ -358,10 +385,6 @@ public class ChatForm extends MPForm {
 						s = new StringItem(null, "Media");
 						s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 						safeInsert(thread, insert++, s);
-					} else if (type.equals("poll")) {
-						// TODO
-					} else if (type.equals("geo")) {
-						// TODO
 					} else if (type.equals("webpage")) {
 						sb.setLength(0);
 						if ((t = media.getString("name", null)) != null && t.length() != 0) {
@@ -386,14 +409,22 @@ public class ChatForm extends MPForm {
 						space = true;
 					} else if (type.equals("document")) {
 						sb.setLength(0);
-						if (!media.has("title") && (t = media.getString("name", null)) != null && t.length() != 0) {
-							sb.append(t);
+						boolean nameSet = false;
+						if (media.has("audio")) {
+							JSONObject audio = media.getObject("audio");
+							if ((t = audio.getString("artist", null)) != null && t.length() != 0) {
+								sb.append(t).append(" - ");
+							}
+							if ((t = audio.getString("title", null)) != null && t.length() != 0) {
+								sb.append(t);
+								nameSet = true;
+							}
 						}
-						if ((t = media.getString("artist", null)) != null && t.length() != 0) {
-							sb.append(t).append(" - ");
-						}
-						if ((t = media.getString("title", null)) != null && t.length() != 0) {
-							sb.append(t);
+						
+						if (!nameSet) {
+							if ((t = media.getString("name", null)) != null && t.length() != 0) {
+								sb.append(t);
+							}
 						}
 						sb.append('\n');
 						if (!media.isNull("size")) {
@@ -437,7 +468,7 @@ public class ChatForm extends MPForm {
 					} else if (type.equals("photo")) {
 						ImageItem img = new ImageItem("", null, 0, "");
 						img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP
-								| ((text != null && text.length() != 0 || !MP.reverseChat) ?
+								| ((text != null && text.length() != 0 || !reverse || mediaFilter != null) ?
 										(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER) : 0));
 						img.setDefaultCommand(MP.openImageCmd);
 						img.setItemCommandListener(MP.midlet);
@@ -450,6 +481,28 @@ public class ChatForm extends MPForm {
 						if (msgItem == null) {
 							msgItem = img;
 						}
+					} else if (type.equals("poll")) {
+						// TODO
+						sb.setLength(0);
+						sb.append("Poll");
+						s = new StringItem(null, sb.toString());
+						s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						safeInsert(thread, insert++, s);
+						space = true;
+					} else if (type.equals("geo")) {
+						sb.setLength(0);
+						sb.append("Geo: ")
+						.append(media.get("lat")).append(", ").append(media.get("long"));
+						s = new StringItem(null, sb.toString());
+						s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						safeInsert(thread, insert++, s);
+						space = true;
+					} else {
+						System.out.println(media);
+						s = new StringItem(null, "Undefined media");
+						s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						safeInsert(thread, insert++, s);
+						space = true;
 					}
 				}
 			} else if (message.has("act")) {
@@ -531,6 +584,7 @@ public class ChatForm extends MPForm {
 		messageId = 0;
 		addOffset = 0;
 		offsetId = 0;
+		switched = false;
 	}
 	
 	void shown() {

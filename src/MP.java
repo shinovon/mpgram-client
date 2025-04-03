@@ -123,6 +123,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static boolean jsonStream = true;
 	static boolean parseRichtext = true;
 	static boolean parseLinks = true;
+//	static long updatesDelay = 45000L;
 
 	// threading
 	private static int run;
@@ -190,9 +191,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command acceptInviteCmd;
 	static Command joinChatCmd;
 	static Command leaveChatCmd;
+	static Command chatMediaCmd;
+	static Command gotoPinnedMsgCmd;
+	static Command chatMembersCmd;
 
 	static Command okCmd;
 	static Command cancelCmd;
+	
+	static Command nextPageCmd;
+	static Command prevPageCmd;
 	
 	// ui
 	private static Displayable mainDisplayable;
@@ -330,8 +337,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		
 		// commands
 		
-		exitCmd = new Command("Exit", Command.EXIT, 10);
-		backCmd = new Command("Back", Command.BACK, 10);
+		exitCmd = new Command("Exit", Command.EXIT, 15);
+		backCmd = new Command("Back", Command.BACK, 15);
 		
 		settingsCmd = new Command("Settings", Command.SCREEN, 5);
 		aboutCmd = new Command("About", Command.SCREEN, 6);
@@ -348,9 +355,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 
 		foldersCmd = new Command("Folders", Command.SCREEN, 4);
 		refreshCmd = new Command("Refresh", Command.SCREEN, 5);
-		archiveCmd = new Command("Archived chats", Command.SCREEN, 5);
-		contactsCmd = new Command("Contacts", Command.SCREEN, 6);
-		searchCmd = new Command("Search", Command.SCREEN, 7);
+		archiveCmd = new Command("Archived chats", Command.SCREEN, 8);
+		contactsCmd = new Command("Contacts", Command.SCREEN, 9);
+		searchCmd = new Command("Search", Command.SCREEN, 10);
 		
 		itemChatCmd = new Command("Open chat", Command.ITEM, 1);
 		itemChatInfoCmd = new Command("Profile", Command.ITEM, 2);
@@ -381,9 +388,14 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		acceptInviteCmd = new Command("Join", Command.ITEM, 1);
 		joinChatCmd = new Command("Join group", Command.SCREEN, 1);
 		leaveChatCmd = new Command("Leave group", Command.ITEM, 1);
+		chatMediaCmd = new Command("Media", Command.ITEM, 1);
+		gotoPinnedMsgCmd = new Command("Go to", Command.ITEM, 1);
 		
 		okCmd = new Command("Ok", Command.OK, 1);
 		cancelCmd = new Command("Cancel", Command.CANCEL, 2);
+
+		nextPageCmd = new Command("Next page", Command.SCREEN, 6);
+		prevPageCmd = new Command("Prev page", Command.SCREEN, 7);
 		
 		loadingForm = new Form("mpgram");
 		loadingForm.append("Loading");
@@ -412,6 +424,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			
 			openLoad(mainDisplayable = mainChatsList());
 		}
+//		start(RUN_UPDATES, null);
 	}
 	
 	public void run() {
@@ -572,7 +585,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						user = j.getString("user");
 					}
 					if (res.indexOf("captcha") != -1) {
-						// TODO
 						display(errorAlert(res), null);
 						((CaptchaForm) param).load();
 						break;
@@ -723,6 +735,17 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			break;
 		}
+		case RUN_UPDATES: {
+//			try {
+//				while (user != null) {
+//					Thread.sleep(45000L);
+//				}
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//				display(errorAlert("Updates thread died!\n" + e.toString()), current);
+//			}
+			break;
+		}
 		}
 //		running--;
 	}
@@ -753,6 +776,14 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				display(foldersList);
 				return;
 			}
+//			if (c == nextPageCmd) {
+//				chatsList.paginate(1);
+//				return;
+//			}
+//			if (c == prevPageCmd) {
+//				chatsList.paginate(-1);
+//				return;
+//			}
 		}
 		if (d instanceof ChatForm) { // chat form commands
 			if (c == latestCmd) {
@@ -781,7 +812,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				display(t);
 				return;
 			}
-			if (c == backCmd && ((ChatForm) d).query != null) {
+			if (c == backCmd && ((ChatForm) d).query != null && ((ChatForm) d).switched) {
 				// close search
 				((ChatForm) current).reset();
 				start(RUN_LOAD_FORM, current);
@@ -790,9 +821,14 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		if (d instanceof TextBox && c == searchCmd) {
 			commandAction(backCmd, d);
-			((ChatForm) current).reset();
-			((ChatForm) current).query = ((TextBox) d).getString();
-			start(RUN_LOAD_FORM, current);
+			if (current instanceof ChatForm) {
+				((ChatForm) current).reset();
+				((ChatForm) current).query = ((TextBox) d).getString();
+				((ChatForm) current).switched = true;
+				start(RUN_LOAD_FORM, current);
+			} else {
+				openLoad(new ChatForm(((ChatInfoForm) current).id, ((TextBox) d).getString(), 0, 0));
+			}
 			return;
 		}
 		if (d instanceof ChatInfoForm) { // profile commands
@@ -814,6 +850,33 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			if (c == leaveChatCmd) {
 				start(RUN_LEAVE_CHANNEL, ((ChatInfoForm) d).id);
+				return;
+			}
+			if (c == searchCmd) {
+				TextBox t = new TextBox("Search", "", 200, TextField.ANY);
+				t.addCommand(cancelCmd);
+				t.addCommand(searchCmd);
+				t.setCommandListener(this);
+				
+				display(t);
+				return;
+			}
+			if (c == chatMediaCmd) {
+				openLoad(new ChatForm(((ChatInfoForm) current).id, "Photos"));
+				return;
+			}
+			if (c == gotoPinnedMsgCmd) {
+				int id = ((ChatInfoForm) current).pinnedMessageId;
+				if (((ChatInfoForm) d).chatForm != null) {
+					commandAction(backCmd, d);
+					((ChatInfoForm) d).chatForm.openMessage(Integer.toString(id), 0);
+				} else {
+					openLoad(new ChatForm(((ChatInfoForm) current).id, null, id, 0));
+				}
+				return;
+			}
+			if (c == chatMembersCmd) {
+				// TODO
 				return;
 			}
 		}
