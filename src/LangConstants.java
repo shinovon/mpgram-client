@@ -159,5 +159,8 @@ public interface LangConstants {
 	static final int _member = 156;
 	static final int _members = 157;
 	static final int _members2 = 158;
+	static final int _subscriber = 159;
+	static final int _subscribers = 160;
+	static final int _subscribers2 = 161;
 	static final int mpgram = 0;
 }
