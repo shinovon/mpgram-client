@@ -184,7 +184,7 @@ public class ChatForm extends MPForm implements LangConstants {
 		int l = messages.size();
 		urls = new Hashtable();
 		
-		if (query == null && l != 0) {
+		if (query == null && mediaFilter == null && l != 0) {
 			// mark messages as read
 			try {
 				sb.setLength(0);

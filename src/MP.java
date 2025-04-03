@@ -72,6 +72,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static final int RUN_IMPORT_INVITE = 13;
 	static final int RUN_JOIN_CHANNEL = 14;
 	static final int RUN_LEAVE_CHANNEL = 15;
+	static final int RUN_CHECK_OTA = 16;
 	
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
@@ -81,6 +82,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static final String API_URL = "api.php";
 	static final String AVA_URL = "ava.php";
 	static final String FILE_URL = "file.php";
+	static final String OTA_URL = "http://nnprojetc.cc/mp/upd.php";
 	
 	static final String API_VERSION = "5";
 	
@@ -133,6 +135,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static boolean parseLinks = true;
 //	static long updatesDelay = 45000L;
 	static String lang = "en";
+	static boolean checkUpdates = true;
 
 	// threading
 	private static int run;
@@ -433,9 +436,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			run = RUN_VALIDATE_AUTH;
 			run();
 			
-			openLoad(mainDisplayable = mainChatsList());
+			openLoad(mainDisplayable = selfId != null ? (Displayable) mainChatsList() : initialAuthForm());
 		}
-//		start(RUN_UPDATES, null);
+		
+		start(RUN_CHECK_OTA, null);
 	}
 	
 	public void run() {
@@ -762,6 +766,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 //				e.printStackTrace();
 //				display(errorAlert("Updates thread died!\n" + e.toString()), current);
 //			}
+			break;
+		}
+		case RUN_CHECK_OTA: {
+			try {
+				JSONObject j = JSONObject.parseObject(new String(get(OTA_URL), "UTF-8"));
+				if (j.getBoolean("update_available", false) && checkUpdates) {
+					// TODO
+				}
+			} catch (Exception ignored) {}
 			break;
 		}
 		}
