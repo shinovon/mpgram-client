@@ -42,6 +42,7 @@ public class ChatForm extends MPForm implements LangConstants {
 	static final int UPDATE_USER_TYPING = 2;
 	static final int UPDATE_NEW_MESSAGE = 3;
 	static final int UPDATE_DELETE_MESSAGES = 4;
+	static final int UPDATE_EDIT_MESSAGE = 5;
 
 	String id;
 	String username;
@@ -759,6 +760,24 @@ public class ChatForm extends MPForm implements LangConstants {
 			}
 			break;
 		}
+		case UPDATE_EDIT_MESSAGE: {
+			JSONObject msg = update.getObject("message");
+			String id = msg.getString("id");
+			if (!loadedMsgs.contains(id)) break;
+			
+			int idx = deleteMessage(id);
+			if (idx == -1) break;
+			
+			boolean reverse = MP.reverseChat;
+			Item[] item = new Item[1];
+			message(update.getObject("message"),
+					idx,
+					new StringBuffer(),
+					Calendar.getInstance(),
+					reverse,
+					MP.selfId.equals(this.id),
+					item);
+		}
 		}
 		if (typing != 0 && System.currentTimeMillis() - typing >= 6000L) {
 			setTicker(null);
@@ -766,21 +785,22 @@ public class ChatForm extends MPForm implements LangConstants {
 		}
 	}
 	
-	void deleteMessage(String id) {
+	int deleteMessage(String id) {
 		Object[] p = (Object[]) urls.get(id);
-		if (p == null) return;
+		if (p == null) return -1;
 		
 		Item item = (Item) p[0];
 		int size = size();
 		int idx;
 		for (idx = 0; idx < size && get(idx) != item; ++idx);
-		if (idx == size) return;
+		if (idx == size) return -1;
 		
 		loadedMsgs.removeElement(id);
 		do {
 			item = get(idx);
 			delete(idx);
 		} while (item != p[1]);
+		return idx;
 	}
 
 }
