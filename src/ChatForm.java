@@ -213,7 +213,7 @@ public class ChatForm extends MPForm implements LangConstants {
 				if (topMsgId != 0) {
 					sb.append("&thread=").append(topMsgId);
 				}
-//				MP.api(sb.toString());
+				MP.api(sb.toString());
 			} catch (Exception e) {}
 		}
 		
