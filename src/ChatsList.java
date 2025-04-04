@@ -188,7 +188,7 @@ public class ChatsList extends MPList implements LangConstants {
 		String id = (String) ids.elementAt(i);
 		if (id == null) return;
 		
-		MP.openChat(id);
+		MP.openChat(id, -1);
 	}
 	
 	void changeFolder(int folderId, String title) {

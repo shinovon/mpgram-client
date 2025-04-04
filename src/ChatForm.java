@@ -115,14 +115,25 @@ public class ChatForm extends MPForm implements LangConstants {
 
 			if (mediaFilter == null) {
 				canWrite = !broadcast;
+				JSONObject fullInfo = (JSONObject) MP.api("getFullInfo&id=".concat(id));
 				if (id.charAt(0) == '-') {
-					JSONObject fullInfo = (JSONObject) MP.api("getFullInfo&id=".concat(id));
 					JSONObject chat = fullInfo.getObject("Chat");
-					
 					if (chat.has("admin_rights")) {
 						JSONObject adminRights = chat.getObject("admin_rights");
 						canWrite = !broadcast || adminRights.getBoolean("post_messages", false);
 						canDelete = adminRights.getBoolean("delete_messages", false);
+					}
+				} else if (MP.chatStatus) {
+					setStatus(fullInfo.getObject("User").getObject("status"));
+				}
+				JSONObject full = fullInfo.getObject("full");
+				if (messageId == -1 && full.has("read_inbox_max_id")) {
+					messageId = 0;
+					int maxId = full.getInt("read_inbox_max_id");
+					if (maxId != 0 && full.getInt("unread_count", 0) > limit) {
+						offsetId = maxId;
+						addOffset = -limit;
+						dir = 1;
 					}
 				}
 			
@@ -150,7 +161,8 @@ public class ChatForm extends MPForm implements LangConstants {
 			}
 			sb.setLength(0);
 		}
-		
+
+		if (messageId == -1) messageId = 0;
 		if (messageId != 0) {
 			// message to focus
 			offsetId = messageId;
@@ -695,16 +707,7 @@ public class ChatForm extends MPForm implements LangConstants {
 		case UPDATE_USER_STATUS: {
 			if (MP.chatStatus) {
 				typing = 0;
-				JSONObject status = update.getObject("status");
-				String s;
-				if ("userStatusOnline".equals(status.getString("_"))) {
-					s = MP.L[Online];
-				} else if(status.has("was_online")) {
-					s = MP.L[LastSeen] + MP.localizeDate(status.getInt("was_online"), 3);
-				} else {
-					s = MP.L[Offline];
-				}
-				setTicker(new Ticker(s));
+				setStatus(update.getObject("status"));
 			}
 			break;
 		}
@@ -801,6 +804,18 @@ public class ChatForm extends MPForm implements LangConstants {
 			delete(idx);
 		} while (item != p[1]);
 		return idx;
+	}
+	
+	private void setStatus(JSONObject status) {
+		String s;
+		if ("userStatusOnline".equals(status.getString("_"))) {
+			s = MP.L[Online];
+		} else if(status.has("was_online")) {
+			s = MP.L[LastSeen] + MP.localizeDate(status.getInt("was_online"), 3);
+		} else {
+			s = MP.L[Offline];
+		}
+		setTicker(new Ticker(s));
 	}
 
 }

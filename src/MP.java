@@ -144,6 +144,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static boolean focusNewMessages = false;
 	static long updatesDelay = 3000L;
 	static int updatesTimeout = 30;
+	static boolean sendTyping = true;
 
 	// threading
 	private static int run;
@@ -504,6 +505,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 
 	public void itemStateChanged(Item item) {
 		if (item == messageField) {
+			if (!sendTyping) return;
 			long l = System.currentTimeMillis();
 			if (l - lastType < 5000L) return;
 			
@@ -794,7 +796,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				String type = r.getString("_");
 				if ("chatInviteAlready".equals(type)) {
 					// already in chat, just open it
-					openChat(id);
+					openChat(id, 0);
 					break;
 				}
 				
@@ -810,7 +812,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				MP.api("importChatInvite&id=".concat(d.invite));
 				
 				commandAction(backCmd, current);
-				openChat(d.id);
+				openChat(d.id, 0);
 			} catch (Exception e) {
 				display(errorAlert(e.toString()), current);
 			}
@@ -823,7 +825,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				
 				if (run == RUN_JOIN_CHANNEL) {
 					commandAction(backCmd, current);
-					openChat((String) param);
+					openChat((String) param, 0);
 				} else {
 					commandAction(refreshCmd, current);
 				}
@@ -1060,7 +1062,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 			if (c == openChatCmd) {
-				openChat(((ChatInfoForm) d).id);
+				openChat(((ChatInfoForm) d).id, -1);
 				return;
 			}
 			if (c == acceptInviteCmd) {
@@ -1565,7 +1567,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		if (c == itemChatCmd) {
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
-			openChat(s[2]);
+			openChat(s[2], -1);
 			return;
 		}
 		if (c == itemChatInfoCmd) {
@@ -1954,7 +1956,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 	static boolean handleDeepLink(String url) {
 		if (url.startsWith("@")) {
-			openChat(url.substring(1));
+			openChat(url.substring(1), -1);
 			return true;
 		}
 		int i;
@@ -2165,8 +2167,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return false;
 	}
 	
-	static void openChat(String id) {
-		openLoad(new ChatForm(id, null, 0, 0));
+	static void openChat(String id, int msg) {
+		openLoad(new ChatForm(id, null, msg, 0));
 	}
 	
 	static void openProfile(String id, ChatForm chatForm, int mode) {
