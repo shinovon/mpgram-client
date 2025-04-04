@@ -223,6 +223,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static ChatsList chatsList;
 	static FoldersList foldersList;
 	private static Form settingsForm;
+	private static Form authForm;
 	private static Vector formHistory = new Vector();
 
 	// auth items
@@ -438,15 +439,36 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			start(RUN_IMAGES, null);
 		}
 		
+		f = new Form("Auth");
+		f.addCommand(exitCmd);
+		f.addCommand(aboutCmd);
+		f.addCommand(settingsCmd);
+		f.setCommandListener(midlet);
+		
+		TextField t = new TextField(L[InstanceURL], instanceUrl, 200, TextField.URL);
+		instanceField = t;
+		f.append(t);
+		
+		t = new TextField(L[InstancePassword], instancePassword, 200, TextField.NON_PREDICTIVE);
+		instancePasswordField = t;
+		f.append(t);
+		
+		StringItem s = new StringItem(null, L[Auth_Btn], StringItem.BUTTON);
+		s.setDefaultCommand(authCmd);
+		s.setItemCommandListener(midlet);
+		s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+		f.append(s);
+		
+		authForm = f;
+		
 		if (user == null || userState < 3) {
-			display(mainDisplayable = initialAuthForm());
+			display(mainDisplayable = authForm);
 		} else {
 			run = RUN_VALIDATE_AUTH;
+			runParam = authForm;
 			run();
 			
-			if (selfId == null) {
-				display(mainDisplayable = initialAuthForm());
-			} else {
+			if (selfId != null) {
 				openLoad(mainDisplayable = mainChatsList());
 			}
 		}
@@ -480,12 +502,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				if (e.code == 401) {
 					userState = 0;
 					user = null;
-					display(errorAlert(e.toString()), mainDisplayable = initialAuthForm());
+					display(errorAlert(e.toString()), param != null ? null : (mainDisplayable = authForm));
 					break;
 				}
-				display(errorAlert(e.toString()), null);
-			} catch (IOException e) {
-				display(errorAlert(e.toString()), null);
+				display(errorAlert(e.toString()), param != null ? null : (mainDisplayable = authForm));
+			} catch (Exception e) {
+				display(errorAlert(e.toString()), param != null ? null : (mainDisplayable = authForm));
 			}
 			break;
 		}
@@ -946,7 +968,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					writeAuth();
 					
 					display(loadingAlert(L[WaitingForServerResponse]), null);
-					start(RUN_VALIDATE_AUTH, user);
+					start(RUN_VALIDATE_AUTH, null);
 					return;
 				}
 				instanceUrl = instanceField.getString();
@@ -1215,7 +1237,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			if (c == logoutCmd) {
 				userState = 0;
-				display(mainDisplayable = initialAuthForm());
+				display(mainDisplayable = authForm);
 				writeAuth();
 				return;
 			}
@@ -1725,30 +1747,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		l.addCommand(settingsCmd);
 		l.addCommand(contactsCmd);
 		return l;
-	}
-	
-	static Form initialAuthForm() {
-		Form f = new Form("Auth");
-		f.addCommand(exitCmd);
-		f.addCommand(aboutCmd);
-		f.addCommand(settingsCmd);
-		f.setCommandListener(midlet);
-		
-		TextField t = new TextField(L[InstanceURL], instanceUrl, 200, TextField.URL);
-		instanceField = t;
-		f.append(t);
-		
-		t = new TextField(L[InstancePassword], instancePassword, 200, TextField.NON_PREDICTIVE);
-		instancePasswordField = t;
-		f.append(t);
-		
-		StringItem s = new StringItem(null, L[Auth_Btn], StringItem.BUTTON);
-		s.setDefaultCommand(authCmd);
-		s.setItemCommandListener(midlet);
-		s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-		f.append(s);
-		
-		return f;
 	}
 	
 	static Form writeForm(String id, String reply, String text, String editId) {
