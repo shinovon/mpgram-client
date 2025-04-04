@@ -19,6 +19,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -31,6 +33,8 @@ import cc.nnproject.json.JSONArray;
 import cc.nnproject.json.JSONObject;
 
 public class ChatForm extends MPForm implements LangConstants {
+	
+	private static final int SPACER_HEIGHT = 8;
 
 	String id;
 	String username;
@@ -221,9 +225,11 @@ public class ChatForm extends MPForm implements LangConstants {
 		}
 		
 		int insert = top;
-//		long lastDate = 0;
+		int lastDay = 0;
 		long group = 0;
 		boolean space = false;
+		
+		Calendar c = Calendar.getInstance();
 		
 		for (int i = l - 1; i >= 0 && thread == this.thread; --i) {
 			if (!reverse) insert = top;
@@ -242,14 +248,18 @@ public class ChatForm extends MPForm implements LangConstants {
 			String text = message.getString("text", null);
 			String[] key = new String[] { this.id, idString, fromId, null };
 
-			// TODO date label
-//			if (lastDate == 0) {
-//				s = new StringItem(null, "April 1");
-//				s.setFont(MP.medPlainFont);
-//				s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-//				safeInsert(thread, insert, s);
-//				if (reverse) insert++;
-//			}
+			// date label
+			long date = message.getLong("date");
+			c.setTime(new Date(date * 1000L));
+			int d;
+			if (lastDay != (d = c.get(Calendar.DAY_OF_MONTH) + 100 * c.get(Calendar.MONTH) + 10000 * c.get(Calendar.YEAR))) {
+				s = new StringItem(null, MP.localizeDate(date, 0));
+				s.setFont(MP.largePlainFont);
+				s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+				safeInsert(thread, insert, s);
+				if (reverse) insert++;
+				lastDay = d;
+			}
 			
 			sb.setLength(0);
 			sb.append(out && !broadcast ? MP.L[You] : MP.getName(fromId, true));
@@ -283,17 +293,18 @@ public class ChatForm extends MPForm implements LangConstants {
 			s.setItemCommandListener(MP.midlet);
 			s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			if (group == 0 || group != message.getLong("group", 0) || !reverse) {
-				if (group != 0 && !reverse) {
-					Spacer sp = new Spacer(10, 8);
+				if (reverse && (space || group != 0)) {
+					Spacer sp = new Spacer(10, SPACER_HEIGHT);
 					sp.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					safeInsert(thread, insert++, sp);
 				}
+			
 				safeInsert(thread, insert++, s);
 				urls.put(s, key);
 				msgItem = s;
-				space = true;
 			}
 			group = message.getLong("group", 0);
+			space = false;
 			
 			if (mediaFilter == null) {
 				if (message.has("fwd")) {
@@ -385,6 +396,7 @@ public class ChatForm extends MPForm implements LangConstants {
 						s = new StringItem(null, MP.L[Media]);
 						s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 						safeInsert(thread, insert++, s);
+						space = true;
 					} else if (type.equals("webpage")) {
 						sb.setLength(0);
 						if ((t = media.getString("name", null)) != null && t.length() != 0) {
@@ -469,7 +481,7 @@ public class ChatForm extends MPForm implements LangConstants {
 						ImageItem img = new ImageItem("", null, 0, "");
 						img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP
 								| ((text != null && text.length() != 0 || !reverse || mediaFilter != null) ?
-										(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER) : 0));
+										Item.LAYOUT_NEWLINE_BEFORE : 0));
 						img.setDefaultCommand(MP.openImageCmd);
 						img.setItemCommandListener(MP.midlet);
 						safeInsert(thread, insert++, img);
@@ -516,8 +528,8 @@ public class ChatForm extends MPForm implements LangConstants {
 					: (i == 0 ? ((endReached && dir == 0) || dir == -1) : (i == l - 1 ? (dir == 1) : false))) {
 				focus = msgItem;
 			}
-			if (group == 0 || space) {
-				Spacer sp = new Spacer(10, 8);
+			if (!reverse || (group == 0 && space)) {
+				Spacer sp = new Spacer(10, SPACER_HEIGHT);
 				sp.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 				safeInsert(thread, insert++, sp);
 			}

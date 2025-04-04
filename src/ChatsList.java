@@ -32,7 +32,12 @@ public class ChatsList extends MPList implements LangConstants {
 	int folder = -1;
 //	long firstMsgDate, lastMsgDate;
 //	long offsetDate;
+	int offset;
 	Vector ids;
+	String url;
+	String arrayName;
+	boolean users;
+	boolean noAvas;
 
 	public ChatsList(String title, int folder) {
 		super(title);
@@ -40,8 +45,19 @@ public class ChatsList extends MPList implements LangConstants {
 //		if (folder == 0) {
 //			addCommand(MP.archiveCmd);
 //		}
+		addCommand(MP.backCmd);
 		addCommand(MP.foldersCmd);
 		addCommand(MP.refreshCmd);
+		setFitPolicy(List.TEXT_WRAP_ON);
+	}
+	
+	public ChatsList(String title, String url, String arrayName) {
+		super(title);
+		this.url = url;
+		this.arrayName = arrayName;
+		this.users = true;
+		this.noAvas = true;
+		addCommand(MP.backCmd);
 		setFitPolicy(List.TEXT_WRAP_ON);
 	}
 
@@ -49,12 +65,18 @@ public class ChatsList extends MPList implements LangConstants {
 		deleteAll();
 		ids = new Vector();
 		
-		StringBuffer sb = new StringBuffer("getDialogs");
+		StringBuffer sb = new StringBuffer(url != null ? url : "getDialogs");
 		if (limit != 0) {
 			sb.append("&limit=").append(limit);
 		}
 		if (folder != -1) {
 			sb.append("&f=").append(folder);
+		}
+		if (offset != 0) {
+			sb.append("&offset=").append(offset);
+			addCommand(MP.prevPageCmd);
+		} else {
+			removeCommand(MP.prevPageCmd);
 		}
 //		if (offsetDate != 0) {
 //			sb.append("&offset_date=").append(offsetDate);
@@ -67,6 +89,46 @@ public class ChatsList extends MPList implements LangConstants {
 		MP.fillPeersCache(j);
 		
 		if (thread != this.thread) throw MP.cancelException;
+		
+		if (users) {
+			if (j.has("res")) j = j.getObject("res");
+			
+			JSONArray users = j.getArray(arrayName != null ? arrayName : "users");
+			int l = users.size();
+
+			for (int i = 0; i < l && thread == this.thread; ++i) {
+				JSONObject user = users.getObject(i);
+				
+				String id = user.getString("id");
+				ids.addElement(id);
+
+				sb.setLength(0);
+				MP.appendOneLine(sb, MP.getName(user));
+				
+				if (user.has("s")) {
+					long wasOnline;
+					if (user.getBoolean("s")) {
+						sb.append('\n').append(MP.L[Online]);
+					} else if ((wasOnline = user.getLong("w")) != 0) {
+						sb.append('\n').append(MP.L[LastSeen]).append(MP.localizeDate(wasOnline, 4));
+					} else {
+						sb.append('\n').append(MP.L[Offline]);
+					}
+				}
+				
+				int itemIdx = safeAppend(thread, sb.toString(), null);
+				
+				if (noAvas || !MP.loadAvatars) continue;
+				MP.queueAvatar(id, new Object[] { this, new Integer(itemIdx) });
+			}
+			
+			if (l == limit && j.has("count")) {
+				addCommand(MP.nextPageCmd);
+			} else {
+				removeCommand(MP.nextPageCmd);
+			}
+			return;
+		}
 		
 		JSONArray dialogs = j.getArray("dialogs");
 		int l = dialogs.size();
@@ -88,15 +150,14 @@ public class ChatsList extends MPList implements LangConstants {
 			sb.setLength(0);
 			String name = MP.getName(peer);
 			MP.appendOneLine(sb, name);
+			if (dialog.has("unread")) {
+				sb.append(" +").append(dialog.getInt("unread"));
+			}
 			
 			JSONObject message = dialog.getObject("msg", null)/*messages.getObject(id)*/;
 			if (message != null) {
-//				if (i == 0) {
-//					firstMsgDate = message.getLong("date");
-//				} else if (i == l - 1) {
-//					lastMsgDate = message.getLong("date");
-//				}
-				sb.append('\n');
+				sb.append('\n')
+				.append(MP.localizeDate(message.getLong("date"), 2)).append(' ');
 				if (!peer.getBoolean("c", false)) {
 					if (message.getBoolean("out", false)) {
 						sb.append(MP.L[You_Prefix]);
@@ -117,7 +178,7 @@ public class ChatsList extends MPList implements LangConstants {
 			
 			int itemIdx = safeAppend(thread, sb.toString(), null);
 			
-			if (!MP.loadAvatars) continue;
+			if (noAvas || !MP.loadAvatars) continue;
 			MP.queueAvatar(id, new Object[] { this, new Integer(itemIdx) });
 		}
 	}
@@ -138,18 +199,25 @@ public class ChatsList extends MPList implements LangConstants {
 		MP.midlet.start(MP.RUN_LOAD_LIST, this);
 	}
 	
-//	void paginate(int dir) {
-//		if (dir == 1) {
-//			offsetDate = lastMsgDate;
-//		} else if (dir == -1) {
-//			offsetDate = firstMsgDate;
-//		} else {
-//			offsetDate = 0;
-//		}
-//	}
+	void paginate(int dir) {
+		cancel();
+		if (users) {
+			if (dir == 1) {
+				offset += limit;
+			} else if (dir == -1) {
+				if ((offset -= limit) < 20) {
+					offset = 0;
+				}
+			} else {
+				offset = 0;
+			}
+			load();
+			return;
+		}
+	}
 	
 	void shown() {
-		if (!finished || ids == null) return;
+		if (!finished || ids == null || noAvas) return;
 		for (int i = ids.size() - 1; i >= 0; i--) {
 			if (getImage(i) != null) continue; // TODO break?
 			MP.queueAvatar((String) ids.elementAt(i), new Object[] { this, new Integer(i) });

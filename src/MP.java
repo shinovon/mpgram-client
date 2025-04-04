@@ -102,6 +102,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 
 	static final IllegalStateException cancelException = new IllegalStateException("cancel");
 	
+	static final int ONE_LINE_LENGTH = 50;
+	
 	// midp lifecycle
 	static MP midlet;
 	static Display display;
@@ -407,6 +409,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		leaveChatCmd = new Command(L[LeaveGroup], Command.ITEM, 1);
 		chatMediaCmd = new Command(L[Media], Command.ITEM, 1);
 		gotoPinnedMsgCmd = new Command(L[GoTo], Command.ITEM, 1);
+		chatMembersCmd = new Command(L[Members], Command.SCREEN, 6);
 		
 		okCmd = new Command(L[Ok], Command.OK, 1);
 		cancelCmd = new Command(L[Cancel], Command.CANCEL, 2);
@@ -441,7 +444,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			run = RUN_VALIDATE_AUTH;
 			run();
 			
-			openLoad(mainDisplayable = selfId != null ? (Displayable) mainChatsList() : initialAuthForm());
+			if (selfId == null) {
+				display(mainDisplayable = initialAuthForm());
+			} else {
+				openLoad(mainDisplayable = mainChatsList());
+			}
 		}
 		
 		start(RUN_CHECK_OTA, null);
@@ -819,14 +826,18 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				display(foldersList);
 				return;
 			}
-//			if (c == nextPageCmd) {
-//				chatsList.paginate(1);
-//				return;
-//			}
-//			if (c == prevPageCmd) {
-//				chatsList.paginate(-1);
-//				return;
-//			}
+			if (c == contactsCmd) {
+				openLoad(new ChatsList(L[Contacts], "getContacts&fields=status", null));
+				return;
+			}
+			if (c == nextPageCmd) {
+				chatsList.paginate(1);
+				return;
+			}
+			if (c == prevPageCmd) {
+				chatsList.paginate(-1);
+				return;
+			}
 		}
 		if (d instanceof ChatForm) { // chat form commands
 			if (c == latestCmd) {
@@ -919,7 +930,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 			if (c == chatMembersCmd) {
-				// TODO
+				openLoad(new ChatsList(L[Members], "getParticipants&peer=" + ((ChatInfoForm) current).id + "&fields=status", null));
 				return;
 			}
 		}
@@ -1327,6 +1338,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			return;
 		}
 		if (c == backCmd || c == cancelCmd) {
+			// cancel ota update dialog
+			updateUrl = null;
+			
 			if (formHistory.size() == 0) {
 				display(null, true);
 				return;
@@ -1562,13 +1576,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static StringBuffer appendOneLine(StringBuffer sb, String s) {
 		if (s == null) return sb;
 		int i = 0, l = s.length();
-		while (i < l && i < 64) {
+		while (i < l && i < ONE_LINE_LENGTH) {
 			char c = s.charAt(i++);
 			if (c == '\r') continue;
 			if (c != '\n') sb.append(c);
 			else sb.append(' ');
 		}
-		if (i == 64) sb.append("..");
+		if (i == ONE_LINE_LENGTH) sb.append("..");
 		return sb;
 	}
 	
@@ -1709,6 +1723,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		l.addCommand(exitCmd);
 		l.addCommand(aboutCmd);
 		l.addCommand(settingsCmd);
+		l.addCommand(contactsCmd);
 		return l;
 	}
 	
@@ -2028,6 +2043,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			display.setCurrent(d);
 			return;
 		}
+		if (updateUrl != null) {
+			return;
+		}
 		if (d == null || d == mainDisplayable) {
 			d = mainDisplayable;
 			
@@ -2321,98 +2339,96 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return Integer.toString(n).concat(L[n == 1 || (ru && n % 10 == 1 && n % 100 != 11) ?
 				i : (ru && (n % 10 > 4 || n % 10 < 2) ? (i + 2) : (i + 1))]);
 	}
-	
-	static String localizeDate(long date, int detailMode) {
-		long now = System.currentTimeMillis();
-		long d = (now - date) / 1000L;
+
+	// mode: 0 - date, 1 - detailed date, 2 - short date, 3 - last seen detailed, 4 - last seen
+	static String localizeDate(long date, int mode) {
+		long now = System.currentTimeMillis() / 1000L;
+		long d = now - date;
 		boolean ru = "ru".equals(lang);
+
+		StringBuffer sb = new StringBuffer();
+		Calendar c = Calendar.getInstance();
+		int currentYear = c.get(Calendar.YEAR);
+		c.setTime(new Date(date * 1000L));
 		
-		if (detailMode != 0) {
-			if (d < 5) {
-				return L[Now];
-			}
-			
+		if (mode == 4) {
 			if (d < 60) {
-				if (d == 1 || (ru && d % 10 == 1 && d % 100 != 11))
-					return Integer.toString((int) d).concat(L[_secondAgo]);
-				if (ru && (d % 10 > 4 || d % 10 < 2))
-					return Integer.toString((int) d).concat(L[_secondsAgo2]);
-				return Integer.toString((int) d).concat(L[_secondsAgo]);
+				return L[JustNow];
 			}
 			
 			if (d < 60 * 60) {
 				d /= 60L;
 				if (d == 1 || (ru && d % 10 == 1 && d % 100 != 11))
-					return Integer.toString((int) d).concat(L[_minuteAgo]);
+					return sb.append((int) d).append(L[_minuteAgo]).toString();
 				if (ru && (d % 10 > 4 || d % 10 < 2))
-					return Integer.toString((int) d).concat(L[_minutesAgo2]);
-				return Integer.toString((int) d).concat(L[_minutesAgo]);
+					return sb.append((int) d).append(L[_minutesAgo2]).toString();
+				return sb.append((int) d).append(L[_minutesAgo]).toString();
 			}
 			
-			if (d < 24 * 60 * 60) {
+			if (d < 12 * 60 * 60) {
 				d /= 60 * 60L;
 				if (d == 1 || (ru && d % 10 == 1 && d % 100 != 11))
-					return Integer.toString((int) d).concat(L[_hourAgo]);
+					return sb.append((int) d).append(L[_hoursAgo]).toString();
 				if (ru && (d % 10 > 4 || d % 10 < 2))
-					return Integer.toString((int) d).concat(L[_hoursAgo2]);
-				return Integer.toString((int) d).concat(L[_hoursAgo]);
-			}
-			
-			if (d < 7 * 24 * 60 * 60) {
-				d /= 24 * 60 * 60L;
-				if (d == 1) {
-					return L[Yesterday];
-				}
-				if (ru && d % 10 == 1 && d % 100 != 11)
-					return Integer.toString((int) d).concat(L[_dayAgo]);
-				if (ru && (d % 10 > 4 || d % 10 < 2))
-					return Integer.toString((int) d).concat(L[_daysAgo2]);
-				return Integer.toString((int) d).concat(L[_daysAgo]);
-			}
-
-			if (d < 28 * 24 * 60 * 60) {
-				d /= 7 * 24 * 60 * 60L;
-				if (d == 1)
-					return L[LastWeek];
-				if (ru && d % 10 == 1 && d % 100 != 11)
-					return Integer.toString((int) d).concat(L[_weekAgo]);
-				if (ru && (d % 10 > 4 || d % 10 < 2))
-					return Integer.toString((int) d).concat(L[_weeksAgo2]);
-				return Integer.toString((int) d).concat(L[_weeksAgo]);
-			}
-			
-			if (detailMode != 1) {
-				if (d < 365 * 24 * 60 * 60) {
-					d /= 30 * 24 * 60 * 60L;
-					if (d == 1)
-						return Integer.toString((int) d).concat(L[_monthAgo]);
-					if (ru && (d % 10 > 4 || d % 10 < 2))
-						return Integer.toString((int) d).concat(L[_monthsAgo2]);
-					return Integer.toString((int) d).concat(L[_monthsAgo]);
-				}
-				
-				d /= 365 * 24 * 60 * 60L;
-				if (d == 1) return Integer.toString((int) d).concat(L[_yearAgo]);
-				if (ru && (d % 10 > 4 || d % 10 < 2))
-					return Integer.toString((int) d).concat(L[_yearsAgo2]);
-				return Integer.toString((int) d).concat(L[_yearsAgo]);
+					return sb.append((int) d).append(L[_hoursAgo2]).toString();
+				return sb.append((int) d).append(L[_hoursAgo]).toString();
 			}
 		}
 		
-		Calendar c = Calendar.getInstance();
-		int currentYear = c.get(Calendar.YEAR);
-		c.setTime(new Date(date));
-		
-		StringBuffer sb = new StringBuffer();
-		if (detailMode != 0) sb.append(L[on_Date]);
-		
-		if (!ru) sb.append(L[Jan + c.get(Calendar.MONTH)]).append(' ');
-		sb.append(c.get(Calendar.DAY_OF_MONTH));
-		if (ru) sb.append(' ').append(L[Jan + c.get(Calendar.MONTH)]);
-		
-		int year = c.get(Calendar.YEAR);
-		if (year != currentYear) {
-			sb.append(", ").append(year);
+		if (mode == 2) {
+			if (d < 24 * 60 * 60) {
+				sb.append(n(c.get(Calendar.HOUR_OF_DAY)))
+				.append(':')
+				.append(n(c.get(Calendar.MINUTE)));
+			} else if (d < 6 * 24 * 60 * 60) {
+				sb.append(L[Sun + c.get(Calendar.DAY_OF_WEEK) - 1]);
+			} else {
+				sb.append(n(c.get(Calendar.DAY_OF_MONTH)))
+				.append('.')
+				.append(n(c.get(Calendar.MONTH) + 1))
+				.append('.')
+				.append(n(c.get(Calendar.YEAR)));
+			}
+		} else {
+			int dayNow = (int) (now / (24 * 60 * 60L));
+			int day = (int) (date / (24 * 60 * 60L));
+			if (mode == 3 || mode == 4) {
+				boolean b = true;
+				if (day == dayNow) {
+					sb.append(L[Today]);
+				} else if (day == dayNow - 1) {
+					sb.append(L[Yesterday]);
+				} else {
+					b = false;
+					sb.append(n(c.get(Calendar.DAY_OF_MONTH)))
+					.append('.')
+					.append(n(c.get(Calendar.MONTH) + 1))
+					.append('.')
+					.append(n(c.get(Calendar.YEAR)));
+				}
+				if (b || mode == 3) {
+					sb.append(L[at_Time])
+					.append(n(c.get(Calendar.HOUR_OF_DAY)))
+					.append(':')
+					.append(n(c.get(Calendar.MINUTE)));
+				}
+			} else {
+				if (!ru) sb.append(L[Jan + c.get(Calendar.MONTH)]).append(' ');
+				sb.append(c.get(Calendar.DAY_OF_MONTH));
+				if (ru) sb.append(' ').append(L[Jan + c.get(Calendar.MONTH)]);
+				
+				int year = c.get(Calendar.YEAR);
+				if (year != currentYear || mode == 1) {
+					sb.append(' ').append(year);
+				}
+				
+				if (mode == 1) {
+					sb.append(' ')
+					.append(n(c.get(Calendar.HOUR_OF_DAY)))
+					.append(':')
+					.append(n(c.get(Calendar.MINUTE)));
+				}
+			}
 		}
 		
 		return sb.toString();

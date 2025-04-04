@@ -91,7 +91,7 @@ public class ChatInfoForm extends MPForm implements LangConstants {
 					sb.append(MP.L[Online]);
 				} else if(status.has("was_online")) {
 					sb.append(MP.L[LastSeen]);
-					sb.append(MP.localizeDate(status.getInt("was_online"), 1));
+					sb.append(MP.localizeDate(status.getInt("was_online"), 3));
 				} else {
 					sb.append(MP.L[Offline]);
 				}
@@ -132,10 +132,9 @@ public class ChatInfoForm extends MPForm implements LangConstants {
 			}
 		} else {
 			if (mode != 3) {
-				// TODO
-//				if (full.getBoolean("can_view_participants", false)) {
-//					addCommand(MP.chatMembersCmd);
-//				}
+				if (full.getBoolean("can_view_participants", false)) {
+					addCommand(MP.chatMembersCmd);
+				}
 				
 				if (full.has("participants_count")) {
 					s = new StringItem(null, MP.localizeAmount(full.getInt("participants_count"),

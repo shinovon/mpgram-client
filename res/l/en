@@ -12,11 +12,9 @@ About
  hour ago
  hours ago
 
-yesterday
  day ago
  days ago
 
-last week
  week ago
  weeks ago
 
@@ -26,7 +24,6 @@ last week
  year ago
  years ago
 
-on 
 Jan
 Feb
 Mar
@@ -39,8 +36,27 @@ Sep
 Oct
 Nov
 Dec
-at 
+on 
+ at 
 now
+just now
+today
+yesterday
+last week
+Sun
+Mon
+Tue
+Wed
+Thu
+Fri
+Sat
+Sunday
+Monday
+Tuesday
+Wednesday
+Thursday
+Friday
+Saturday
 Auth
 Next
 New session
@@ -76,6 +92,7 @@ Join
 Join group
 Leave group
 Chat media
+Members
 Ok
 Cancel
 Next page
@@ -143,9 +160,9 @@ You:
 Forwarded message
 All chats
 Archive
-Online
-Offline
-Last seen 
+online
+offline
+last seen 
 Bio
 About
 Username
