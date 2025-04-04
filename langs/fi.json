@@ -79,7 +79,7 @@
 	"Reply": "Vastaa",
 	"Forward": "Välitä",
 	"CopyMessage": "Kopioi viesti",
-	"CopyMessageLink": "Kopioi viestin linkki",
+	"CopyMessageLink": "Kopioi linkki",
 	"Delete": "Poista",
 	"Edit": "Muokkaa",
 	"GoTo": "Siirry",
@@ -195,7 +195,7 @@
 	"About_Chat": "Tietoja",
 	"Username": "Käyttäjätunnus",
 	"Link": "Linkki",
-	"SearchMessages": "Etsi viestejä",
+	"SearchMessages": "Hae viesteistä",
 	"ViewGroup": "Näytä ryhmä",
 	"GoToPinnedMessage": "Näytä kiinnitetty viesti",
 	
