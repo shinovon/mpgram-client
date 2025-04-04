@@ -2435,7 +2435,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static HttpConnection openHttpConnection(String url) throws IOException {
 		System.out.println(url);
 		HttpConnection hc = (HttpConnection) Connector.open(url);
-		hc.setRequestProperty("User-Agent", "mpgram4/".concat(version));
+		hc.setRequestProperty("User-Agent", "mpgram4/".concat(version).concat(" (https://github.com/shinovon/mpgram-client)"));
 		if (url.startsWith(instanceUrl)) {
 			if (user != null) {
 				hc.setRequestProperty("X-mpgram-user", user);

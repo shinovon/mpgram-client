@@ -712,7 +712,7 @@ public class ChatForm extends MPForm implements LangConstants {
 			break;
 		}
 		case UPDATE_USER_TYPING: {
-			// TODO
+			// TODO timer thread
 			if ("sendMessageCancelAction".equals(update.getObject("action").getString("_"))) {
 				setTicker(null);
 				typing = 0;
