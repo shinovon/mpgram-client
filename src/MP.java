@@ -138,8 +138,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static String lang = "en";
 	static boolean checkUpdates = true; // ota
 	static boolean chatUpdates = true;
-	static boolean chatStatus = true;
-	static boolean focusNewMessages = true;
+	static boolean chatStatus = false;
+	static boolean focusNewMessages = false;
 	static long updatesDelay = 3000L;
 	static int updatesTimeout = 30;
 
@@ -335,6 +335,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			parseRichtext = j.getBoolean("parseRichtext", parseRichtext);
 			parseLinks = j.getBoolean("parseLinks", parseLinks);
 			lang = j.getString("lang", lang);
+			checkUpdates = j.getBoolean("checkUpdates", checkUpdates);
+			chatUpdates = j.getBoolean("chatUpdates", chatUpdates);
+			chatStatus = j.getBoolean("chatStatus", chatStatus);
+			focusNewMessages = j.getBoolean("focusNewMessages", focusNewMessages);
+			updatesDelay = j.getLong("updatesDelay", updatesDelay);
+			updatesTimeout = j.getInt("updatesTimeout", updatesTimeout);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -515,15 +521,16 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					writeAuth();
 				}
 			} catch (APIException e) {
+				if (param != null) mainDisplayable = authForm;
 				if (e.code == 401) {
 					userState = 0;
 					user = null;
-					display(errorAlert(e.toString()), param != null ? null : (mainDisplayable = authForm));
+					display(errorAlert(e.toString()), mainDisplayable);
 					break;
 				}
-				display(errorAlert(e.toString()), param != null ? null : (mainDisplayable = authForm));
+				display(errorAlert(e.toString()), mainDisplayable);
 			} catch (Exception e) {
-				display(errorAlert(e.toString()), param != null ? null : (mainDisplayable = authForm));
+				display(errorAlert(e.toString()), mainDisplayable);
 			}
 			break;
 		}
@@ -829,7 +836,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		case RUN_CHAT_UPDATES: { // chat updates loop
 			updatesThread = Thread.currentThread();
 			try {
-				// TODO
 				StringBuffer sb = new StringBuffer();
 				ChatForm form = (ChatForm) param;
 				JSONObject j;
@@ -839,27 +845,31 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				int offset = 0;
 				int fails = 0;
 				boolean check = true;
-				while (form.update && current == form) {
+				while (form.update) {
 					Thread.sleep(updatesDelay);
-					if (fails >= 5) {
-						display(errorAlert("Updates thread died!"), null);
-						break;
-					}
 					try {
 						if (!form.update) break;
 						if (check) {
-							j = ((JSONObject) api("getLastUpdate&peer=".concat(form.id))).getObject("res");
-							int off = j.getInt("update_id");
-							if (off < offset) {
-								offset = off;
+							sb.setLength(0);
+							sb.append("getLastUpdate&peer=").append(form.id);
+							if (offset == 0) {
+								sb.append("&id=").append(form.firstMsgId);
 							}
+							int off = 0;
+							try {
+								j = ((JSONObject) api(sb.toString())).getObject("res");
+								off = j.getInt("update_id") + 1;
+								if (off < offset) {
+									offset = off;
+								}
+							} catch (Exception ignored) {}
 							check = false;
 						}
 						if (!form.update) break;
 						
 						sb.setLength(0);
 						sb.append(instanceUrl).append(API_URL + "?v=" + API_VERSION + "&method=")
-						.append("updates&peer=").append(form.id)
+						.append("updates&media=1&read=1&peer=").append(form.id)
 						.append("&offset=").append(offset)
 						.append("&timeout=").append(updatesTimeout);
 						
@@ -909,6 +919,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						e.printStackTrace();
 						fails++;
 						check = true;
+						if (fails >= 5) {
+							display(errorAlert("Updates thread died!\n" + e.toString()), null);
+							break;
+						}
 					} finally {
 						if (in != null) try {
 							in.close();
@@ -1179,6 +1193,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					f.setCommandListener(this);
 					StringItem s;
 					
+					// ui
+					
 					s = new StringItem(null, L[UI]);
 					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					s.setFont(largePlainFont);
@@ -1214,6 +1230,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					msgsGauge = new Gauge(L[MessagesCount], true, 50, messagesLimit);
 					msgsGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(msgsGauge);
+					
+					// behaviour
 					
 					s = new StringItem(null, L[Behaviour]);
 					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -1267,6 +1285,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					s.setItemCommandListener(this);
 					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(s);
+					
+					// authorization
 					
 					s = new StringItem(null, L[Authorization]);
 					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -1337,6 +1357,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					j.put("parseRichtext", parseRichtext);
 					j.put("parseLinks", parseLinks);
 					j.put("lang", lang);
+					j.put("checkUpdates", checkUpdates);
+					j.put("chatUpdates", chatUpdates);
+					j.put("chatStatus", chatStatus);
+					j.put("focusNewMessages", focusNewMessages);
+					j.put("updatesDelay", updatesDelay);
+					j.put("updatesTimeout", updatesTimeout);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);

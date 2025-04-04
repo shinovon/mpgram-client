@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import javax.microedition.lcdui.ImageItem;
 import javax.microedition.lcdui.Item;
@@ -71,7 +72,7 @@ public class ChatForm extends MPForm implements LangConstants {
 	int lastDay;
 	boolean space;
 	long group;
-	int loadedMsgsCount;
+	Vector loadedMsgs = new Vector();
 
 	long typing;
 	
@@ -207,12 +208,13 @@ public class ChatForm extends MPForm implements LangConstants {
 			// mark messages as read
 			try {
 				sb.setLength(0);
-				sb.append("readMessages?peer=").append(id)
+				sb.append("readMessages&peer=").append(id)
 				.append("&max=").append(messages.getObject(0).getString("id"));
 				if (topMsgId != 0) {
 					sb.append("&thread=").append(topMsgId);
 				}
-			} catch (Exception ignored) {}
+//				MP.api(sb.toString());
+			} catch (Exception e) {}
 		}
 		
 		StringItem s;
@@ -241,8 +243,6 @@ public class ChatForm extends MPForm implements LangConstants {
 		int insert = top;
 		Item[] item = new Item[1];
 		Calendar c = Calendar.getInstance();
-		
-		loadedMsgsCount = l;
 		
 		for (int i = l - 1; i >= 0 && thread == this.thread; --i) {
 			if (!reverse) insert = top;
@@ -289,6 +289,8 @@ public class ChatForm extends MPForm implements LangConstants {
 		boolean out = message.getBoolean("out", false);
 		String text = message.getString("text", null);
 		String[] key = new String[] { this.id, idString, fromId, null };
+		
+		loadedMsgs.addElement(idString);
 
 		// date label
 		long date = message.getLong("date");
@@ -642,17 +644,12 @@ public class ChatForm extends MPForm implements LangConstants {
 				addOffset = 0;
 				offsetId = 0;
 			} else {
-				addOffset = -limit-1;
+				addOffset = -limit - 1;
 				offsetId = firstMsgId;
 			}
 		} else {
-			if (endReached && update) {
-				addOffset = limit;
-				offsetId = 0;
-			} else {
-				addOffset = 0;
-				offsetId = lastMsgId;
-			}
+			offsetId = firstMsgId;
+			addOffset = limit - 1;
 		}
 		load();
 	}
@@ -663,7 +660,7 @@ public class ChatForm extends MPForm implements LangConstants {
 		messageId = 0;
 		addOffset = 0;
 		offsetId = 0;
-		loadedMsgsCount = 0;
+		loadedMsgs.removeAllElements();
 		switched = false;
 	}
 	
@@ -693,10 +690,6 @@ public class ChatForm extends MPForm implements LangConstants {
 	void handleUpdate(int type, JSONObject update) {
 		if (!this.update) return;
 		System.out.println("update: " + type + " " + update);
-		if (typing != 0 && System.currentTimeMillis() - typing >= 3000L) {
-			setTicker(null);
-			typing = 0;
-		}
 		switch (type) {
 		case UPDATE_USER_STATUS: {
 			if (MP.chatStatus) {
@@ -716,16 +709,32 @@ public class ChatForm extends MPForm implements LangConstants {
 		}
 		case UPDATE_USER_TYPING: {
 			// TODO
-			typing = System.currentTimeMillis();
+			if ("sendMessageCancelAction".equals(update.getObject("action").getString("_"))) {
+				setTicker(null);
+				typing = 0;
+				break;
+			}
 			if (id.charAt(0) != '-') {
 				setTicker(new Ticker(title + " is typing.."));
 			} else {
+				if (update.has("top_msg_id") && topMsgId != update.getInt("top_msg_id")) {
+					break;
+				}
 				setTicker(new Ticker("Someone is typing.."));
 			}
+			typing = System.currentTimeMillis();
 			break;
 		}
 		case UPDATE_NEW_MESSAGE: {
-			// TODO delete old messages
+			setTicker(null);
+			typing = 0;
+			
+			if (topMsgId != 0) break;
+			
+			// delete old messages
+			while (loadedMsgs.size() >= limit) {
+				deleteMessage((String) loadedMsgs.elementAt(0));
+			}
 			boolean reverse = MP.reverseChat;
 			Item[] item = new Item[1];
 			message(update.getObject("message"),
@@ -736,8 +745,7 @@ public class ChatForm extends MPForm implements LangConstants {
 					MP.selfId.equals(this.id),
 					item);
 			firstMsgId = update.getObject("message").getInt("id");
-			loadedMsgsCount++;
-			if (item[0] != null && MP.focusNewMessages) {
+			if (item[0] != null && MP.focusNewMessages && MP.current == this) {
 				MP.display.setCurrentItem(item[0]);
 			}
 			break;
@@ -752,6 +760,10 @@ public class ChatForm extends MPForm implements LangConstants {
 			break;
 		}
 		}
+		if (typing != 0 && System.currentTimeMillis() - typing >= 6000L) {
+			setTicker(null);
+			typing = 0;
+		}
 	}
 	
 	void deleteMessage(String id) {
@@ -764,7 +776,7 @@ public class ChatForm extends MPForm implements LangConstants {
 		for (idx = 0; idx < size && get(idx) != item; ++idx);
 		if (idx == size) return;
 		
-		loadedMsgsCount--;
+		loadedMsgs.removeElement(id);
 		do {
 			item = get(idx);
 			delete(idx);
