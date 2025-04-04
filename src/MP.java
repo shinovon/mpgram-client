@@ -136,7 +136,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static boolean parseRichtext = true;
 	static boolean parseLinks = true;
 	static String lang = "en";
-	static boolean checkUpdates = true;
+	static boolean checkUpdates = true; // ota
 	static boolean chatUpdates = true;
 	static boolean chatStatus = true;
 	static boolean focusNewMessages = true;

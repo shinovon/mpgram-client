@@ -49,15 +49,16 @@ public class ChatForm extends MPForm implements LangConstants {
 	String title;
 	String mediaFilter;
 	
+	// params
 	int limit = MP.messagesLimit;
 	int addOffset, offsetId;
-	
+	int messageId, topMsgId;
+
+	boolean infoLoaded;
 	boolean left, broadcast, forum;
 	boolean canWrite, canDelete;
-	int messageId, topMsgId;
 	
-	boolean info;
-	
+	// pagination
 	int dir;
 	int firstMsgId, lastMsgId;
 	boolean endReached, hasOffset;
@@ -99,7 +100,7 @@ public class ChatForm extends MPForm implements LangConstants {
 		deleteAll();
 		
 		StringBuffer sb = new StringBuffer();
-		if (!info) {
+		if (!infoLoaded) {
 			JSONObject peer = MP.getPeer(id, true);
 			
 			left = peer.getBoolean("l", false);
@@ -129,7 +130,7 @@ public class ChatForm extends MPForm implements LangConstants {
 					addCommand(MP.writeCmd);
 				}
 			}
-			info = true;
+			infoLoaded = true;
 		}
 		setTitle(title);
 		
@@ -716,7 +717,11 @@ public class ChatForm extends MPForm implements LangConstants {
 		case UPDATE_USER_TYPING: {
 			// TODO
 			typing = System.currentTimeMillis();
-			setTicker(new Ticker("Someone is typing.."));
+			if (id.charAt(0) == '-') {
+				setTicker(new Ticker(title + " is typing.."));
+			} else {
+				setTicker(new Ticker("Someone is typing.."));
+			}
 			break;
 		}
 		case UPDATE_NEW_MESSAGE: {
