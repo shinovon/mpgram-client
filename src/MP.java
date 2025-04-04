@@ -63,7 +63,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static final int RUN_SEND_MESSAGE = 4;
 	static final int RUN_VALIDATE_AUTH = 5;
 	static final int RUN_IMAGES = 6;
-	static final int RUN_UPDATES = 7;
 	static final int RUN_LOAD_FORM = 8;
 	static final int RUN_LOAD_LIST = 9;
 	static final int RUN_AUTH = 10;
@@ -73,6 +72,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static final int RUN_JOIN_CHANNEL = 14;
 	static final int RUN_LEAVE_CHANNEL = 15;
 	static final int RUN_CHECK_OTA = 16;
+	static final int RUN_CHAT_UPDATES = 17;
 	
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
@@ -131,18 +131,24 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static int avatarsCacheThreshold = 20;
 	static int chatsLimit = 20;
 	static int messagesLimit = 20;
-	static int profilesCacheThreshold = 200;
+	static int peersCacheThreshold = 200;
 	static boolean jsonStream = true;
 	static boolean parseRichtext = true;
 	static boolean parseLinks = true;
-//	static long updatesDelay = 45000L;
 	static String lang = "en";
 	static boolean checkUpdates = true;
+	static boolean chatUpdates = true;
+	static boolean chatStatus = true;
+	static boolean focusNewMessages = true;
+	static long updatesDelay = 3000L;
+	static int updatesTimeout = 30;
 
 	// threading
 	private static int run;
 	private static Object runParam;
 //	private static int running;
+	static Thread updatesThread;
+	static HttpConnection updatesConnection;
 	
 	private static Object imagesLoadLock = new Object();
 	private static Vector imagesToLoad = new Vector(); // TODO hashtable?
@@ -276,6 +282,18 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		f.append("Loading");
 		display.setCurrent(mainDisplayable = f);
 		
+		try {
+			// check for j2me loader
+			Class.forName("javax.microedition.shell.MicroActivity");
+			f.deleteAll();
+			f.addCommand(exitCmd = new Command("Exit", Command.EXIT, 1));
+			f.setCommandListener(midlet);
+			f.append("J2ME Loader is not supported.");
+			return;
+		} catch (Exception ignored) {}
+		
+		// init platform dependent settings
+		
 		String p = System.getProperty("microedition.platform");
 		symbianJrt = p != null && p.indexOf("platform=S60") != -1;
 		useLoadingForm = !symbianJrt /*&&
@@ -283,15 +301,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				System.getProperty("com.symbian.default.to.suite.icon") != null)*/;
 		
 		threadedImages = symbianJrt;
-		
-		try {
-			Class.forName("javax.microedition.shell.MicroActivity");
-			f.deleteAll();
-			f.addCommand(exitCmd);
-			f.setCommandListener(midlet);
-			f.append("J2ME Loader is not supported.");
-			return;
-		} catch (Exception ignored) {}
 		
 		avatarSize = Math.min(display.getBestImageHeight(Display.LIST_ELEMENT), display.getBestImageWidth(Display.LIST_ELEMENT));
 		if (avatarSize < 8) avatarSize = 16;
@@ -321,7 +330,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			useLoadingForm = j.getBoolean("useLoadingForm", useLoadingForm);
 			chatsLimit = j.getInt("chatsLimit", chatsLimit);
 			messagesLimit = j.getInt("messagesLimit", messagesLimit);
-			profilesCacheThreshold = j.getInt("profilesCacheThreshold", profilesCacheThreshold);
+			peersCacheThreshold = j.getInt("profilesCacheThreshold", peersCacheThreshold);
 			jsonStream = j.getBoolean("jsonStream", jsonStream);
 			parseRichtext = j.getBoolean("parseRichtext", parseRichtext);
 			parseLinks = j.getBoolean("parseLinks", parseLinks);
@@ -425,12 +434,16 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		loadingForm.addCommand(cancelCmd);
 		loadingForm.setCommandListener(this);
 		
+		// load resources
+		
 		if (loadAvatars) {
 			try {
 				userDefaultImg = resize(Image.createImage("/us.png"), avatarSize, avatarSize);
 				chatDefaultImg = resize(Image.createImage("/gr.png"), avatarSize, avatarSize);
 			} catch (Throwable ignored) {}
 		}
+		
+		// start image loader threads
 
 		start(RUN_IMAGES, null);
 
@@ -438,6 +451,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			start(RUN_IMAGES, null);
 			start(RUN_IMAGES, null);
 		}
+		
+		// create auth form
 		
 		f = new Form("Auth");
 		f.addCommand(exitCmd);
@@ -461,11 +476,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		
 		authForm = f;
 		
+		//
+		
 		if (user == null || userState < 3) {
 			display(mainDisplayable = authForm);
 		} else {
 			run = RUN_VALIDATE_AUTH;
-			runParam = authForm;
 			run();
 			
 			if (selfId != null) {
@@ -511,7 +527,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			break;
 		}
-		case RUN_IMAGES: { // avatars loading
+		case RUN_IMAGES: { // avatars loading loop
 			try {
 				while (true) {
 					synchronized (imagesLoadLock) {
@@ -541,7 +557,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							String url;
 							Image img = null;
 							String recordName = null;
-							if (src instanceof String) {
+							if (src instanceof String) { // avatar
 								recordName = AVATAR_RECORD_PREFIX + avatarSize + "r" + (String) src;
 								url = instanceUrl + AVA_URL + "?a&c=" + ((String) src) + "&p=r" + avatarSize;
 
@@ -559,7 +575,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 										}
 									} catch (Exception ignored) {}
 								}
-							} else if (src instanceof String[]) {
+							} else if (src instanceof String[]) { // message file
 								String peer = ((String[]) src)[0];
 								String id = ((String[]) src)[1];
 								String p = ((String[]) src)[3];
@@ -658,7 +674,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					display(t);
 				} else {
 					if (userState == 2) {
-						// cloud password
+						// check cloud password
 						sb.append("complete2faLogin&password=");
 						appendUrl(sb, (String) param);
 					
@@ -679,7 +695,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							break;
 						}
 					} else {
-						// code
+						// check code
 						sb.append("completePhoneLogin&code=").append((String) param);
 					
 						JSONObject j = (JSONObject) api(sb.toString());
@@ -718,6 +734,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				String[] s = (String[]) param;
 				MP.api("deleteMessage&peer=".concat(s[0].concat("&id=").concat(s[1])));
 
+				// refresh chat after deleting
 				commandAction(refreshCmd, current);
 				display(infoAlert(L[MessageDeleted_Alert]), current);
 			} catch (Exception e) {
@@ -738,6 +755,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				appendUrl(sb.append("&text="), (String) param);
 				api(sb.toString());
 				
+				// go to latest message after sending
 				commandAction(backCmd, current);
 				commandAction(latestCmd, current);
 				display(infoAlert(L[MessageSent_Alert]), current);
@@ -753,6 +771,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				String id = rawPeer.getString("id");
 				String type = r.getString("_");
 				if ("chatInviteAlready".equals(type)) {
+					// already in chat, just open it
 					openChat(id);
 					break;
 				}
@@ -763,7 +782,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			break;
 		}
-		case RUN_IMPORT_INVITE: {
+		case RUN_IMPORT_INVITE: { // join chat by invite link
 			try {
 				ChatInfoForm d = (ChatInfoForm) param;
 				MP.api("importChatInvite&id=".concat(d.invite));
@@ -791,18 +810,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			break;
 		}
-		case RUN_UPDATES: {
-//			try {
-//				while (user != null) {
-//					Thread.sleep(45000L);
-//				}
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//				display(errorAlert("Updates thread died!\n" + e.toString()), current);
-//			}
-			break;
-		}
-		case RUN_CHECK_OTA: {
+		case RUN_CHECK_OTA: { // check for client updates
 			try {
 				JSONObject j = JSONObject.parseObject(new String(get(OTA_URL + "?v=" + version + "&l=" + lang), "UTF-8"));
 				if (j.getBoolean("update_available", false) && checkUpdates) {
@@ -816,6 +824,107 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					display(a);
 				}
 			} catch (Exception ignored) {}
+			break;
+		}
+		case RUN_CHAT_UPDATES: { // chat updates loop
+			updatesThread = Thread.currentThread();
+			try {
+				// TODO
+				StringBuffer sb = new StringBuffer();
+				ChatForm form = (ChatForm) param;
+				JSONObject j;
+
+				HttpConnection hc = null;
+				InputStream in = null;
+				int offset = 0;
+				int fails = 0;
+				boolean check = true;
+				while (form.update && current == form) {
+					Thread.sleep(updatesDelay);
+					if (fails >= 5) {
+						display(errorAlert("Updates thread died!"), null);
+						break;
+					}
+					try {
+						if (!form.update) break;
+						if (check) {
+							j = ((JSONObject) api("getLastUpdate&peer=".concat(form.id))).getObject("res");
+							int off = j.getInt("update_id");
+							if (off < offset) {
+								offset = off;
+							}
+							check = false;
+						}
+						if (!form.update) break;
+						
+						sb.setLength(0);
+						sb.append(instanceUrl).append(API_URL + "?v=" + API_VERSION + "&method=")
+						.append("updates&peer=").append(form.id)
+						.append("&offset=").append(offset)
+						.append("&timeout=").append(updatesTimeout);
+						
+						hc = updatesConnection = openHttpConnection(sb.toString());
+						hc.setRequestMethod("GET");
+						
+						int c = hc.getResponseCode();
+						if (c >= 400) {
+							throw new APIException("updates", c, null);
+						}
+						if (jsonStream) {
+							j = (JSONObject) JSONStream.getStream(in = hc.openInputStream()).nextValue();
+						} else {
+							j = JSONObject.parseObject(readUtf(in = hc.openInputStream(), (int) hc.getLength()));
+						}
+						
+						in.close();
+						in = null;
+						
+						if (j.has("error")) {
+							throw new APIException("updates", c, j);
+						}
+						
+						JSONArray updates = j.getArray("res");
+						int l = updates.size();
+						
+						for (int i = 0; i < l; ++i) {
+							JSONObject update = updates.getObject(i);
+							offset = update.getInt("update_id");
+							update = update.getObject("update");
+							String type = update.getString("_");
+							if ("updateUserStatus".equals(type)) {
+								form.handleUpdate(ChatForm.UPDATE_USER_STATUS, update);
+							} else if ("updateUserTyping".equals(type)
+									|| "updateChatUserTyping".equals(type)
+									|| "updateChannelUserTyping".equals(type)) {
+								form.handleUpdate(ChatForm.UPDATE_USER_TYPING, update);
+							} else if ("updateNewMessage".equals(type)
+									|| "updateNewChannelMessage".equals(type)) {
+								form.handleUpdate(ChatForm.UPDATE_NEW_MESSAGE, update);
+							} else if ("updateDeleteChannelMessages".equals(type)) {
+								form.handleUpdate(ChatForm.UPDATE_DELETE_MESSAGES, update);
+							}
+						}
+						
+					} catch (Exception e) {
+						e.printStackTrace();
+						fails++;
+						check = true;
+					} finally {
+						if (in != null) try {
+							in.close();
+						} catch (IOException e) {}
+						if (hc != null) try {
+							hc.close();
+						} catch (IOException e) {}
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				if (updatesThread == Thread.currentThread()) {
+					updatesThread = null;
+				}
+			}
 			break;
 		}
 		}
@@ -968,7 +1077,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					writeAuth();
 					
 					display(loadingAlert(L[WaitingForServerResponse]), null);
-					start(RUN_VALIDATE_AUTH, null);
+					start(RUN_VALIDATE_AUTH, user);
 					return;
 				}
 				instanceUrl = instanceField.getString();
@@ -1149,7 +1258,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					avaCacheGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(avaCacheGauge);
 					
-					profileCacheGauge = new Gauge(L[ProfilesCacheThreshold], true, 30, profilesCacheThreshold / 10);
+					profileCacheGauge = new Gauge(L[ProfilesCacheThreshold], true, 30, peersCacheThreshold / 10);
 					profileCacheGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(profileCacheGauge);
 					
@@ -1204,7 +1313,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				
 				avatarsCache = avaCacheChoice.getSelectedIndex();
 				avatarsCacheThreshold = avaCacheGauge.getValue() * 5;
-				profilesCacheThreshold = profileCacheGauge.getValue() * 10;
+				peersCacheThreshold = profileCacheGauge.getValue() * 10;
 				
 				try {
 					RecordStore.deleteRecordStore(SETTINGS_RECORD_NAME);
@@ -1223,7 +1332,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					j.put("useLoadingForm", useLoadingForm);
 					j.put("chatsLimit", chatsLimit);
 					j.put("messagesLimit", messagesLimit);
-					j.put("profilesCacheThreshold", profilesCacheThreshold);
+					j.put("profilesCacheThreshold", peersCacheThreshold);
 					j.put("jsonStream", jsonStream);
 					j.put("parseRichtext", parseRichtext);
 					j.put("parseLinks", parseLinks);
@@ -1412,12 +1521,14 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			return;
 		}
 		if (c == copyMsgCmd) {
+			// copy message text
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
-			copy("", (String) ((MPForm) current).urls.get(s[1]));
+			copy("", (String) ((Object[]) ((MPForm) current).urls.get(s[1]))[2]);
 			return;
 		}
 		if (c == messageLinkCmd) {
+			// copy message link
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 			StringBuffer sb = new StringBuffer("https://t.me/"); 
@@ -1531,6 +1642,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		JSONObject peer = getPeer(id, false);
 		if (peer != null) {
 			id = peer.getString("id");
+			// put placeholder avatar if peer doesn't have it
 			if (!peer.has("p")) {
 				putImage(target, id.charAt(0) == '-' ? chatDefaultImg : userDefaultImg);
 				return;
@@ -1542,7 +1654,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			imagesLoadLock.notifyAll();
 		}
 	}
-
 
 	private static void putImage(Object target, Image img) {
 		if (target instanceof ImageItem) {
@@ -1569,7 +1680,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static void fillPeersCache(JSONObject r) {
 		JSONObject users = r.getObject("users", null);
 		if (users != null && usersCache != null) {
-			if (usersCache.size() > profilesCacheThreshold) {
+			if (usersCache.size() > peersCacheThreshold) {
 				usersCache.clear();
 			}
 			for (Enumeration e = users.keys(); e.hasMoreElements(); ) {
@@ -1582,7 +1693,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		JSONObject chats = r.getObject("chats", null);
 		if (chats != null && chatsCache != null) {
-			if (chatsCache.size() > profilesCacheThreshold) {
+			if (chatsCache.size() > peersCacheThreshold) {
 				chatsCache.clear();
 			}
 			for (Enumeration e = chats.keys(); e.hasMoreElements(); ) {
