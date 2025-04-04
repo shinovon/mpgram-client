@@ -717,7 +717,7 @@ public class ChatForm extends MPForm implements LangConstants {
 		case UPDATE_USER_TYPING: {
 			// TODO
 			typing = System.currentTimeMillis();
-			if (id.charAt(0) == '-') {
+			if (id.charAt(0) != '-') {
 				setTicker(new Ticker(title + " is typing.."));
 			} else {
 				setTicker(new Ticker("Someone is typing.."));
