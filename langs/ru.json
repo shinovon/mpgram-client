@@ -133,6 +133,7 @@
 	"Language": "Язык",
 	"ReversedChat": "Перевёрнутый чат",
 	"ShowMedia": "Отобр. медиа",
+	"ShowChatStatus": "Отобр. статус чата",
 	"ThumbnailsSize": "Размер картинок",
 	"ChatsCount": "Кол-во чатов",
 	"MessagesCount": "Кол-во сообщений",
@@ -141,6 +142,8 @@
 	"UseJSONStream": "Исп. JSONStream",
 	"FormatText": "Форматировать текст",
 	"ParseLinks": "Парсить ссылки",
+	"ChatAutoUpdate": "Авто-обновление чата",
+	"UpdatesTimeout": "Таймаут обновлений",
 	
 	"LoadMediaThumbnails": "Загружать медиа",
 	"LoadAvatars": "Загружать аватарки",

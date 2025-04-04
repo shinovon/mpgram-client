@@ -118,6 +118,7 @@ Authorization
 Language
 Reversed chat
 Show media
+Show chat status
 Thumbnails size
 Chats count
 Messages count
@@ -125,6 +126,8 @@ Wait for page to load
 Use JSONStream
 Format text
 Parse links
+Chat auto-update
+Updates timeout
 Load media thumbnails
 Load avatars
 Multi-threaded loading

@@ -46,6 +46,7 @@ import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.ImageItem;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemCommandListener;
+import javax.microedition.lcdui.ItemStateListener;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.Spacer;
 import javax.microedition.lcdui.StringItem;
@@ -58,7 +59,7 @@ import cc.nnproject.json.JSONArray;
 import cc.nnproject.json.JSONObject;
 import cc.nnproject.json.JSONStream;
 
-public class MP extends MIDlet implements CommandListener, ItemCommandListener, Runnable, LangConstants {
+public class MP extends MIDlet implements CommandListener, ItemCommandListener, ItemStateListener, Runnable, LangConstants {
 
 	static final int RUN_SEND_MESSAGE = 4;
 	static final int RUN_VALIDATE_AUTH = 5;
@@ -73,6 +74,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static final int RUN_LEAVE_CHANNEL = 15;
 	static final int RUN_CHECK_OTA = 16;
 	static final int RUN_CHAT_UPDATES = 17;
+	static final int RUN_SET_TYPING = 18;
 	
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
@@ -247,6 +249,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static Gauge profileCacheGauge;
 	private static Gauge chatsGauge;
 	private static Gauge msgsGauge;
+	private static Gauge updateTimeoutGauge;
 	
 	// write items
 	private static TextField messageField;
@@ -264,6 +267,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static String replyTo;
 	private static String edit;
 	private static String updateUrl;
+	private static long lastType;
 	
 	protected void destroyApp(boolean u) {
 	}
@@ -482,7 +486,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		
 		authForm = f;
 		
-		//
+		// load main form
 		
 		if (user == null || userState < 3) {
 			display(mainDisplayable = authForm);
@@ -497,7 +501,18 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		
 		start(RUN_CHECK_OTA, null);
 	}
+
+	public void itemStateChanged(Item item) {
+		if (item == messageField) {
+			long l = System.currentTimeMillis();
+			if (l - lastType < 5000L) return;
+			
+			lastType = l;
+			start(RUN_SET_TYPING, ((TextField) item).getString().length() == 0 ? "Cancel" : null);
+		}
+	}
 	
+	// threading
 	public void run() {
 		int run;
 		Object param;
@@ -922,7 +937,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						e.printStackTrace();
 						fails++;
 						check = true;
-						if (fails >= 5) {
+						if (fails >= 5 && form.update) {
 							display(errorAlert("Updates thread died!\n" + e.toString()), null);
 							break;
 						}
@@ -943,6 +958,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				}
 			}
 			break;
+		}
+		case RUN_SET_TYPING: {
+			try {
+				api("setTyping&action=" + (param == null ? "Typing" : (String) param)
+						+ "&peer=" + writeTo);
+			} catch (Exception ignored) {}
 		}
 		}
 //		running--;
@@ -1215,10 +1236,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					
 					uiChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
 							L[ReversedChat],
-							L[ShowMedia]
+							L[ShowMedia],
+							L[ShowChatStatus],
 					}, null);
 					uiChoice.setSelectedIndex(0, reverseChat);
 					uiChoice.setSelectedIndex(1, showMedia);
+					uiChoice.setSelectedIndex(2, chatStatus);
 					uiChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(uiChoice);
 					
@@ -1245,14 +1268,20 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							L[WaitForPageToLoad],
 							L[UseJSONStream],
 							L[FormatText],
-							L[ParseLinks]
+							L[ParseLinks],
+							L[ChatAutoUpdate]
 					}, null);
 					behChoice.setSelectedIndex(0, useLoadingForm);
 					behChoice.setSelectedIndex(1, jsonStream);
 					behChoice.setSelectedIndex(2, parseRichtext);
 					behChoice.setSelectedIndex(3, parseLinks);
+					behChoice.setSelectedIndex(4, chatUpdates);
 					behChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(behChoice);
+					
+					updateTimeoutGauge = new Gauge(L[UpdatesTimeout], true, 20, updatesTimeout / 5);
+					updateTimeoutGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(updateTimeoutGauge);
 					
 					imagesChoice = new ChoiceGroup(L[Images], Choice.MULTIPLE, new String[] {
 							L[LoadMediaThumbnails],
@@ -1314,6 +1343,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				
 				reverseChat = uiChoice.isSelected(0);
 				showMedia = uiChoice.isSelected(1);
+				chatStatus = uiChoice.isSelected(2);
 				
 				if ((photoSize = (photoSizeGauge.getValue() * 8)) < 16) {
 					photoSizeGauge.setValue((photoSize = 16) / 8);
@@ -1329,6 +1359,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				jsonStream = behChoice.isSelected(1);
 				parseRichtext = behChoice.isSelected(2);
 				parseLinks = behChoice.isSelected(3);
+				chatUpdates = behChoice.isSelected(4);
+				
+				if ((updatesTimeout = updateTimeoutGauge.getValue() * 5) < 5) {
+					updateTimeoutGauge.setValue((updatesTimeout = 5) / 5);
+				}
 				
 				loadThumbs = imagesChoice.isSelected(0);
 				loadAvatars = imagesChoice.isSelected(1);
@@ -1748,7 +1783,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return sb;
 	}
 	
-	static JSONObject getPeer(String id, boolean now) {
+	static JSONObject getPeer(String id, boolean loadIfNeeded) {
 		if (id == null) return null;
 
 		Object o = id;
@@ -1762,7 +1797,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				}
 			}
 			
-			if (o == null && now) {
+			if (o == null && loadIfNeeded) {
 				Long.parseLong(id);
 				try {
 					fillPeersCache((JSONObject) api("getPeers&id=".concat(id)));
@@ -1790,21 +1825,21 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return getName(id, variant, true);
 	}
 	
-	static String getName(String id, boolean variant, boolean now) {
+	static String getName(String id, boolean variant, boolean loadIfNeeded) {
 		if (id == null) return null;
 		String res;
 		JSONObject o;
 		if (id.charAt(0) == '-') {
 			o = chatsCache.getObject(id, null);
 			if (o == null) {
-				o = getPeer(id, now);
+				o = getPeer(id, loadIfNeeded);
 			}
 			if (o == null) return null;
 			res = o.getString("t");
 		} else {
 			o = usersCache.getObject(id, null);
 			if (o == null) {
-				o = getPeer(id, now);
+				o = getPeer(id, loadIfNeeded);
 			}
 			if (o == null) return null;
 			res = variant ? getShortName(o) : getName(o);
@@ -1896,6 +1931,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		
 		Form f = new Form(editId != null ? editId : reply != null ? L[Reply_Title] : L[Write_Title]);
 		f.setCommandListener(midlet);
+		f.setItemStateListener(midlet);
 		f.addCommand(backCmd);
 		f.addCommand(sendCmd);
 		

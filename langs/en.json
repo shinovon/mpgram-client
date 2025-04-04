@@ -133,6 +133,7 @@
 	"Language": "Language",
 	"ReversedChat": "Reversed chat",
 	"ShowMedia": "Show media",
+	"ShowChatStatus": "Show chat status",
 	"ThumbnailsSize": "Thumbnails size",
 	"ChatsCount": "Chats count",
 	"MessagesCount": "Messages count",
@@ -141,6 +142,8 @@
 	"UseJSONStream": "Use JSONStream",
 	"FormatText": "Format text",
 	"ParseLinks": "Parse links",
+	"ChatAutoUpdate": "Chat auto-update",
+	"UpdatesTimeout": "Updates timeout",
 	
 	"LoadMediaThumbnails": "Load media thumbnails",
 	"LoadAvatars": "Load avatars",
