@@ -1474,6 +1474,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		{ // write form commands
 			if (c == sendCmd) {
+				if (MP.updatesThread != null) {
+					if (MP.symbianJrt) MP.updatesThread.interrupt();
+					try {
+						MP.updatesConnection.close();
+					} catch (Exception e) {}
+				}
 				display(loadingAlert(L[Sending]), d);
 				start(RUN_SEND_MESSAGE, messageField.getString());
 				return;
