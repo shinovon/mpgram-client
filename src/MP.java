@@ -159,6 +159,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static long updatesDelay = 3000L;
 	static int updatesTimeout = 30;
 	static boolean sendTyping = true;
+	static int chatsListFontSize = 0; // 0 - default, 1 - small, 2 - medium
 
 	// threading
 	private static int run;
@@ -259,6 +260,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static ChoiceGroup uiChoice;
 	private static ChoiceGroup behChoice;
 	private static ChoiceGroup langChoice;
+	private static ChoiceGroup chatsFontSizeCoice;
 	private static Gauge avaCacheGauge;
 	private static Gauge photoSizeGauge;
 	private static Gauge profileCacheGauge;
@@ -360,6 +362,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			focusNewMessages = j.getBoolean("focusNewMessages", focusNewMessages);
 			updatesDelay = j.getLong("updatesDelay", updatesDelay);
 			updatesTimeout = j.getInt("updatesTimeout", updatesTimeout);
+			chatsListFontSize = j.getInt("chatsListFontSize", chatsListFontSize);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -1281,6 +1284,14 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					msgsGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(msgsGauge);
 					
+					chatsFontSizeCoice = new ChoiceGroup(L[ChatsListFontSize], Choice.POPUP, new String[] {
+						L[Default],
+						L[Small],
+						L[Medium]
+					}, null);
+					chatsFontSizeCoice.setSelectedIndex(chatsListFontSize, true);
+					f.append(chatsFontSizeCoice);
+					
 					// behaviour
 					
 					s = new StringItem(null, L[Behaviour]);
@@ -1379,6 +1390,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					msgsGauge.setValue(messagesLimit = 5);
 				}
 				
+				chatsListFontSize = chatsFontSizeCoice.getSelectedIndex();
+				
 				useLoadingForm = behChoice.isSelected(0);
 				jsonStream = behChoice.isSelected(1);
 				parseRichtext = behChoice.isSelected(2);
@@ -1425,6 +1438,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					j.put("focusNewMessages", focusNewMessages);
 					j.put("updatesDelay", updatesDelay);
 					j.put("updatesTimeout", updatesTimeout);
+					j.put("chatsListFontSize", chatsListFontSize);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);

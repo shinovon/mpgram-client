@@ -21,6 +21,7 @@ SOFTWARE.
 */
 import java.util.Vector;
 
+import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.List;
 
 import cc.nnproject.json.JSONArray;
@@ -117,6 +118,9 @@ public class ChatsList extends MPList implements LangConstants {
 				}
 				
 				int itemIdx = safeAppend(thread, sb.toString(), null);
+				if (MP.chatsListFontSize != 0) {
+					setFont(itemIdx, MP.chatsListFontSize == 1 ? MP.smallPlainFont : MP.medPlainFont);
+				}
 				
 				if (noAvas || !MP.loadAvatars) continue;
 				MP.queueAvatar(id, new Object[] { this, new Integer(itemIdx) });
@@ -177,6 +181,9 @@ public class ChatsList extends MPList implements LangConstants {
 			}
 			
 			int itemIdx = safeAppend(thread, sb.toString(), null);
+			if (MP.chatsListFontSize != 0) {
+				setFont(itemIdx, MP.chatsListFontSize == 1 ? MP.smallPlainFont : MP.medPlainFont);
+			}
 			
 			if (noAvas || !MP.loadAvatars) continue;
 			MP.queueAvatar(id, new Object[] { this, new Integer(itemIdx) });

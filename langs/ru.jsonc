@@ -169,6 +169,10 @@
 	"ThumbnailsSize": "Размер картинок",
 	"ChatsCount": "Кол-во чатов",
 	"MessagesCount": "Кол-во сообщений",
+	"ChatsListFontSize": "Размер шрифта списка чатов",
+	"Default": "По умолчанию",
+	"Small": "Мелкий",
+	"Medium": "Средний",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Ждать полной загрузки",

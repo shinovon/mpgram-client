@@ -169,6 +169,10 @@
 	"ThumbnailsSize": "Thumbnails size",
 	"ChatsCount": "Chats count",
 	"MessagesCount": "Messages count",
+	"ChatsListFontSize": "Chats list font size",
+	"Default": "Default",
+	"Small": "Small",
+	"Medium": "Medium",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Wait for page to load",
