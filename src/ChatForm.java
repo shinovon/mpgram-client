@@ -127,7 +127,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 						canWrite = !broadcast || adminRights.getBoolean("post_messages", false);
 						canDelete = adminRights.getBoolean("delete_messages", false);
 					}
-				} else if (MP.chatStatus) {
+				} else if (MP.chatStatus && fullInfo.getObject("User").has("status")) {
 					setStatus(fullInfo.getObject("User").getObject("status"));
 				}
 				JSONObject full = fullInfo.getObject("full");
@@ -326,36 +326,37 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 		sb.setLength(0);
 		sb.append(out && !broadcast ? MP.L[You] : MP.getName(fromId, true));
 		MP.appendTime(sb.append(' '), /*lastDate = */message.getLong("date"));
-		
-		s = new StringItem(null, sb.toString());
-		s.setFont(MP.smallBoldFont);
-//		s.addCommand(MP.forwardMsgCmd);
-		if (this.id.charAt(0) == '-') {
-			s.addCommand(MP.messageLinkCmd);
-		}
-		if (text != null && text.length() != 0) {
-			s.addCommand(MP.copyMsgCmd);
-		}
-		if (mediaFilter == null) {
-			if (canWrite) {
-				s.addCommand(MP.replyMsgCmd);
+
+		// author and time label
+		if (!message.has("act")
+				&& (group == 0 || group != message.getLong("group", 0) || !reverse)) {
+			s = new StringItem(null, sb.toString());
+			s.setFont(MP.smallBoldFont);
+			s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+			s.setItemCommandListener(MP.midlet);
+			
+//			s.addCommand(MP.forwardMsgCmd); // TODO
+			if (this.id.charAt(0) == '-') {
+				s.addCommand(MP.messageLinkCmd);
 			}
-			if (out || selfChat) {
-				s.addCommand(MP.deleteMsgCmd);
-				s.addCommand(MP.editMsgCmd);
-			} else {
-				s.setDefaultCommand(MP.itemChatCmd);
-				s.addCommand(MP.itemChatInfoCmd);
-				if (canDelete) {
+			if (text != null && text.length() != 0) {
+				s.addCommand(MP.copyMsgCmd);
+			}
+			if (mediaFilter == null) {
+				if (canWrite) {
+					s.addCommand(MP.replyMsgCmd);
+				}
+				if (out || selfChat) {
 					s.addCommand(MP.deleteMsgCmd);
+					s.addCommand(MP.editMsgCmd);
+				} else {
+					s.setDefaultCommand(MP.itemChatCmd);
+					s.addCommand(MP.itemChatInfoCmd);
+					if (canDelete) {
+						s.addCommand(MP.deleteMsgCmd);
+					}
 				}
 			}
-		}
-		
-		s.setItemCommandListener(MP.midlet);
-		s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-		// do not add name if message is grouped
-		if (group == 0 || group != message.getLong("group", 0) || !reverse) {
 			if (reverse && (space || group != 0)) {
 				Spacer sp = new Spacer(10, SPACER_HEIGHT);
 				sp.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -364,15 +365,15 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 			} else {
 				firstItem = s;
 			}
-			safeInsert(thread, insert++, s);
+			safeInsert(thread, insert++, lastItem = s);
 			msgItem = s;
-			lastItem = s;
 			urls.put(s, key);
 		}
 		group = message.getLong("group", 0);
 		space = false;
 		
 		if (mediaFilter == null) {
+			// 'forwarded from ...' label
 			if (message.has("fwd")) {
 				JSONObject fwd = message.getObject("fwd");
 				
@@ -385,7 +386,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 				s = new StringItem(null, sb.toString());
 				s.setFont(MP.smallItalicFont);
 				s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-				safeInsert(thread, insert++, s);
+				safeInsert(thread, insert++, lastItem = s);
 
 				if (fwd.has("peer") && fwd.has("msg")) {
 					s.setDefaultCommand(MP.gotoMsgCmd);
@@ -395,6 +396,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 				space = true;
 			}
 			
+			// reply
 			if (message.has("reply")) {
 				JSONObject reply = message.getObject("reply");
 				if (topMsgId == 0 || reply.getInt("id") != topMsgId) {
@@ -428,7 +430,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 						s.setFont(MP.smallItalicFont);
 						s.setDefaultCommand(MP.gotoMsgCmd);
 						s.setItemCommandListener(MP.midlet);
-						safeInsert(thread, insert++, s);
+						safeInsert(thread, insert++, lastItem = s);
 						
 						urls.put(s, new String[] { reply.getString("peer", null), reply.getString("id", null) });
 					}
@@ -455,7 +457,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 				// media is disabled
 				s = new StringItem(null, MP.L[Media]);
 				s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-				safeInsert(thread, insert++, s);
+				safeInsert(thread, insert++, lastItem = s);
 			} else {
 				JSONObject media = message.getObject("media");
 				
@@ -464,10 +466,9 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 					// server doesn't know this media type
 					s = new StringItem(null, MP.L[Media]);
 					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					safeInsert(thread, insert++, s);
+					safeInsert(thread, insert++, lastItem = s);
 					
 					if (msgItem == null) msgItem = s;
-					lastItem = s;
 					space = true;
 				} else if (type.equals("webpage")) {
 					// webpage
@@ -484,12 +485,11 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 					s.setFont(MP.smallItalicFont);
 					s.setDefaultCommand(MP.richTextLinkCmd);
 					s.setItemCommandListener(MP.midlet);
-					safeInsert(thread, insert++, s);
+					safeInsert(thread, insert++, lastItem = s);
 					
 					urls.put(s, media.getString("url"));
 
 					if (msgItem == null) msgItem = s;
-					lastItem = s;
 					space = true;
 				} else if (type.equals("document")) {
 					// document
@@ -527,26 +527,24 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 						img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 						img.setDefaultCommand(MP.documentCmd);
 						img.setItemCommandListener(MP.midlet);
-						safeInsert(thread, insert++, img);
+						safeInsert(thread, insert++, lastItem = img);
 						
 						key[3] = "thumbrmin";
 						urls.put(img, key);
 						MP.queueImage(key, img);
 
 						if (msgItem == null) msgItem = img;
-						lastItem = img;
 					} else {
 						s = new StringItem(null, sb.toString());
 						s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 						s.setFont(MP.smallItalicFont);
 						s.setDefaultCommand(MP.documentCmd);
 						s.setItemCommandListener(MP.midlet);
-						safeInsert(thread, insert++, s);
+						safeInsert(thread, insert++, lastItem = s);
 
 						urls.put(s, key);
 						
 						if (msgItem == null) msgItem = s;
-						lastItem = s;
 					}
 					space = true;
 				} else if (type.equals("photo")) {
@@ -557,24 +555,22 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 									Item.LAYOUT_NEWLINE_BEFORE : 0));
 					img.setDefaultCommand(MP.openImageCmd);
 					img.setItemCommandListener(MP.midlet);
-					safeInsert(thread, insert++, img);
+					safeInsert(thread, insert++, lastItem = img);
 					
 					key[3] = "rprev";
 					urls.put(img, key);
 					MP.queueImage(key, img);
 
 					if (msgItem == null) msgItem = img;
-					lastItem = img;
 				} else if (type.equals("poll")) {
 					// TODO poll
 					sb.setLength(0);
 					sb.append(MP.L[Poll]);
 					s = new StringItem(null, sb.toString());
 					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					safeInsert(thread, insert++, s);
+					safeInsert(thread, insert++, lastItem = s);
 
 					if (msgItem == null) msgItem = s;
-					lastItem = s;
 					space = true;
 				} else if (type.equals("geo")) {
 					// geo
@@ -583,36 +579,119 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 					.append(media.get("lat")).append(", ").append(media.get("long"));
 					s = new StringItem(null, sb.toString());
 					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					safeInsert(thread, insert++, s);
+					safeInsert(thread, insert++, lastItem = s);
 
 					if (msgItem == null) msgItem = s;
-					lastItem = s;
 					space = true;
 				} else {
 					// unknown media type
 					System.out.println(media);
 					s = new StringItem(null, "Undefined media");
 					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					safeInsert(thread, insert++, s);
+					safeInsert(thread, insert++, lastItem = s);
 
 					if (msgItem == null) msgItem = s;
-					lastItem = s;
 					space = true;
 				}
 			}
 		} else if (message.has("act")) {
-			// TODO action
-			s = new StringItem(null, MP.L[Action] + ": " + message.getObject("act").getString("_"));
-			s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-			safeInsert(thread, insert++, s);
-			lastItem = s;
+			// Action
+			JSONObject act = message.getObject("act");
+			String type = act.getString("_");
+			String user = act.getString("user", null);
+			
+			t = null;
+			l: {
+				if ("ChatCreate".equals(type)) {
+					t = MP.L[GroupCreated_Action];
+				} else if ("ChannelCreate".equals(type)) {
+					t = MP.L[ChannelCreated_Action];
+				} else if ("ChatEditPhoto".equals(type)) {
+					t = MP.L[PhotoUpdated_Action];
+				} else if ("HistoryClear".equals(type)) {
+					t = MP.L[ChatHistoryCleared_Action];
+				} else if ("ChatEditTitle".equals(type)) {
+					t = MP.L[NameChanged_Action].concat(act.getString("t", ""));
+				} else {
+					s = new StringItem(null, MP.getName(fromId, false));
+					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE);
+					s.setFont(MP.medPlainFont);
+
+					s.setDefaultCommand(MP.itemChatCmd);
+					s.addCommand(MP.itemChatInfoCmd);
+					s.addCommand(MP.replyMsgCmd);
+					if (mediaFilter == null) {
+						if (canWrite) {
+							s.addCommand(MP.replyMsgCmd);
+						}
+					}
+					urls.put(s, key);
+					safeInsert(thread, insert++, lastItem = s);
+					if (msgItem == null) msgItem = s;
+					
+					if ("PinMessage".equals(type)) {
+						t = MP.L[PinnedMessage_Action];
+					} else if ("ChatJoinedByLink".equals(type)) {
+						t = MP.L[JoinedByLink_Action];
+					} else if ("ChatJoinedByRequest".equals(type)) {
+						t = MP.L[JoinedByRequest_Action];
+					} else {
+						if ("ChatAddUser".equals(type) || "ChatDeleteUser".equals(type)) {
+							if (fromId.equals(user)) {
+								t = MP.L["ChatAddUser".equals(type) ? Joined_Action : Left_Action];
+							} else {
+								s = new StringItem(null, MP.L["ChatAddUser".equals(type) ? Added_Action : Removed_Action]);
+								s.setLayout(Item.LAYOUT_CENTER);
+								s.setFont(MP.medPlainFont);
+								safeInsert(thread, insert++, s);
+								
+								Spacer sp = new Spacer(MP.medPlainFont.charWidth(' '), MP.medPlainFont.getHeight());
+								s.setLayout(Item.LAYOUT_CENTER);
+								safeInsert(thread, insert++, sp);
+
+								s = new StringItem(null, MP.getName(user, false));
+								s.setLayout(Item.LAYOUT_CENTER);
+								s.setFont(MP.medPlainFont);
+								safeInsert(thread, insert++, lastItem = s);
+								
+								break l;
+							}
+						} else {
+							// undefined action
+							System.out.println(act);
+							
+							s = new StringItem(null, MP.L[Action]);
+							s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+							s.setFont(MP.medPlainFont);
+							safeInsert(thread, insert++, lastItem = s);
+							break l;
+						}
+					}
+					
+					s = new StringItem(null, t);
+					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_AFTER);
+					s.setFont(MP.medPlainFont);
+					safeInsert(thread, insert++, lastItem = s);
+					
+					break l;
+				}
+				
+				if (t != null) {
+					s = new StringItem(null, t);
+					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					s.setFont(MP.medPlainFont);
+					safeInsert(thread, insert++, lastItem = s);
+					
+					if (msgItem == null) msgItem = s;
+				}
+			}
+			
 			space = true;
 		}
 		if (!reverse || (group == 0 && space)) {
 			Spacer sp = new Spacer(10, SPACER_HEIGHT);
 			sp.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-			safeInsert(thread, insert++, sp);
-			lastItem = sp;
+			safeInsert(thread, insert++, lastItem = sp);
 		}
 		if (itemPtr != null) {
 			itemPtr[0] = msgItem;

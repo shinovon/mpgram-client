@@ -242,9 +242,9 @@
 	// Chat actions
 	"PinnedMessage_Action": " pinned message",
 	"Joined_Action": " joined the group",
-	"Added_Action": " added ",
+	"Added_Action": " added",
 	"Left_Action": " left the group",
-	"Removed_Action": " removed ",
+	"Removed_Action": " removed",
 	"JoinedByLink_Action": " joined the group via invite link",
 	"JoinedByRequest_Action": " was accepted to the group",
 	"ChatHistoryCleared_Action": "Chat history was cleared",

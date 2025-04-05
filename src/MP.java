@@ -1859,11 +1859,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		
 		return (JSONObject) o;
 	}
-	
-	static String getName(String id, boolean variant) {
-		return getName(id, variant, true);
-	}
-	
+
+	// variant: false - full; true - short
 	static String getName(String id, boolean variant, boolean loadIfNeeded) {
 		if (id == null) return null;
 		String res;
@@ -1884,6 +1881,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			res = variant ? getShortName(o) : getName(o);
 		}
 		return res;
+	}
+	
+	static String getName(String id, boolean variant) {
+		return getName(id, variant, true);
 	}
 	
 	static String getName(JSONObject p) {

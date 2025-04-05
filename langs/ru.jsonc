@@ -242,9 +242,9 @@
 	// Chat actions
 	"PinnedMessage_Action": " закрепил(а) сообщение",
 	"Joined_Action": " теперь в группе",
-	"Added_Action": " добавил(a) ",
+	"Added_Action": " добавил(a)",
 	"Left_Action": " покинул(а) группу",
-	"Removed_Action": " исключил(а) ",
+	"Removed_Action": " исключил(а)",
 	"JoinedByLink_Action": " вступил(а) в группу по ссылке-приглашению",
 	"JoinedByRequest_Action": " принят(а) в группу",
 	"ChatHistoryCleared_Action": "История чата была очищена",
