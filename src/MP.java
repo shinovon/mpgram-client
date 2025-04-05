@@ -1035,7 +1035,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		if (d instanceof ChatForm) { // chat form commands
 			if (c == latestCmd) {
 				((ChatForm) d).reset();
-				((MPForm) d).load();
+				start(RUN_LOAD_FORM, d);
 				return;
 			}
 			if (c == olderMessagesCmd || c == newerMessagesCmd) {
@@ -1542,12 +1542,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		if (c == refreshCmd) {
 			if (d instanceof MPForm) {
 				((MPForm) d).cancel();
-				((MPForm) d).load();
+				start(RUN_LOAD_FORM, d);
 				return;
 			}
 			if (d instanceof MPList) {
 				((MPList) d).cancel();
-				((MPList) d).load();
+				start(RUN_LOAD_LIST, d);
 				return;
 			}
 			return;
