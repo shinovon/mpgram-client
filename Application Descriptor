@@ -1,5 +1,5 @@
 MIDlet-Vendor: nnproject
-MIDlet-Version: 0.8.1
+MIDlet-Version: 0.8.2
 MIDlet-Icon: /m.png
 MicroEdition-Configuration: CLDC-1.1
 MIDlet-1: MPGram,/m.png,MP
