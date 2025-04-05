@@ -962,6 +962,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						fails++;
 						check = true;
 						if (fails >= 5 && form.update) {
+							form.update = false;
 							display(errorAlert("Updates thread died!\n" + e.toString()), null);
 							break;
 						}
@@ -975,7 +976,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						if (updatesConnection == hc) {
 							updatesConnection = null;
 						}
-						form.update = false;
 					}
 				}
 			} catch (Exception e) {

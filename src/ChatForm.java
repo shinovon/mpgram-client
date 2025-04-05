@@ -34,7 +34,7 @@ import javax.microedition.lcdui.Ticker;
 import cc.nnproject.json.JSONArray;
 import cc.nnproject.json.JSONObject;
 
-public class ChatForm extends MPForm implements LangConstants {
+public class ChatForm extends MPForm implements LangConstants, Runnable {
 	
 	private static final int SPACER_HEIGHT = 8;
 	
@@ -76,6 +76,10 @@ public class ChatForm extends MPForm implements LangConstants {
 	Vector loadedMsgs = new Vector();
 
 	long typing;
+
+	private Ticker statusTicker;
+	private final Object typingLock = new Object();
+	private Thread typingThread;
 	
 	public ChatForm(String id, String query, int message, int topMsg) {
 		super(id);
@@ -287,6 +291,7 @@ public class ChatForm extends MPForm implements LangConstants {
 			}
 			update = true;
 			MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
+			(typingThread = new Thread(this)).start();
 		}
 	}
 
@@ -673,6 +678,7 @@ public class ChatForm extends MPForm implements LangConstants {
 		messageId = 0;
 		addOffset = 0;
 		offsetId = 0;
+		typing = 0;
 		loadedMsgs.removeAllElements();
 		switched = false;
 	}
@@ -706,32 +712,42 @@ public class ChatForm extends MPForm implements LangConstants {
 		switch (type) {
 		case UPDATE_USER_STATUS: {
 			if (MP.chatStatus) {
-				typing = 0;
 				setStatus(update.getObject("status"));
+				typing = 0;
+				typingThread.interrupt();
 			}
 			break;
 		}
 		case UPDATE_USER_TYPING: {
-			// TODO timer thread
 			if ("sendMessageCancelAction".equals(update.getObject("action").getString("_"))) {
-				setTicker(null);
+				setTicker(statusTicker);
 				typing = 0;
+				typingThread.interrupt();
 				break;
 			}
+			// TODO localize
 			if (id.charAt(0) != '-') {
-				setTicker(new Ticker(title + " is typing.."));
+				if (typing == 0) {
+					setTicker(new Ticker(title + " is typing.."));
+				}
 			} else {
 				if (update.has("top_msg_id") && topMsgId != update.getInt("top_msg_id")) {
 					break;
 				}
-				setTicker(new Ticker("Someone is typing.."));
+				if (typing == 0) {
+					setTicker(new Ticker("Someone is typing.."));
+				}
 			}
 			typing = System.currentTimeMillis();
+			typingThread.interrupt();
+			synchronized (typingLock) {
+				typingLock.notify();
+			}
 			break;
 		}
 		case UPDATE_NEW_MESSAGE: {
-			setTicker(null);
 			typing = 0;
+			typingThread.interrupt();
 			
 			if (topMsgId != 0) break;
 			
@@ -765,6 +781,9 @@ public class ChatForm extends MPForm implements LangConstants {
 			break;
 		}
 		case UPDATE_EDIT_MESSAGE: {
+			typing = 0;
+			typingThread.interrupt();
+			
 			JSONObject msg = update.getObject("message");
 			String id = msg.getString("id");
 			if (!loadedMsgs.contains(id)) break;
@@ -783,10 +802,6 @@ public class ChatForm extends MPForm implements LangConstants {
 					true,
 					item);
 		}
-		}
-		if (typing != 0 && System.currentTimeMillis() - typing >= 6000L) {
-			setTicker(null);
-			typing = 0;
 		}
 	}
 	
@@ -817,7 +832,30 @@ public class ChatForm extends MPForm implements LangConstants {
 		} else {
 			s = MP.L[Offline];
 		}
-		setTicker(new Ticker(s));
+		setTicker(statusTicker = new Ticker(s));
+	}
+	
+	// typing timer loop
+	public void run() {
+		try {
+			while (update) {
+				try {
+					if (typing == 0) {
+						synchronized (typingLock) {
+							typingLock.wait();
+						}
+					}
+					Thread.sleep(5000);
+					typing = 0;
+				} catch (Exception e) {}
+				if (typing == 0 && getTicker() != statusTicker) {
+					setTicker(statusTicker);
+				}
+			}
+
+			setTicker(null);
+			typing = 0;
+		} catch (Exception e) {}
 	}
 
 }
