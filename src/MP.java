@@ -549,7 +549,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			try {
 				selfId = ((JSONObject) api("me")).getString("id");
 				userState = 4;
-				
+
+				api("updateStatus");
 				if (param != null) {
 					openLoad(mainDisplayable = mainChatsList());
 					writeAuth();
