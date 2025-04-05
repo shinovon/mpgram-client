@@ -894,7 +894,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							try {
 								j = ((JSONObject) api(sb.toString())).getObject("res");
 								off = j.getInt("update_id") + 1;
-								if (off < offset) {
+								if (offset == 0 || off < offset) {
 									offset = off;
 								}
 							} catch (Exception ignored) {}
