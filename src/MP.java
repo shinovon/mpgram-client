@@ -375,7 +375,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 		
 		// load locale
-		(L = new String[200])[0] = "mpgram";
+		(L = new String[300])[0] = "mpgram";
 		try {
 			loadLocale(lang);
 		} catch (Exception e) {
