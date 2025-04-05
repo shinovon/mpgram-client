@@ -107,7 +107,7 @@ public class ChatInfoForm extends MPForm implements LangConstants {
 				phone = "+".concat(rawPeer.getString("phone"));
 				addCommand(MP.callCmd);
 				
-				s = new StringItem(MP.L[PhoneNumber], phone);
+				s = new StringItem(MP.L[Mobile], phone);
 				s.setFont(MP.medPlainFont);
 				s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 				s.addCommand(MP.callItemCmd);
