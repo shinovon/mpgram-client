@@ -2593,12 +2593,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			
 			if (d < 60 * 60) {
 				d /= 60L;
-				return appendLocalizedPlural(sb, (int) d, _minutesAgo).toString();
+				return appendLocalizedPlural(sb, (int) d, _minuteAgo).toString();
 			}
 			
 			if (d < 12 * 60 * 60) {
 				d /= 60 * 60L;
-				return appendLocalizedPlural(sb, (int) d, _hoursAgo).toString();
+				return appendLocalizedPlural(sb, (int) d, _hourAgo).toString();
 			}
 		}
 		

@@ -76,10 +76,10 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 	Vector loadedMsgs = new Vector();
 
 	long typing;
-
-	private Ticker statusTicker;
 	private final Object typingLock = new Object();
 	private Thread typingThread;
+	
+	long wasOnline;
 	
 	public ChatForm(String id, String query, int message, int topMsg) {
 		super(id);
@@ -720,7 +720,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 		}
 		case UPDATE_USER_TYPING: {
 			if ("sendMessageCancelAction".equals(update.getObject("action").getString("_"))) {
-				setTicker(statusTicker);
+				setStatus(null);
 				typing = 0;
 				typingThread.interrupt();
 				break;
@@ -829,14 +829,37 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 	
 	private void setStatus(JSONObject status) {
 		String s;
+		if (status == null) {
+			if (MP.chatStatus) {
+				if (wasOnline == 1) {
+					s = MP.L[Online];
+				} else if (wasOnline != 0) {
+					s = MP.L[LastSeen] + MP.localizeDate(wasOnline, 4);
+				} else if (wasOnline == 2) {
+					s = MP.L[Offline];
+				} else {
+					s = null;
+				}
+				Ticker t = getTicker();
+				if (t != null && t.getString().equals(s))
+					return;
+				setTicker(new Ticker(s));
+				return;
+			}
+			setTicker(null);
+			return;
+		}
+		;
 		if ("userStatusOnline".equals(status.getString("_"))) {
+			wasOnline = 1;
 			s = MP.L[Online];
-		} else if(status.has("was_online")) {
-			s = MP.L[LastSeen] + MP.localizeDate(status.getInt("was_online"), 4);
+		} else if ((wasOnline = status.getInt("was_online", 0)) != 0) {
+			s = MP.L[LastSeen] + MP.localizeDate(wasOnline, 4);
 		} else {
 			s = MP.L[Offline];
+			wasOnline = 2;
 		}
-		setTicker(statusTicker = new Ticker(s));
+		setTicker(new Ticker(s));
 	}
 	
 	// typing timer loop
@@ -846,14 +869,14 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 				try {
 					if (typing == 0) {
 						synchronized (typingLock) {
-							typingLock.wait();
+							typingLock.wait(60000);
 						}
 					}
 					Thread.sleep(5000);
 					typing = 0;
 				} catch (Exception e) {}
-				if (typing == 0 && getTicker() != statusTicker) {
-					setTicker(statusTicker);
+				if (typing == 0) {
+					setStatus(null);
 				}
 			}
 
