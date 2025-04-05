@@ -268,8 +268,9 @@
 	"Owner": "владелец",
 	"Admin": "админ",
 	"Bot": "бот",
-	"GroupInfo": "Group info",
 	"UserInfo": "User info",
+	"GroupInfo": "Group info",
+	"ChannelInfo": "Channel info",
 	
 	"_member": " участник",
 	"_members": " участника",

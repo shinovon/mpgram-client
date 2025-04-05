@@ -268,8 +268,9 @@
 	"Owner": "owner",
 	"Admin": "admin",
 	"Bot": "bot",
-	"GroupInfo": "Group info",
 	"UserInfo": "User info",
+	"GroupInfo": "Group info",
+	"ChannelInfo": "Channel info",
 	
 	"_member": " member",
 	"_members": " members",

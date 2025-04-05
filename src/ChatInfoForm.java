@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 import javax.microedition.lcdui.Item;
+import javax.microedition.lcdui.Spacer;
 import javax.microedition.lcdui.StringItem;
 
 import cc.nnproject.json.JSONObject;
@@ -53,10 +54,12 @@ public class ChatInfoForm extends MPForm implements LangConstants {
 		StringBuffer sb = new StringBuffer();
 		JSONObject rawPeer = null;
 		String name = null;
+		boolean broadcast = false;
 		if (mode == 0) {
 			JSONObject peer = MP.getPeer(id, true);
 			id = peer.getString("id");
-			setTitle(name = MP.getName(peer));
+			broadcast = peer.getBoolean("c", false);
+			name = MP.getName(peer);
 		} else if (mode == 1) {
 			sb.append("resolvePhone&phone=").append(id);
 			JSONObject r = ((JSONObject) MP.api(sb.toString())).getObject("res");
@@ -64,23 +67,28 @@ public class ChatInfoForm extends MPForm implements LangConstants {
 			
 			rawPeer = r.getArray("users").getObject(0);
 			id = rawPeer.getString("id");
-			setTitle(name = MP.getNameRaw(rawPeer));
+			name = MP.getNameRaw(rawPeer);
+		} else {
+			name = getTitle();
 		}
-
 		boolean isUser = id.charAt(0) != '-';
 		
 		StringItem s;
 		
-		s = new StringItem(null, name);
-		s.setFont(MP.medPlainFont);
-		s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-		append(s);
+		if (name != null) {
+			s = new StringItem(null, name);
+			s.setFont(MP.medPlainFont);
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+			append(s);
+		}
 		
 		JSONObject full = null;
 		if (mode != 3) {
 			JSONObject fullInfo = (JSONObject) MP.api("getFullInfo&id=".concat(id));
 			full = fullInfo.getObject("full");
 			rawPeer = fullInfo.getObject(isUser ? "User" : "Chat");
+			
+			setTitle(MP.L[isUser ? UserInfo : broadcast ? ChannelInfo : GroupInfo]);
 		}
 		
 		if (isUser) {
@@ -180,6 +188,8 @@ public class ChatInfoForm extends MPForm implements LangConstants {
 			s.setDefaultCommand(MP.gotoPinnedMsgCmd);
 			s.setItemCommandListener(MP.midlet);
 			append(s);
+			
+			append(new Spacer(10, 8));
 		}
 		
 		if (chatForm != null) {
