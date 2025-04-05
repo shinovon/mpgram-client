@@ -950,6 +950,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						}
 						
 					} catch (Exception e) {
+						if (e.toString().indexOf("Interrupted") != -1) {
+							form.update = false;
+							break;
+						}
 						e.printStackTrace();
 						fails++;
 						check = true;
@@ -964,6 +968,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						if (hc != null) try {
 							hc.close();
 						} catch (IOException e) {}
+						if (updatesConnection == hc) {
+							updatesConnection = null;
+						}
+						form.update = false;
 					}
 				}
 			} catch (Exception e) {

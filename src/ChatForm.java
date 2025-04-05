@@ -280,10 +280,10 @@ public class ChatForm extends MPForm implements LangConstants {
 		
 		if (endReached && MP.chatUpdates && mediaFilter == null) {
 			if (MP.updatesThread != null) {
+				MP.updatesThread.interrupt();
 				try {
 					MP.updatesConnection.close();
 				} catch (Exception e) {}
-				MP.updatesThread.interrupt();
 			}
 			update = true;
 			MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
@@ -682,10 +682,10 @@ public class ChatForm extends MPForm implements LangConstants {
 		// close updater loop
 		update = false;
 		if (MP.updatesThread != null) {
+			MP.updatesThread.interrupt();
 			try {
 				MP.updatesConnection.close();
 			} catch (Exception e) {}
-			MP.updatesThread.interrupt();
 		}
 	}
 	
