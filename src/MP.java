@@ -2530,7 +2530,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		int b = n % 100;
 		if ("pl".equals(lang) ? n == 1 : a == 1 && b != 11)
 			return s.concat(L[i]);
-		if ((a >= 2 || a <= 4) && !(b >= 12 && b <= 14))
+		if ((a >= 2 && a <= 4) && !(b >= 12 && b <= 14))
 			return s.concat(L[i + 1]);
 		return s.concat(L[i + 2]);
 	}
@@ -2543,7 +2543,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		int b = n % 100;
 		if ("pl".equals(lang) ? n == 1 : a == 1 && b != 11)
 			return sb.append(L[i]);
-		if ((a >= 2 || a <= 4) && !(b >= 12 && b <= 14))
+		if ((a >= 2 && a <= 4) && !(b >= 12 && b <= 14))
 			return sb.append(L[i + 1]);
 		return sb.append(L[i + 2]);
 	}
