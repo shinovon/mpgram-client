@@ -1,6 +1,6 @@
 {
 	// About this locale file
-	"LocaleInfo": "Finnish, by @gtrxac",
+	"LocaleInfo": "Finnish, by gtrxAC",
 	"LocaleSlavicNumerals": "",
 	
 	// Common commands
@@ -174,7 +174,7 @@
 	"LoadAvatars": "Profiilikuvat",
 	"MultiThreadedLoading": "Monisäikeinen lataus",
 	
-	// Caching settings
+	// Cache settings
 	"AvatarsCaching": "Prof.kuvien välimuisti",
 	"Disabled": "Pois",
 	"HoldInRAM": "Pidä muistissa",
@@ -208,13 +208,17 @@
 	
 	// Message
 	"ForwardedFrom": "Välitetty käyttäjältä ",
-	"Media": "Media",
-	"Poll": "Kysely",
-	"Geo": "Sijainti: ",
-	"Action": "Toiminto",
 	"You": "Sinä",
 	"You_Prefix": "Sinä: ",
 	"ForwardedMessage": "Välitetty viesti",
+	"Action": "Toiminto",
+	
+	// Message media
+	"Media": "Media",
+	"Poll": "Kysely",
+	"Geo": "Sijainti: ",
+	
+	// Chat actions
 	
 	// Folders
 	"AllChats": "Kaikki keskustelut",

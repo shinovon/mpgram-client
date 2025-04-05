@@ -36,6 +36,9 @@
 	"Today": "today",
 	"Yesterday": "yesterday",
 	"LastWeek": "last week",
+	"LastMonth": "last month",
+	"ALongTimeAgo": "a long time ago",
+	"Recently": "recently",
 	// Date suffixes
 	"on_Date": "on ",
 	"at_Time": " at ",
@@ -95,6 +98,7 @@
 	"Delete": "Delete",
 	"Edit": "Edit",
 	"GoTo": "Go to",
+	"Pin": "Pin",
 	
 	// Item commands
 	"Link_Cmd": "Link",
@@ -108,10 +112,12 @@
 	"ChatInfo": "Chat info",
 	"Older": "Older",
 	"Newer": "Newer",
+	"SendSticker": "Send sticker",
 	
 	// Message writing form commands
 	"Send": "Send",
 	"OpenTextBox": "Open text box",
+	"ChooseFile": "Choose file",
 	
 	// Profile/chat info commands
 	"Join": "Join",
@@ -119,6 +125,7 @@
 	"LeaveGroup": "Leave group",
 	"ChatMedia": "Chat media",
 	"Members": "Members",
+	"AddToContacts": "Add to contacts",
 	
 	// Dialog commands
 	"Ok": "Ok",
@@ -145,6 +152,8 @@
 	"CloudPassword": "Cloud password",
 	"Captcha": "Captcha",
 	"Auth_Btn": "Authorize",
+	"InvalidCode_Alert": "Invalid code!",
+	"CodeExpired_Alert": "Code expired!",
 	
 	// Settings sections
 	"UI": "UI",
@@ -174,7 +183,7 @@
 	"LoadAvatars": "Load avatars",
 	"MultiThreadedLoading": "Multi-threaded loading",
 	
-	// Caching settings
+	// Cache settings
 	"AvatarsCaching": "Avatars caching",
 	"Disabled": "Disabled",
 	"HoldInRAM": "Hold in RAM",
@@ -194,6 +203,13 @@
 	"Reply_Title": "Reply",
 	"Write_Title": "Write",
 	"Message": "Message",
+	"File": "File",
+	"File_Prefix": "File: ",
+	"NotSelected": "Not selected",
+	"SendUncompressed": "Send uncompressed",
+	"SendAsVoice": "Send as voice message",
+	"HideWithSpoiler": "Hide with spoiler",
+	"EnableHTMLFormatting": "Enable HTML-formatting",
 	
 	// Alert messages
 	"MessageSent_Alert": "Message sent",
@@ -208,13 +224,30 @@
 	
 	// Message
 	"ForwardedFrom": "Forwarded from ",
-	"Media": "Media",
-	"Poll": "Poll",
-	"Geo": "Geo: ",
-	"Action": "Action",
 	"You": "You",
 	"You_Prefix": "You: ",
 	"ForwardedMessage": "Forwarded message",
+	"Action": "Action",
+	"Edited": "edited",
+	
+	// Message media
+	"Media": "Media",
+	"Poll": "Poll",
+	"Geo": "Geo: ",
+	
+	// Chat actions
+	"PinnedMessage_Action": " pinned message",
+	"Joined_Action": " joined the group",
+	"Added_Action": " added ",
+	"Left_Action": " left the group",
+	"Removed_Action": " removed ",
+	"JoinedByLink_Action": " joined the group via invite link",
+	"JoinedByRequest_Action": " was accepted to the group",
+	"ChatHistoryCleared_Action": "Chat history was cleared",
+	"GroupCreated_Action": "Group created",
+	"ChannelCreated_Action": "Channel created",
+	"PhotoUpdated_Action": "Photo updated",
+	"NameChanged_Action": "Name was changed to ",
 	
 	// Folders
 	"AllChats": "All chats",
@@ -225,13 +258,18 @@
 	"Offline": "offline",
 	"LastSeen": "last seen ",
 	"About_User": "Bio",
-	"About_Chat": "About",
+	"About_Chat": "Description",
 	"Mobile": "Mobile",
 	"Username": "Username",
 	"Link": "Link",
 	"SearchMessages": "Search messages",
 	"ViewGroup": "View group",
 	"GoToPinnedMessage": "Show pinned message",
+	"Owner": "owner",
+	"Admin": "admin",
+	"Bot": "bot",
+	"GroupInfo": "Group info",
+	"UserInfo": "User info",
 	
 	"_member": " member",
 	"_members": " members",
@@ -239,5 +277,25 @@
 	
 	"_subscriber": " subscriber",
 	"_subscribers": " subcribers",
-	"_subscribers2": ""
+	"_subscribers2": "",
+	
+	"_photo": " photo",
+	"_photos": " photos",
+	"_photos2": "",
+	
+	"_video": " video",
+	"_videos": " videos",
+	"_videos2": "",
+	
+	"_file": " file",
+	"_files": " files",
+	"_files2": "",
+	
+	"_audioFile": " audio file",
+	"_audioFiles": " audio files",
+	"_audioFiles2": "",
+	
+	"_voiceMessage": " voice message",
+	"_voiceMessages": " voice messages",
+	"_voiceMessages2": ""
 }

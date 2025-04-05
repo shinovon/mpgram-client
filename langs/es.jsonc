@@ -145,6 +145,8 @@
 	"CloudPassword": "Contraseña 2fa",
 	"Captcha": "Codigo de la imagen",
 	"Auth_Btn": "Autorizar",
+	"InvalidCode_Alert": "Codigo invalido",
+	"CodeExpired_Alert": "Codigo caducado!",
 	
 	// Settings sections
 	"UI": "UI",
@@ -174,7 +176,7 @@
 	"LoadAvatars": "Cargar avatares",
 	"MultiThreadedLoading": "Carga multihilo",
 	
-	// Caching settings
+	// Cache settings
 	"AvatarsCaching": "Almacenar cache de avatares",
 	"Disabled": "Desabilitado",
 	"HoldInRAM": "Mantener en RAM",
@@ -194,6 +196,7 @@
 	"Reply_Title": "Respuesta",
 	"Write_Title": "Escribir",
 	"Message": "Mensaje",
+	"EnableHTMLFormatting": "HTML formato",
 	
 	// Alert messages
 	"MessageSent_Alert": "Mensaje enviado",
@@ -208,13 +211,29 @@
 	
 	// Message
 	"ForwardedFrom": "Reenviado desde ",
-	"Media": "Medios",
-	"Poll": "Encuesta",
-	"Geo": "Geo: ",
-	"Action": "Accion",
 	"You": "Tu",
 	"You_Prefix": "Tu: ",
 	"ForwardedMessage": "Mensaje reenviado",
+	"Action": "Accion",
+	
+	// Message media
+	"Media": "Medios",
+	"Poll": "Encuesta",
+	"Geo": "Geo: ",
+	
+	// Chat actions
+	"PinnedMessage_Action": " mensaje anclado",
+	"Joined_Action": " se unió al grupo",
+	"Added_Action": " agregado ",
+	"Left_Action": " dejó el grupo",
+	"Removed_Action": " removido ",
+	"JoinedByLink_Action": " se unió al grupo a través del enlace de invitación",
+	"JoinedByRequest_Action": " fue aceptado en el grupo",
+	"ChatHistoryCleared_Action": "Se borró el historial de chat",
+	"GroupCreated_Action": "Grupo creado",
+	"ChannelCreated_Action": "Canal creado",
+	"PhotoUpdated_Action": "Foto actualizada",
+	"NameChanged_Action": "El nombre fue cambiado a ",
 	
 	// Folders
 	"AllChats": "Todos los chats",

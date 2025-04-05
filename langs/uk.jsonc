@@ -174,7 +174,7 @@
 	"LoadAvatars": "Завантажувати аватарки",
 	"MultiThreadedLoading": "Багатопоточне завантаження",
 	
-	// Caching settings
+	// Cache settings
 	"AvatarsCaching": "Кешування аватарок",
 	"Disabled": "Викл",
 	"HoldInRAM": "Зберігати у ОЗУ",
@@ -208,13 +208,17 @@
 	
 	// Message
 	"ForwardedFrom": "Переслано від ",
-	"Media": "Медіа",
-	"Poll": "Опрос",
-	"Geo": "Геопозиція: ",
-	"Action": "Дія",
 	"You": "Ви",
 	"You_Prefix": "Ви: ",
 	"ForwardedMessage": "Переслане повідомл.",
+	"Action": "Дія",
+	
+	// Message media
+	"Media": "Медіа",
+	"Poll": "Опрос",
+	"Geo": "Геопозиція: ",
+	
+	// Chat actions
 	
 	// Folders
 	"AllChats": "Усі чати",

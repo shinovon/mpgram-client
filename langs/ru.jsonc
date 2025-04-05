@@ -1,15 +1,15 @@
 {
-	// Информация об этом файле локализации
-	"LocaleInfo": "Русский, от shinovon",
+	// About this locale file
+	"LocaleInfo": "Russian, by shinovon",
 	"LocaleSlavicNumerals": "1",
 	
-	// Общие комманды
+	// Common commands
 	"Exit": "Выход",
 	"Back": "Назад",
 	"Settings": "Настройки",
 	"About": "О программе",
 	
-	// Смещение дат
+	// Date offsets
 	"_secondAgo": " секунду назад",
 	"_secondsAgo": " секунды назад",
 	"_secondsAgo2": " секунд назад",
@@ -36,10 +36,13 @@
 	"Today": "сегодня",
 	"Yesterday": "вчера",
 	"LastWeek": "на этой неделе",
-	// Суффиксы дат
+	"LastMonth": "в этом месяце",
+	"ALongTimeAgo": "давно",
+	"Recently": "недавно",
+	// Date suffixes
 	"on_Date": "",
 	"at_Time": " в ",
-	// Месяца
+	// Months
 	"Jan": "Янв",
 	"Feb": "Фев",
 	"Mar": "Мар",
@@ -52,7 +55,7 @@
 	"Oct": "Окт",
 	"Nov": "Ноя",
 	"Dec": "Дек",
-	// Дни недели
+	// Days of week
 	"Sun": "Вс",
 	"Mon": "Пн",
 	"Tue": "Вт",
@@ -68,24 +71,24 @@
 	"Friday": "Пятница",
 	"Saturday": "Cуббота",
 	
-	// Команды авторизации
+	// Auth commands
 	"Auth": "Авторизоваться",
 	"Next": "Далее",
 	"NewSession": "Новая сессия",
 	"ImportSession": "Импортировать сессию",
 	
-	// Команды настроек
+	// Settings commands
 	"Logout": "Выйти",
 	"ClearCache": "Очистить кэш",
 	
-	// Команды списка чатов
+	// Chats list commands
 	"Folders": "Папки",
 	"Refresh": "Обновить",
 	"ArchivedChats": "Архив",
 	"Contacts": "Контакты",
 	"Search": "Поиск",
 	
-	// Команды сообщения
+	// Message commands
 	"OpenChat": "Открыть чат",
 	"Profile": "Профиль",
 	"Reply": "Ответить",
@@ -95,46 +98,50 @@
 	"Delete": "Удалить",
 	"Edit": "Редактировать",
 	"GoTo": "Перейти",
+	"Pin": "Закрепить",
 	
-	// Команды элементов
+	// Item commands
 	"Link_Cmd": "Открыть",
 	"ViewImage": "Показать",
 	"Call": "Позвонить",
 	"Download": "Скачать",
 	
-	// Команды формы чата
+	// Chat form commands
 	"WriteMessage": "Написать сообщение",
 	"LatestMessages_Cmd": "Обновить",
 	"ChatInfo": "Информация о чате",
 	"Older": "Старее",
 	"Newer": "Новее",
+	"SendSticker": "Отправить стикер",
 	
-	// Команды формы написания
+	// Message writing form commands
 	"Send": "Отправить",
 	"OpenTextBox": "Открыть на весь экран",
+	"ChooseFile": "Выбрать файл",
 	
-	// Команды профиля/информации о чате
+	// Profile/chat info commands
 	"Join": "Войти",
 	"JoinGroup": "Вступить в группу",
 	"LeaveGroup": "Покинуть группу",
 	"ChatMedia": "Медиафайлы",
 	"Members": "Участники",
+	"AddToContacts": "Добавить в контакты",
 	
-	// Команды диалогов
-	"Ok": "Ок",
+	// Dialog commands
+	"Ok": "ОК",
 	"Cancel": "Отмена",
 	
-	// Команды пагинации
+	// Pagination commands
 	"NextPage": "След. стр.",
 	"PrevPage": "Прев. стр.",
 	
-	// Состояния загрузки
+	// Loading states
 	"Loading": "Загрузка...",
 	"Authorizing": "Авторизация...",
 	"WaitingForServerResponse": "Ожидание ответа сервера...",
 	"Sending": "Отправка...",
 	
-	// Процесс авторизации
+	// Authorization process
 	"Auth_Title": "Авторизация",
 	"InstanceURL": "URL инстанса",
 	"InstancePassword": "Пароль инстанса",
@@ -145,14 +152,16 @@
 	"CloudPassword": "Облачный пароль",
 	"Captcha": "Капча",
 	"Auth_Btn": "Авторизоваться",
+	"InvalidCode_Alert": "Неправильный код!",
+	"CodeExpired_Alert": "Код истек!",
 	
-	// Секции настроек
+	// Settings sections
 	"UI": "Вид интерфейса",
 	"Behaviour": "Поведение",
 	"Images": "Картинки",
 	"Authorization": "Авторизация",
 	
-	// Настройки UI
+	// UI Settings
 	"Language": "Язык",
 	"ReversedChat": "Перевёрнутый чат",
 	"ShowMedia": "Отобр. медиа",
@@ -161,7 +170,7 @@
 	"ChatsCount": "Кол-во чатов",
 	"MessagesCount": "Кол-во сообщений",
 	
-	// Настройки поведения
+	// Behaviour settings
 	"WaitForPageToLoad": "Ждать полной загрузки",
 	"UseJSONStream": "Исп. JSONStream",
 	"FormatText": "Форматировать текст",
@@ -169,12 +178,12 @@
 	"ChatAutoUpdate": "Авто-обновление чата",
 	"UpdatesTimeout": "Таймаут обновлений",
 	
-	// Настройки изображений
+	// Images settings
 	"LoadMediaThumbnails": "Загружать медиа",
 	"LoadAvatars": "Загружать аватарки",
 	"MultiThreadedLoading": "Многопоточная загрузка",
 	
-	// Настройки кэширования
+	// Cache settings
 	"AvatarsCaching": "Кэшироние аватарок",
 	"Disabled": "Выкл",
 	"HoldInRAM": "Хранить в ОЗУ",
@@ -183,55 +192,84 @@
 	"AvatarsCacheThreshold": "Порог кэширования аватарок",
 	"ProfilesCacheThreshold": "Порог кэширования профилей",
 	
-	// О программе
+	// About
 	"AboutText": "Клиент Telegram для J2ME, основанный на API MPGram Web.",
 	"Developer": "Разработчик",
 	"Author": "Автор",
 	"Donate": "Донат",
 	"Chat": "Чат",
 	
-	// Форма написания
+	// Write form
 	"Reply_Title": "Ответ",
 	"Write_Title": "Сообщение",
 	"Message": "Сообщение",
+	"File": "Файл",
+	"File_Prefix": "Файл: ",
+	"NotSelected": "Не выбран",
+	"SendUncompressed": "Отправить без сжатия",
+	"SendAsVoice": "Отправить как голосовое",
+	"HideWithSpoiler": "Поменить как спойлер",
+	"EnableHTMLFormatting": "HTML-форматирование",
 	
-	// Информационные сообщения
+	// Alert messages
 	"MessageSent_Alert": "Сообщение отправлено",
 	"MessageDeleted_Alert": "Сообщение удалено",
 	"UpdateAvailable_Alert": "Доступно обновление клиента",
 	
-	// Форма чата
+	// Chat form
 	"ChatMedia_Title": "Медиафайлы",
 	"Search_TitlePrefix": "Поиск - ",
 	"OlderMessages": "Старые сообщения",
 	"NewerMessages": "Новые сообщения",
 	
-	// Сообщение
+	// Message
 	"ForwardedFrom": "Переслано от ",
-	"Media": "Медиа",
-	"Poll": "Опрос",
-	"Geo": "Геопозиция: ",
-	"Action": "Действие",
 	"You": "Вы",
 	"You_Prefix": "Вы: ",
 	"ForwardedMessage": "Пересланное сообщ.",
+	"Action": "Действие",
+	"Edited": "изменено",
 	
-	// Папки
+	// Message media
+	"Media": "Медиа",
+	"Poll": "Опрос",
+	"Geo": "Геопозиция: ",
+	
+	// Chat actions
+	"PinnedMessage_Action": " закрепил(а) сообщение",
+	"Joined_Action": " теперь в группе",
+	"Added_Action": " добавил(a) ",
+	"Left_Action": " покинул(а) группу",
+	"Removed_Action": " исключил(а) ",
+	"JoinedByLink_Action": " вступил(а) в группу по ссылке-приглашению",
+	"JoinedByRequest_Action": " принят(а) в группу",
+	"ChatHistoryCleared_Action": "История чата была очищена",
+	"GroupCreated_Action": "Группа создана",
+	"ChannelCreated_Action": "Канал создан",
+	"PhotoUpdated_Action": "Фото изменено",
+	"NameChanged_Action": "Имя было изменено на ",
+	
+	// Folders
 	"AllChats": "Все чаты",
 	"Archive": "Архив",
 	
-	// Профиль/информация о чате
+	// Profile/chat info
 	"Online": "в сети",
 	"Offline": "офлайн",
 	"LastSeen": "был(а) ",
 	"About_User": "О себе",
-	"About_Chat": "Информация",
+	"About_Chat": "Описание",
 	"Mobile": "Телефон",
 	"Username": "Имя пользователя",
 	"Link": "Ссылка",
 	"SearchMessages": "Поиск сообщений",
 	"ViewGroup": "Показать группу",
 	"GoToPinnedMessage": "Открыть закрепленное сообщение",
+	"Owner": "владелец",
+	"Admin": "админ",
+	"Bot": "бот",
+	"GroupInfo": "Group info",
+	"UserInfo": "User info",
 	
 	"_member": " участник",
 	"_members": " участника",
@@ -239,5 +277,25 @@
 	
 	"_subscriber": " подписчик",
 	"_subscribers": " подписчика",
-	"_subscribers2": " подписчиков"
+	"_subscribers2": " подписчиков",
+	
+	"_photo": " photo",
+	"_photos": " photos",
+	"_photos2": " photos",
+	
+	"_video": " video",
+	"_videos": " videos",
+	"_videos2": " videos",
+	
+	"_file": " файл",
+	"_files": " файла",
+	"_files2": " файлов",
+	
+	"_audioFile": " audio file",
+	"_audioFiles": " audio files",
+	"_audioFiles2": " audio files",
+	
+	"_voiceMessage": " voice message",
+	"_voiceMessages": " voice messages",
+	"_voiceMessages2": " voice messages"
 }
