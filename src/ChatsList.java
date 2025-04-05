@@ -105,7 +105,9 @@ public class ChatsList extends MPList implements LangConstants {
 				sb.setLength(0);
 				MP.appendOneLine(sb, MP.getName(user));
 				
-				if (user.has("s")) {
+				if (user.getBoolean("b", false)) { // bot
+					sb.append('\n').append(MP.L[Bot]);
+				} else if (user.has("s")) { // status
 					long wasOnline;
 					if (user.getBoolean("s")) {
 						sb.append('\n').append(MP.L[Online]);
@@ -114,6 +116,9 @@ public class ChatsList extends MPList implements LangConstants {
 					} else {
 						sb.append('\n').append(MP.L[Offline]);
 					}
+				}
+				if (user.getBoolean("a", false)) { // admin
+					sb.append(" (").append(MP.L[Admin]).append(')');
 				}
 				
 				int itemIdx = safeAppend(thread, sb.toString(), null);
