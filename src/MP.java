@@ -134,7 +134,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static String instanceUrl = DEFAULT_INSTANCE_URL;
 	private static String instancePassword;
 	private static int tzOffset;
-	private static boolean symbianJrt;
+	static boolean symbianJrt;
 	static boolean useLoadingForm;
 	private static int avatarSize;
 	private static int photoSize = 120;
@@ -887,14 +887,14 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						if (check) {
 							sb.setLength(0);
 							sb.append("getLastUpdate&peer=").append(form.id);
-							if (offset == 0) {
+							if (offset <= 0) {
 								sb.append("&id=").append(form.firstMsgId);
 							}
 							int off = 0;
 							try {
 								j = ((JSONObject) api(sb.toString())).getObject("res");
-								off = j.getInt("update_id") + 1;
-								if (offset == 0 || off < offset) {
+								off = j.getInt("update_id");
+								if (offset <= 0 || off < offset) {
 									offset = off;
 								}
 							} catch (Exception ignored) {}

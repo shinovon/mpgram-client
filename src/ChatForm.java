@@ -284,7 +284,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 		
 		if (endReached && MP.chatUpdates && mediaFilter == null) {
 			if (MP.updatesThread != null) {
-				MP.updatesThread.interrupt();
+				if (MP.symbianJrt) MP.updatesThread.interrupt();
 				try {
 					MP.updatesConnection.close();
 				} catch (Exception e) {}
@@ -688,7 +688,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 		// close updater loop
 		update = false;
 		if (MP.updatesThread != null) {
-			MP.updatesThread.interrupt();
+			if (MP.symbianJrt) MP.updatesThread.interrupt();
 			try {
 				MP.updatesConnection.close();
 			} catch (Exception e) {}
@@ -746,6 +746,10 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 			break;
 		}
 		case UPDATE_NEW_MESSAGE: {
+			// check for duplicate
+			if (update.getObject("message").getInt("id") == firstMsgId)
+				break;
+			
 			typing = 0;
 			typingThread.interrupt();
 			
@@ -828,7 +832,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 		if ("userStatusOnline".equals(status.getString("_"))) {
 			s = MP.L[Online];
 		} else if(status.has("was_online")) {
-			s = MP.L[LastSeen] + MP.localizeDate(status.getInt("was_online"), 3);
+			s = MP.L[LastSeen] + MP.localizeDate(status.getInt("was_online"), 4);
 		} else {
 			s = MP.L[Offline];
 		}
