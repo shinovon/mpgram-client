@@ -44,7 +44,8 @@ public abstract class MPForm extends Form {
 		loaded = true;
 		canceled = finished = false;
 
-		setTicker(new Ticker("Loading.."));
+		Ticker ticker;
+		setTicker(ticker = new Ticker("Loading.."));
 		if (MP.useLoadingForm) {
 			MP.display(MP.loadingForm);
 		}
@@ -71,7 +72,9 @@ public abstract class MPForm extends Form {
 			MP.display(MP.errorAlert(e.toString()), this);
 			e.printStackTrace();
 		} finally {
-			setTicker(null);
+			if (getTicker() == ticker) {
+				setTicker(null);
+			}
 			
 			if (this.thread == thread) {
 				this.thread = null;

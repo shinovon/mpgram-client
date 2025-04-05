@@ -21,7 +21,6 @@ SOFTWARE.
 */
 import java.util.Vector;
 
-import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.List;
 
 import cc.nnproject.json.JSONArray;
