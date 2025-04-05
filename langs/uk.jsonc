@@ -1,0 +1,242 @@
+{
+	// About this locale file
+	"LocaleInfo": "Ukrainian, by @karusel33",
+	"LocaleSlavicNumerals": "1",
+	
+	// Common commands
+	"Exit": "Вихід",
+	"Back": "Назад",
+	"Settings": "Налаштування",
+	"About": "Про програму",
+	
+	// Date offsets
+	"_secondAgo": " секунду тому",
+	"_secondsAgo": " секунди тому",
+	"_secondsAgo2": " секунд тому",
+	"_minuteAgo": " минуту тому",
+	"_minutesAgo": " минути тому",
+	"_minutesAgo2": " минут тому",
+	"_hourAgo": " годину тому",
+	"_hoursAgo": " години тому",
+	"_hoursAgo2": " годин тому",
+	"_dayAgo": " день тому",
+	"_daysAgo": " дні тому",
+	"_daysAgo2": " днів тому",
+	"_weekAgo": " тиждень тому",
+	"_weeksAgo": " тижні тому",
+	"_weeksAgo2": " тижнів тому",
+	"_monthAgo": " місяць тому",
+	"_monthsAgo": " місяці тому",
+	"_monthsAgo2": " місяців тому",
+	"_yearAgo": " рік тому",
+	"_yearsAgo": " роки тому",
+	"_yearsAgo2": " років тому",
+	"Now": "зараз",
+	"JustNow": "щойно",
+	"Today": "сьогодні",
+	"Yesterday": "вчора",
+	"LastWeek": "цього тижня",
+	// Date suffixes
+	"on_Date": "",
+	"at_Time": " в ",
+	// Months
+	"Jan": "Січ",
+	"Feb": "Лют",
+	"Mar": "Бер",
+	"Apr": "Квіт",
+	"May": "Трав",
+	"Jun": "Чер",
+	"Jul": "Лип",
+	"Aug": "Сер",
+	"Sep": "Вер",
+	"Oct": "Жов",
+	"Nov": "Лист",
+	"Dec": "Груд",
+	// Days of week
+	"Sun": "Нед",
+	"Mon": "Пн",
+	"Tue": "Вівт",
+	"Wed": "Сер",
+	"Thu": "Чт",
+	"Fri": "Вт",
+	"Sat": "Сб",
+	"Sunday": "Неділя",
+	"Monday": "Понеділок",
+	"Tuesday": "Вівторок",
+	"Wednesday": "Середа",
+	"Thursday": "Четвер",
+	"Friday": "П'ятниця",
+	"Saturday": "Cубота",
+	
+	// Auth commands
+	"Auth": "Авторизуватися",
+	"Next": "Далі",
+	"NewSession": "Нова сесія",
+	"ImportSession": "Імпортувати сесію",
+	
+	// Settings commands
+	"Logout": "Вийти",
+	"ClearCache": "Очистити кеш",
+	
+	// Chats list commands
+	"Folders": "Папки",
+	"Refresh": "Оновити",
+	"ArchivedChats": "Архів",
+	"Contacts": "Контакти",
+	"Search": "Пошук",
+	
+	// Message commands
+	"OpenChat": "Відкрити чат",
+	"Profile": "Профіль",
+	"Reply": "Відповісти",
+	"Forward": "Переслати",
+	"CopyMessage": "Копіювати текст",
+	"CopyMessageLink": "Копіювати посилання",
+	"Delete": "Видалити",
+	"Edit": "Редагувати",
+	"GoTo": "Перейти",
+	
+	// Item commands
+	"Link_Cmd": "Відкрити",
+	"ViewImage": "Показати",
+	"Call": "Зателефонувати",
+	"Download": "Завантижити",
+	
+	// Chat form commands
+	"WriteMessage": "Надіслати повідомлення",
+	"LatestMessages_Cmd": "Оновити",
+	"ChatInfo": "Інформація про чат",
+	"Older": "Старше",
+	"Newer": "Новіше",
+	
+	// Message writing form commands
+	"Send": "Відправити",
+	"OpenTextBox": "Відкрити на весь екран",
+	
+	// Profile/chat info commands
+	"Join": "Увійти",
+	"JoinGroup": "Вступити до групи",
+	"LeaveGroup": "Покинути групу",
+	"ChatMedia": "Медіафайли",
+	"Members": "Учасники",
+	
+	// Dialog commands
+	"Ok": "Ок",
+	"Cancel": "Скасувати",
+	
+	// Pagination commands
+	"NextPage": "Наст. Стор",
+	"PrevPage": "Поперед. Стор.",
+	
+	// Loading states
+	"Loading": "Завантаження...",
+	"Authorizing": "Авторизація...",
+	"WaitingForServerResponse": "Очікування відповіді сервера...",
+	"Sending": "Надсилання...",
+	
+	// Authorization process
+	"Auth_Title": "Авторизація",
+	"InstanceURL": "URL інстансу",
+	"InstancePassword": "Пароль інстансу",
+	"ChooseAuthMethod": "Виберіть спосіб авторизації",
+	"PhoneNumber": "Номер телефону",
+	"SessionCode": "код сесії",
+	"Code": "Код",
+	"CloudPassword": "Хмарний пароль",
+	"Captcha": "Капча",
+	"Auth_Btn": "Авторизуватися",
+	
+	// Settings sections
+	"UI": "Вигляд інтерфейсу",
+	"Behaviour": "Поведінка",
+	"Images": "Картинки",
+	"Authorization": "Авторизація",
+	
+	// UI Settings
+	"Language": "Мова",
+	"ReversedChat": "Перевернутий чат",
+	"ShowMedia": "Відобр. медіа",
+	"ShowChatStatus": "Відобр. статус чату",
+	"ThumbnailsSize": "Розмір картинок",
+	"ChatsCount": "Кількість чатів",
+	"MessagesCount": "Кількість повідомлень",
+	
+	// Behaviour settings
+	"WaitForPageToLoad": "Чекати повного завантаження",
+	"UseJSONStream": "Вик. JSONStream",
+	"FormatText": "Форматувати текст",
+	"ParseLinks": "Парсі посилання",
+	"ChatAutoUpdate": "Авто-оновлення чата",
+	"UpdatesTimeout": "Таймаут оновлення",
+	
+	// Images settings
+	"LoadMediaThumbnails": "Завантажувати медіа",
+	"LoadAvatars": "Завантажувати аватарки",
+	"MultiThreadedLoading": "Багатопоточне завантаження",
+	
+	// Caching settings
+	"AvatarsCaching": "Кешування аватарок",
+	"Disabled": "Викл",
+	"HoldInRAM": "Зберігати у ОЗУ",
+	"Store": "Зберігати у RMS",
+	"HoldInRAMandStore": "Зберігати у ОЗУ і в RMS",
+	"AvatarsCacheThreshold": "Поріг кешування аватарок",
+	"ProfilesCacheThreshold": "Поріг кешування профилей",
+	
+	// About
+	"AboutText": "Клієнт Telegram для J2ME заснований на API MPGram Web.",
+	"Developer": "Розробник",
+	"Author": "Автор",
+	"Donate": "Донат",
+	"Chat": "Чат",
+	
+	// Write form
+	"Reply_Title": "Відповідь",
+	"Write_Title": "Повідомлення",
+	"Message": "Повідомлення",
+	
+	// Alert messages
+	"MessageSent_Alert": "Повідомлення відправлено",
+	"MessageDeleted_Alert": "Повідомлення видалено",
+	"UpdateAvailable_Alert": "Доступне оновлення клієнта",
+	
+	// Chat form
+	"ChatMedia_Title": "Медіафайли",
+	"Search_TitlePrefix": "Пошук - ",
+	"OlderMessages": "Нові повідомлення",
+	"NewerMessages": "Старі повідомлення",
+	
+	// Message
+	"ForwardedFrom": "Переслано від ",
+	"Media": "Медіа",
+	"Poll": "Опрос",
+	"Geo": "Геопозиція: ",
+	"Action": "Дія",
+	"You": "Ви",
+	"You_Prefix": "Ви: ",
+	"ForwardedMessage": "Переслане повідомл.",
+	
+	// Folders
+	"AllChats": "Усі чати",
+	"Archive": "Архів",
+	
+	// Profile/chat info
+	"Online": "онлайн",
+	"Offline": "офлайн",
+	"LastSeen": "був/була ",
+	"About_User": "Інформація",
+	"About_Chat": "Інформація",
+	"Username": "Username",
+	"Link": "Посилання",
+	"SearchMessages": "Пошук повідомлень",
+	"ViewGroup": "Показати групу",
+	"GoToPinnedMessage": "Відкрити закріплене повідомлення",
+	
+	"_member": " учасник",
+	"_members": " учасника",
+	"_members2": "учасників",
+	
+	"_subscriber": " підписник",
+	"_subscribers": " підписника",
+	"_subscribers2": " підписників"
+}

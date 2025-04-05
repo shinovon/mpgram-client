@@ -1,10 +1,15 @@
 {
-	"LocaleInfo": "Built-in",
+	// About this locale file
+	"LocaleInfo": "English, by shinovon",
+	"LocaleSlavicNumerals": "",
+	
+	// Common commands
 	"Exit": "Exit",
 	"Back": "Back",
 	"Settings": "Settings",
 	"About": "About",
 	
+	// Date offsets
 	"_secondAgo": " second ago",
 	"_secondsAgo": " seconds ago",
 	"_secondsAgo2": "",
@@ -26,6 +31,15 @@
 	"_yearAgo": " year ago",
 	"_yearsAgo": " years ago",
 	"_yearsAgo2": "",
+	"Now": "now",
+	"JustNow": "just now",
+	"Today": "today",
+	"Yesterday": "yesterday",
+	"LastWeek": "last week",
+	// Date suffixes
+	"on_Date": "on ",
+	"at_Time": " at ",
+	// Months
 	"Jan": "Jan",
 	"Feb": "Feb",
 	"Mar": "Mar",
@@ -38,13 +52,7 @@
 	"Oct": "Oct",
 	"Nov": "Nov",
 	"Dec": "Dec",
-	"on_Date": "on ",
-	"at_Time": " at ",
-	"Now": "now",
-	"JustNow": "just now",
-	"Today": "today",
-	"Yesterday": "yesterday",
-	"LastWeek": "last week",
+	// Days of week
 	"Sun": "Sun",
 	"Mon": "Mon",
 	"Tue": "Tue",
@@ -60,20 +68,24 @@
 	"Friday": "Friday",
 	"Saturday": "Saturday",
 	
+	// Auth commands
 	"Auth": "Auth",
 	"Next": "Next",
 	"NewSession": "New session",
 	"ImportSession": "Import session",
 	
+	// Settings commands
 	"Logout": "Logout",
 	"ClearCache": "Clear cache",
 	
+	// Chats list commands
 	"Folders": "Folders",
 	"Refresh": "Refresh",
 	"ArchivedChats": "Archived chats",
 	"Contacts": "Contacts",
 	"Search": "Search",
 	
+	// Message commands
 	"OpenChat": "Open chat",
 	"Profile": "Profile",
 	"Reply": "Reply",
@@ -84,36 +96,45 @@
 	"Edit": "Edit",
 	"GoTo": "Go to",
 	
+	// Item commands
 	"Link_Cmd": "Link",
 	"ViewImage": "View image",
 	"Call": "Call",
 	"Download": "Download",
+	
+	// Chat form commands
 	"WriteMessage": "Write message",
 	"LatestMessages_Cmd": "Refresh",
 	"ChatInfo": "Chat info",
 	"Older": "Older",
 	"Newer": "Newer",
 	
+	// Message writing form commands
 	"Send": "Send",
 	"OpenTextBox": "Open text box",
 	
+	// Profile/chat info commands
 	"Join": "Join",
 	"JoinGroup": "Join group",
 	"LeaveGroup": "Leave group",
 	"ChatMedia": "Chat media",
 	"Members": "Members",
 	
+	// Dialog commands
 	"Ok": "Ok",
 	"Cancel": "Cancel",
 	
+	// Pagination commands
 	"NextPage": "Next page",
 	"PrevPage": "Prev page",
 	
+	// Loading states
 	"Loading": "Loading",
 	"Authorizing": "Authorizing",
 	"WaitingForServerResponse": "Waiting for server response...",
 	"Sending": "Sending",
 	
+	// Authorization process
 	"Auth_Title": "Auth",
 	"InstanceURL": "Instance URL",
 	"InstancePassword": "Instance Password",
@@ -125,11 +146,13 @@
 	"Captcha": "Captcha",
 	"Auth_Btn": "Authorize",
 	
+	// Settings sections
 	"UI": "UI",
 	"Behaviour": "Behaviour",
 	"Images": "Images",
 	"Authorization": "Authorization",
 	
+	// UI Settings
 	"Language": "Language",
 	"ReversedChat": "Reversed chat",
 	"ShowMedia": "Show media",
@@ -138,6 +161,7 @@
 	"ChatsCount": "Chats count",
 	"MessagesCount": "Messages count",
 	
+	// Behaviour settings
 	"WaitForPageToLoad": "Wait for page to load",
 	"UseJSONStream": "Use JSONStream",
 	"FormatText": "Format text",
@@ -145,10 +169,12 @@
 	"ChatAutoUpdate": "Chat auto-update",
 	"UpdatesTimeout": "Updates timeout",
 	
+	// Images settings
 	"LoadMediaThumbnails": "Load media thumbnails",
 	"LoadAvatars": "Load avatars",
 	"MultiThreadedLoading": "Multi-threaded loading",
 	
+	// Caching settings
 	"AvatarsCaching": "Avatars caching",
 	"Disabled": "Disabled",
 	"HoldInRAM": "Hold in RAM",
@@ -157,25 +183,30 @@
 	"AvatarsCacheThreshold": "Avatars cache threshold",
 	"ProfilesCacheThreshold": "Profiles cache threshold",
 	
+	// About
 	"AboutText": "Server-assisted Telegram client for J2ME, based on MPGram Web API.",
 	"Developer": "Developer",
 	"Author": "Author",
 	"Donate": "Donate",
 	"Chat": "Chat",
 	
+	// Write form
 	"Reply_Title": "Reply",
 	"Write_Title": "Write",
 	"Message": "Message",
 	
+	// Alert messages
 	"MessageSent_Alert": "Message sent",
 	"MessageDeleted_Alert": "Message deleted",
 	"UpdateAvailable_Alert": "New update available",
 	
+	// Chat form
 	"ChatMedia_Title": "Media",
 	"Search_TitlePrefix": "Search - ",
 	"OlderMessages": "Older messages",
 	"NewerMessages": "Newer messages",
 	
+	// Message
 	"ForwardedFrom": "Forwarded from ",
 	"Media": "Media",
 	"Poll": "Poll",
@@ -185,9 +216,11 @@
 	"You_Prefix": "You: ",
 	"ForwardedMessage": "Forwarded message",
 	
+	// Folders
 	"AllChats": "All chats",
 	"Archive": "Archive",
 	
+	// Profile/chat info
 	"Online": "online",
 	"Offline": "offline",
 	"LastSeen": "last seen ",

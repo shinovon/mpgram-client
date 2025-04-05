@@ -4,3 +4,7 @@ deployed
 bin
 *.class
 *.jar
+
+# see langs/compile.py
+src/LangConstants.java
+res/l

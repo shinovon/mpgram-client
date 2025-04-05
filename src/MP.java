@@ -88,9 +88,21 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 	static final String API_VERSION = "5";
 	
-	static final String[] LANGS = {
-		"en",
-		"ru",
+	static final String[][] LANGS = {
+		{
+			"en",
+			"es",
+			"fi",
+			"ru",
+			"uk",
+		},
+		{
+			"English",
+			"Español",
+			"Suomi",
+			"Русский",
+			"Українська",
+		}
 	};
 	
 	static final Font largePlainFont = Font.getFont(0, 0, Font.SIZE_LARGE);
@@ -1226,9 +1238,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					s.setFont(largePlainFont);
 					f.append(s);
 					
-					langChoice = new ChoiceGroup(L[Language], Choice.POPUP, LANGS, null);
-					for (int i = 0; i < LANGS.length; ++i) {
-						if (lang.equals(LANGS[i])) {
+					langChoice = new ChoiceGroup(L[Language], Choice.POPUP, LANGS[1], null);
+					for (int i = 0; i < LANGS[0].length; ++i) {
+						if (lang.equals(LANGS[0][i])) {
 							langChoice.setSelectedIndex(i, true);
 							break;
 						}
@@ -1341,7 +1353,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			if (c == backCmd && d == settingsForm) {
 				// apply and save settings
-				lang = LANGS[langChoice.getSelectedIndex()];
+				lang = LANGS[0][langChoice.getSelectedIndex()];
 				
 				reverseChat = uiChoice.isSelected(0);
 				showMedia = uiChoice.isSelected(1);
@@ -2510,10 +2522,30 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				.append(n((int) date % 60));
 	}
 
-	static String localizeAmount(int n, int i) {
-		boolean ru = "ru".equals(lang);
-		return Integer.toString(n).concat(L[n == 1 || (ru && n % 10 == 1 && n % 100 != 11) ?
-				i : (ru && (n % 10 > 4 || n % 10 < 2) ? (i + 2) : (i + 1))]);
+	static String localizeNumeral(int n, int i) {
+		String s = Integer.toString(n);
+		if (L[LocaleSlavicNumerals].length() == 0) return s.concat(L[n == 1 ? i : i + 1]);
+		
+		int a = n % 10;
+		int b = n % 100;
+		if ("pl".equals(lang) ? n == 1 : a == 1 && b != 11)
+			return s.concat(L[i]);
+		if ((a >= 2 || a <= 4) && !(b >= 12 && b <= 14))
+			return s.concat(L[i + 1]);
+		return s.concat(L[i + 2]);
+	}
+	
+	static StringBuffer appendLocalizedNumeral(StringBuffer sb, int n, int i) {
+		sb.append(n);
+		if (L[LocaleSlavicNumerals].length() == 0) return sb.append(L[n == 1 ? i : i + 1]);
+		
+		int a = n % 10;
+		int b = n % 100;
+		if ("pl".equals(lang) ? n == 1 : a == 1 && b != 11)
+			return sb.append(L[i]);
+		if ((a >= 2 || a <= 4) && !(b >= 12 && b <= 14))
+			return sb.append(L[i + 1]);
+		return sb.append(L[i + 2]);
 	}
 
 	// mode: 0 - date, 1 - detailed date, 2 - short date, 3 - last seen detailed, 4 - last seen
@@ -2534,20 +2566,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			
 			if (d < 60 * 60) {
 				d /= 60L;
-				if (d == 1 || (ru && d % 10 == 1 && d % 100 != 11))
-					return sb.append((int) d).append(L[_minuteAgo]).toString();
-				if (ru && (d % 10 > 4 || d % 10 < 2))
-					return sb.append((int) d).append(L[_minutesAgo2]).toString();
-				return sb.append((int) d).append(L[_minutesAgo]).toString();
+				return appendLocalizedNumeral(sb, (int) d, _minutesAgo).toString();
 			}
 			
 			if (d < 12 * 60 * 60) {
 				d /= 60 * 60L;
-				if (d == 1 || (ru && d % 10 == 1 && d % 100 != 11))
-					return sb.append((int) d).append(L[_hoursAgo]).toString();
-				if (ru && (d % 10 > 4 || d % 10 < 2))
-					return sb.append((int) d).append(L[_hoursAgo2]).toString();
-				return sb.append((int) d).append(L[_hoursAgo]).toString();
+				return appendLocalizedNumeral(sb, (int) d, _hoursAgo).toString();
 			}
 		}
 		

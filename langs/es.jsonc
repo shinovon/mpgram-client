@@ -1,0 +1,242 @@
+{
+	// About this locale file
+	"LocaleInfo": "Spanish, by @jazminrocio",
+	"LocaleSlavicNumerals": "",
+	
+	// Common commands
+	"Exit": "Salir",
+	"Back": "Atras",
+	"Settings": "Ajustes",
+	"About": "Sobre",
+	
+	// Date offsets
+	"_secondAgo": " hace un segundo",
+	"_secondsAgo": " hace segundos",
+	"_secondsAgo2": "",
+	"_minuteAgo": " hace un minuto",
+	"_minutesAgo": " hace minutos",
+	"_minutesAgo2": "",
+	"_hourAgo": " hace una hora",
+	"_hoursAgo": " hace horas",
+	"_hoursAgo2": "",
+	"_dayAgo": " hace dias",
+	"_daysAgo": " hace dias",
+	"_daysAgo2": "",
+	"_weekAgo": " hace una semana",
+	"_weeksAgo": " hace semanas",
+	"_weeksAgo2": "",
+	"_monthAgo": " hace un mes",
+	"_monthsAgo": " haces meses",
+	"_monthsAgo2": "",
+	"_yearAgo": " hace tiempo",
+	"_yearsAgo": " hace mucho tiempo",
+	"_yearsAgo2": "",
+	"Now": "ahora",
+	"JustNow": "justo ahora",
+	"Today": "hoy",
+	"Yesterday": "ayer",
+	"LastWeek": "la semana pasada",
+	// Date suffixes
+	"on_Date": "sobre ",
+	"at_Time": " at ",
+	// Months
+	"Jan": "Enero",
+	"Feb": "Feb",
+	"Mar": "Mar",
+	"Apr": "Abril",
+	"May": "Mayo",
+	"Jun": "Jun",
+	"Jul": "Jul",
+	"Aug": "Ago",
+	"Sep": "Sep",
+	"Oct": "Oct",
+	"Nov": "Nov",
+	"Dec": "Dec",
+	// Days of week
+	"Sun": "Dom",
+	"Mon": "Lun",
+	"Tue": "Mar",
+	"Wed": "Mier",
+	"Thu": "Jue",
+	"Fri": "Vier",
+	"Sat": "Sab",
+	"Sunday": "Domingo",
+	"Monday": "Lunes",
+	"Tuesday": "Martes",
+	"Wednesday": "Miercoles",
+	"Thursday": "Jueves",
+	"Friday": "Viernes",
+	"Saturday": "Sabado",
+	
+	// Auth commands
+	"Auth": "Autorizacion",
+	"Next": "Siguiente",
+	"NewSession": "Nueva sesion",
+	"ImportSession": "Importar sesion",
+	
+	// Settings commands
+	"Logout": "Cerrar sesion",
+	"ClearCache": "Eliminar mugre",
+	
+	// Chats list commands
+	"Folders": "Carpetas",
+	"Refresh": "Actualizar",
+	"ArchivedChats": "Chats archivados",
+	"Contacts": "Contactos",
+	"Search": "Busqueda",
+	
+	// Message commands
+	"OpenChat": "Abrir chat",
+	"Profile": "Perfil",
+	"Reply": "Responder mensaje",
+	"Forward": "Adjuntar mensajes",
+	"CopyMessage": "Copiar mensaje",
+	"CopyMessageLink": "Copiar enlace del mensaje",
+	"Delete": "Eliminar",
+	"Edit": "Editar",
+	"GoTo": "Ir a",
+	
+	// Item commands
+	"Link_Cmd": "Enlace",
+	"ViewImage": "Ver imagen",
+	"Call": "Llamar",
+	"Download": "Descargar",
+	
+	// Chat form commands
+	"WriteMessage": "Escribir mensaje",
+	"LatestMessages_Cmd": "Actualizar",
+	"ChatInfo": "Chat info",
+	"Older": "Mensajes antiguos",
+	"Newer": "Mensajes mas recientes",
+	
+	// Message writing form commands
+	"Send": "Enviar",
+	"OpenTextBox": "Abrir cuadro de texto",
+	
+	// Profile/chat info commands
+	"Join": "Unirse",
+	"JoinGroup": "Unirse al grupo",
+	"LeaveGroup": "Dejar el grupo",
+	"ChatMedia": "Documentos del chat",
+	"Members": "Miembros",
+	
+	// Dialog commands
+	"Ok": "Aceptar",
+	"Cancel": "Cancelar",
+	
+	// Pagination commands
+	"NextPage": "Pagina siguiente",
+	"PrevPage": "Pagina anterior",
+	
+	// Loading states
+	"Loading": "Cargando",
+	"Authorizing": "Autorizando",
+	"WaitingForServerResponse": "Esperando respuesta del servidor...",
+	"Sending": "Enviando",
+	
+	// Authorization process
+	"Auth_Title": "Autorizacion",
+	"InstanceURL": "Instancia URL",
+	"InstancePassword": "Contraseña de Instancia",
+	"ChooseAuthMethod": "Elija el método de autorización",
+	"PhoneNumber": "Numero de telefono",
+	"SessionCode": "Codigo de sesión",
+	"Code": "Codigo",
+	"CloudPassword": "Contraseña 2fa",
+	"Captcha": "Codigo de la imagen",
+	"Auth_Btn": "Autorizar",
+	
+	// Settings sections
+	"UI": "UI",
+	"Behaviour": "Caracteristicas",
+	"Images": "Imagenes",
+	"Authorization": "Autorizacion",
+	
+	// UI Settings
+	"Language": "Lenguaje",
+	"ReversedChat": "Invertir chat",
+	"ShowMedia": "Mostrar medios",
+	"ShowChatStatus": "Mostrar el estado del chat",
+	"ThumbnailsSize": "Tamaño de miniaturas",
+	"ChatsCount": "Contador de chats",
+	"MessagesCount": " Contador de mensajes",
+	
+	// Behaviour settings
+	"WaitForPageToLoad": "Espere a que se cargue la pagina",
+	"UseJSONStream": "Usar JSONStream",
+	"FormatText": "Formato de texto",
+	"ParseLinks": "Analizar enlaces",
+	"ChatAutoUpdate": "Actualización automatica del chat",
+	"UpdatesTimeout": "Tiempo de espera de actualizaciones",
+	
+	// Images settings
+	"LoadMediaThumbnails": "Cargar miniaturas de medios",
+	"LoadAvatars": "Cargar avatares",
+	"MultiThreadedLoading": "Carga multihilo",
+	
+	// Caching settings
+	"AvatarsCaching": "Almacenar cache de avatares",
+	"Disabled": "Desabilitado",
+	"HoldInRAM": "Mantener en RAM",
+	"Store": "Tienda",
+	"HoldInRAMandStore": "Mantener en RAM y almacenar",
+	"AvatarsCacheThreshold": "Limite de cache de avatares",
+	"ProfilesCacheThreshold": "Limite de cache de perfiles",
+	
+	// About
+	"AboutText": "Cliente de Telegram asistido por servidor para J2ME, basado en la API web de MPGram.",
+	"Developer": "Desarrollador",
+	"Author": "Autor",
+	"Donate": "Donar",
+	"Chat": "Chat",
+	
+	// Write form
+	"Reply_Title": "Respuesta",
+	"Write_Title": "Escribir",
+	"Message": "Mensaje",
+	
+	// Alert messages
+	"MessageSent_Alert": "Mensaje enviado",
+	"MessageDeleted_Alert": "Mensaje eliminado",
+	"UpdateAvailable_Alert": "Nueva actualización disponible",
+	
+	// Chat form
+	"ChatMedia_Title": "Media",
+	"Search_TitlePrefix": "Buscar - ",
+	"OlderMessages": "Mensajes antiguos",
+	"NewerMessages": "Mensajes mas recientes",
+	
+	// Message
+	"ForwardedFrom": "Reenviado desde ",
+	"Media": "Medios",
+	"Poll": "Encuesta",
+	"Geo": "Geo: ",
+	"Action": "Accion",
+	"You": "Tu",
+	"You_Prefix": "Tu: ",
+	"ForwardedMessage": "Mensaje reenviado",
+	
+	// Folders
+	"AllChats": "Todos los chats",
+	"Archive": "Archivo",
+	
+	// Profile/chat info
+	"Online": "En linea",
+	"Offline": "Apagado",
+	"LastSeen": "visto por última vez ",
+	"About_User": "Bio",
+	"About_Chat": "Sobre",
+	"Username": "Nombre de Usuario",
+	"Link": "Enlace",
+	"SearchMessages": "Buscar mensajes",
+	"ViewGroup": "Ver grupo",
+	"GoToPinnedMessage": "Ver mensaje anclado",
+	
+	"_member": " miembro",
+	"_members": " miembros",
+	"_members2": "",
+	
+	"_subscriber": " suscriptor",
+	"_subscribers": " suscriptores",
+	"_subscribers2": ""
+}

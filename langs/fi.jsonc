@@ -1,10 +1,15 @@
 {
-	"LocaleInfo": "Sisäänrakennettu",
+	// About this locale file
+	"LocaleInfo": "Finnish, by @gtrxac",
+	"LocaleSlavicNumerals": "",
+	
+	// Common commands
 	"Exit": "Poistu",
 	"Back": "Takaisin",
 	"Settings": "Asetukset",
 	"About": "Tietoja",
 	
+	// Date offsets
 	"_secondAgo": " sekunti sitten",
 	"_secondsAgo": " sekuntia sitten",
 	"_secondsAgo2": "",
@@ -26,6 +31,15 @@
 	"_yearAgo": " vuosi sitten",
 	"_yearsAgo": " vuotta sitten",
 	"_yearsAgo2": "",
+	"Now": "nyt",
+	"JustNow": "hiljattain",
+	"Today": "tänään",
+	"Yesterday": "eilen",
+	"LastWeek": "viime viikolla",
+	// Date suffixes
+	"on_Date": "",
+	"at_Time": " klo ",
+	// Months
 	"Jan": "tammi",
 	"Feb": "helmi",
 	"Mar": "maalis",
@@ -38,13 +52,7 @@
 	"Oct": "loka",
 	"Nov": "marras",
 	"Dec": "joulu",
-	"on_Date": "",
-	"at_Time": " klo ",
-	"Now": "nyt",
-	"JustNow": "hiljattain",
-	"Today": "tänään",
-	"Yesterday": "eilen",
-	"LastWeek": "viime viikolla",
+	// Days of week
 	"Sun": "su",
 	"Mon": "ma",
 	"Tue": "ti",
@@ -60,20 +68,24 @@
 	"Friday": "perjantai",
 	"Saturday": "lauantai",
 	
+	// Auth commands
 	"Auth": "Kirjaudu",
 	"Next": "Seuraava",
 	"NewSession": "Uusi istunto",
 	"ImportSession": "Tuo istunto",
 	
+	// Settings commands
 	"Logout": "Kirjaudu ulos",
 	"ClearCache": "Tyhjennä välimuisti",
 	
+	// Chats list commands
 	"Folders": "Kansiot",
 	"Refresh": "Päivitä",
 	"ArchivedChats": "Arkistoidut keskustelut",
 	"Contacts": "Yhteystiedot",
 	"Search": "Haku",
 	
+	// Message commands
 	"OpenChat": "Avaa keskustelu",
 	"Profile": "Profiili",
 	"Reply": "Vastaa",
@@ -84,36 +96,45 @@
 	"Edit": "Muokkaa",
 	"GoTo": "Siirry",
 	
+	// Item commands
 	"Link_Cmd": "Linkki",
 	"ViewImage": "Näytä kuva",
 	"Call": "Soita",
 	"Download": "Lataa",
+	
+	// Chat form commands
 	"WriteMessage": "Kirjoita viesti",
 	"LatestMessages_Cmd": "Päivitä",
 	"ChatInfo": "Keskustelun tiedot",
 	"Older": "Vanhemmat",
 	"Newer": "Uudemmat",
 	
+	// Message writing form commands
 	"Send": "Lähetä",
 	"OpenTextBox": "Avaa tekstiruutu",
 	
+	// Profile/chat info commands
 	"Join": "Liity",
 	"JoinGroup": "Liity ryhmään",
 	"LeaveGroup": "Poistu ryhmästä",
 	"ChatMedia": "Keskustelun media",
 	"Members": "Jäsenet",
 	
+	// Dialog commands
 	"Ok": "OK",
 	"Cancel": "Peruuta",
 	
+	// Pagination commands
 	"NextPage": "Seuraava sivu",
 	"PrevPage": "Edellinen sivu",
 	
+	// Loading states
 	"Loading": "Ladataan",
 	"Authorizing": "Kirjaudutaan sisään",
 	"WaitingForServerResponse": "Odotetaan palvelimen vastausta...",
 	"Sending": "Lähetetään",
 	
+	// Authorization process
 	"Auth_Title": "Kirjaudu",
 	"InstanceURL": "Palvelimen osoite",
 	"InstancePassword": "Palvelimen salasana",
@@ -125,11 +146,13 @@
 	"Captcha": "Captcha",
 	"Auth_Btn": "Kirjaudu",
 	
+	// Settings sections
 	"UI": "Käyttöliittymä",
 	"Behaviour": "Yleiset",
 	"Images": "Kuvat",
 	"Authorization": "Kirjautuminen",
 	
+	// UI Settings
 	"Language": "Kieli",
 	"ReversedChat": "Vaihda viestien järjestystä",
 	"ShowMedia": "Näytä media",
@@ -138,6 +161,7 @@
 	"ChatsCount": "Keskustelujen määrä",
 	"MessagesCount": "Viestien määrä",
 	
+	// Behaviour settings
 	"WaitForPageToLoad": "Odota sivun latausta",
 	"UseJSONStream": "Käytä JSON-streamia",
 	"FormatText": "Tekstin muotoilu",
@@ -145,10 +169,12 @@
 	"ChatAutoUpdate": "Autom. päivitys",
 	"UpdatesTimeout": "Päivitysten aikaväli",
 	
+	// Images settings
 	"LoadMediaThumbnails": "Kuvien esikatselu",
 	"LoadAvatars": "Profiilikuvat",
 	"MultiThreadedLoading": "Monisäikeinen lataus",
 	
+	// Caching settings
 	"AvatarsCaching": "Prof.kuvien välimuisti",
 	"Disabled": "Pois",
 	"HoldInRAM": "Pidä muistissa",
@@ -157,25 +183,30 @@
 	"AvatarsCacheThreshold": "Prof.kuvien välimuistin koko",
 	"ProfilesCacheThreshold": "Profiilien välimuistin koko",
 	
+	// About
 	"AboutText": "MPGram Web -rajapintaan perustuva Telegram-asiakasohjelma J2ME-alustalle.",
 	"Developer": "Kehittäjä",
 	"Author": "Tekijä",
 	"Donate": "Lahjoita",
 	"Chat": "Chat",
 	
+	// Write form
 	"Reply_Title": "Vastaa",
 	"Write_Title": "Kirjoita",
 	"Message": "Viesti",
 	
+	// Alert messages
 	"MessageSent_Alert": "Viesti lähetetty",
 	"MessageDeleted_Alert": "Viesti poistettu",
 	"UpdateAvailable_Alert": "Päivitys saatavilla",
 	
+	// Chat form
 	"ChatMedia_Title": "Media",
 	"Search_TitlePrefix": "Haku - ",
 	"OlderMessages": "Vanhemmat viestit",
 	"NewerMessages": "Uudemmat viestit",
 	
+	// Message
 	"ForwardedFrom": "Välitetty käyttäjältä ",
 	"Media": "Media",
 	"Poll": "Kysely",
@@ -185,9 +216,11 @@
 	"You_Prefix": "Sinä: ",
 	"ForwardedMessage": "Välitetty viesti",
 	
+	// Folders
 	"AllChats": "Kaikki keskustelut",
 	"Archive": "Arkisto",
 	
+	// Profile/chat info
 	"Online": "paikalla",
 	"Offline": "ei paikalla",
 	"LastSeen": "nähty ",

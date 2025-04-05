@@ -268,7 +268,7 @@ public class ChatForm extends MPForm implements LangConstants {
 				lastMsgId = id;
 			}
 			
-			insert = message(message, insert, sb, c, reverse, selfChat, item);
+			insert = message(message, insert, sb, c, reverse, selfChat, false, item);
 
 			if (this.messageId != 0 ? (messageId == id)
 					: (i == 0 ? ((endReached && dir == 0) || dir == -1) : (i == l - 1 ? (dir == 1) : false))) {
@@ -290,7 +290,7 @@ public class ChatForm extends MPForm implements LangConstants {
 		}
 	}
 
-	private int message(JSONObject message, int insert, StringBuffer sb, Calendar c, boolean reverse, boolean selfChat, Item[] itemPtr) {
+	private int message(JSONObject message, int insert, StringBuffer sb, Calendar c, boolean reverse, boolean selfChat, boolean edit, Item[] itemPtr) {
 		StringItem s;
 		String t;
 		Item msgItem = null;
@@ -309,7 +309,7 @@ public class ChatForm extends MPForm implements LangConstants {
 		long date = message.getLong("date");
 		c.setTime(new Date(date * 1000L));
 		int d;
-		if (lastDay != (d = c.get(Calendar.DAY_OF_MONTH) + 100 * c.get(Calendar.MONTH) + 10000 * c.get(Calendar.YEAR))) {
+		if (!edit && lastDay != (d = c.get(Calendar.DAY_OF_MONTH) + 100 * c.get(Calendar.MONTH) + 10000 * c.get(Calendar.YEAR))) {
 			s = new StringItem(null, MP.localizeDate(date, 0));
 			s.setFont(MP.largePlainFont);
 			s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -747,6 +747,7 @@ public class ChatForm extends MPForm implements LangConstants {
 					Calendar.getInstance(),
 					reverse,
 					MP.selfId.equals(this.id),
+					false,
 					item);
 			firstMsgId = update.getObject("message").getInt("id");
 			if (item[0] != null && MP.focusNewMessages && MP.current == this) {
@@ -779,6 +780,7 @@ public class ChatForm extends MPForm implements LangConstants {
 					Calendar.getInstance(),
 					reverse,
 					MP.selfId.equals(this.id),
+					true,
 					item);
 		}
 		}
