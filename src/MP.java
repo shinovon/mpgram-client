@@ -95,6 +95,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			"fi",
 			"ru",
 			"uk",
+			"ar",
 		},
 		{
 			"English",
@@ -102,6 +103,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			"Suomi",
 			"Русский",
 			"Українська",
+			"العربية"
 		}
 	};
 	
@@ -2522,26 +2524,28 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				.append(n((int) date % 60));
 	}
 
-	static String localizeNumeral(int n, int i) {
+	static String localizePlural(int n, int i) {
 		String s = Integer.toString(n);
-		if (L[LocaleSlavicNumerals].length() == 0) return s.concat(L[n == 1 ? i : i + 1]);
+		if (L[LocaleSlavicPlurals].length() == 0)
+			return s.concat(L[n == 1 ? i : i + 1]);
 		
 		int a = n % 10;
 		int b = n % 100;
-		if ("pl".equals(lang) ? n == 1 : a == 1 && b != 11)
+		if ("pl".equals(lang) ? n == 1 : (a == 1 && b != 11))
 			return s.concat(L[i]);
 		if ((a >= 2 && a <= 4) && !(b >= 12 && b <= 14))
 			return s.concat(L[i + 1]);
 		return s.concat(L[i + 2]);
 	}
 	
-	static StringBuffer appendLocalizedNumeral(StringBuffer sb, int n, int i) {
+	static StringBuffer appendLocalizedPlural(StringBuffer sb, int n, int i) {
 		sb.append(n);
-		if (L[LocaleSlavicNumerals].length() == 0) return sb.append(L[n == 1 ? i : i + 1]);
+		if (L[LocaleSlavicPlurals].length() == 0)
+			return sb.append(L[n == 1 ? i : i + 1]);
 		
 		int a = n % 10;
 		int b = n % 100;
-		if ("pl".equals(lang) ? n == 1 : a == 1 && b != 11)
+		if ("pl".equals(lang) ? n == 1 : (a == 1 && b != 11))
 			return sb.append(L[i]);
 		if ((a >= 2 && a <= 4) && !(b >= 12 && b <= 14))
 			return sb.append(L[i + 1]);
@@ -2566,12 +2570,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			
 			if (d < 60 * 60) {
 				d /= 60L;
-				return appendLocalizedNumeral(sb, (int) d, _minutesAgo).toString();
+				return appendLocalizedPlural(sb, (int) d, _minutesAgo).toString();
 			}
 			
 			if (d < 12 * 60 * 60) {
 				d /= 60 * 60L;
-				return appendLocalizedNumeral(sb, (int) d, _hoursAgo).toString();
+				return appendLocalizedPlural(sb, (int) d, _hoursAgo).toString();
 			}
 		}
 		

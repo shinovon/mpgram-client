@@ -1,0 +1,246 @@
+{
+	// About this locale file
+	"LocaleInfo": "Arab, by @ZAIOOD999",
+	"LocaleSlavicPlurals": "",
+	
+	// Common commands
+	"Exit": "خروج",
+	"Back": "رجوع",
+	"Settings": "الاعدادات",
+	"About": "حول",
+	
+	// Date offsets
+	"_secondAgo": " قبل ثانية",
+	"_secondsAgo": " قبل ثواني",
+	"_secondsAgo2": "",
+	"_minuteAgo": " قبل دقيقة",
+	"_minutesAgo": " قبل دقائق",
+	"_minutesAgo2": "",
+	"_hourAgo": " قبل ساعة",
+	"_hoursAgo": " قبل ساعات",
+	"_hoursAgo2": "",
+	"_dayAgo": " قبل يوم",
+	"_daysAgo": " قبل ايام",
+	"_daysAgo2": "",
+	"_weekAgo": " قبل اسبوع",
+	"_weeksAgo": " قبل اسابيع",
+	"_weeksAgo2": "",
+	"_monthAgo": " قبل شهر",
+	"_monthsAgo": " قبل شهور",
+	"_monthsAgo2": "",
+	"_yearAgo": " قبل سنة",
+	"_yearsAgo": " قبل سنوات",
+	"_yearsAgo2": "",
+	"Now": "الان",
+	"JustNow": "الان",
+	"Today": "اليوم",
+	"Yesterday": "البارحة",
+	"LastWeek": "الاسبوع الماضي",
+	// Date suffixes
+	"on_Date": "في ",
+	"at_Time": " في",
+	// Months
+	"Jan": "يناير",
+	"Feb": "فبراير",
+	"Mar": "مارس",
+	"Apr": "ابريل",
+	"May": "مايو",
+	"Jun": "يونيو",
+	"Jul": "ايلول",
+	"Aug": "اغسطس",
+	"Sep": "سبتمبر",
+	"Oct": "اكتوبر",
+	"Nov": "نوفمبر",
+	"Dec": "ديسمبر",
+	// Days of week
+	"Sun": "احد",
+	"Mon": "اثنين",
+	"Tue": "ثلاثاء",
+	"Wed": "اربعاء",
+	"Thu": "خميس",
+	"Fri": "جمعة",
+	"Sat": "سبت",
+	"Sunday": "الاحد",
+	"Monday": "الاثنين",
+	"Tuesday": "الثلاثاء",
+	"Wednesday": "الاربعاء",
+	"Thursday": "الخميس",
+	"Friday": "الجمعة",
+	"Saturday": "السبت",
+	
+	// Auth commands
+	"Auth": "مصادقة",
+	"Next": "التالي",
+	"NewSession": "جلسة جديدة",
+	"ImportSession": "ادخال جلسة",
+	
+	// Settings commands
+	"Logout": "تسجيل خروج",
+	"ClearCache": "تفريغ التخزين المؤقت",
+	
+	// Chats list commands
+	"Folders": "مجلدات",
+	"Refresh": "تحديث",
+	"ArchivedChats": "المحادثات المؤرشفة",
+	"Contacts": "جهات الاتصال",
+	"Search": "البحث",
+		
+	// Message commands
+	"OpenChat": "فتح المحادثة",
+	"Profile": "الحساب",
+	"Reply": "الرد",
+	"Forward": "تحويل",
+	"CopyMessage": "نسخ الرسالة",
+	"CopyMessageLink": "نسخ رابط الرسالة",
+	"Delete": "مسح",
+	"Edit": "تعديل",
+	"GoTo": "الذهاب الى",
+	
+	// Item commands
+	"Link_Cmd": "الرابط",
+	"ViewImage": "اظهار الصورة",
+	"Call": "اتصال",
+	"Download": "تحميل",
+	
+	// Chat form commands
+	"WriteMessage": "كتابة رسالة",
+	"LatestMessages_Cmd": "تحديث",
+	"ChatInfo": "معلومات المحادثة",
+	"Older": "اقدم",
+	"Newer": "احدث",
+	
+	// Message writing form commands
+	"Send": "ارسال",
+	"OpenTextBox": "فتح مربع النص",
+	
+	// Profile/chat info commands
+	"Join": "انضمام",
+	"JoinGroup": "الانضمام للمجموعة",
+	"LeaveGroup": "الخروج من المجموعة",
+	"ChatMedia": "وسائط المحادثة",
+	"Members": "اعضاء",
+	
+	// Dialog commands
+	"Ok": "تم",
+	"Cancel": "الغاء",
+	
+	// Pagination commands
+	"NextPage": "الصفحة التالية",
+	"PrevPage": "الصفحة السابقة",
+	
+	// Loading states
+	"Loading": "تحميل",
+	"Authorizing": "يتم التحقق",
+	"WaitingForServerResponse": "...انتظار رد الخادم",
+	"Sending": "يتم الارسال",
+	
+	// Authorization process
+	"Auth_Title": "التحقق",
+	"InstanceURL": "عنوان URL للمثال",
+	"InstancePassword": "كلمة مرور المثال",
+	"ChooseAuthMethod": "اختر طريقة المصادقة",
+	"PhoneNumber": "رقم الهاتف",
+	"SessionCode": "رمز الجلسة",
+	"Code": "رمز",
+	"CloudPassword": "كلمة المرور",
+	"Captcha": "كلمة التحقق",
+	"Auth_Btn": "مصادقة",
+	
+	// Settings sections
+	"UI": "واجهة المستخدم",
+	"Behaviour": "السلوك",
+	"Images": "صور",
+	"Authorization": "المصادقة",
+	
+	// UI Settings
+	"Language": "اللغة",
+	"ReversedChat": "محادثة مقلوبة",
+	"ShowMedia": "اظهار الوسائط",
+	"ShowChatStatus": "اظهار حالة المحادثة",
+	"ThumbnailsSize": "حجم الصور المصغرة",
+	"ChatsCount": "عدد المحادثات",
+	"MessagesCount": "عدد الرسائل",
+	
+	// Behaviour settings
+	"WaitForPageToLoad": "انتظار تحميل الصفحة",
+	"UseJSONStream": "JSONStream استخدام",
+	"FormatText": "تنسيق النص",
+	"ParseLinks": "تحليل الروابط",
+	"ChatAutoUpdate": "تحديث المحادثة تلقائيا",
+	"UpdatesTimeout": "انتهاء وقت التحديث",
+	
+	// Images settings
+	"LoadMediaThumbnails": "تحميل صور مصغرة للوسائط",
+	"LoadAvatars": "تحميل صور الحسابات",
+	"MultiThreadedLoading": "تحميل متعدد الخيوط",
+	
+	// Cache settings
+	"AvatarsCaching": "تخزين صور الحسابات مؤقتا",
+	"Disabled": "غير مفعل",
+	"HoldInRAM": "عقد في ذاكرة الوصول العشوائي",
+	"Store": "خرن",
+	"HoldInRAMandStore": " العقد في ذاكرة الوصول العشوائي والتخزين",
+	"AvatarsCacheThreshold": "عتبة تخزين صور الحسابات المؤقت",
+	"ProfilesCacheThreshold": "عتبة تخزين الحسابات المؤقت",
+	
+	// About
+	"AboutText": ".MPGram Web API عميل تلكرام،يعتمد على",
+	"Developer": "المطور",
+	"Author": "المؤلف",
+	"Donate": "تبرع",
+	"Chat": "محادثة",
+	
+	// Write form
+	"Reply_Title": "رد",
+	"Write_Title": "كتابة",
+	"Message": "رسالة",
+	
+	// Alert messages
+	"MessageSent_Alert": "الرسالة مرسلة",
+	"MessageDeleted_Alert": "الرسالة ممسوحة",
+	"UpdateAvailable_Alert": "تحديث جديد متوفر",
+	
+	// Chat form
+	"ChatMedia_Title": "وسائط",
+	"Search_TitlePrefix": "بحث - ",
+	"OlderMessages": "رسائل اقدم",
+	"NewerMessages": "رسائل احدث",
+	
+	// Message
+	"ForwardedFrom": "محولة من ",
+	"Action": "فعل",
+	"You": "انت",
+	"You_Prefix": "انت: ",
+	"ForwardedMessage": "رسالة محولة",
+	
+	// Message media
+	"Media": "وسائط",
+	"Poll": "تصويت",
+	"Geo": "جغرافي: ",
+	
+	// Chat actions
+	
+	// Folders
+	"AllChats": "جميع المحادثات",
+	"Archive": "ارشيف",
+	
+	// Profile/chat info
+	"Online": "متصل",
+	"Offline": "غير متصل",
+	"LastSeen": "اخر ظهور ",
+	"About_User": "النبذة",
+	"About_Chat": "حول",
+	"Username": "اسم المستخدم",
+	"Link": "الرابط",
+	"SearchMessages": "البحث في الرسائل",
+	"ViewGroup": "اظهار المجموعة",
+	"GoToPinnedMessage": "الذهاب للرسالة المثبتة",
+	
+	"_member": " عضو",
+	"_members": " اعضاء",
+	"_members2": "",
+	
+	"_subscriber": " مشترك",
+	"_subscribers": " مشتركين",
+	"_subscribers2": ""
+}

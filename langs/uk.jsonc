@@ -1,7 +1,7 @@
 {
 	// About this locale file
 	"LocaleInfo": "Ukrainian, by @karusel33",
-	"LocaleSlavicNumerals": "1",
+	"LocaleSlavicPlurals": "1",
 	
 	// Common commands
 	"Exit": "Вихід",

@@ -1,7 +1,7 @@
 {
 	// About this locale file
 	"LocaleInfo": "Russian, by shinovon",
-	"LocaleSlavicNumerals": "1",
+	"LocaleSlavicPlurals": "1",
 	
 	// Common commands
 	"Exit": "Выход",

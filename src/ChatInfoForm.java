@@ -145,7 +145,7 @@ public class ChatInfoForm extends MPForm implements LangConstants {
 				}
 				
 				if (full.has("participants_count")) {
-					s = new StringItem(null, MP.localizeNumeral(full.getInt("participants_count"),
+					s = new StringItem(null, MP.localizePlural(full.getInt("participants_count"),
 							rawPeer.getBoolean("broadcast", false) ? _subscriber : _member));
 					s.setFont(MP.medPlainFont);
 					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
