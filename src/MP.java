@@ -84,7 +84,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static final String AUTH_RECORD_NAME = "mp4user";
 	private static final String AVATAR_RECORD_PREFIX = "mcA";
 	
-	private static final String DEFAULT_INSTANCE_URL = "http://mp2.nnchan.ru/";
+	private static final String DEFAULT_INSTANCE_URL = "http://mp.nnchan.ru/";
 	static final String API_URL = "api.php";
 	static final String AVA_URL = "ava.php";
 	static final String FILE_URL = "file.php";

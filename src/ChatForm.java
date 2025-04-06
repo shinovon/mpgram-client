@@ -915,6 +915,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 	private void setStatus(JSONObject status) {
 		String s;
 		if (status == null) {
+			setTicker(null);
 			if (MP.chatStatus) {
 				if (wasOnline == 1) {
 					s = MP.L[Online];
@@ -929,9 +930,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 				if (t != null && t.getString().equals(s))
 					return;
 				setTicker(new Ticker(s));
-				return;
 			}
-			setTicker(null);
 			return;
 		}
 		if ("userStatusOnline".equals(status.getString("_"))) {
