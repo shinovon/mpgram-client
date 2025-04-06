@@ -21,6 +21,7 @@ SOFTWARE.
 */
 import java.io.InterruptedIOException;
 
+import javax.microedition.io.Connection;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.Ticker;
@@ -79,7 +80,7 @@ public abstract class MPList extends List {
 		loaded = false;
 		if (finished || thread == null) return;
 		canceled = true;
-		thread.interrupt();
+		MP.cancel(thread, false);
 		thread = null;
 	}
 

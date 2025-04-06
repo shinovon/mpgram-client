@@ -186,7 +186,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 				MP.appendUrl(sb.append("&q="), query);
 			}
 		} else {
-			sb.append("getHistory");
+			sb.append("getHistory&read=1");
 		}
 		
 		sb.append("&media=1&peer=").append(id);
@@ -221,18 +221,18 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 		int l = messages.size();
 		urls = new Hashtable();
 		
-		if (query == null && mediaFilter == null && l != 0) {
-			// mark messages as read
-			try {
-				sb.setLength(0);
-				sb.append("readMessages&peer=").append(id)
-				.append("&max=").append(messages.getObject(0).getString("id"));
-				if (topMsgId != 0) {
-					sb.append("&thread=").append(topMsgId);
-				}
-				MP.api(sb.toString());
-			} catch (Exception e) {}
-		}
+//		if (query == null && mediaFilter == null && l != 0) {
+//			// mark messages as read
+//			try {
+//				sb.setLength(0);
+//				sb.append("readMessages&peer=").append(id)
+//				.append("&max=").append(messages.getObject(0).getString("id"));
+//				if (topMsgId != 0) {
+//					sb.append("&thread=").append(topMsgId);
+//				}
+//				MP.api(sb.toString());
+//			} catch (Exception e) {}
+//		}
 		
 		StringItem s;
 		Item focus = null;
@@ -283,11 +283,9 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 		super.focusOnFinish = focus;
 		
 		if (endReached && MP.chatUpdates && mediaFilter == null) {
+			// start updater thread
 			if (MP.updatesThread != null) {
-				if (MP.symbianJrt) MP.updatesThread.interrupt();
-				try {
-					MP.updatesConnection.close();
-				} catch (Exception e) {}
+				MP.cancel(MP.updatesThread, true);
 			}
 			update = true;
 			MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
@@ -764,15 +762,23 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 	
 	void cancel() {
 		super.cancel();
-		// close updater loop
+		// close updater thread
 		update = false;
 		if (MP.updatesThread != null) {
-			if (MP.symbianJrt) MP.updatesThread.interrupt();
-			try {
-				MP.updatesConnection.close();
-			} catch (Exception e) {}
+			MP.cancel(MP.updatesThread, true);
 		}
 	}
+	
+//	void closed(boolean destroy) {
+//		if (destroy) cancel();
+//		else {
+//			// close updater thread
+//			update = false;
+//			if (MP.updatesThread != null) {
+//				MP.cancel(MP.updatesThread, true);
+//			}
+//		}
+//	}
 	
 	void shown() {
 		if (!finished || urls == null) return;
@@ -787,7 +793,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 	
 	void handleUpdate(int type, JSONObject update) {
 		if (!this.update) return;
-		System.out.println("update: " + type + " " + update);
+//		MP.log("update: " + type);
 		switch (type) {
 		case UPDATE_USER_STATUS: {
 			if (MP.chatStatus) {
@@ -912,10 +918,10 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 			if (MP.chatStatus) {
 				if (wasOnline == 1) {
 					s = MP.L[Online];
-				} else if (wasOnline != 0) {
-					s = MP.L[LastSeen] + MP.localizeDate(wasOnline, 4);
 				} else if (wasOnline == 2) {
 					s = MP.L[Offline];
+				} else if (wasOnline != 0) {
+					s = MP.L[LastSeen] + MP.localizeDate(wasOnline, 4);
 				} else {
 					s = null;
 				}
@@ -928,7 +934,6 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 			setTicker(null);
 			return;
 		}
-		;
 		if ("userStatusOnline".equals(status.getString("_"))) {
 			wasOnline = 1;
 			s = MP.L[Online];

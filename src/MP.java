@@ -22,6 +22,7 @@ SOFTWARE.
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+//import java.io.OutputStreamWriter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
@@ -29,6 +30,8 @@ import java.util.Hashtable;
 import java.util.TimeZone;
 import java.util.Vector;
 
+//import javax.microedition.io.CommConnection;
+import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 import javax.microedition.lcdui.Alert;
@@ -75,6 +78,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static final int RUN_CHECK_OTA = 16;
 	static final int RUN_CHAT_UPDATES = 17;
 	static final int RUN_SET_TYPING = 18;
+	static final int RUN_KEEP_ALIVE = 19;
 	
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
@@ -124,6 +128,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static MP midlet;
 	static Display display;
 	static Displayable current;
+	static boolean paused;
 
 	private static String version;
 
@@ -160,13 +165,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static int updatesTimeout = 30;
 	static boolean sendTyping = true;
 	static int chatsListFontSize = 0; // 0 - default, 1 - small, 2 - medium
+	static boolean keepAlive = true;
 
 	// threading
 	private static int run;
 	private static Object runParam;
 //	private static int running;
 	static Thread updatesThread;
-	static HttpConnection updatesConnection;
+	static Hashtable threadConnections = new Hashtable();
+	static Vector closingConnections = new Vector();
 	
 	private static Object imagesLoadLock = new Object();
 	private static Vector imagesToLoad = new Vector(); // TODO hashtable?
@@ -286,13 +293,26 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static String updateUrl;
 	private static long lastType;
 	
+//	static OutputStreamWriter console;
+//	static void log(String s) {
+//		System.out.println(s);
+//		if (console == null) return;
+//		try {
+//			console.write(s.concat("\n"));
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
+	
 	protected void destroyApp(boolean u) {
 	}
 
 	protected void pauseApp() {
+		paused = true;
 	}
 
 	protected void startApp()  {
+		paused = false;
 		if (midlet != null) return;
 		midlet = this;
 
@@ -312,6 +332,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			f.append("J2ME Loader is not supported.");
 			return;
 		} catch (Exception ignored) {}
+		
+//		try {
+//			CommConnection c = (CommConnection) Connector.open("comm:USB1;baudrate=9600");
+//			console = new OutputStreamWriter(c.openOutputStream());
+//			log("Log start");
+//		} catch (Exception e) {
+//			display(errorAlert(e.toString()));
+//			return;
+//		}
 		
 		// init platform dependent settings
 		
@@ -540,21 +569,21 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			param = MP.runParam;
 			notify();
 		}
-		System.out.println("run " + run + " " + param);
 //		running++;
 		switch (run) {
 		case RUN_VALIDATE_AUTH: {
 			display(loadingAlert(L[Authorizing]), null);
 			
 			try {
-				selfId = ((JSONObject) api("me")).getString("id");
+				selfId = ((JSONObject) api("me&status=1")).getString("id");
 				userState = 4;
 
-				api("updateStatus");
 				if (param != null) {
 					openLoad(mainDisplayable = mainChatsList());
 					writeAuth();
 				}
+				
+				start(RUN_KEEP_ALIVE, null);
 			} catch (APIException e) {
 				if (param != null) mainDisplayable = authForm;
 				if (e.code == 401) {
@@ -869,21 +898,20 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			break;
 		}
 		case RUN_CHAT_UPDATES: { // chat updates loop
-			updatesThread = Thread.currentThread();
+			Thread thread;
+			updatesThread = thread = Thread.currentThread();
 			try {
 				StringBuffer sb = new StringBuffer();
 				ChatForm form = (ChatForm) param;
 				JSONObject j;
 
-				HttpConnection hc = null;
-				InputStream in = null;
 				int offset = 0;
 				int fails = 0;
 				boolean check = true;
-				while (form.update) {
-					Thread.sleep(updatesDelay);
+				while (form.update && updatesThread == thread) {
 					try {
-						if (!form.update) break;
+						Thread.sleep(updatesDelay);
+						if (!form.update || updatesThread != thread) break;
 						if (check) {
 							sb.setLength(0);
 							sb.append("getLastUpdate&peer=").append(form.id);
@@ -900,7 +928,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							} catch (Exception ignored) {}
 							check = false;
 						}
-						if (!form.update) break;
+						if (!form.update || updatesThread != thread) break;
 						
 						sb.setLength(0);
 						sb.append(instanceUrl).append(API_URL + "?v=" + API_VERSION + "&method=")
@@ -908,25 +936,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						.append("&offset=").append(offset)
 						.append("&timeout=").append(updatesTimeout);
 						
-						hc = updatesConnection = openHttpConnection(sb.toString());
-						hc.setRequestMethod("GET");
-						
-						int c = hc.getResponseCode();
-						if (c >= 400) {
-							throw new APIException("updates", c, null);
-						}
-						if (jsonStream) {
-							j = (JSONObject) JSONStream.getStream(in = hc.openInputStream()).nextValue();
-						} else {
-							j = JSONObject.parseObject(readUtf(in = hc.openInputStream(), (int) hc.getLength()));
-						}
-						
-						in.close();
-						in = null;
-						
-						if (j.has("error")) {
-							throw new APIException("updates", c, j);
-						}
+						j = (JSONObject) api(sb.toString());
 						
 						JSONArray updates = j.getArray("res");
 						int l = updates.size();
@@ -954,6 +964,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						}
 						
 					} catch (Exception e) {
+//						log("updates: " + e.toString());
 						if (e.toString().indexOf("Interrupted") != -1) {
 							form.update = false;
 							break;
@@ -966,25 +977,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							display(errorAlert("Updates thread died!\n" + e.toString()), null);
 							break;
 						}
-					} finally {
-						if (in != null) try {
-							in.close();
-						} catch (IOException e) {}
-						if (hc != null) try {
-							hc.close();
-						} catch (IOException e) {}
-						if (updatesConnection == hc) {
-							updatesConnection = null;
-						}
 					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
-				if (updatesThread == Thread.currentThread()) {
+				if (updatesThread == thread)
 					updatesThread = null;
-				}
 			}
+//			log("updates died");
 			break;
 		}
 		case RUN_SET_TYPING: {
@@ -992,8 +993,26 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				api("setTyping&action=" + (param == null ? "Typing" : (String) param)
 						+ "&peer=" + writeTo);
 			} catch (Exception ignored) {}
+			break;
+		}
+		case RUN_KEEP_ALIVE: { // Keep session alive
+			try {
+				boolean wasShown = true;
+				while (keepAlive) {
+					Thread.sleep(30000L);
+					if (threadConnections.size() != 0) continue;
+					try {
+						boolean shown = !paused && current.isShown();
+						api(wasShown != shown ?
+								("updateStatus".concat(!shown ? "&off=1" : "")) : "me");
+						wasShown = shown;
+					} catch (Exception e) {}
+				}
+			} catch (Exception e) {}
+			break;
 		}
 		}
+//		log("done " + run + " " + param);
 //		running--;
 	}
 
@@ -1009,6 +1028,21 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		} catch (Exception e) {}
 		return t;
 	}
+	
+	static void cancel(Thread thread, boolean updates) {
+		if (thread == null) return;
+		if (updates) updatesThread = null;
+		if (!symbianJrt) {
+			try {
+				Connection c = (Connection) MP.threadConnections.get(thread);
+				if (c != null) {
+					closingConnections.addElement(c);
+					c.close();
+				}
+			} catch (Exception ignored) {}
+		}
+		thread.interrupt();
+	}
 
 	public void commandAction(Command c, Displayable d) {
 		if (d instanceof ChatsList) { // chats list commands
@@ -1018,9 +1052,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			if (c == foldersCmd) {
 				if (foldersList == null) {
-					openLoad(foldersList = new FoldersList());
+					foldersList = new FoldersList();
 				}
-				display(foldersList);
+				openLoad(foldersList);
 				return;
 			}
 			if (c == contactsCmd) {
@@ -1475,10 +1509,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		{ // write form commands
 			if (c == sendCmd) {
 				if (MP.updatesThread != null) {
-					if (MP.symbianJrt) MP.updatesThread.interrupt();
-					try {
-						MP.updatesConnection.close();
-					} catch (Exception e) {}
+					MP.cancel(MP.updatesThread, true);
 				}
 				display(loadingAlert(L[Sending]), d);
 				start(RUN_SEND_MESSAGE, messageField.getString());
@@ -2341,13 +2372,30 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 
 		HttpConnection hc = null;
 		InputStream in = null;
+		Thread thread = Thread.currentThread();
 		try {
 			String t = instanceUrl.concat(API_URL + "?v=" + API_VERSION + "&method=").concat(url);
-			hc = openHttpConnection(t);
-			hc.setRequestMethod("GET");
-			
+//			MP.log(threadConnections.size() + " connections, " + closingConnections.size() + " closing");
+//			MP.log(">>api: " + url);
+			try {
+				while (closingConnections.size() != 0) {
+//					MP.log("waiting: " + url);
+					Thread.sleep(1000);
+				}
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e.toString());
+			}
+			synchronized (threadConnections) {
+				threadConnections.put(thread, hc = openHttpConnection(t));
+				hc.setRequestMethod("GET");
+			}
+//			MP.log("connect: " + hc + " - " + url);
 			int c = hc.getResponseCode();
-			if (c == 502 || c == 504) {
+//			MP.log("<<res: " + c + " - " + url);
+			if ((c == 502 || c == 504) && !url.startsWith("updates")) {
+				try {
+					hc.close();
+				} catch (Exception ignored) {}
 				// repeat
 				try {
 					Thread.sleep(3000);
@@ -2375,6 +2423,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				throw new APIException(url, c, res);
 			}
 		} finally {
+			closingConnections.removeElement(hc);
+			threadConnections.remove(thread);
 			if (in != null) try {
 				in.close();
 			} catch (IOException e) {}
@@ -2477,8 +2527,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	}
 	
 	private static HttpConnection openHttpConnection(String url) throws IOException {
-		System.out.println(url);
-		HttpConnection hc = (HttpConnection) Connector.open(url);
+//		log("open: " + url);
+		HttpConnection hc = (HttpConnection) Connector.open(url, Connector.READ_WRITE, url.indexOf("method=updates") == -1);
 		hc.setRequestProperty("User-Agent", "mpgram4/".concat(version).concat(" (https://github.com/shinovon/mpgram-client)"));
 		if (url.startsWith(instanceUrl)) {
 			if (user != null) {

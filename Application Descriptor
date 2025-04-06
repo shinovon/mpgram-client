@@ -1,10 +1,12 @@
+Nokia-MIDlet-Background-Event: pause
+MIDlet-Version: 0.8.8
 MIDlet-Vendor: nnproject
-MIDlet-Version: 0.8.7
 MIDlet-Icon: /m.png
 MicroEdition-Configuration: CLDC-1.1
-MIDlet-1: MPGram,/m.png,MP
 MIDlet-Name: MPGram
+MIDlet-1: MPGram,/m.png,MP
 MicroEdition-Profile: MIDP-2.0
 MIDlet-Jar-URL: mpgram.jar
+MIDlet-Permissions: javax.microedition.io.Connector.http
 Nokia-Scalable-Icon: /m.svg
 Nokia-Scalable-Icon-MIDlet-1: /m.svg

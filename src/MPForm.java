@@ -22,6 +22,7 @@ SOFTWARE.
 import java.io.InterruptedIOException;
 import java.util.Hashtable;
 
+import javax.microedition.io.Connection;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.Ticker;
@@ -86,7 +87,7 @@ public abstract class MPForm extends Form {
 		loaded = false;
 		if (finished || thread == null) return;
 		canceled = true;
-		thread.interrupt();
+		MP.cancel(thread, false);
 		thread = null;
 	}
 
