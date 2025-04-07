@@ -168,6 +168,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static int chatsListFontSize = 0; // 0 - default, 1 - small, 2 - medium
 	static boolean keepAlive = true;
 	static boolean utf = true;
+	static long keepAliveInterval = 30000L;
 
 	// threading
 	private static int run;
@@ -1005,7 +1006,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			try {
 				boolean wasShown = true;
 				while (keepAlive) {
-					Thread.sleep(30000L);
+					Thread.sleep(keepAliveInterval);
 					if (threadConnections.size() != 0) continue;
 					try {
 						boolean shown = !paused && current.isShown();
