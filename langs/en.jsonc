@@ -173,6 +173,7 @@
 	"Default": "Default",
 	"Small": "Small",
 	"Medium": "Medium",
+	"FocusNewMessages": "Focus new messages",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Wait for page to load",

@@ -173,6 +173,7 @@
 	"Default": "По умолчанию",
 	"Small": "Мелкий",
 	"Medium": "Средний",
+	"FocusNewMessages": "Focus new messages", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Ждать полной загрузки",

@@ -323,7 +323,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		version = getAppProperty("MIDlet-Version");
 		display = Display.getDisplay(this);
 		
-		Form f = new Form("mpgram");
+		Form f = new Form("MPGram");
 		f.append("Loading");
 		display.setCurrent(mainDisplayable = f);
 		
@@ -414,7 +414,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 		
 		// load locale
-		(L = new String[300])[0] = "mpgram";
+		(L = new String[300])[0] = "MPGram";
 		try {
 			loadLocale(lang);
 		} catch (Exception e) {
@@ -1312,10 +1312,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							L[ReversedChat],
 							L[ShowMedia],
 							L[ShowChatStatus],
+							L[FocusNewMessages],
 					}, null);
 					uiChoice.setSelectedIndex(0, reverseChat);
 					uiChoice.setSelectedIndex(1, showMedia);
 					uiChoice.setSelectedIndex(2, chatStatus);
+					uiChoice.setSelectedIndex(3, focusNewMessages);
 					uiChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(uiChoice);
 					
@@ -1426,6 +1428,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				reverseChat = uiChoice.isSelected(0);
 				showMedia = uiChoice.isSelected(1);
 				chatStatus = uiChoice.isSelected(2);
+				focusNewMessages = uiChoice.isSelected(3);
 				
 				if ((photoSize = (photoSizeGauge.getValue() * 8)) < 16) {
 					photoSizeGauge.setValue((photoSize = 16) / 8);

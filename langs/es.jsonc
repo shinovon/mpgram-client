@@ -173,6 +173,7 @@
 	"Default": "Default", // Untranslated
 	"Small": "Small", // Untranslated
 	"Medium": "Medium", // Untranslated
+	"FocusNewMessages": "Focus new messages", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Espere a que se cargue la pagina",
