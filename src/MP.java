@@ -176,6 +176,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Thread updatesThread;
 	static Hashtable threadConnections = new Hashtable();
 	static Vector closingConnections = new Vector();
+	private static boolean sending;
 	
 	private static Object imagesLoadLock = new Object();
 	private static Vector imagesToLoad = new Vector(); // TODO hashtable?
@@ -835,6 +836,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				display(infoAlert(L[MessageSent_Alert]), current);
 			} catch (Exception e) {
 				display(errorAlert(e.toString()), current);
+			} finally {
+				sending = false;
 			}
 			break;
 		}
@@ -1513,6 +1516,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		{ // write form commands
 			if (c == sendCmd) {
+				if (sending) return;
+				sending = true;
 				if (MP.updatesThread != null) {
 					MP.cancel(MP.updatesThread, true);
 				}
