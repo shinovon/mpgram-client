@@ -283,6 +283,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 	// write items
 	private static TextField messageField;
+	private static TextField fileField;
+	private static ChoiceGroup sendChoice;
 
 	// cache
 	private static JSONObject usersCache = new JSONObject();
@@ -802,7 +804,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		case RUN_SEND_MESSAGE: {
 			try {
-				String file = null;
+				String file = fileField.getString();
+				if (file.length() <= 8) {
+					file = null;
+				}
 				StringBuffer sb;
 				if (edit != null) {
 					sb = new StringBuffer(edit != null ? "editMessage" : "sendMessage");
@@ -818,6 +823,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					sb.append("&peer=").append(writeTo);
 					if (replyTo != null) {
 						sb.append("&reply=").append(replyTo);
+					}
+					if (sendChoice.isSelected(0)) {
+						sb.append("&uncompressed=1");
+					}
+					if (sendChoice.isSelected(1)) {
+						sb.append("&spoiler=1");
 					}
 				}
 				postMessage(sb.toString(), file, (String) param);
@@ -2025,6 +2036,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		s.setDefaultCommand(openTextBoxCmd);
 		s.setItemCommandListener(midlet);
 		f.append(s);
+		
+		// TODO
+		
+		t = new TextField("File", "file:///", 300, TextField.ANY);
+		f.append(fileField = t);
+		f.append(sendChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
+				"Send uncompressed",
+				"Hide with spoiler"
+		}, null));
 		
 		return f;
 	}
