@@ -1060,9 +1060,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			if (c == foldersCmd) {
 				if (foldersList == null) {
-					foldersList = new FoldersList();
+					openLoad(foldersList = new FoldersList());
+				} else if (foldersList.size() == 0) {
+					openLoad(foldersList);
+				} else {
+					display(foldersList);
 				}
-				openLoad(foldersList);
 				return;
 			}
 			if (c == contactsCmd) {
