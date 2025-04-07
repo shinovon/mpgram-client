@@ -22,18 +22,19 @@ SOFTWARE.
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-//import java.io.OutputStreamWriter;
+import java.io.OutputStream;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Random;
 import java.util.TimeZone;
 import java.util.Vector;
 
-//import javax.microedition.io.CommConnection;
 import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
+import javax.microedition.io.file.FileConnection;
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Choice;
@@ -178,6 +179,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Hashtable threadConnections = new Hashtable();
 	static Vector closingConnections = new Vector();
 	private static boolean sending;
+	private static boolean uploading;
 	
 	private static Object imagesLoadLock = new Object();
 	private static Vector imagesToLoad = new Vector(); // TODO hashtable?
@@ -297,17 +299,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static String updateUrl;
 	private static long lastType;
 	
-//	static OutputStreamWriter console;
-//	static void log(String s) {
-//		System.out.println(s);
-//		if (console == null) return;
-//		try {
-//			console.write(s.concat("\n"));
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
-	
 	protected void destroyApp(boolean u) {
 	}
 
@@ -336,15 +327,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			f.append("J2ME Loader is not supported.");
 			return;
 		} catch (Exception ignored) {}
-		
-//		try {
-//			CommConnection c = (CommConnection) Connector.open("comm:USB1;baudrate=9600");
-//			console = new OutputStreamWriter(c.openOutputStream());
-//			log("Log start");
-//		} catch (Exception e) {
-//			display(errorAlert(e.toString()));
-//			return;
-//		}
 		
 		// init platform dependent settings
 		
@@ -820,22 +802,32 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		case RUN_SEND_MESSAGE: {
 			try {
-				StringBuffer sb = new StringBuffer(edit != null ? "editMessage" : "sendMessage");
-				sb.append("&peer=").append(writeTo);
+				String file = null;
+				StringBuffer sb;
 				if (edit != null) {
-					sb.append("&id=").append(edit);
+					sb = new StringBuffer(edit != null ? "editMessage" : "sendMessage");
+					sb.append("&peer=").append(writeTo);
+					if (edit != null) {
+						sb.append("&id=").append(edit);
+					}
+					if (replyTo != null) {
+						sb.append("&reply=").append(replyTo);
+					}
+				} else {
+					sb = new StringBuffer(file != null ? "sendMedia" : "sendMessage");
+					sb.append("&peer=").append(writeTo);
+					if (replyTo != null) {
+						sb.append("&reply=").append(replyTo);
+					}
 				}
-				if (replyTo != null) {
-					sb.append("&reply=").append(replyTo);
-				}
-				appendUrl(sb.append("&text="), (String) param);
-				api(sb.toString());
+				postMessage(sb.toString(), file, (String) param);
 				
 				// go to latest message after sending
 				commandAction(backCmd, current);
 				commandAction(latestCmd, current);
 //				display(infoAlert(L[MessageSent_Alert]), current);
 			} catch (Exception e) {
+				e.printStackTrace();
 				display(errorAlert(e.toString()), current);
 			} finally {
 				sending = false;
@@ -971,7 +963,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						}
 						
 					} catch (Exception e) {
-//						log("updates: " + e.toString());
 						if (e.toString().indexOf("Interrupted") != -1) {
 							form.update = false;
 							break;
@@ -992,7 +983,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				if (updatesThread == thread)
 					updatesThread = null;
 			}
-//			log("updates died");
 			break;
 		}
 		case RUN_SET_TYPING: {
@@ -1026,7 +1016,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			break;
 		}
 		}
-//		log("done " + run + " " + param);
 //		running--;
 	}
 
@@ -2392,11 +2381,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		Thread thread = Thread.currentThread();
 		try {
 			String t = instanceUrl.concat(API_URL + "?v=" + API_VERSION + "&method=").concat(url);
-//			MP.log(threadConnections.size() + " connections, " + closingConnections.size() + " closing");
-//			MP.log(">>api: " + url);
 			try {
 				while (closingConnections.size() != 0) {
-//					MP.log("waiting: " + url);
 					Thread.sleep(1000);
 				}
 			} catch (InterruptedException e) {
@@ -2404,9 +2390,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			threadConnections.put(thread, hc = openHttpConnection(t));
 			hc.setRequestMethod("GET");
-//			MP.log("connect: " + hc + " - " + url);
 			int c = hc.getResponseCode();
-//			MP.log("<<res: " + c + " - " + url);
 			if ((c == 502 || c == 504) && !url.startsWith("updates")) {
 				try {
 					hc.close();
@@ -2479,6 +2463,127 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		return res;
 	}
+	
+	static Object postMessage(String url, String fileUrl, String text) throws IOException {
+		uploading = true;
+		Object res;
+
+		HttpConnection http = null;
+		InputStream httpIn = null;
+		OutputStream httpOut = null;
+		
+		FileConnection file = null;
+		InputStream fileIn = null;
+		
+		StringBuffer sb = new StringBuffer();
+		Random rng = new Random();
+		for (int i = 0; i < 27; i++) {
+			sb.append('-');
+		}
+		for (int i = 0; i < 11; i++) {
+			sb.append(rng.nextInt(10));
+		}
+		String boundary = sb.toString();
+//		int boundaryLength = boundary.length();
+		sb.setLength(0);
+		byte[] CRLF = new byte[] { (byte) '\r', (byte) '\n' };
+		byte[] DASHDASH = new byte[] { (byte) '-', (byte) '-' };
+		
+		try {
+			http = openHttpConnection(instanceUrl.concat(API_URL + "?v=" + API_VERSION + "&method=").concat(url));
+			http.setRequestMethod("POST");
+			http.setRequestProperty("Content-Type", "multipart/form-data; boundary=".concat(boundary));
+
+//			int contentLength = 0;
+//			if (text != null) {
+//				contentLength += 53 + boundaryLength + text.getBytes("UTF-8").length;
+//			}
+//			if (fileUrl != null) {
+//				contentLength += 48 + boundaryLength + file.getName().getBytes("UTF-8").length + (int) file.fileSize();
+//			}
+//			contentLength += boundaryLength + 6;
+//			http.setRequestProperty("Content-length", String.valueOf(contentLength));
+			httpOut = http.openOutputStream();
+			try {
+				if (text != null) {
+					httpOut.write(DASHDASH);
+					httpOut.write(boundary.getBytes());
+					httpOut.write(CRLF);
+					String s = "Content-Disposition: form-data; name=\"text\"";
+					httpOut.write(s.getBytes());
+					httpOut.write(CRLF);
+					httpOut.write(CRLF);
+					byte[] b = text.getBytes("UTF-8");
+					httpOut.write(b);
+					httpOut.write(CRLF);
+				}
+
+				if (fileUrl != null) {
+					file = (FileConnection) Connector.open(fileUrl);
+					try {
+						fileIn = file.openInputStream();
+						try {
+							httpOut.write(DASHDASH);
+							httpOut.write(boundary.getBytes());
+							httpOut.write(CRLF);
+							String s = "Content-Disposition: form-data; name=\"file\"; filename=\"";
+							byte[] b = file.getName().getBytes("UTF-8");
+							httpOut.write(s.getBytes());
+							httpOut.write(b);
+							httpOut.write((byte) '"');
+							httpOut.write(CRLF);
+							httpOut.write(CRLF);
+							httpOut.flush();
+							b = new byte[4096];
+							int i;
+							while ((i = fileIn.read(b)) != -1) {
+								httpOut.write(b, 0, i);
+							}
+							httpOut.write(CRLF);
+							httpOut.write(CRLF);
+						} finally {
+							fileIn.close();
+						}
+					} finally {
+						file.close();
+					}
+				}
+				
+				httpOut.write(DASHDASH);
+				httpOut.write(boundary.getBytes());
+				httpOut.write(DASHDASH);
+				httpOut.write(CRLF);
+				httpOut.flush();
+			} finally {
+				httpOut.close();
+			}
+			
+			int c = http.getResponseCode();
+			try {
+				if (jsonStream) {
+					res = JSONStream.getStream(httpIn = http.openInputStream()).nextValue();
+				} else {
+					res = JSONObject.parseJSON(readUtf(httpIn = http.openInputStream(), (int) http.getLength()));
+				}
+			} catch (RuntimeException e) {
+				if (c >= 400) {
+					throw new APIException(url, c, null);
+				} else throw e;
+			}
+			if (c >= 400 || (res instanceof JSONObject && ((JSONObject) res).has("error"))) {
+				throw new APIException(url, c, res);
+			}
+			return res;
+		} finally {
+			uploading = false;
+			if (httpIn != null) try {
+				httpIn.close();
+			} catch (IOException e) {}
+			if (http != null) try {
+				http.close();
+			} catch (IOException e) {}
+		}
+	}
 
 	static Image getImage(String url) throws IOException {
 		byte[] b = get(url);
@@ -2542,8 +2647,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	}
 	
 	private static HttpConnection openHttpConnection(String url) throws IOException {
-//		log("open: " + url);
-		HttpConnection hc = (HttpConnection) Connector.open(url, Connector.READ_WRITE, url.indexOf("method=updates") == -1);
+		System.out.println(url);
+		HttpConnection hc = (HttpConnection) Connector.open(url, Connector.READ_WRITE,
+				url.indexOf("method=updates") == -1 || OTA_URL.equals(url));
 		hc.setRequestProperty("User-Agent", "mpgram4/".concat(version).concat(" (https://github.com/shinovon/mpgram-client)"));
 		if (url.startsWith(instanceUrl)) {
 			if (user != null) {
