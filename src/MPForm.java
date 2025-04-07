@@ -22,7 +22,6 @@ SOFTWARE.
 import java.io.InterruptedIOException;
 import java.util.Hashtable;
 
-import javax.microedition.io.Connection;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.Ticker;
