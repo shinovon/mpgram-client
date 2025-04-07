@@ -79,6 +79,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static final int RUN_CHAT_UPDATES = 17;
 	static final int RUN_SET_TYPING = 18;
 	static final int RUN_KEEP_ALIVE = 19;
+	static final int RUN_CLOSE_CONNECTION = 20;
 	
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
@@ -166,6 +167,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static boolean sendTyping = true;
 	static int chatsListFontSize = 0; // 0 - default, 1 - small, 2 - medium
 	static boolean keepAlive = true;
+	static boolean utf = true;
 
 	// threading
 	private static int run;
@@ -346,9 +348,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		
 		String p = System.getProperty("microedition.platform");
 		symbianJrt = p != null && p.indexOf("platform=S60") != -1;
-		useLoadingForm = !symbianJrt /*&&
-				(System.getProperty("com.symbian.midp.serversocket.support") != null ||
-				System.getProperty("com.symbian.default.to.suite.icon") != null)*/;
+		useLoadingForm = !symbianJrt;
+		jsonStream = symbianJrt ||
+				((System.getProperty("com.symbian.midp.serversocket.support") == null &&
+				System.getProperty("com.symbian.default.to.suite.icon") == null));
 		
 		threadedImages = symbianJrt;
 		
@@ -922,17 +925,17 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							try {
 								j = ((JSONObject) api(sb.toString())).getObject("res");
 								off = j.getInt("update_id");
-								if (offset <= 0 || off < offset) {
+								if (!j.getBoolean("exact", false))
+									off -= 1;
+								if (offset <= 0 || off < offset)
 									offset = off;
-								}
 							} catch (Exception ignored) {}
 							check = false;
 						}
 						if (!form.update || updatesThread != thread) break;
 						
 						sb.setLength(0);
-						sb.append(instanceUrl).append(API_URL + "?v=" + API_VERSION + "&method=")
-						.append("updates&media=1&read=1&peer=").append(form.id)
+						sb.append("updates&media=1&read=1&peer=").append(form.id)
 						.append("&offset=").append(offset)
 						.append("&timeout=").append(updatesTimeout);
 						
@@ -1011,6 +1014,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			} catch (Exception e) {}
 			break;
 		}
+		case RUN_CLOSE_CONNECTION: {
+			try {
+				closingConnections.addElement(param);
+				((Connection) param).close();
+			} catch (Exception ignored) {}
+			break;
+		}
 		}
 //		log("done " + run + " " + param);
 //		running--;
@@ -1031,17 +1041,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 	static void cancel(Thread thread, boolean updates) {
 		if (thread == null) return;
-		if (updates) updatesThread = null;
-		if (!symbianJrt) {
-			try {
-				Connection c = (Connection) MP.threadConnections.get(thread);
-				if (c != null) {
-					closingConnections.addElement(c);
-					c.close();
-				}
-			} catch (Exception ignored) {}
-		}
+//		if (updates) updatesThread = null;
 		thread.interrupt();
+		if (!symbianJrt) {
+			Connection c = (Connection) threadConnections.get(thread);
+			if (c != null) midlet.start(RUN_CLOSE_CONNECTION, c);
+		}
 	}
 
 	public void commandAction(Command c, Displayable d) {
@@ -2347,7 +2352,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return a;
 	}
 
-	private static Alert loadingAlert(String s) {
+	static Alert loadingAlert(String s) {
 		Alert a = new Alert("", s, null, null);
 		a.setCommandListener(midlet);
 		a.addCommand(Alert.DISMISS_COMMAND);
@@ -2385,10 +2390,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e.toString());
 			}
-			synchronized (threadConnections) {
-				threadConnections.put(thread, hc = openHttpConnection(t));
-				hc.setRequestMethod("GET");
-			}
+			threadConnections.put(thread, hc = openHttpConnection(t));
+			hc.setRequestMethod("GET");
 //			MP.log("connect: " + hc + " - " + url);
 			int c = hc.getResponseCode();
 //			MP.log("<<res: " + c + " - " + url);
@@ -2534,7 +2537,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			if (user != null) {
 				hc.setRequestProperty("X-mpgram-user", user);
 			}
-			hc.setRequestProperty("X-mpgram-unicode", "1");
+			if (utf) hc.setRequestProperty("X-mpgram-unicode", "1");
 			hc.setRequestProperty("X-mpgram-app-version", version);
 			if (instancePassword != null) {
 				hc.setRequestProperty("X-mpgram-instance-password", instancePassword);
