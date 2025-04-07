@@ -282,10 +282,17 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 		
 		super.focusOnFinish = focus;
 		
-		if (endReached && MP.chatUpdates && mediaFilter == null) {
+		if (endReached && MP.chatUpdates && mediaFilter == null && thread == this.thread) {
 			// start updater thread
 			if (MP.updatesThread != null) {
+				MP.display(MP.loadingAlert("Waiting for chat to disconnect..."), this);
+				
 				MP.cancel(MP.updatesThread, true);
+				while (MP.updatesThread != null) {
+					Thread.sleep(1000L);
+				}
+				
+				if (MP.current == this) MP.display(this);
 			}
 			update = true;
 			MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
@@ -810,19 +817,9 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 				typingThread.interrupt();
 				break;
 			}
-			// TODO localize
-			if (id.charAt(0) != '-') {
-				if (typing == 0) {
-					setTicker(new Ticker(title + " is typing.."));
-				}
-			} else {
-				if (update.has("top_msg_id") && topMsgId != update.getInt("top_msg_id")) {
-					break;
-				}
-				if (typing == 0) {
-					setTicker(new Ticker("Someone is typing.."));
-				}
-			}
+			if (id.charAt(0) != '-' && update.has("top_msg_id") && topMsgId != update.getInt("top_msg_id"))
+				break;
+			setTitle("(...) ".concat(title));
 			typing = System.currentTimeMillis();
 			typingThread.interrupt();
 			synchronized (typingLock) {
@@ -913,6 +910,9 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 	}
 	
 	private void setStatus(JSONObject status) {
+		if (!title.equals(getTitle())) {
+			setTitle(title);
+		}
 		String s;
 		if (status == null) {
 			setTicker(null);
