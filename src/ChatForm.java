@@ -922,7 +922,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 				} else if (wasOnline == 2) {
 					s = MP.L[Offline];
 				} else if (wasOnline != 0) {
-					s = MP.L[LastSeen] + MP.localizeDate(wasOnline, 4);
+					s = /*MP.L[LastSeen] + */MP.localizeDate(wasOnline, 4);
 				} else {
 					s = null;
 				}
@@ -937,7 +937,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 			wasOnline = 1;
 			s = MP.L[Online];
 		} else if ((wasOnline = status.getInt("was_online", 0)) != 0) {
-			s = MP.L[LastSeen] + MP.localizeDate(wasOnline, 4);
+			s = /*MP.L[LastSeen] + */MP.localizeDate(wasOnline, 4);
 		} else {
 			s = MP.L[Offline];
 			wasOnline = 2;
