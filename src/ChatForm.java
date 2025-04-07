@@ -285,7 +285,8 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 		if (endReached && MP.chatUpdates && mediaFilter == null && thread == this.thread) {
 			// start updater thread
 			if (MP.updatesThread != null) {
-				MP.display(MP.loadingAlert("Waiting for chat to disconnect..."), this);
+				// TODO localize
+				MP.display(MP.loadingAlert("Waiting for previous chat to disconnect..."), this);
 				
 				MP.cancel(MP.updatesThread, true);
 				while (MP.updatesThread != null) {

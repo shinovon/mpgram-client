@@ -2504,7 +2504,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			sb.append(rng.nextInt(10));
 		}
 		String boundary = sb.toString();
-//		int boundaryLength = boundary.length();
+		int boundaryLength = boundary.length();
 		sb.setLength(0);
 		byte[] CRLF = new byte[] { (byte) '\r', (byte) '\n' };
 		byte[] DASHDASH = new byte[] { (byte) '-', (byte) '-' };
@@ -2512,25 +2512,26 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		try {
 			http = openHttpConnection(instanceUrl.concat(API_URL + "?v=" + API_VERSION + "&method=").concat(url));
 			http.setRequestMethod("POST");
-			http.setRequestProperty("Content-Type", "multipart/form-data; boundary=".concat(boundary));
+			http.setRequestProperty("Content-Type", "multipart/form-data; charset=UTF-8; boundary=".concat(boundary));
 
-//			int contentLength = 0;
-//			if (text != null) {
-//				contentLength += 53 + boundaryLength + text.getBytes("UTF-8").length;
-//			}
-//			if (fileUrl != null) {
-//				contentLength += 48 + boundaryLength + file.getName().getBytes("UTF-8").length + (int) file.fileSize();
-//			}
-//			contentLength += boundaryLength + 6;
-//			http.setRequestProperty("Content-length", String.valueOf(contentLength));
+			int contentLength = 0;
+			if (text != null) {
+				contentLength += 43 + 10 + boundaryLength + text.getBytes("UTF-8").length;
+			}
+			if (fileUrl != null) {
+				file = (FileConnection) Connector.open(fileUrl);
+				contentLength += 55 + 1 + 10 + boundaryLength + file.getName().getBytes("UTF-8").length + (int) file.fileSize();
+			}
+			contentLength += boundaryLength + 4;
+			http.setRequestProperty("Content-Length", String.valueOf(contentLength));
+			
 			httpOut = http.openOutputStream();
 			try {
 				if (text != null) {
 					httpOut.write(DASHDASH);
 					httpOut.write(boundary.getBytes());
 					httpOut.write(CRLF);
-					String s = "Content-Disposition: form-data; name=\"text\"";
-					httpOut.write(s.getBytes());
+					httpOut.write("Content-Disposition: form-data; name=\"text\"".getBytes());
 					httpOut.write(CRLF);
 					httpOut.write(CRLF);
 					byte[] b = text.getBytes("UTF-8");
@@ -2539,40 +2540,30 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				}
 
 				if (fileUrl != null) {
-					file = (FileConnection) Connector.open(fileUrl);
+					fileIn = file.openInputStream();
 					try {
-						fileIn = file.openInputStream();
-						try {
-							httpOut.write(DASHDASH);
-							httpOut.write(boundary.getBytes());
-							httpOut.write(CRLF);
-							String s = "Content-Disposition: form-data; name=\"file\"; filename=\"";
-							byte[] b = file.getName().getBytes("UTF-8");
-							httpOut.write(s.getBytes());
-							httpOut.write(b);
-							httpOut.write((byte) '"');
-							httpOut.write(CRLF);
-							httpOut.write(CRLF);
-							httpOut.flush();
-							b = new byte[4096];
-							int i;
-							while ((i = fileIn.read(b)) != -1) {
-								httpOut.write(b, 0, i);
-							}
-							httpOut.write(CRLF);
-							httpOut.write(CRLF);
-						} finally {
-							fileIn.close();
+						httpOut.write(DASHDASH);
+						httpOut.write(boundary.getBytes());
+						httpOut.write(CRLF);
+						httpOut.write("Content-Disposition: form-data; name=\"file\"; filename=\"".getBytes());
+						httpOut.write(file.getName().getBytes("UTF-8"));
+						httpOut.write((byte) '"');
+						httpOut.write(CRLF);
+						httpOut.write(CRLF);
+						byte[] b = new byte[4096];
+						int i;
+						while ((i = fileIn.read(b)) != -1) {
+							httpOut.write(b, 0, i);
 						}
+						httpOut.write(CRLF);
 					} finally {
-						file.close();
+						fileIn.close();
 					}
 				}
-				
+
 				httpOut.write(DASHDASH);
 				httpOut.write(boundary.getBytes());
 				httpOut.write(DASHDASH);
-				httpOut.write(CRLF);
 				httpOut.flush();
 			} finally {
 				httpOut.close();
@@ -2596,6 +2587,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			return res;
 		} finally {
 			uploading = false;
+			if (file != null) try {
+				file.close();
+			} catch (IOException e) {}
 			if (httpIn != null) try {
 				httpIn.close();
 			} catch (IOException e) {}
