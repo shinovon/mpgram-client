@@ -811,7 +811,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 
 				// refresh chat after deleting
 				commandAction(refreshCmd, current);
-				display(infoAlert(L[MessageDeleted_Alert]), current);
+//				display(infoAlert(L[MessageDeleted_Alert]), current);
 			} catch (Exception e) {
 				display(errorAlert(e.toString()), current);
 			}
@@ -833,7 +833,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				// go to latest message after sending
 				commandAction(backCmd, current);
 				commandAction(latestCmd, current);
-				display(infoAlert(L[MessageSent_Alert]), current);
+//				display(infoAlert(L[MessageSent_Alert]), current);
 			} catch (Exception e) {
 				display(errorAlert(e.toString()), current);
 			} finally {
