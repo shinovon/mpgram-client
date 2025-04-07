@@ -710,7 +710,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 	}
 
 	public void openMessage(String msg, int topMsg) {
-		if (urls != null && urls.contains(msg)) { // TODO doesn't work
+		if (urls != null && urls.containsKey(msg)) { // TODO doesn't work
 			Item focus = null;
 			for (Enumeration en = urls.keys(); en.hasMoreElements(); ) {
 				Object key = en.nextElement();
