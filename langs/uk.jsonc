@@ -1,6 +1,6 @@
 {
 	// About this locale file
-	"LocaleInfo": "Ukrainian, by @karusel33",
+	"LocaleInfo": "Ukrainian, by @karusel33, @PhantomHorror",
 	"LocaleSlavicPlurals": "1",
 	
 	// Common commands
@@ -13,9 +13,9 @@
 	"_secondAgo": " секунду тому",
 	"_secondsAgo": " секунди тому",
 	"_secondsAgo2": " секунд тому",
-	"_minuteAgo": " минуту тому",
-	"_minutesAgo": " минути тому",
-	"_minutesAgo2": " минут тому",
+	"_minuteAgo": " хвилину тому",
+	"_minutesAgo": " хвилини тому",
+	"_minutesAgo2": " хвилин тому",
 	"_hourAgo": " годину тому",
 	"_hoursAgo": " години тому",
 	"_hoursAgo2": " годин тому",
@@ -36,9 +36,12 @@
 	"Today": "сьогодні",
 	"Yesterday": "вчора",
 	"LastWeek": "цього тижня",
+	"LastMonth": "last month", // Untranslated
+	"ALongTimeAgo": "a long time ago", // Untranslated
+	"Recently": "recently", // Untranslated
 	// Date suffixes
 	"on_Date": "",
-	"at_Time": " в ",
+	"at_Time": " о ",
 	// Months
 	"Jan": "Січ",
 	"Feb": "Лют",
@@ -95,6 +98,7 @@
 	"Delete": "Видалити",
 	"Edit": "Редагувати",
 	"GoTo": "Перейти",
+	"Pin": "Pin", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "Відкрити",
@@ -108,10 +112,12 @@
 	"ChatInfo": "Інформація про чат",
 	"Older": "Старше",
 	"Newer": "Новіше",
+	"SendSticker": "Send sticker", // Untranslated
 	
 	// Message writing form commands
 	"Send": "Відправити",
 	"OpenTextBox": "Відкрити на весь екран",
+	"ChooseFile": "Choose file", // Untranslated
 	
 	// Profile/chat info commands
 	"Join": "Увійти",
@@ -119,6 +125,7 @@
 	"LeaveGroup": "Покинути групу",
 	"ChatMedia": "Медіафайли",
 	"Members": "Учасники",
+	"AddToContacts": "Add to contacts", // Untranslated
 	
 	// Dialog commands
 	"Ok": "Ок",
@@ -145,6 +152,8 @@
 	"CloudPassword": "Хмарний пароль",
 	"Captcha": "Капча",
 	"Auth_Btn": "Авторизуватися",
+	"InvalidCode_Alert": "Invalid code!", // Untranslated
+	"CodeExpired_Alert": "Code expired!", // Untranslated
 	
 	// Settings sections
 	"UI": "Вигляд інтерфейсу",
@@ -160,12 +169,16 @@
 	"ThumbnailsSize": "Розмір картинок",
 	"ChatsCount": "Кількість чатів",
 	"MessagesCount": "Кількість повідомлень",
+	"ChatsListFontSize": "Chats list font size", // Untranslated
+	"Default": "Default", // Untranslated
+	"Small": "Small", // Untranslated
+	"Medium": "Medium", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Чекати повного завантаження",
 	"UseJSONStream": "Вик. JSONStream",
 	"FormatText": "Форматувати текст",
-	"ParseLinks": "Парсі посилання",
+	"ParseLinks": "Відображати посилання",
 	"ChatAutoUpdate": "Авто-оновлення чата",
 	"UpdatesTimeout": "Таймаут оновлення",
 	
@@ -176,12 +189,12 @@
 	
 	// Cache settings
 	"AvatarsCaching": "Кешування аватарок",
-	"Disabled": "Викл",
-	"HoldInRAM": "Зберігати у ОЗУ",
-	"Store": "Зберігати у RMS",
-	"HoldInRAMandStore": "Зберігати у ОЗУ і в RMS",
+	"Disabled": "Вимк.",
+	"HoldInRAM": "Зберігати в ОЗП",
+	"Store": "Зберігати в RMS",
+	"HoldInRAMandStore": "Зберігати в ОЗП і в RMS",
 	"AvatarsCacheThreshold": "Поріг кешування аватарок",
-	"ProfilesCacheThreshold": "Поріг кешування профилей",
+	"ProfilesCacheThreshold": "Поріг кешування профілів",
 	
 	// About
 	"AboutText": "Клієнт Telegram для J2ME заснований на API MPGram Web.",
@@ -194,6 +207,13 @@
 	"Reply_Title": "Відповідь",
 	"Write_Title": "Повідомлення",
 	"Message": "Повідомлення",
+	"File": "File", // Untranslated
+	"File_Prefix": "File: ", // Untranslated
+	"NotSelected": "Not selected", // Untranslated
+	"SendUncompressed": "Send uncompressed", // Untranslated
+	"SendAsVoice": "Send as voice message", // Untranslated
+	"HideWithSpoiler": "Hide with spoiler", // Untranslated
+	"EnableHTMLFormatting": "Enable HTML-formatting", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Повідомлення відправлено",
@@ -212,13 +232,26 @@
 	"You_Prefix": "Ви: ",
 	"ForwardedMessage": "Переслане повідомл.",
 	"Action": "Дія",
+	"Edited": "edited", // Untranslated
 	
 	// Message media
 	"Media": "Медіа",
-	"Poll": "Опрос",
+	"Poll": "Опитування",
 	"Geo": "Геопозиція: ",
 	
 	// Chat actions
+	"PinnedMessage_Action": " pinned message", // Untranslated
+	"Joined_Action": " joined the group", // Untranslated
+	"Added_Action": " added", // Untranslated
+	"Left_Action": " left the group", // Untranslated
+	"Removed_Action": " removed", // Untranslated
+	"JoinedByLink_Action": " joined the group via invite link", // Untranslated
+	"JoinedByRequest_Action": " was accepted to the group", // Untranslated
+	"ChatHistoryCleared_Action": "Chat history was cleared", // Untranslated
+	"GroupCreated_Action": "Group created", // Untranslated
+	"ChannelCreated_Action": "Channel created", // Untranslated
+	"PhotoUpdated_Action": "Photo updated", // Untranslated
+	"NameChanged_Action": "Name was changed to ", // Untranslated
 	
 	// Folders
 	"AllChats": "Усі чати",
@@ -230,11 +263,18 @@
 	"LastSeen": "був/була ",
 	"About_User": "Інформація",
 	"About_Chat": "Інформація",
-	"Username": "Username",
+	"Mobile": "Mobile", // Untranslated
+	"Username": "Ім'я користувача",
 	"Link": "Посилання",
 	"SearchMessages": "Пошук повідомлень",
 	"ViewGroup": "Показати групу",
 	"GoToPinnedMessage": "Відкрити закріплене повідомлення",
+	"Owner": "owner", // Untranslated
+	"Admin": "admin", // Untranslated
+	"Bot": "bot", // Untranslated
+	"UserInfo": "User info", // Untranslated
+	"GroupInfo": "Group info", // Untranslated
+	"ChannelInfo": "Channel info", // Untranslated
 	
 	"_member": " учасник",
 	"_members": " учасника",
@@ -242,5 +282,25 @@
 	
 	"_subscriber": " підписник",
 	"_subscribers": " підписника",
-	"_subscribers2": " підписників"
+	"_subscribers2": " підписників",
+
+	"_photo": " фото",
+	"_photos": " фото",
+	"_photos2": " фото",
+	
+	"_video": " відео",
+	"_videos": " відео",
+	"_videos2": " відео",
+	
+	"_file": " файл",
+	"_files": " файла",
+	"_files2": " файлів",
+	
+	"_audioFile": " аудіо файл",
+	"_audioFiles": " аудіо файла",
+	"_audioFiles2": " аудіо файлів",
+	
+	"_voiceMessage": " голосове повідомлення",
+	"_voiceMessages": " голосових повідомлень",
+	"_voiceMessages2": " голосових повідомлень"
 }

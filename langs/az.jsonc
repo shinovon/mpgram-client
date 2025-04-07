@@ -1,0 +1,306 @@
+{
+	// About this locale file
+	"LocaleInfo": "Azerbaijani, by Red Fixrai",
+	"LocaleSlavicPlurals": "",
+	
+	// Common commands
+	"Exit": "Çıxış",
+	"Back": "Geri",
+	"Settings": "Quraşdırma",
+	"About": "Haqqinda",
+	
+	// Date offsets
+	"_secondAgo": " saniyə əvvəl",
+	"_secondsAgo": " saniyə əvvəl",
+	"_secondsAgo2": "",
+	"_minuteAgo": " dəqiqə əvvəl",
+	"_minutesAgo": " dəqiqə əvvəl",
+	"_minutesAgo2": "",
+	"_hourAgo": " saat əvvəl",
+	"_hoursAgo": " saat əvvəl",
+	"_hoursAgo2": "",
+	"_dayAgo": " gün əvvəl",
+	"_daysAgo": " gün əvvəl",
+	"_daysAgo2": "",
+	"_weekAgo": " həftə əvvəl",
+	"_weeksAgo": " həftə əvvəl",
+	"_weeksAgo2": "",
+	"_monthAgo": " ay əvvəl",
+	"_monthsAgo": " ay əvvəl",
+	"_monthsAgo2": "",
+	"_yearAgo": " il əvvəl",
+	"_yearsAgo": " il əvvəl",
+	"_yearsAgo2": "",
+	"Now": "indi",
+	"JustNow": "indicə",
+	"Today": "bu gün",
+	"Yesterday": "dünən",
+	"LastWeek": "bu həftə",
+	"LastMonth": "last month", // Untranslated
+	"ALongTimeAgo": "a long time ago", // Untranslated
+	"Recently": "recently", // Untranslated
+	// Date suffixes
+	"on_Date": "",
+	"at_Time": "",
+	// Months
+	"Jan": "Yan",
+	"Feb": "Fev",
+	"Mar": "Mar",
+	"Apr": "Apr",
+	"May": "May",
+	"Jun": "İyun",
+	"Jul": "İyun",
+	"Aug": "Avq",
+	"Sep": "Sen",
+	"Oct": "Okt",
+	"Nov": "Noy",
+	"Dec": "Dec",
+	// Days of week
+	"Sun": "baz",
+	"Mon": "baz ert",
+	"Tue": "çər axş",
+	"Wed": "çər",
+	"Thu": "cüm axş",
+	"Fri": "cüm",
+	"Sat": "şən",
+	"Sunday": "Bazar günu",
+	"Monday": "Bazar ertəsi",
+	"Tuesday": "Çərşəmbə axşamı",
+	"Wednesday": "Çərşəmbə",
+	"Thursday": "Cümə axşami",
+	"Friday": "Cümə",
+	"Saturday": "Şənbə",
+	
+	// Auth commands
+	"Auth": "Daxil ol",
+	"Next": "Sonrakı",
+	"NewSession": "Yeni sessiya",
+	"ImportSession": "İdxal Sessiya",
+	
+	// Settings commands
+	"Logout": "Çıxış",
+	"ClearCache": "Keç təmizlə",
+	
+	// Chats list commands
+	"Folders": "Qovluq",
+	"Refresh": "Yenilə",
+	"ArchivedChats": "Arxiv",
+	"Contacts": "Kontaktlar",
+	"Search": "Axtarış",
+	
+	// Message commands
+	"OpenChat": "Söhbəti açın",
+	"Profile": "Profil",
+	"Reply": "Cavab ver",
+	"Forward": "İrəli",
+	"CopyMessage": "Mətni kopyala",
+	"CopyMessageLink": "Linki kopyala",
+	"Delete": "Poz",
+	"Edit": "Redaktə et",
+	"GoTo": "Keç",
+	"Pin": "Pin", // Untranslated
+	
+	// Item commands
+	"Link_Cmd": "Aç",
+	"ViewImage": "Görsəd",
+	"Call": "Zəng et",
+	"Download": "Yükle",
+	
+	// Chat form commands
+	"WriteMessage": "Mesaj gönder",
+	"LatestMessages_Cmd": "Yenilə",
+	"ChatInfo": "Söhbət məlumatı",
+	"Older": "Daha köhnə",
+	"Newer": "Daha yeni",
+	"SendSticker": "Send sticker", // Untranslated
+	
+	// Message writing form commands
+	"Send": "Göndər",
+	"OpenTextBox": "Mətn qutusunu açın",
+	"ChooseFile": "Choose file", // Untranslated
+	
+	// Profile/chat info commands
+	"Join": "Gir",
+	"JoinGroup": "Qrupa gir",
+	"LeaveGroup": "Qruipdan çıx",
+	"ChatMedia": "Media faylar",
+	"Members": "Üzvləri",
+	"AddToContacts": "Add to contacts", // Untranslated
+	
+	// Dialog commands
+	"Ok": "Ok",
+	"Cancel": "Ləvğ et",
+	
+	// Pagination commands
+	"NextPage": "Son. Səy",
+	"PrevPage": "Əvv. Səy",
+	
+	// Loading states
+	"Loading": "Yüklenir...",
+	"Authorizing": "Avtorizsiya...",
+	"WaitingForServerResponse": "Server Cavabını Gözləyir...",
+	"Sending": "Göndərilir...",
+	
+	// Authorization process
+	"Auth_Title": "Avtorizasiya",
+	"InstanceURL": "URL instant",
+	"InstancePassword": "Parol URL",
+	"ChooseAuthMethod": "Avtorizasiya metodun seçin",
+	"PhoneNumber": "Telefon nömrəsi",
+	"SessionCode": "Sessiya kodu",
+	"Code": "Kod",
+	"CloudPassword": "Bulud parolu",
+	"Captcha": "Kapça",
+	"Auth_Btn": "Avtorizasiyə ed",
+	"InvalidCode_Alert": "Invalid code!", // Untranslated
+	"CodeExpired_Alert": "Code expired!", // Untranslated
+	
+	// Settings sections
+	"UI": "İnterfeys görünüşü",
+	"Behaviour": "Davranış",
+	"Images": "Şəkil",
+	"Authorization": "Avtorzasiya",
+	
+	// UI Settings
+	"Language": "Dil",
+	"ReversedChat": "Alt-üst söhbət",
+	"ShowMedia": "Media göstərin",
+	"ShowChatStatus": "Söhbət statusunu göstərin",
+	"ThumbnailsSize": "Söhbət statusunu göstərin",
+	"ChatsCount": "Söhbətlərin sayı",
+	"MessagesCount": "Mesajların sayı",
+	"ChatsListFontSize": "Chats list font size", // Untranslated
+	"Default": "Default", // Untranslated
+	"Small": "Small", // Untranslated
+	"Medium": "Medium", // Untranslated
+	
+	// Behaviour settings
+	"WaitForPageToLoad": "Tam yükləməni gözləyin",
+	"UseJSONStream": "İspan JSONStream",
+	"FormatText": "Mətni formatlayın",
+	"ParseLinks": "Bağlantıları təhlil edin",
+	"ChatAutoUpdate": "Söhbətin avtomatik yenilənməsi",
+	"UpdatesTimeout": "Yeniləmə vaxtı aşımı",
+	
+	// Images settings
+	"LoadMediaThumbnails": "Media yükləyin",
+	"LoadAvatars": "Avatarları yükləyin",
+	"MultiThreadedLoading": "Çox yivli yükləmə",
+	
+	// Cache settings
+	"AvatarsCaching": "Avatar keşləmə",
+	"Disabled": "Sönlü",
+	"HoldInRAM": "RAM-da saxlayın",
+	"Store": "RMS-də saxlayın",
+	"HoldInRAMandStore": "RAM və RMS-də saxlayın",
+	"AvatarsCacheThreshold": "Avatar keşləmə həddi",
+	"ProfilesCacheThreshold": "Profilin keşləmə həddi",
+	
+	// About
+	"AboutText": "MPGram Web API əsasında J2ME üçün Telegram müştərisi.",
+	"Developer": "Tərtibatçı",
+	"Author": "Müəllif",
+	"Donate": "Donat",
+	"Chat": "Söhbət",
+	
+	// Write form
+	"Reply_Title": "Cavab verinв",
+	"Write_Title": "Mesaj",
+	"Message": "Mesaj",
+	"File": "File", // Untranslated
+	"File_Prefix": "File: ", // Untranslated
+	"NotSelected": "Not selected", // Untranslated
+	"SendUncompressed": "Send uncompressed", // Untranslated
+	"SendAsVoice": "Send as voice message", // Untranslated
+	"HideWithSpoiler": "Hide with spoiler", // Untranslated
+	"EnableHTMLFormatting": "Enable HTML-formatting", // Untranslated
+	
+	// Alert messages
+	"MessageSent_Alert": "Mesaj göndərildi",
+	"MessageDeleted_Alert": "Post silindi",
+	"UpdateAvailable_Alert": "Müştəri yeniləməsi mövcuddur",
+	
+	// Chat form
+	"ChatMedia_Title": "Media faylları",
+	"Search_TitlePrefix": "Axtar -",
+	"OlderMessages": "Köhnə mesajlar",
+	"NewerMessages": "Yeni mesajlar",
+	
+	// Message
+	"ForwardedFrom": "Kimdən yönləndirilib",
+	"You": "Siz",
+	"You_Prefix": "Siz: ",
+	"ForwardedMessage": "Yönləndirilmiş mesaj",
+	"Action": "Fəaliyyət",
+	"Edited": "edited", // Untranslated
+	
+	// Message media
+	"Media": "Media",
+	"Poll": "Poll", // Untranslated
+	"Geo": "Geolokasiya: ",
+	
+	// Chat actions
+	"PinnedMessage_Action": " pinned message", // Untranslated
+	"Joined_Action": " joined the group", // Untranslated
+	"Added_Action": " added", // Untranslated
+	"Left_Action": " left the group", // Untranslated
+	"Removed_Action": " removed", // Untranslated
+	"JoinedByLink_Action": " joined the group via invite link", // Untranslated
+	"JoinedByRequest_Action": " was accepted to the group", // Untranslated
+	"ChatHistoryCleared_Action": "Chat history was cleared", // Untranslated
+	"GroupCreated_Action": "Group created", // Untranslated
+	"ChannelCreated_Action": "Channel created", // Untranslated
+	"PhotoUpdated_Action": "Photo updated", // Untranslated
+	"NameChanged_Action": "Name was changed to ", // Untranslated
+	
+	// Folders
+	"AllChats": "Bütün söhbətlər",
+	"Archive": "Arxiv",
+	
+	// Profile/chat info
+	"Online": "onlayn",
+	"Offline": "oflayn",
+	"LastSeen": "idi ",
+	"About_User": "Məlumat",
+	"About_Chat": "Məlumat",
+	"Mobile": "Mobile", // Untranslated
+	"Username": "İstifadəçi adı",
+	"Link": "Link",
+	"SearchMessages": "Mesajları axtarın",
+	"ViewGroup": "Qrupu göstərin",
+	"GoToPinnedMessage": "Saxlanmış mesajı açın",
+	"Owner": "owner", // Untranslated
+	"Admin": "admin", // Untranslated
+	"Bot": "bot", // Untranslated
+	"UserInfo": "User info", // Untranslated
+	"GroupInfo": "Group info", // Untranslated
+	"ChannelInfo": "Channel info", // Untranslated
+	
+	"_member": "iştirakçı",
+	"_members": "iştirakçı",
+	"_members2": "",
+	
+	"_subscriber": " abunəçi",
+	"_subscribers": " abunəçi",
+	"_subscribers2": "",
+	
+	"_photo": " photo", // Untranslated
+	"_photos": " photos", // Untranslated
+	"_photos2": "",
+	
+	"_video": " video", // Untranslated
+	"_videos": " videos", // Untranslated
+	"_videos2": "",
+	
+	"_file": " file", // Untranslated
+	"_files": " files", // Untranslated
+	"_files2": "",
+	
+	"_audioFile": " audio file", // Untranslated
+	"_audioFiles": " audio files", // Untranslated
+	"_audioFiles2": "",
+	
+	"_voiceMessage": " voice message", // Untranslated
+	"_voiceMessages": " voice messages", // Untranslated
+	"_voiceMessages2": ""
+}

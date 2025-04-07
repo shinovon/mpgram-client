@@ -1,24 +1,27 @@
 from os import listdir
 import json
 
-def load_jsonc(f):
-    cleaned=""
+def load_jsonc(f,lines=None):
+    cleaned = ""
     for s in f:
+        if lines != None:
+            lines.append(s)
         if s.strip().startswith("//"):
             cleaned += "\n"
             continue
         if " // " in s:
-            cleaned += s[:s.index(" // ")]
+            cleaned += s[:s.index(" // ")] + "\n"
         else:
             cleaned += s
     return json.loads(cleaned)
 
-desc=[]
+en_lines = []
+en_json = None
 with open("en.jsonc", encoding="utf-8") as f:
-    desc = load_jsonc(f)
+    en_json = load_jsonc(f,en_lines)
 
 err=False
-for s in desc.keys():
+for s in en_json.keys():
     if " " in s:
         print("Invalid key:", s)
         err=True
@@ -29,7 +32,7 @@ if not err:
         f.write("\n")
         f.write("public interface LangConstants {\n")
         i = 1
-        for s in desc:
+        for s in en_json.keys():
             f.write("\tstatic final int " + s + " = " + str(i) + ";\n")
             i += 1
         f.write("\tstatic final int mpgram = 0;\n")
@@ -41,15 +44,56 @@ if not err:
         print(n)
         
         j = None
+        lines = []
         with open(n, encoding="utf-8") as f:
-            j = load_jsonc(f)
+            j = load_jsonc(f, lines)
 
         with open("../res/l/" + n[:-6], mode='w', encoding="utf-8") as f:
-            for s in desc.keys():
-                if s in j and j[s] != None:
-                    f.write(j[s].replace("\n", "\\\n"))
+            for s in en_json.keys():
+                if s in j:
+                    if j[s] == None:
+                        f.write(en_json[s].replace("\n", "\\\n"))
+                        #print("Missing key:", s)
+                    else:
+                        f.write(en_json[s].replace("\n", "\\\n"))
                 else:
-                    f.write(desc[s].replace("\n", "\\\n"))
+                    f.write(en_json[s].replace("\n", "\\\n"))
                     print("Missing key:", s)
                 f.write("\n")
+        
+        if len(lines) != len(en_lines):
+            print("Filling")
+            for k in en_json.keys():
+                if k in j.keys():
+                    continue
+                i = 0
+                for s in en_lines:
+                    if s.strip().startswith("//") and s.strip() != lines[i].strip():
+                        print(i, s.strip())
+                        if lines[i].strip().starswith("//"):
+                            lines[i] = s
+                        else:
+                            lines.insert(i, s)
+                    elif s.strip() == "" and lines[i].strip() != "":
+                        lines.insert(i, s)
+                    elif s.strip().split(":")[0] == "\"" + k + "\"":
+                        print(i, s.strip())
+                        if k[0] == '_' and k[-1] == '2':
+                            lines.insert(i, s)
+                        else:
+                            lines.insert(i, s[:-1] + " // Untranslated\n")
+                        break
+                    # elif s.strip()[-1] == ',' and lines[i].strip()[-1] != ',':
+                    #     if " // " in lines[i]:
+                    #         d = lines[i].split(" // ")
+                    #         if d[0][-1] == ',':
+                    #             lines[i] = lines[i][:-1] + ",\n"
+                    #     else:
+                    #         lines[i] = lines[i][:-1] + ",\n"
+                    i += 1
+            
+            with open(n, mode="w", encoding="utf-8") as f:
+                for s in lines:
+                    f.write(s)
+        
         print()

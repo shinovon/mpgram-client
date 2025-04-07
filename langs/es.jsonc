@@ -36,6 +36,9 @@
 	"Today": "hoy",
 	"Yesterday": "ayer",
 	"LastWeek": "la semana pasada",
+	"LastMonth": "last month", // Untranslated
+	"ALongTimeAgo": "a long time ago", // Untranslated
+	"Recently": "recently", // Untranslated
 	// Date suffixes
 	"on_Date": "sobre ",
 	"at_Time": " at ",
@@ -95,6 +98,7 @@
 	"Delete": "Eliminar",
 	"Edit": "Editar",
 	"GoTo": "Ir a",
+	"Pin": "Pin", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "Enlace",
@@ -108,10 +112,12 @@
 	"ChatInfo": "Chat info",
 	"Older": "Mensajes antiguos",
 	"Newer": "Mensajes mas recientes",
+	"SendSticker": "Send sticker", // Untranslated
 	
 	// Message writing form commands
 	"Send": "Enviar",
 	"OpenTextBox": "Abrir cuadro de texto",
+	"ChooseFile": "Choose file", // Untranslated
 	
 	// Profile/chat info commands
 	"Join": "Unirse",
@@ -119,6 +125,7 @@
 	"LeaveGroup": "Dejar el grupo",
 	"ChatMedia": "Documentos del chat",
 	"Members": "Miembros",
+	"AddToContacts": "Add to contacts", // Untranslated
 	
 	// Dialog commands
 	"Ok": "Aceptar",
@@ -162,6 +169,10 @@
 	"ThumbnailsSize": "Tamaño de miniaturas",
 	"ChatsCount": "Contador de chats",
 	"MessagesCount": " Contador de mensajes",
+	"ChatsListFontSize": "Chats list font size", // Untranslated
+	"Default": "Default", // Untranslated
+	"Small": "Small", // Untranslated
+	"Medium": "Medium", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Espere a que se cargue la pagina",
@@ -196,6 +207,12 @@
 	"Reply_Title": "Respuesta",
 	"Write_Title": "Escribir",
 	"Message": "Mensaje",
+	"File": "File", // Untranslated
+	"File_Prefix": "File: ", // Untranslated
+	"NotSelected": "Not selected", // Untranslated
+	"SendUncompressed": "Send uncompressed", // Untranslated
+	"SendAsVoice": "Send as voice message", // Untranslated
+	"HideWithSpoiler": "Hide with spoiler", // Untranslated
 	"EnableHTMLFormatting": "HTML formato",
 	
 	// Alert messages
@@ -215,6 +232,7 @@
 	"You_Prefix": "Tu: ",
 	"ForwardedMessage": "Mensaje reenviado",
 	"Action": "Accion",
+	"Edited": "edited", // Untranslated
 	
 	// Message media
 	"Media": "Medios",
@@ -245,11 +263,18 @@
 	"LastSeen": "visto por última vez ",
 	"About_User": "Bio",
 	"About_Chat": "Sobre",
+	"Mobile": "Mobile", // Untranslated
 	"Username": "Nombre de Usuario",
 	"Link": "Enlace",
 	"SearchMessages": "Buscar mensajes",
 	"ViewGroup": "Ver grupo",
 	"GoToPinnedMessage": "Ver mensaje anclado",
+	"Owner": "owner", // Untranslated
+	"Admin": "admin", // Untranslated
+	"Bot": "bot", // Untranslated
+	"UserInfo": "User info", // Untranslated
+	"GroupInfo": "Group info", // Untranslated
+	"ChannelInfo": "Channel info", // Untranslated
 	
 	"_member": " miembro",
 	"_members": " miembros",
@@ -257,5 +282,25 @@
 	
 	"_subscriber": " suscriptor",
 	"_subscribers": " suscriptores",
-	"_subscribers2": ""
+	"_subscribers2": "",
+	
+	"_photo": " photo", // Untranslated
+	"_photos": " photos", // Untranslated
+	"_photos2": "",
+	
+	"_video": " video", // Untranslated
+	"_videos": " videos", // Untranslated
+	"_videos2": "",
+	
+	"_file": " file", // Untranslated
+	"_files": " files", // Untranslated
+	"_files2": "",
+	
+	"_audioFile": " audio file", // Untranslated
+	"_audioFiles": " audio files", // Untranslated
+	"_audioFiles2": "",
+	
+	"_voiceMessage": " voice message", // Untranslated
+	"_voiceMessages": " voice messages", // Untranslated
+	"_voiceMessages2": ""
 }

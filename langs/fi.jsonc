@@ -36,6 +36,9 @@
 	"Today": "tänään",
 	"Yesterday": "eilen",
 	"LastWeek": "viime viikolla",
+	"LastMonth": "last month", // Untranslated
+	"ALongTimeAgo": "a long time ago", // Untranslated
+	"Recently": "recently", // Untranslated
 	// Date suffixes
 	"on_Date": "",
 	"at_Time": " klo ",
@@ -95,6 +98,7 @@
 	"Delete": "Poista",
 	"Edit": "Muokkaa",
 	"GoTo": "Siirry",
+	"Pin": "Pin", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "Linkki",
@@ -108,10 +112,12 @@
 	"ChatInfo": "Keskustelun tiedot",
 	"Older": "Vanhemmat",
 	"Newer": "Uudemmat",
+	"SendSticker": "Send sticker", // Untranslated
 	
 	// Message writing form commands
 	"Send": "Lähetä",
 	"OpenTextBox": "Avaa tekstiruutu",
+	"ChooseFile": "Choose file", // Untranslated
 	
 	// Profile/chat info commands
 	"Join": "Liity",
@@ -119,6 +125,7 @@
 	"LeaveGroup": "Poistu ryhmästä",
 	"ChatMedia": "Keskustelun media",
 	"Members": "Jäsenet",
+	"AddToContacts": "Add to contacts", // Untranslated
 	
 	// Dialog commands
 	"Ok": "OK",
@@ -145,6 +152,8 @@
 	"CloudPassword": "Pilvisalasana",
 	"Captcha": "Captcha",
 	"Auth_Btn": "Kirjaudu",
+	"InvalidCode_Alert": "Invalid code!", // Untranslated
+	"CodeExpired_Alert": "Code expired!", // Untranslated
 	
 	// Settings sections
 	"UI": "Käyttöliittymä",
@@ -160,6 +169,10 @@
 	"ThumbnailsSize": "Esikatselun koko",
 	"ChatsCount": "Keskustelujen määrä",
 	"MessagesCount": "Viestien määrä",
+	"ChatsListFontSize": "Chats list font size", // Untranslated
+	"Default": "Default", // Untranslated
+	"Small": "Small", // Untranslated
+	"Medium": "Medium", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Odota sivun latausta",
@@ -194,6 +207,13 @@
 	"Reply_Title": "Vastaa",
 	"Write_Title": "Kirjoita",
 	"Message": "Viesti",
+	"File": "File", // Untranslated
+	"File_Prefix": "File: ", // Untranslated
+	"NotSelected": "Not selected", // Untranslated
+	"SendUncompressed": "Send uncompressed", // Untranslated
+	"SendAsVoice": "Send as voice message", // Untranslated
+	"HideWithSpoiler": "Hide with spoiler", // Untranslated
+	"EnableHTMLFormatting": "Enable HTML-formatting", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Viesti lähetetty",
@@ -212,6 +232,7 @@
 	"You_Prefix": "Sinä: ",
 	"ForwardedMessage": "Välitetty viesti",
 	"Action": "Toiminto",
+	"Edited": "edited", // Untranslated
 	
 	// Message media
 	"Media": "Media",
@@ -219,6 +240,18 @@
 	"Geo": "Sijainti: ",
 	
 	// Chat actions
+	"PinnedMessage_Action": " pinned message", // Untranslated
+	"Joined_Action": " joined the group", // Untranslated
+	"Added_Action": " added", // Untranslated
+	"Left_Action": " left the group", // Untranslated
+	"Removed_Action": " removed", // Untranslated
+	"JoinedByLink_Action": " joined the group via invite link", // Untranslated
+	"JoinedByRequest_Action": " was accepted to the group", // Untranslated
+	"ChatHistoryCleared_Action": "Chat history was cleared", // Untranslated
+	"GroupCreated_Action": "Group created", // Untranslated
+	"ChannelCreated_Action": "Channel created", // Untranslated
+	"PhotoUpdated_Action": "Photo updated", // Untranslated
+	"NameChanged_Action": "Name was changed to ", // Untranslated
 	
 	// Folders
 	"AllChats": "Kaikki keskustelut",
@@ -230,11 +263,18 @@
 	"LastSeen": "nähty ",
 	"About_User": "Kuvaus",
 	"About_Chat": "Tietoja",
+	"Mobile": "Mobile", // Untranslated
 	"Username": "Käyttäjätunnus",
 	"Link": "Linkki",
 	"SearchMessages": "Hae viesteistä",
 	"ViewGroup": "Näytä ryhmä",
 	"GoToPinnedMessage": "Näytä kiinnitetty viesti",
+	"Owner": "owner", // Untranslated
+	"Admin": "admin", // Untranslated
+	"Bot": "bot", // Untranslated
+	"UserInfo": "User info", // Untranslated
+	"GroupInfo": "Group info", // Untranslated
+	"ChannelInfo": "Channel info", // Untranslated
 	
 	"_member": " jäsen",
 	"_members": " jäsentä",
@@ -242,5 +282,25 @@
 	
 	"_subscriber": " tilaaja",
 	"_subscribers": " tilaajaa",
-	"_subscribers2": ""
+	"_subscribers2": "",
+	
+	"_photo": " photo", // Untranslated
+	"_photos": " photos", // Untranslated
+	"_photos2": "",
+	
+	"_video": " video", // Untranslated
+	"_videos": " videos", // Untranslated
+	"_videos2": "",
+	
+	"_file": " file", // Untranslated
+	"_files": " files", // Untranslated
+	"_files2": "",
+	
+	"_audioFile": " audio file", // Untranslated
+	"_audioFiles": " audio files", // Untranslated
+	"_audioFiles2": "",
+	
+	"_voiceMessage": " voice message", // Untranslated
+	"_voiceMessages": " voice messages", // Untranslated
+	"_voiceMessages2": ""
 }

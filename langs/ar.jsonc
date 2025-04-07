@@ -36,6 +36,9 @@
 	"Today": "اليوم",
 	"Yesterday": "البارحة",
 	"LastWeek": "الاسبوع الماضي",
+	"LastMonth": "last month", // Untranslated
+	"ALongTimeAgo": "a long time ago", // Untranslated
+	"Recently": "recently", // Untranslated
 	// Date suffixes
 	"on_Date": "في ",
 	"at_Time": " في",
@@ -95,6 +98,7 @@
 	"Delete": "مسح",
 	"Edit": "تعديل",
 	"GoTo": "الذهاب الى",
+	"Pin": "Pin", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "الرابط",
@@ -108,10 +112,12 @@
 	"ChatInfo": "معلومات المحادثة",
 	"Older": "اقدم",
 	"Newer": "احدث",
+	"SendSticker": "Send sticker", // Untranslated
 	
 	// Message writing form commands
 	"Send": "ارسال",
 	"OpenTextBox": "فتح مربع النص",
+	"ChooseFile": "Choose file", // Untranslated
 	
 	// Profile/chat info commands
 	"Join": "انضمام",
@@ -119,6 +125,7 @@
 	"LeaveGroup": "الخروج من المجموعة",
 	"ChatMedia": "وسائط المحادثة",
 	"Members": "اعضاء",
+	"AddToContacts": "Add to contacts", // Untranslated
 	
 	// Dialog commands
 	"Ok": "تم",
@@ -145,6 +152,8 @@
 	"CloudPassword": "كلمة المرور",
 	"Captcha": "كلمة التحقق",
 	"Auth_Btn": "مصادقة",
+	"InvalidCode_Alert": "Invalid code!", // Untranslated
+	"CodeExpired_Alert": "Code expired!", // Untranslated
 	
 	// Settings sections
 	"UI": "واجهة المستخدم",
@@ -160,6 +169,10 @@
 	"ThumbnailsSize": "حجم الصور المصغرة",
 	"ChatsCount": "عدد المحادثات",
 	"MessagesCount": "عدد الرسائل",
+	"ChatsListFontSize": "Chats list font size", // Untranslated
+	"Default": "Default", // Untranslated
+	"Small": "Small", // Untranslated
+	"Medium": "Medium", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "انتظار تحميل الصفحة",
@@ -194,6 +207,13 @@
 	"Reply_Title": "رد",
 	"Write_Title": "كتابة",
 	"Message": "رسالة",
+	"File": "File", // Untranslated
+	"File_Prefix": "File: ", // Untranslated
+	"NotSelected": "Not selected", // Untranslated
+	"SendUncompressed": "Send uncompressed", // Untranslated
+	"SendAsVoice": "Send as voice message", // Untranslated
+	"HideWithSpoiler": "Hide with spoiler", // Untranslated
+	"EnableHTMLFormatting": "Enable HTML-formatting", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "الرسالة مرسلة",
@@ -212,6 +232,7 @@
 	"You": "انت",
 	"You_Prefix": "انت: ",
 	"ForwardedMessage": "رسالة محولة",
+	"Edited": "edited", // Untranslated
 	
 	// Message media
 	"Media": "وسائط",
@@ -219,6 +240,18 @@
 	"Geo": "جغرافي: ",
 	
 	// Chat actions
+	"PinnedMessage_Action": " pinned message", // Untranslated
+	"Joined_Action": " joined the group", // Untranslated
+	"Added_Action": " added", // Untranslated
+	"Left_Action": " left the group", // Untranslated
+	"Removed_Action": " removed", // Untranslated
+	"JoinedByLink_Action": " joined the group via invite link", // Untranslated
+	"JoinedByRequest_Action": " was accepted to the group", // Untranslated
+	"ChatHistoryCleared_Action": "Chat history was cleared", // Untranslated
+	"GroupCreated_Action": "Group created", // Untranslated
+	"ChannelCreated_Action": "Channel created", // Untranslated
+	"PhotoUpdated_Action": "Photo updated", // Untranslated
+	"NameChanged_Action": "Name was changed to ", // Untranslated
 	
 	// Folders
 	"AllChats": "جميع المحادثات",
@@ -230,11 +263,18 @@
 	"LastSeen": "اخر ظهور ",
 	"About_User": "النبذة",
 	"About_Chat": "حول",
+	"Mobile": "Mobile", // Untranslated
 	"Username": "اسم المستخدم",
 	"Link": "الرابط",
 	"SearchMessages": "البحث في الرسائل",
 	"ViewGroup": "اظهار المجموعة",
 	"GoToPinnedMessage": "الذهاب للرسالة المثبتة",
+	"Owner": "owner", // Untranslated
+	"Admin": "admin", // Untranslated
+	"Bot": "bot", // Untranslated
+	"UserInfo": "User info", // Untranslated
+	"GroupInfo": "Group info", // Untranslated
+	"ChannelInfo": "Channel info", // Untranslated
 	
 	"_member": " عضو",
 	"_members": " اعضاء",
@@ -242,5 +282,25 @@
 	
 	"_subscriber": " مشترك",
 	"_subscribers": " مشتركين",
-	"_subscribers2": ""
+	"_subscribers2": "",
+	
+	"_photo": " photo", // Untranslated
+	"_photos": " photos", // Untranslated
+	"_photos2": "",
+	
+	"_video": " video", // Untranslated
+	"_videos": " videos", // Untranslated
+	"_videos2": "",
+	
+	"_file": " file", // Untranslated
+	"_files": " files", // Untranslated
+	"_files2": "",
+	
+	"_audioFile": " audio file", // Untranslated
+	"_audioFiles": " audio files", // Untranslated
+	"_audioFiles2": "",
+	
+	"_voiceMessage": " voice message", // Untranslated
+	"_voiceMessages": " voice messages", // Untranslated
+	"_voiceMessages2": ""
 }

@@ -284,23 +284,23 @@
 	"_subscribers": " подписчика",
 	"_subscribers2": " подписчиков",
 	
-	"_photo": " photo",
-	"_photos": " photos",
-	"_photos2": " photos",
+	"_photo": " фотография",
+	"_photos": " фотографий",
+	"_photos2": " фотографий",
 	
-	"_video": " video",
-	"_videos": " videos",
-	"_videos2": " videos",
+	"_video": " видео",
+	"_videos": " видео",
+	"_videos2": " видео",
 	
 	"_file": " файл",
 	"_files": " файла",
 	"_files2": " файлов",
 	
-	"_audioFile": " audio file",
-	"_audioFiles": " audio files",
-	"_audioFiles2": " audio files",
+	"_audioFile": " аудиофайл",
+	"_audioFiles": " аудиофайла",
+	"_audioFiles2": " аудиофайлов",
 	
-	"_voiceMessage": " voice message",
-	"_voiceMessages": " voice messages",
-	"_voiceMessages2": " voice messages"
+	"_voiceMessage": " голосовое сообщение",
+	"_voiceMessages": " голосовых сообщения",
+	"_voiceMessages2": " голосовый сообщений"
 }
