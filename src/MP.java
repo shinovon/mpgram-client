@@ -182,7 +182,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Hashtable threadConnections = new Hashtable();
 	static Vector closingConnections = new Vector();
 	private static boolean sending;
-	private static boolean uploading;
 	
 	private static Object imagesLoadLock = new Object();
 	private static Vector imagesToLoad = new Vector(); // TODO hashtable?
@@ -876,9 +875,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				postMessage(sb.toString(), file, (String) param);
 				
 				// go to latest message after sending
-				System.out.println("t: " + current);
 				commandAction(backCmd, current);
-				System.out.println("a: " + current);
 				commandAction(latestCmd, current);
 //				display(infoAlert(L[MessageSent_Alert]), current);
 			} catch (Exception e) {
@@ -1697,7 +1694,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			path = path.concat("/").concat(name);
 			
 			if (dir) {
-				openFilePicker(path);
+				openFilePicker(path.concat("/"));
 				return;
 			}
 			
@@ -2682,7 +2679,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	}
 	
 	static Object postMessage(String url, String fileUrl, String text) throws IOException {
-		uploading = true;
 		Object res;
 
 		HttpConnection http = null;
@@ -2783,7 +2779,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			return res;
 		} finally {
-			uploading = false;
 			if (file != null) try {
 				file.close();
 			} catch (IOException e) {}
