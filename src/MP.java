@@ -413,6 +413,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		try {
 			loadLocale(lang);
 		} catch (Exception e) {
+			e.printStackTrace();
 			try {
 				loadLocale(lang = "en");
 			} catch (Exception e2) {
@@ -1028,8 +1029,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					if (threadConnections.size() != 0) continue;
 					try {
 						boolean shown = !paused && current.isShown();
-						api(wasShown != shown ?
+						if (shown || wasShown != shown) {
+							api(wasShown != shown ?
 								("updateStatus".concat(!shown ? "&off=1" : "")) : "me");
+						}
 						wasShown = shown;
 					} catch (Exception e) {}
 				}

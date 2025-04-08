@@ -55,7 +55,7 @@ if not err:
                         f.write(en_json[s].replace("\n", "\\\n"))
                         #print("Missing key:", s)
                     else:
-                        f.write(en_json[s].replace("\n", "\\\n"))
+                        f.write(j[s].replace("\n", "\\\n"))
                 else:
                     f.write(en_json[s].replace("\n", "\\\n"))
                     print("Missing key:", s)

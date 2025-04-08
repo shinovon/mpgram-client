@@ -814,7 +814,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 	
 	void handleUpdate(int type, JSONObject update) {
 		if (!this.update) return;
-//		MP.log("update: " + type);
+//		System.out.println("update: " + type);
 		switch (type) {
 		case UPDATE_USER_STATUS: {
 			if (MP.chatStatus) {
