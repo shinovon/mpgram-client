@@ -87,6 +87,7 @@
 	"ArchivedChats": "Arkistoidut keskustelut",
 	"Contacts": "Yhteystiedot",
 	"Search": "Haku",
+	"OpenByLink": "Open by link", // Untranslated
 	
 	// Message commands
 	"OpenChat": "Avaa keskustelu",
@@ -140,6 +141,7 @@
 	"Authorizing": "Kirjaudutaan sisään",
 	"WaitingForServerResponse": "Odotetaan palvelimen vastausta...",
 	"Sending": "Lähetetään",
+	"WaitingForPrevChat": "Waiting for previous chat to disconnect...", // Untranslated
 	
 	// Authorization process
 	"Auth_Title": "Kirjaudu",

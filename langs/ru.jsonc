@@ -87,6 +87,7 @@
 	"ArchivedChats": "Архив",
 	"Contacts": "Контакты",
 	"Search": "Поиск",
+	"OpenByLink": "Открыть по ссылке",
 	
 	// Message commands
 	"OpenChat": "Открыть чат",
@@ -140,6 +141,7 @@
 	"Authorizing": "Авторизация...",
 	"WaitingForServerResponse": "Ожидание ответа сервера...",
 	"Sending": "Отправка...",
+	"WaitingForPrevChat": "Отключение от предыдущего чата...",
 	
 	// Authorization process
 	"Auth_Title": "Авторизация",

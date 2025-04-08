@@ -87,6 +87,7 @@
 	"ArchivedChats": "المحادثات المؤرشفة",
 	"Contacts": "جهات الاتصال",
 	"Search": "البحث",
+	"OpenByLink": "Open by link", // Untranslated
 		
 	// Message commands
 	"OpenChat": "فتح المحادثة",
@@ -140,6 +141,7 @@
 	"Authorizing": "يتم التحقق",
 	"WaitingForServerResponse": "...انتظار رد الخادم",
 	"Sending": "يتم الارسال",
+	"WaitingForPrevChat": "Waiting for previous chat to disconnect...", // Untranslated
 	
 	// Authorization process
 	"Auth_Title": "التحقق",

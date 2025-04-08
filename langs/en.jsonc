@@ -87,6 +87,7 @@
 	"ArchivedChats": "Archived chats",
 	"Contacts": "Contacts",
 	"Search": "Search",
+	"OpenByLink": "Open by link",
 	
 	// Message commands
 	"OpenChat": "Open chat",
@@ -140,6 +141,7 @@
 	"Authorizing": "Authorizing",
 	"WaitingForServerResponse": "Waiting for server response...",
 	"Sending": "Sending",
+	"WaitingForPrevChat": "Waiting for previous chat to disconnect...",
 	
 	// Authorization process
 	"Auth_Title": "Auth",

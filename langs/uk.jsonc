@@ -87,6 +87,7 @@
 	"ArchivedChats": "Архів",
 	"Contacts": "Контакти",
 	"Search": "Пошук",
+	"OpenByLink": "Open by link", // Untranslated
 	
 	// Message commands
 	"OpenChat": "Відкрити чат",
@@ -140,6 +141,7 @@
 	"Authorizing": "Авторизація...",
 	"WaitingForServerResponse": "Очікування відповіді сервера...",
 	"Sending": "Надсилання...",
+	"WaitingForPrevChat": "Waiting for previous chat to disconnect...", // Untranslated
 	
 	// Authorization process
 	"Auth_Title": "Авторизація",

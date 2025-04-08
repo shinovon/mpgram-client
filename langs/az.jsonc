@@ -87,6 +87,7 @@
 	"ArchivedChats": "Arxiv",
 	"Contacts": "Kontaktlar",
 	"Search": "Axtarış",
+	"OpenByLink": "Open by link", // Untranslated
 	
 	// Message commands
 	"OpenChat": "Söhbəti açın",
@@ -140,6 +141,7 @@
 	"Authorizing": "Avtorizsiya...",
 	"WaitingForServerResponse": "Server Cavabını Gözləyir...",
 	"Sending": "Göndərilir...",
+	"WaitingForPrevChat": "Waiting for previous chat to disconnect...", // Untranslated
 	
 	// Authorization process
 	"Auth_Title": "Avtorizasiya",

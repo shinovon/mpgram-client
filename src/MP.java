@@ -35,6 +35,7 @@ import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 import javax.microedition.io.file.FileConnection;
+import javax.microedition.io.file.FileSystemRegistry;
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Choice;
@@ -212,6 +213,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command foldersCmd;
 	static Command contactsCmd;
 	static Command searchCmd;
+	static Command openLinkCmd;
 
 	static Command itemChatCmd;
 	static Command itemChatInfoCmd;
@@ -236,6 +238,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 	static Command sendCmd;
 	static Command openTextBoxCmd;
+	static Command chooseFileCmd;
 	
 	static Command callCmd;
 	static Command openChatCmd;
@@ -248,6 +251,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 
 	static Command okCmd;
 	static Command cancelCmd;
+	static Command goCmd;
 	
 	static Command nextPageCmd;
 	static Command prevPageCmd;
@@ -261,6 +265,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static FoldersList foldersList;
 	private static Form settingsForm;
 	private static Form authForm;
+	private static Form writeForm;
 	private static Vector formHistory = new Vector();
 
 	// auth items
@@ -283,8 +288,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 	// write items
 	private static TextField messageField;
-	private static TextField fileField;
+//	private static TextField fileField;
 	private static ChoiceGroup sendChoice;
+	private static StringItem fileLabel;
 
 	// cache
 	private static JSONObject usersCache = new JSONObject();
@@ -292,14 +298,19 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static Hashtable imagesCache = new Hashtable();
 	
 	private static Image userDefaultImg, chatDefaultImg;
+	private static Image fileImg, folderImg;
 	
 	// temp
 	private static String richTextUrl;
 	private static String writeTo;
 	private static String replyTo;
+	private static String sendFile;
 	private static String edit;
 	private static String updateUrl;
 	private static long lastType;
+	
+	// file picker
+	private static Vector rootsList;
 	
 	protected void destroyApp(boolean u) {
 	}
@@ -433,6 +444,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		archiveCmd = new Command(L[ArchivedChats], Command.SCREEN, 8);
 		contactsCmd = new Command(L[Contacts], Command.SCREEN, 9);
 		searchCmd = new Command(L[Search], Command.SCREEN, 10);
+		openLinkCmd = new Command(L[OpenByLink], Command.SCREEN, 11);
 		
 		itemChatCmd = new Command(L[OpenChat], Command.ITEM, 1);
 		itemChatInfoCmd = new Command(L[Profile], Command.ITEM, 2);
@@ -457,6 +469,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		
 		sendCmd = new Command(L[Send], Command.OK, 1);
 		openTextBoxCmd = new Command(L[OpenTextBox], Command.ITEM, 1);
+		chooseFileCmd = new Command(L[ChooseFile], Command.ITEM, 1);
 		
 		callCmd = new Command(L[Call], Command.SCREEN, 5);
 		openChatCmd = new Command(L[OpenChat], Command.SCREEN, 1);
@@ -468,7 +481,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		chatMembersCmd = new Command(L[Members], Command.SCREEN, 6);
 		
 		okCmd = new Command(L[Ok], Command.OK, 1);
-		cancelCmd = new Command(L[Cancel], Command.CANCEL, 2);
+		cancelCmd = new Command(L[Cancel], Command.CANCEL, 20);
+		goCmd = new Command(L[Ok], Command.OK, 1);
 
 		nextPageCmd = new Command(L[NextPage], Command.SCREEN, 6);
 		prevPageCmd = new Command(L[PrevPage], Command.SCREEN, 7);
@@ -804,8 +818,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		case RUN_SEND_MESSAGE: {
 			try {
-				String file = fileField.getString();
-				if (file.length() <= 8) {
+//				String file = fileField.getString();
+				String file = MP.sendFile;
+				if (file != null && file.length() <= 8) {
 					file = null;
 				}
 				StringBuffer sb;
@@ -834,7 +849,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				postMessage(sb.toString(), file, (String) param);
 				
 				// go to latest message after sending
+				System.out.println("t: " + current);
 				commandAction(backCmd, current);
+				System.out.println("a: " + current);
 				commandAction(latestCmd, current);
 //				display(infoAlert(L[MessageSent_Alert]), current);
 			} catch (Exception e) {
@@ -1079,6 +1096,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			if (c == prevPageCmd) {
 				chatsList.paginate(-1);
+				return;
+			}
+			if (c == openLinkCmd) {
+				TextBox t = new TextBox("", "https://t.me/", 200, TextField.URL);
+				t.addCommand(cancelCmd);
+				t.addCommand(goCmd);
+				t.setCommandListener(this);
+				
+				display(t);
 				return;
 			}
 		}
@@ -1525,11 +1551,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			if (c == sendCmd) {
 				if (sending) return;
 				sending = true;
+				String t = messageField.getString();
+				if (t.trim().length() == 0 && sendFile == null) {
+					return;
+				}
 				if (MP.updatesThread != null) {
 					MP.cancel(MP.updatesThread, true);
 				}
 				display(loadingAlert(L[Sending]), d);
-				start(RUN_SEND_MESSAGE, messageField.getString());
+				start(RUN_SEND_MESSAGE, t);
 				return;
 			}
 			if (c == openTextBoxCmd) {
@@ -1538,6 +1568,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				t.addCommand(cancelCmd);
 				t.setCommandListener(this);
 				display(t);
+				return;
+			}
+			if (c == chooseFileCmd) {
+				openFilePicker("");
 				return;
 			}
 			if (c == okCmd) {
@@ -1606,6 +1640,49 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				((MPList) d).select(((List) d).getSelectedIndex());
 				return;
 			}
+			
+			// file picker
+			int i = ((List) d).getSelectedIndex();
+			if (i == -1) return;
+			boolean dir = ((List) d).getImage(i) == folderImg;
+			String name = ((List) d).getString(i);
+			String path = d.getTitle();
+			
+			if ("/".equals(path)) path = "";
+			path = path.concat("/").concat(name);
+			
+			if (dir) {
+				openFilePicker(path);
+				return;
+			}
+			
+			// file selected
+			commandAction(cancelCmd, d);
+			sendFile = "file://".concat(path);
+			fileLabel.setText(L[File_Prefix].concat(path));
+			return;
+		}
+		if (c == cancelCmd && d instanceof List) { // go back to write form
+			Displayable t = writeForm;
+			System.out.println("c: " + t + ", h: " + formHistory);
+			synchronized (formHistory) {
+				int i = formHistory.size();
+				while (i-- != 0) {
+					if (formHistory.elementAt(i) == t) {
+						break;
+					}
+					formHistory.removeElementAt(i);
+				}
+			}
+			System.out.println("a: " + formHistory);
+			
+			display(t, true);
+			return;
+		}
+		if (c == goCmd) { // url dialog submit
+			commandAction(backCmd, d);
+			
+			openUrl(((TextBox) d).getString());
 			return;
 		}
 		if (c == refreshCmd) {
@@ -2015,6 +2092,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		l.addCommand(aboutCmd);
 		l.addCommand(settingsCmd);
 		l.addCommand(contactsCmd);
+		l.addCommand(openLinkCmd);
 		return l;
 	}
 	
@@ -2022,6 +2100,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		writeTo = id;
 		replyTo = reply;
 		edit = editId;
+		sendFile = null;
 		
 		Form f = new Form(editId != null ? editId : reply != null ? L[Reply_Title] : L[Write_Title]);
 		f.setCommandListener(midlet);
@@ -2030,6 +2109,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		f.addCommand(sendCmd);
 		
 		TextField t = new TextField(L[Message], text, 500, TextField.ANY);
+		t.addCommand(sendCmd);
+		t.setItemCommandListener(midlet);
 		f.append(messageField = t);
 		
 		StringItem s = new StringItem(null, "...", Item.BUTTON);
@@ -2037,16 +2118,27 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		s.setItemCommandListener(midlet);
 		f.append(s);
 		
-		// TODO
+		// file
 		
-		t = new TextField("File", "file:///", 300, TextField.ANY);
-		f.append(fileField = t);
+		s = new StringItem(null, L[File_Prefix].concat(L[NotSelected]));
+		s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+		f.append(fileLabel = s);
+		
+		s = new StringItem(null, L[ChooseFile], Item.BUTTON);
+		s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+		s.setDefaultCommand(chooseFileCmd);
+		s.setItemCommandListener(midlet);
+		f.append(s);
+		
+//		t = new TextField("File", "file:///", 300, TextField.ANY);
+//		f.append(fileField = t);
+		
 		f.append(sendChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
 				"Send uncompressed",
 				"Hide with spoiler"
 		}, null));
 		
-		return f;
+		return writeForm = f;
 	}
 	
 	static void openUrl(String url) {
@@ -2268,6 +2360,64 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return false;
 	}
 	
+	static void openFilePicker(String path) {
+		if (path.length() == 0) path = "/";
+		display(loadingAlert(L[Loading]), current);
+		try {
+			if (fileImg == null) {
+				fileImg = Image.createImage("/file.png");
+				folderImg = Image.createImage("/folder.png");
+			}
+			
+			List list = new List(path, List.IMPLICIT);
+			list.addCommand(backCmd);
+			list.addCommand(cancelCmd);
+			list.addCommand(List.SELECT_COMMAND);
+			list.setSelectCommand(List.SELECT_COMMAND);
+			list.setCommandListener(midlet);
+			
+			if ("/".equals(path)) {
+				// roots
+				if (rootsList == null) {
+					rootsList = new Vector();
+					Enumeration roots = FileSystemRegistry.listRoots();
+					while (roots.hasMoreElements()) {
+						String s = (String) roots.nextElement();
+						if (s.startsWith("file:///")) s = s.substring("file:///".length());
+						rootsList.addElement(s);
+					}
+				}
+				
+				int l = rootsList.size();
+				for (int i = 0; i < l; i++) {
+					String s = (String) rootsList.elementAt(i);
+					if (s.startsWith("file:///")) s = s.substring("file:///".length());
+					if (s.endsWith("/")) s = s.substring(0, s.length() - 1);
+					list.append(s, folderImg);
+				}
+			} else {
+				FileConnection fc = (FileConnection) Connector.open("file://".concat(path));
+				try {
+					Enumeration en = fc.list();
+					while (en.hasMoreElements()) {
+						String s = (String) en.nextElement();
+						if (s.endsWith("/")) {
+							list.append(s.substring(0, s.length() - 1), folderImg);
+						} else {
+							list.append(s, fileImg);
+						}
+					}
+				} finally {
+					fc.close();
+				}
+			}
+			display(list);
+		} catch (Exception e) {
+			display(errorAlert(e.toString()), current);
+			e.printStackTrace();
+		}
+	}
+	
 	static void openChat(String id, int msg) {
 		openLoad(new ChatForm(id, null, msg, 0));
 	}
@@ -2403,6 +2553,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			String t = instanceUrl.concat(API_URL + "?v=" + API_VERSION + "&method=").concat(url);
 			try {
 				while (closingConnections.size() != 0) {
+					System.out.println("wait " + closingConnections);
 					Thread.sleep(1000);
 				}
 			} catch (InterruptedException e) {
