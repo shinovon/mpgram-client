@@ -195,7 +195,7 @@ public class ChatInfoForm extends MPForm implements LangConstants {
 		if (chatForm != null) {
 			s = new StringItem(null, MP.L[SearchMessages], Item.BUTTON);
 			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-			s.setDefaultCommand(MP.searchCmd);
+			s.setDefaultCommand(MP.searchMsgCmd);
 			s.setItemCommandListener(MP.midlet);
 			append(s);
 			

@@ -212,7 +212,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command archiveCmd;
 	static Command foldersCmd;
 	static Command contactsCmd;
-	static Command searchCmd;
+	static Command searchChatsCmd;
 	static Command openLinkCmd;
 
 	static Command itemChatCmd;
@@ -235,6 +235,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command olderMessagesCmd;
 	static Command newerMessagesCmd;
 	static Command latestCmd;
+	static Command searchMsgCmd;
 	
 	static Command sendCmd;
 	static Command openTextBoxCmd;
@@ -444,7 +445,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		refreshCmd = new Command(L[Refresh], Command.SCREEN, 5);
 		archiveCmd = new Command(L[ArchivedChats], Command.SCREEN, 8);
 		contactsCmd = new Command(L[Contacts], Command.SCREEN, 9);
-		searchCmd = new Command(L[Search], Command.SCREEN, 10);
+		searchChatsCmd = new Command(L[Search], Command.SCREEN, 10);
 		openLinkCmd = new Command(L[OpenByLink], Command.SCREEN, 11);
 		
 		itemChatCmd = new Command(L[OpenChat], Command.ITEM, 1);
@@ -467,6 +468,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		chatInfoCmd = new Command(L[ChatInfo], Command.SCREEN, 7);
 		olderMessagesCmd = new Command(L[Older], Command.ITEM, 1);
 		newerMessagesCmd = new Command(L[Newer], Command.ITEM, 1);
+		searchMsgCmd = new Command(L[Search], Command.SCREEN, 10);
 		
 		sendCmd = new Command(L[Send], Command.OK, 1);
 		openTextBoxCmd = new Command(L[OpenTextBox], Command.ITEM, 1);
@@ -1110,6 +1112,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				display(t);
 				return;
 			}
+			if (c == searchChatsCmd) {
+				TextBox t = new TextBox(L[Search], "", 200, TextField.ANY);
+				t.addCommand(cancelCmd);
+				t.addCommand(searchChatsCmd);
+				t.setCommandListener(this);
+				
+				display(t);
+				return;
+			}
 		}
 		if (d instanceof ChatForm) { // chat form commands
 			if (c == latestCmd) {
@@ -1129,10 +1140,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				display(writeForm(((ChatForm) d).id, null, "", null));
 				return;
 			}
-			if (c == searchCmd) {
+			if (c == searchMsgCmd) {
 				TextBox t = new TextBox(L[Search], "", 200, TextField.ANY);
 				t.addCommand(cancelCmd);
-				t.addCommand(searchCmd);
+				t.addCommand(searchMsgCmd);
 				t.setCommandListener(this);
 				
 				display(t);
@@ -1145,7 +1156,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 		}
-		if (d instanceof TextBox && c == searchCmd) {
+		if (d instanceof TextBox && c == searchMsgCmd) {
 			commandAction(backCmd, d);
 			if (current instanceof ChatForm) {
 				((ChatForm) current).reset();
@@ -1155,6 +1166,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			} else {
 				openLoad(new ChatForm(((ChatInfoForm) current).id, ((TextBox) d).getString(), 0, 0));
 			}
+			return;
+		}
+		if (d instanceof TextBox && c == searchChatsCmd) {
+			commandAction(backCmd, d);
+			openLoad(new ChatsList(L[Search],
+					appendUrl(new StringBuffer("searchChats&q="), ((TextBox) d).getString()).toString(),
+					"results"));
 			return;
 		}
 		if (d instanceof ChatInfoForm) { // profile commands
@@ -1178,10 +1196,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				start(RUN_LEAVE_CHANNEL, ((ChatInfoForm) d).id);
 				return;
 			}
-			if (c == searchCmd) {
+			if (c == searchMsgCmd) {
 				TextBox t = new TextBox(L[Search], "", 200, TextField.ANY);
 				t.addCommand(cancelCmd);
-				t.addCommand(searchCmd);
+				t.addCommand(searchMsgCmd);
 				t.setCommandListener(this);
 				
 				display(t);
@@ -2095,6 +2113,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		l.addCommand(aboutCmd);
 		l.addCommand(settingsCmd);
 		l.addCommand(contactsCmd);
+		l.addCommand(searchChatsCmd);
 		l.addCommand(openLinkCmd);
 		return l;
 	}
