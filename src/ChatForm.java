@@ -498,58 +498,72 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 					space = true;
 				} else if (type.equals("document")) {
 					// document
-					// TODO sticker
 					sb.setLength(0);
-					boolean nameSet = false;
-					if (media.has("audio")) {
-						JSONObject audio = media.getObject("audio");
-						if ((t = audio.getString("artist", null)) != null && t.length() != 0) {
-							sb.append(t).append(" - ");
-						}
-						if ((t = audio.getString("title", null)) != null && t.length() != 0) {
-							sb.append(t);
-							nameSet = true;
-						}
-					}
 					
-					if (!nameSet) {
-						if ((t = media.getString("name", null)) != null && t.length() != 0) {
-							sb.append(t);
-						}
-					}
-					sb.append('\n');
-					if (!media.isNull("size")) {
-						long size = media.getLong("size");
-						if (size >= 1024 * 1024) {
-							sb.append(((int) (size / (1048576D) * 100)) / 100D).append(" MB");
-						} else {
-							sb.append(((int) (size / (1024D) * 100)) / 100D).append(" KB");
-						}
-					}
-					
-					if (media.getBoolean("thumb", false)) {
+					if ("image/webp".equals(media.getString("mime", null)) && "sticker.webp".equals(media.getString("name", null))) {
+						// sticker
 						ImageItem img = new ImageItem(sb.toString(), null, 0, "");
 						img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-						img.setDefaultCommand(MP.documentCmd);
 						img.setItemCommandListener(MP.midlet);
 						safeInsert(thread, insert++, lastItem = img);
 						
-						key[3] = "thumbrmin";
+						key[3] = "rsticker";
 						urls.put(img, key);
 						MP.queueImage(key, img);
 
 						if (msgItem == null) msgItem = img;
 					} else {
-						s = new StringItem(null, sb.toString());
-						s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-						s.setFont(MP.smallItalicFont);
-						s.setDefaultCommand(MP.documentCmd);
-						s.setItemCommandListener(MP.midlet);
-						safeInsert(thread, insert++, lastItem = s);
-
-						urls.put(s, key);
+						boolean nameSet = false;
+						if (media.has("audio")) {
+							JSONObject audio = media.getObject("audio");
+							if ((t = audio.getString("artist", null)) != null && t.length() != 0) {
+								sb.append(t).append(" - ");
+							}
+							if ((t = audio.getString("title", null)) != null && t.length() != 0) {
+								sb.append(t);
+								nameSet = true;
+							}
+						}
 						
-						if (msgItem == null) msgItem = s;
+						if (!nameSet) {
+							if ((t = media.getString("name", null)) != null && t.length() != 0) {
+								sb.append(t);
+							}
+						}
+						sb.append('\n');
+						if (!media.isNull("size")) {
+							long size = media.getLong("size");
+							if (size >= 1024 * 1024) {
+								sb.append(((int) (size / (1048576D) * 100)) / 100D).append(" MB");
+							} else {
+								sb.append(((int) (size / (1024D) * 100)) / 100D).append(" KB");
+							}
+						}
+						
+						if (media.getBoolean("thumb", false)) {
+							ImageItem img = new ImageItem(sb.toString(), null, 0, "");
+							img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+							img.setDefaultCommand(MP.documentCmd);
+							img.setItemCommandListener(MP.midlet);
+							safeInsert(thread, insert++, lastItem = img);
+							
+							key[3] = "thumbrmin";
+							urls.put(img, key);
+							MP.queueImage(key, img);
+	
+							if (msgItem == null) msgItem = img;
+						} else {
+							s = new StringItem(null, sb.toString());
+							s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+							s.setFont(MP.smallItalicFont);
+							s.setDefaultCommand(MP.documentCmd);
+							s.setItemCommandListener(MP.midlet);
+							safeInsert(thread, insert++, lastItem = s);
+	
+							urls.put(s, key);
+							
+							if (msgItem == null) msgItem = s;
+						}
 					}
 					space = true;
 				} else if (type.equals("photo")) {
