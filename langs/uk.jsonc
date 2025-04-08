@@ -119,6 +119,7 @@
 	"Send": "Відправити",
 	"OpenTextBox": "Відкрити на весь екран",
 	"ChooseFile": "Вибрати файл",	
+	
 	// Profile/chat info commands
 	"Join": "Увійти",
 	"JoinGroup": "Вступити до групи",
@@ -126,6 +127,7 @@
 	"ChatMedia": "Медіафайли",
 	"Members": "Учасники",
 	"AddToContacts": "Додати до контактів",	
+	
 	// Dialog commands
 	"Ok": "Ок",
 	"Cancel": "Скасувати",
@@ -140,6 +142,7 @@
 	"WaitingForServerResponse": "Очікування відповіді сервера...",
 	"Sending": "Надсилання...",
 	"WaitingForPrevChat": "Відключення від попереднього чату...",	
+	
 	// Authorization process
 	"Auth_Title": "Авторизація",
 	"InstanceURL": "URL інстансу",
@@ -212,7 +215,7 @@
 	"NotSelected": "Не вибрано",
 	"SendUncompressed": "Надіслати без стиснення",
 	"SendAsVoice": "Надіслати як голосове повідомлення",
-	"HideWithSpoiler": Позначити як спойлер",
+	"HideWithSpoiler": "Позначити як спойлер",
 	"EnableHTMLFormatting": "HTML-форматування",
 	
 	// Alert messages
