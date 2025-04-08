@@ -36,9 +36,9 @@
 	"Today": "сьогодні",
 	"Yesterday": "вчора",
 	"LastWeek": "цього тижня",
-	"LastMonth": "last month", // Untranslated
-	"ALongTimeAgo": "a long time ago", // Untranslated
-	"Recently": "recently", // Untranslated
+	"LastMonth": "цього місяця",
+	"ALongTimeAgo": "давно",
+	"Recently": "нещодавно",
 	// Date suffixes
 	"on_Date": "",
 	"at_Time": " о ",
@@ -87,7 +87,7 @@
 	"ArchivedChats": "Архів",
 	"Contacts": "Контакти",
 	"Search": "Пошук",
-	"OpenByLink": "Open by link", // Untranslated
+	"OpenByLink": "Відкрити за посиланням",
 	
 	// Message commands
 	"OpenChat": "Відкрити чат",
@@ -99,7 +99,7 @@
 	"Delete": "Видалити",
 	"Edit": "Редагувати",
 	"GoTo": "Перейти",
-	"Pin": "Pin", // Untranslated
+	"Pin": "Закріпити",
 	
 	// Item commands
 	"Link_Cmd": "Відкрити",
@@ -113,21 +113,19 @@
 	"ChatInfo": "Інформація про чат",
 	"Older": "Старше",
 	"Newer": "Новіше",
-	"SendSticker": "Send sticker", // Untranslated
+	"SendSticker": "Надіслати стікер",
 	
 	// Message writing form commands
 	"Send": "Відправити",
 	"OpenTextBox": "Відкрити на весь екран",
-	"ChooseFile": "Choose file", // Untranslated
-	
+	"ChooseFile": "Вибрати файл",	
 	// Profile/chat info commands
 	"Join": "Увійти",
 	"JoinGroup": "Вступити до групи",
 	"LeaveGroup": "Покинути групу",
 	"ChatMedia": "Медіафайли",
 	"Members": "Учасники",
-	"AddToContacts": "Add to contacts", // Untranslated
-	
+	"AddToContacts": "Додати до контактів",	
 	// Dialog commands
 	"Ok": "Ок",
 	"Cancel": "Скасувати",
@@ -141,8 +139,7 @@
 	"Authorizing": "Авторизація...",
 	"WaitingForServerResponse": "Очікування відповіді сервера...",
 	"Sending": "Надсилання...",
-	"WaitingForPrevChat": "Waiting for previous chat to disconnect...", // Untranslated
-	
+	"WaitingForPrevChat": "Відключення від попереднього чату...",	
 	// Authorization process
 	"Auth_Title": "Авторизація",
 	"InstanceURL": "URL інстансу",
@@ -154,8 +151,8 @@
 	"CloudPassword": "Хмарний пароль",
 	"Captcha": "Капча",
 	"Auth_Btn": "Авторизуватися",
-	"InvalidCode_Alert": "Invalid code!", // Untranslated
-	"CodeExpired_Alert": "Code expired!", // Untranslated
+	"InvalidCode_Alert": "Неправильний код!",
+	"CodeExpired_Alert": "Код минув!",
 	
 	// Settings sections
 	"UI": "Вигляд інтерфейсу",
@@ -171,11 +168,11 @@
 	"ThumbnailsSize": "Розмір картинок",
 	"ChatsCount": "Кількість чатів",
 	"MessagesCount": "Кількість повідомлень",
-	"ChatsListFontSize": "Chats list font size", // Untranslated
-	"Default": "Default", // Untranslated
-	"Small": "Small", // Untranslated
-	"Medium": "Medium", // Untranslated
-	"FocusNewMessages": "Focus new messages", // Untranslated
+	"ChatsListFontSize": "Розмір шрифту списку чатів",
+	"Default": "За замовчуванням",
+	"Small": "Маленький",
+	"Medium": "Середній",
+	"FocusNewMessages": "Фокус нових повідомлень",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Чекати повного завантаження",
@@ -210,13 +207,13 @@
 	"Reply_Title": "Відповідь",
 	"Write_Title": "Повідомлення",
 	"Message": "Повідомлення",
-	"File": "File", // Untranslated
-	"File_Prefix": "File: ", // Untranslated
-	"NotSelected": "Not selected", // Untranslated
-	"SendUncompressed": "Send uncompressed", // Untranslated
-	"SendAsVoice": "Send as voice message", // Untranslated
-	"HideWithSpoiler": "Hide with spoiler", // Untranslated
-	"EnableHTMLFormatting": "Enable HTML-formatting", // Untranslated
+	"File": "Файл", 
+	"File_Prefix": "Файл: ", 
+	"NotSelected": "Не вибрано",
+	"SendUncompressed": "Надіслати без стиснення",
+	"SendAsVoice": "Надіслати як голосове повідомлення",
+	"HideWithSpoiler": Позначити як спойлер",
+	"EnableHTMLFormatting": "HTML-форматування",
 	
 	// Alert messages
 	"MessageSent_Alert": "Повідомлення відправлено",
@@ -235,7 +232,7 @@
 	"You_Prefix": "Ви: ",
 	"ForwardedMessage": "Переслане повідомл.",
 	"Action": "Дія",
-	"Edited": "edited", // Untranslated
+	"Edited": "відредаговано",  
 	
 	// Message media
 	"Media": "Медіа",
@@ -243,18 +240,18 @@
 	"Geo": "Геопозиція: ",
 	
 	// Chat actions
-	"PinnedMessage_Action": " pinned message", // Untranslated
-	"Joined_Action": " joined the group", // Untranslated
-	"Added_Action": " added", // Untranslated
-	"Left_Action": " left the group", // Untranslated
-	"Removed_Action": " removed", // Untranslated
-	"JoinedByLink_Action": " joined the group via invite link", // Untranslated
-	"JoinedByRequest_Action": " was accepted to the group", // Untranslated
-	"ChatHistoryCleared_Action": "Chat history was cleared", // Untranslated
-	"GroupCreated_Action": "Group created", // Untranslated
-	"ChannelCreated_Action": "Channel created", // Untranslated
-	"PhotoUpdated_Action": "Photo updated", // Untranslated
-	"NameChanged_Action": "Name was changed to ", // Untranslated
+	"PinnedMessage_Action": " закріпив повідомлення", 
+	"Joined_Action": " тепер у групі", 
+	"Added_Action": " додав", 
+	"Left_Action": " покинув групу", 
+	"Removed_Action": " виключив", 
+	"JoinedByLink_Action": " вступив до групи за посиланням", 
+	"JoinedByRequest_Action": " прийнятий до групи", 
+	"ChatHistoryCleared_Action": "Історія чату була очищена", 
+	"GroupCreated_Action": "Група створена", 
+	"ChannelCreated_Action": "Канал створено", 
+	"PhotoUpdated_Action": "Фото змінено", 
+	"NameChanged_Action": "Ім'я було змінено на ", 
 	
 	// Folders
 	"AllChats": "Усі чати",
@@ -266,18 +263,18 @@
 	"LastSeen": "був/була ",
 	"About_User": "Інформація",
 	"About_Chat": "Інформація",
-	"Mobile": "Mobile", // Untranslated
+	"Mobile": "Телефон", 
 	"Username": "Ім'я користувача",
 	"Link": "Посилання",
 	"SearchMessages": "Пошук повідомлень",
 	"ViewGroup": "Показати групу",
 	"GoToPinnedMessage": "Відкрити закріплене повідомлення",
-	"Owner": "owner", // Untranslated
-	"Admin": "admin", // Untranslated
-	"Bot": "bot", // Untranslated
-	"UserInfo": "User info", // Untranslated
-	"GroupInfo": "Group info", // Untranslated
-	"ChannelInfo": "Channel info", // Untranslated
+	"Owner": "творець", 
+	"Admin": "адмін", 
+	"Bot": "бот", 
+	"UserInfo": "Інформація про користувача", 
+	"GroupInfo": "Інформація про групу", 
+	"ChannelInfo": "Інформація про канал", 
 	
 	"_member": " учасник",
 	"_members": " учасника",

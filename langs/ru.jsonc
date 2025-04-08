@@ -215,7 +215,7 @@
 	"NotSelected": "Не выбран",
 	"SendUncompressed": "Отправить без сжатия",
 	"SendAsVoice": "Отправить как голосовое",
-	"HideWithSpoiler": "Поменить как спойлер",
+	"HideWithSpoiler": "Пометить как спойлер",
 	"EnableHTMLFormatting": "HTML-форматирование",
 	
 	// Alert messages
