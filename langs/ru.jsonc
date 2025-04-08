@@ -175,7 +175,7 @@
 	"Default": "По умолчанию",
 	"Small": "Мелкий",
 	"Medium": "Средний",
-	"FocusNewMessages": "Focus new messages", // Untranslated
+	"FocusNewMessages": "Авто-прокрутка до новых сообщений",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Ждать полной загрузки",
@@ -275,9 +275,9 @@
 	"Owner": "владелец",
 	"Admin": "админ",
 	"Bot": "бот",
-	"UserInfo": "User info",
-	"GroupInfo": "Group info",
-	"ChannelInfo": "Channel info",
+	"UserInfo": "User info", // Untranslated
+	"GroupInfo": "Group info", // Untranslated
+	"ChannelInfo": "Channel info", // Untranslated
 	
 	"_member": " участник",
 	"_members": " участника",

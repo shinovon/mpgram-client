@@ -171,6 +171,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static boolean keepAlive = true;
 	static boolean utf = true;
 	static long keepAliveInterval = 30000L;
+	static String deviceName;
+	static String systemName;
 
 	// threading
 	private static int run;
@@ -342,15 +344,37 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			return;
 		} catch (Exception ignored) {}
 		
+		// get device name
+		String p, v;
+		if ((p = System.getProperty("microedition.platform")) != null) {
+			symbianJrt = p.indexOf("platform=S60") != -1;
+			try {
+				Class.forName("emulator.custom.CustomMethod");
+				p = "KEmulator";
+				if ((v = System.getProperty("kemulator.mod.version")) != null) {
+					p = p.concat(" ".concat(v));
+				}
+			} catch (Exception e) {
+				int i;
+				
+				if ((i = p.indexOf('/')) != -1 || (i = p.indexOf(' ')) != -1) {
+					p = p.substring(0, i);
+				}
+			}
+			deviceName = p;
+		}
+		if ((p = System.getProperty("os.name")) != null) {
+			if ((v = System.getProperty("os.version")) != null) {
+				p = p.concat(" ".concat(v));
+			}
+			systemName = p;
+		}
+
 		// init platform dependent settings
-		
-		String p = System.getProperty("microedition.platform");
-		symbianJrt = p != null && p.indexOf("platform=S60") != -1;
 		useLoadingForm = !symbianJrt;
 		jsonStream = symbianJrt ||
 				((System.getProperty("com.symbian.midp.serversocket.support") == null &&
 				System.getProperty("com.symbian.default.to.suite.icon") == null));
-		
 		threadedImages = symbianJrt;
 		
 		avatarSize = Math.min(display.getBestImageHeight(Display.LIST_ELEMENT), display.getBestImageWidth(Display.LIST_ELEMENT));
@@ -2842,6 +2866,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			if (user != null) {
 				hc.setRequestProperty("X-mpgram-user", user);
 			}
+			if (deviceName != null) {
+				hc.setRequestProperty("X-mpgram-device", deviceName);
+			}
+			hc.setRequestProperty("X-mpgram-system", systemName != null ? systemName : "J2ME");
 			if (utf) hc.setRequestProperty("X-mpgram-unicode", "1");
 			hc.setRequestProperty("X-mpgram-app-version", version);
 			if (instancePassword != null) {
