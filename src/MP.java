@@ -590,6 +590,14 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	public void itemStateChanged(Item item) {
 		if (item == messageField
 				|| (current instanceof ChatForm && item instanceof TextField)) {
+			String s;
+			// auto send on two returns
+			if (item != messageField &&
+				((s = ((TextField) item).getString()).endsWith("\n\n")
+					|| s.endsWith("\r\n\r\n"))) {
+				commandAction(sendCmd, item);
+				return;
+			}
 			if (!sendTyping) return;
 			long l = System.currentTimeMillis();
 			if (l - lastType < 5000L) return;
@@ -1933,8 +1941,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			sending = true;
 			
-			String t = ((TextField) item).getString();
-			if (t.trim().length() == 0)
+			String t;
+			if ((t = ((TextField) item).getString().trim()).length() == 0)
 				return;
 			if (MP.updatesThread != null) {
 				MP.cancel(MP.updatesThread, true);
