@@ -2298,7 +2298,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		String invite = null;
 		String start = null;
 //		String text = null;
-//		String slug = null;
+		String stickers = null;
 		
 		try {
 			if ((i = url.indexOf("t.me")) == 0 || i == 8) {
@@ -2336,11 +2336,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						}
 					}
 				} else if ("addstickers".equals(s[0])) {
-//					slug = s[1];
+					stickers = s[1];
 				} else if ("addemoji".equals(s[0])) {
 //					slug = s[1];
 				} else if ("joinchat".equals(s[0])) {
-//					invite = s[1];
+					invite = s[1];
 				} else if ("addlist".equals(s[0])) {
 //					slug = s[1];
 				} else if ("proxy".equals(s[0])) {
@@ -2380,11 +2380,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				} else if ("resolve".equals(url)
 						|| "privatepost".equals(url)
 						|| "user".equals(url)
-						|| "join".equals(url)) {
+						|| "join".equals(url)
+						|| "addstickers".equals(url)) {
 					tg = true;
 //					privat = "privatepost".equals(url);
 //				} else if ("addlist".equals(url)) {
-//				} else if ("addstickers".equals(url)) {
 //				} else if ("addemoji".equals(url)) {
 				}
 			}
@@ -2426,7 +2426,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							continue;
 						}
 						if (query[n].startsWith("slug=")) {
-//							slug = query[n].substring(5);
+							stickers = query[n].substring(5);
 							continue;
 						}
 						if (query[n].startsWith("post=")) {
@@ -2478,6 +2478,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				} else if (invite != null) {
 					// resolve invite
 					midlet.start(RUN_RESOLVE_INVITE, invite);
+					
+					return true;
+				} else if (stickers != null) {
+					// add stickers TODO
 					
 					return true;
 				}
