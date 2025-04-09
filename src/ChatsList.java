@@ -91,9 +91,7 @@ public class ChatsList extends MPList implements LangConstants {
 		if (thread != this.thread) throw MP.cancelException;
 		
 		if (users) {
-			if (j.has("res")) j = j.getObject("res");
-			
-			JSONArray users = j.getArray(arrayName != null ? arrayName : "users");
+			JSONArray users = j.getArray("res");
 			int l = users.size();
 
 			for (int i = 0; i < l && thread == this.thread; ++i) {
