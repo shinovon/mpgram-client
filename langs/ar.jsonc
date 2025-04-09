@@ -100,6 +100,7 @@
 	"Edit": "تعديل",
 	"GoTo": "الذهاب الى",
 	"Pin": "Pin", // Untranslated
+	"BanMember": "Ban member", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "الرابط",
@@ -224,6 +225,7 @@
 	"MessageSent_Alert": "الرسالة مرسلة",
 	"MessageDeleted_Alert": "الرسالة ممسوحة",
 	"UpdateAvailable_Alert": "تحديث جديد متوفر",
+	"MemberBanned_Alert": "Member banned", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "وسائط",

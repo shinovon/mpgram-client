@@ -100,6 +100,7 @@
 	"Edit": "Redaktə et",
 	"GoTo": "Keç",
 	"Pin": "Pin", // Untranslated
+	"BanMember": "Ban member", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "Aç",
@@ -224,6 +225,7 @@
 	"MessageSent_Alert": "Mesaj göndərildi",
 	"MessageDeleted_Alert": "Post silindi",
 	"UpdateAvailable_Alert": "Müştəri yeniləməsi mövcuddur",
+	"MemberBanned_Alert": "Member banned", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Media faylları",

@@ -83,6 +83,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static final int RUN_KEEP_ALIVE = 15;
 	static final int RUN_CLOSE_CONNECTION = 16;
 	static final int RUN_BOT_CALLBACK = 17;
+	static final int RUN_BAN_MEMBER = 18;
 	
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
@@ -227,6 +228,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command deleteMsgCmd;
 	static Command editMsgCmd;
 	static Command gotoMsgCmd;
+	static Command botCallbackCmd;
+	static Command banMemberCmd;
 	
 	static Command richTextLinkCmd;
 	static Command openImageCmd;
@@ -484,6 +487,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		deleteMsgCmd = new Command(L[Delete], Command.ITEM, 8);
 		editMsgCmd = new Command(L[Edit], Command.ITEM, 9);
 		gotoMsgCmd = new Command(L[GoTo], Command.ITEM, 1);
+		botCallbackCmd = new Command("", Command.ITEM, 1); // TODO unlocalized
+		banMemberCmd = new Command(L[BanMember], Command.ITEM, 10);
 		
 		richTextLinkCmd = new Command(L[Link_Cmd], Command.ITEM, 1);
 		openImageCmd = new Command(L[ViewImage], Command.ITEM, 1);
@@ -1082,6 +1087,36 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				closingConnections.addElement(param);
 				((Connection) param).close();
 			} catch (Exception ignored) {}
+			break;
+		}
+		case RUN_BOT_CALLBACK: {
+			try {
+				StringBuffer sb = new StringBuffer("botCallback");
+				sb.append("&peer=").append(((String[]) param)[0]);
+				sb.append("&id=").append(((String[]) param)[1]);
+				sb.append("&data=").append(((String[]) param)[2]);
+				
+				JSONObject j = (JSONObject) api(sb.toString());
+				System.out.println(j);
+				// TODO alert
+
+				commandAction(latestCmd, current);
+			} catch (Exception e) {
+				display(errorAlert(e.toString()), current);
+			} finally {
+				sending = false;
+			}
+			break;
+		}
+		case RUN_BAN_MEMBER: {
+			try {
+				String[] s = (String[]) param;
+				MP.api("banMember&peer=".concat(s[0].concat("&id=").concat(s[2])));
+
+				display(infoAlert(L[MemberBanned_Alert]), current);
+			} catch (Exception e) {
+				display(errorAlert(e.toString()), current);
+			}
 			break;
 		}
 		}
@@ -1906,6 +1941,22 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			display(loadingAlert(L[Sending]), current);
 			start(RUN_SEND_MESSAGE, new Object[] { t, ((ChatForm) current).id, null, null, null, null });
+			return;
+		}
+		if (c == botCallbackCmd) {
+			String[] p = (String[]) ((MPForm) current).urls.get(item);
+			if (sending || p == null) return;
+			sending = true;
+			display(loadingAlert(L[Sending]), current);
+			start(RUN_BOT_CALLBACK, p);
+			return;
+		}
+		if (c == banMemberCmd) {
+			String[] s = (String[]) ((MPForm) current).urls.get(item);
+			if (s == null) return;
+
+			display(loadingAlert(L[Loading]), current);
+			start(RUN_BAN_MEMBER, s);
 			return;
 		}
 		commandAction(c, display.getCurrent());

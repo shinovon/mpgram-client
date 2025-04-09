@@ -100,6 +100,7 @@
 	"Edit": "Edit",
 	"GoTo": "Go to",
 	"Pin": "Pin",
+	"BanMember": "Ban member",
 	
 	// Item commands
 	"Link_Cmd": "Link",
@@ -138,9 +139,9 @@
 	
 	// Loading states
 	"Loading": "Loading",
-	"Authorizing": "Authorizing",
+	"Authorizing": "Authorizing...",
 	"WaitingForServerResponse": "Waiting for server response...",
-	"Sending": "Sending",
+	"Sending": "Sending...",
 	"WaitingForPrevChat": "Waiting for previous chat to disconnect...",
 	
 	// Authorization process
@@ -224,6 +225,7 @@
 	"MessageSent_Alert": "Message sent",
 	"MessageDeleted_Alert": "Message deleted",
 	"UpdateAvailable_Alert": "Client update available",
+	"MemberBanned_Alert": "Member banned",
 	
 	// Chat form
 	"ChatMedia_Title": "Media",

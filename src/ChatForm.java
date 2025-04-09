@@ -59,7 +59,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 
 	boolean infoLoaded;
 	boolean left, broadcast, forum;
-	boolean canWrite, canDelete;
+	boolean canWrite, canDelete, canBan;
 	
 	// pagination
 	int dir;
@@ -135,6 +135,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 						JSONObject adminRights = chat.getObject("admin_rights");
 						canWrite = !broadcast || adminRights.getBoolean("post_messages", false);
 						canDelete = adminRights.getBoolean("delete_messages", false);
+						canBan = !broadcast && adminRights.getBoolean("ban_users", false);
 					}
 				} else if (MP.chatStatus && fullInfo.getObject("User").has("status")) {
 					setStatus(fullInfo.getObject("User").getObject("status"));
@@ -355,7 +356,6 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 			s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			s.setItemCommandListener(MP.midlet);
 			
-//			s.addCommand(MP.forwardMsgCmd); // TODO
 			if (this.id.charAt(0) == '-') {
 				s.addCommand(MP.messageLinkCmd);
 			}
@@ -363,8 +363,12 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 				s.addCommand(MP.copyMsgCmd);
 			}
 			if (mediaFilter == null) {
+//				s.addCommand(MP.forwardMsgCmd); // TODO
 				if (canWrite) {
 					s.addCommand(MP.replyMsgCmd);
+				}
+				if (canBan && !out) {
+					s.addCommand(MP.banMemberCmd);
 				}
 				if (out || selfChat) {
 					s.addCommand(MP.deleteMsgCmd);
@@ -722,6 +726,33 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 			
 			space = true;
 		}
+		
+		if (message.has("markup")) {
+			JSONArray markup = message.getArray("markup");
+			int rows = markup.size();
+			for (int i = 0; i < rows; i++) {
+				JSONArray markupRow = markup.getArray(i);
+				int cols = markupRow.size();
+				for (int j = 0; j < cols; j++) {
+					JSONObject markupItem = markupRow.getObject(j);
+					
+					s = new StringItem(null, markupItem.getString("text"), Item.BUTTON);
+					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | (j == 0 ? Item.LAYOUT_NEWLINE_BEFORE : 0));
+					if (markupItem.has("data")) {
+						urls.put(s, new String[] { this.id, idString, markupItem.getString("data") });
+						s.setDefaultCommand(MP.botCallbackCmd);
+					} else if (markupItem.has("url")) {
+						urls.put(s, markupItem.getString("url"));
+						s.setDefaultCommand(MP.openLinkCmd);
+					}
+					s.setItemCommandListener(MP.midlet);
+					safeInsert(thread, insert++, lastItem = s);
+					
+					if (msgItem == null) msgItem = s;
+				}
+			}
+		}
+		
 		if (!reverse || (group == 0 && space)) {
 			Spacer sp = new Spacer(10, SPACER_HEIGHT);
 			sp.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -959,7 +990,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 				Ticker t = getTicker();
 				if (t != null && t.getString().equals(s))
 					return;
-				setTicker(new Ticker(s));
+				setTicker(s == null ? null : new Ticker(s));
 			}
 			return;
 		}

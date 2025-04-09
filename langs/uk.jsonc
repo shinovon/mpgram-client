@@ -100,6 +100,7 @@
 	"Edit": "Редагувати",
 	"GoTo": "Перейти",
 	"Pin": "Закріпити",
+	"BanMember": "Ban member", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "Відкрити",
@@ -224,6 +225,7 @@
 	"MessageSent_Alert": "Повідомлення відправлено",
 	"MessageDeleted_Alert": "Повідомлення видалено",
 	"UpdateAvailable_Alert": "Доступне оновлення клієнта",
+	"MemberBanned_Alert": "Member banned", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Медіафайли",

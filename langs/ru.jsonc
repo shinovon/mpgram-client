@@ -100,6 +100,7 @@
 	"Edit": "Редактировать",
 	"GoTo": "Перейти",
 	"Pin": "Закрепить",
+	"BanMember": "Забанить участника",
 	
 	// Item commands
 	"Link_Cmd": "Открыть",
@@ -224,6 +225,7 @@
 	"MessageSent_Alert": "Сообщение отправлено",
 	"MessageDeleted_Alert": "Сообщение удалено",
 	"UpdateAvailable_Alert": "Доступно обновление клиента",
+	"MemberBanned_Alert": "Участник забанен",
 	
 	// Chat form
 	"ChatMedia_Title": "Медиафайлы",

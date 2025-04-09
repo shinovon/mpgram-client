@@ -100,6 +100,7 @@
 	"Edit": "Editar",
 	"GoTo": "Ir a",
 	"Pin": "Pin", // Untranslated
+	"BanMember": "Ban member", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "Enlace",
@@ -224,6 +225,7 @@
 	"MessageSent_Alert": "Mensaje enviado",
 	"MessageDeleted_Alert": "Mensaje eliminado",
 	"UpdateAvailable_Alert": "Nueva actualización disponible",
+	"MemberBanned_Alert": "Member banned", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Media",
