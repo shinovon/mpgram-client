@@ -66,22 +66,23 @@ import cc.nnproject.json.JSONStream;
 
 public class MP extends MIDlet implements CommandListener, ItemCommandListener, ItemStateListener, Runnable, LangConstants {
 
-	static final int RUN_SEND_MESSAGE = 4;
-	static final int RUN_VALIDATE_AUTH = 5;
-	static final int RUN_IMAGES = 6;
-	static final int RUN_LOAD_FORM = 8;
-	static final int RUN_LOAD_LIST = 9;
-	static final int RUN_AUTH = 10;
-	static final int RUN_DELETE_MESSAGE = 11;
-	static final int RUN_RESOLVE_INVITE = 12;
-	static final int RUN_IMPORT_INVITE = 13;
-	static final int RUN_JOIN_CHANNEL = 14;
-	static final int RUN_LEAVE_CHANNEL = 15;
-	static final int RUN_CHECK_OTA = 16;
-	static final int RUN_CHAT_UPDATES = 17;
-	static final int RUN_SET_TYPING = 18;
-	static final int RUN_KEEP_ALIVE = 19;
-	static final int RUN_CLOSE_CONNECTION = 20;
+	static final int RUN_SEND_MESSAGE = 1;
+	static final int RUN_VALIDATE_AUTH = 2;
+	static final int RUN_IMAGES = 3;
+	static final int RUN_LOAD_FORM = 4;
+	static final int RUN_LOAD_LIST = 5;
+	static final int RUN_AUTH = 6;
+	static final int RUN_DELETE_MESSAGE = 7;
+	static final int RUN_RESOLVE_INVITE = 8;
+	static final int RUN_IMPORT_INVITE = 9;
+	static final int RUN_JOIN_CHANNEL = 10;
+	static final int RUN_LEAVE_CHANNEL = 11;
+	static final int RUN_CHECK_OTA = 12;
+	static final int RUN_CHAT_UPDATES = 13;
+	static final int RUN_SET_TYPING = 14;
+	static final int RUN_KEEP_ALIVE = 15;
+	static final int RUN_CLOSE_CONNECTION = 16;
+	static final int RUN_BOT_CALLBACK = 17;
 	
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
@@ -3112,6 +3113,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return r;
 	}
 	
+	// Rich text
+	
 	private static final int
 			RT_BOLD = 0,
 			RT_ITALIC = 1,
@@ -3388,7 +3391,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return Font.getFont(face, style, size);
 	}
 	
-	// tube42 image utils
+/*
+ * Part of the TUBE42 imagelib, released under the LGPL license.
+ *
+ * Development page: https://github.com/tube42/imagelib
+ * License:          http://www.gnu.org/copyleft/lesser.html
+ */
 	
 	static Image resize(Image src_i, int size_w, int size_h) {
 		// set source size
