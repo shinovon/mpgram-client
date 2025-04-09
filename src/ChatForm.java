@@ -94,11 +94,13 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 		this.messageId = message;
 		this.topMsgId = topMsg;
 		
-		setItemStateListener(MP.midlet);
-		textField = new TextField("", "", 500, TextField.ANY);
-		textField.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-		textField.addCommand(MP.sendCmd);
-		textField.setItemCommandListener(MP.midlet);
+		if (MP.chatField) {
+			setItemStateListener(MP.midlet);
+			textField = new TextField("", "", 500, TextField.ANY);
+			textField.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+			textField.addCommand(MP.sendCmd);
+			textField.setItemCommandListener(MP.midlet);
+		}
 	}
 	
 	// create in media mode
