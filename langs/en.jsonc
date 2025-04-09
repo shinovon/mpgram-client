@@ -176,6 +176,7 @@
 	"Small": "Small",
 	"Medium": "Medium",
 	"FocusNewMessages": "Focus new messages",
+	"ChatTextField": "Text field in chat",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Wait for page to load",
@@ -184,6 +185,7 @@
 	"ParseLinks": "Parse links",
 	"ChatAutoUpdate": "Chat auto-update",
 	"UpdatesTimeout": "Updates timeout",
+	"KeepSessionAlive": "Keep session alive",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Load media thumbnails",
@@ -221,7 +223,7 @@
 	// Alert messages
 	"MessageSent_Alert": "Message sent",
 	"MessageDeleted_Alert": "Message deleted",
-	"UpdateAvailable_Alert": "New update available",
+	"UpdateAvailable_Alert": "Client update available",
 	
 	// Chat form
 	"ChatMedia_Title": "Media",

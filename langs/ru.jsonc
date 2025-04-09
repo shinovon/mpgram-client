@@ -176,6 +176,7 @@
 	"Small": "Мелкий",
 	"Medium": "Средний",
 	"FocusNewMessages": "Авто-прокрутка до новых сообщений",
+	"ChatTextField": "Текстовое поле в чате",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Ждать полной загрузки",
@@ -184,6 +185,7 @@
 	"ParseLinks": "Парсить ссылки",
 	"ChatAutoUpdate": "Авто-обновление чата",
 	"UpdatesTimeout": "Таймаут обновлений",
+	"KeepSessionAlive": "Удерживать сессию активной",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Загружать медиа",

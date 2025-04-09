@@ -176,6 +176,7 @@
 	"Small": "Small", // Untranslated
 	"Medium": "Medium", // Untranslated
 	"FocusNewMessages": "Focus new messages", // Untranslated
+	"ChatTextField": "Text field in chat", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Espere a que se cargue la pagina",
@@ -184,6 +185,7 @@
 	"ParseLinks": "Analizar enlaces",
 	"ChatAutoUpdate": "Actualización automatica del chat",
 	"UpdatesTimeout": "Tiempo de espera de actualizaciones",
+	"KeepSessionAlive": "Keep session alive", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "Cargar miniaturas de medios",

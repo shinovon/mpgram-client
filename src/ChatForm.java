@@ -29,6 +29,7 @@ import javax.microedition.lcdui.ImageItem;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.Spacer;
 import javax.microedition.lcdui.StringItem;
+import javax.microedition.lcdui.TextField;
 import javax.microedition.lcdui.Ticker;
 
 import cc.nnproject.json.JSONArray;
@@ -81,6 +82,8 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 	
 	long wasOnline;
 	
+	TextField textField;
+	
 	public ChatForm(String id, String query, int message, int topMsg) {
 		super(id);
 		addCommand(MP.latestCmd);
@@ -90,6 +93,12 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 		this.query = query;
 		this.messageId = message;
 		this.topMsgId = topMsg;
+		
+		setItemStateListener(MP.midlet);
+		textField = new TextField("", "", 500, TextField.ANY);
+		textField.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+		textField.addCommand(MP.sendCmd);
+		textField.setItemCommandListener(MP.midlet);
 	}
 	
 	// create in media mode
@@ -255,6 +264,12 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 			s.setItemCommandListener(MP.midlet);
 			safeInsert(thread, reverse ? size() : 0, s);
 			if (!reverse) top += 1;
+		} else if (textField != null) {
+			safeInsert(thread, reverse ? size() : 0, textField);
+			if (!reverse) top += 1;
+			if (endReached && dir == 0) {
+				focus = textField;
+			}
 		}
 		
 		int insert = top;
@@ -274,8 +289,8 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 			
 			insert = message(message, insert, sb, c, reverse, selfChat, false, item);
 
-			if (this.messageId != 0 ? (messageId == id)
-					: (i == 0 ? ((endReached && dir == 0) || dir == -1) : (i == l - 1 ? (dir == 1) : false))) {
+			if (focus == null && (this.messageId != 0 ? (messageId == id)
+					: (i == 0 ? ((endReached && dir == 0) || dir == -1) : (i == l - 1 ? (dir == 1) : false)))) {
 				focus = item[0];
 			}
 		}
@@ -857,8 +872,9 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 			}
 			boolean reverse = MP.reverseChat;
 			Item[] item = new Item[1];
+			int o = (textField != null ? 1 : 0);
 			message(update.getObject("message"),
-					reverse ? size() : 0,
+					reverse ? size() - o : 0 + o,
 					new StringBuffer(),
 					Calendar.getInstance(),
 					reverse,

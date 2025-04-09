@@ -176,6 +176,7 @@
 	"Small": "Small", // Untranslated
 	"Medium": "Medium", // Untranslated
 	"FocusNewMessages": "Focus new messages", // Untranslated
+	"ChatTextField": "Text field in chat", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "انتظار تحميل الصفحة",
@@ -184,6 +185,7 @@
 	"ParseLinks": "تحليل الروابط",
 	"ChatAutoUpdate": "تحديث المحادثة تلقائيا",
 	"UpdatesTimeout": "انتهاء وقت التحديث",
+	"KeepSessionAlive": "Keep session alive", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "تحميل صور مصغرة للوسائط",

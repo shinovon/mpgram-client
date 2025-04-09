@@ -173,6 +173,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static long keepAliveInterval = 30000L;
 	static String deviceName;
 	static String systemName;
+	static boolean chatField;
 
 	// threading
 	private static int run;
@@ -416,6 +417,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			updatesDelay = j.getLong("updatesDelay", updatesDelay);
 			updatesTimeout = j.getInt("updatesTimeout", updatesTimeout);
 			chatsListFontSize = j.getInt("chatsListFontSize", chatsListFontSize);
+			keepAlive = j.getBoolean("keepAlive", keepAlive);
+			chatField = j.getBoolean("chatField", chatField);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -579,7 +582,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	}
 
 	public void itemStateChanged(Item item) {
-		if (item == messageField) {
+		if (item == messageField
+				|| (current instanceof ChatForm && item instanceof TextField)) {
 			if (!sendTyping) return;
 			long l = System.currentTimeMillis();
 			if (l - lastType < 5000L) return;
@@ -844,8 +848,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		case RUN_SEND_MESSAGE: {
 			try {
-//				String file = fileField.getString();
-				String file = MP.sendFile;
+				String text = (String) ((Object[]) param)[0];
+				String writeTo = (String) ((Object[]) param)[1];
+				String replyTo = (String) ((Object[]) param)[2];
+				String edit = (String) ((Object[]) param)[3];
+				String file = (String) ((Object[]) param)[4];
+				ChoiceGroup sendChoice = (ChoiceGroup) ((Object[]) param)[5];
 				if (file != null && file.length() <= 8) {
 					file = null;
 				}
@@ -865,17 +873,23 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					if (replyTo != null) {
 						sb.append("&reply=").append(replyTo);
 					}
-					if (sendChoice.isSelected(0)) {
-						sb.append("&uncompressed=1");
-					}
-					if (sendChoice.isSelected(1)) {
-						sb.append("&spoiler=1");
+					if (sendChoice != null) {
+						if (sendChoice.isSelected(0)) {
+							sb.append("&uncompressed=1");
+						}
+						if (sendChoice.isSelected(1)) {
+							sb.append("&spoiler=1");
+						}
 					}
 				}
-				postMessage(sb.toString(), file, (String) param);
+				postMessage(sb.toString(), file, text);
 				
 				// go to latest message after sending
-				commandAction(backCmd, current);
+				if (!(current instanceof ChatForm)) {
+					commandAction(backCmd, current);
+				} else if (((ChatForm) current).textField != null) {
+					((ChatForm) current).textField.setString("");
+				}
 				commandAction(latestCmd, current);
 //				display(infoAlert(L[MessageSent_Alert]), current);
 			} catch (Exception e) {
@@ -1090,10 +1104,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		if (thread == null) return;
 //		if (updates) updatesThread = null;
 		thread.interrupt();
-		if (!symbianJrt) {
-			Connection c = (Connection) threadConnections.get(thread);
-			if (c != null) midlet.start(RUN_CLOSE_CONNECTION, c);
-		}
+		if (symbianJrt)
+			return;
+		Connection c = (Connection) threadConnections.get(thread);
+		if (c == null || closingConnections.contains(c))
+			return;
+		midlet.start(RUN_CLOSE_CONNECTION, c);
 	}
 
 	public void commandAction(Command c, Displayable d) {
@@ -1381,11 +1397,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							L[ShowMedia],
 							L[ShowChatStatus],
 							L[FocusNewMessages],
+							L[ChatTextField]
 					}, null);
 					uiChoice.setSelectedIndex(0, reverseChat);
 					uiChoice.setSelectedIndex(1, showMedia);
 					uiChoice.setSelectedIndex(2, chatStatus);
 					uiChoice.setSelectedIndex(3, focusNewMessages);
+					uiChoice.setSelectedIndex(4, chatField);
 					uiChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(uiChoice);
 					
@@ -1421,13 +1439,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							L[UseJSONStream],
 							L[FormatText],
 							L[ParseLinks],
-							L[ChatAutoUpdate]
+							L[ChatAutoUpdate],
+							L[KeepSessionAlive]
 					}, null);
 					behChoice.setSelectedIndex(0, useLoadingForm);
 					behChoice.setSelectedIndex(1, jsonStream);
 					behChoice.setSelectedIndex(2, parseRichtext);
 					behChoice.setSelectedIndex(3, parseLinks);
 					behChoice.setSelectedIndex(4, chatUpdates);
+					behChoice.setSelectedIndex(5, keepAlive);
 					behChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(behChoice);
 					
@@ -1497,6 +1517,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				showMedia = uiChoice.isSelected(1);
 				chatStatus = uiChoice.isSelected(2);
 				focusNewMessages = uiChoice.isSelected(3);
+				chatField = uiChoice.isSelected(4);
 				
 				if ((photoSize = (photoSizeGauge.getValue() * 8)) < 16) {
 					photoSizeGauge.setValue((photoSize = 16) / 8);
@@ -1515,6 +1536,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				parseRichtext = behChoice.isSelected(2);
 				parseLinks = behChoice.isSelected(3);
 				chatUpdates = behChoice.isSelected(4);
+				keepAlive = behChoice.isSelected(5);
 				
 				if ((updatesTimeout = updateTimeoutGauge.getValue() * 5) < 5) {
 					updateTimeoutGauge.setValue((updatesTimeout = 5) / 5);
@@ -1557,6 +1579,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					j.put("updatesDelay", updatesDelay);
 					j.put("updatesTimeout", updatesTimeout);
 					j.put("chatsListFontSize", chatsListFontSize);
+					j.put("keepAlive", keepAlive);
+					j.put("chatField", chatField);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
@@ -1601,7 +1625,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					MP.cancel(MP.updatesThread, true);
 				}
 				display(loadingAlert(L[Sending]), d);
-				start(RUN_SEND_MESSAGE, t);
+				start(RUN_SEND_MESSAGE, new Object[] { t, writeTo, replyTo, edit, sendFile, sendChoice });
 				return;
 			}
 			if (c == openTextBoxCmd) {
@@ -1866,6 +1890,21 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			
 			openLoad(new ChatForm(s[0], null, Integer.parseInt(s[1]), 0));
+			return;
+		}
+		if (c == sendCmd) { 
+			if (sending || !(current instanceof ChatForm))
+				return;
+			sending = true;
+			
+			String t = ((TextField) item).getString();
+			if (t.trim().length() == 0)
+				return;
+			if (MP.updatesThread != null) {
+				MP.cancel(MP.updatesThread, true);
+			}
+			display(loadingAlert(L[Sending]), current);
+			start(RUN_SEND_MESSAGE, new Object[] { t, ((ChatForm) current).id, null, null, null, null });
 			return;
 		}
 		commandAction(c, display.getCurrent());

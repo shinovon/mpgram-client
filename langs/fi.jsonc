@@ -176,6 +176,7 @@
 	"Small": "Small", // Untranslated
 	"Medium": "Medium", // Untranslated
 	"FocusNewMessages": "Focus new messages", // Untranslated
+	"ChatTextField": "Text field in chat", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Odota sivun latausta",
@@ -184,6 +185,7 @@
 	"ParseLinks": "Jäsennä linkit",
 	"ChatAutoUpdate": "Autom. päivitys",
 	"UpdatesTimeout": "Päivitysten aikaväli",
+	"KeepSessionAlive": "Keep session alive", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "Kuvien esikatselu",

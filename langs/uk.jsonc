@@ -176,6 +176,7 @@
 	"Small": "Маленький",
 	"Medium": "Середній",
 	"FocusNewMessages": "Фокус нових повідомлень",
+	"ChatTextField": "Text field in chat", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Чекати повного завантаження",
@@ -184,6 +185,7 @@
 	"ParseLinks": "Відображати посилання",
 	"ChatAutoUpdate": "Авто-оновлення чата",
 	"UpdatesTimeout": "Таймаут оновлення",
+	"KeepSessionAlive": "Keep session alive", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "Завантажувати медіа",
