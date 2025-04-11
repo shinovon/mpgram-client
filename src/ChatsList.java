@@ -38,6 +38,7 @@ public class ChatsList extends MPList implements LangConstants {
 	String arrayName;
 	boolean users;
 	boolean noAvas;
+	String peerId, msgId;
 
 	public ChatsList(String title, int folder) {
 		super(title);
@@ -51,6 +52,7 @@ public class ChatsList extends MPList implements LangConstants {
 		setFitPolicy(List.TEXT_WRAP_ON);
 	}
 	
+	// contacts, members
 	public ChatsList(String title, String url, String arrayName) {
 		super(title);
 		this.url = url;
@@ -59,6 +61,17 @@ public class ChatsList extends MPList implements LangConstants {
 		this.noAvas = true;
 		addCommand(MP.backCmd);
 		setFitPolicy(List.TEXT_WRAP_ON);
+	}
+	
+	// forward
+	public ChatsList(String peerId, String msgId) {
+		super(MP.L[Forward]);
+		this.folder = 0;
+		this.peerId = peerId;
+		this.msgId = msgId;
+		addCommand(MP.archiveCmd);
+		addCommand(MP.cancelCmd);
+//		setFitPolicy(List.TEXT_WRAP_ON);
 	}
 
 	void loadInternal(Thread thread) throws Exception {
@@ -156,29 +169,31 @@ public class ChatsList extends MPList implements LangConstants {
 			sb.setLength(0);
 			String name = MP.getName(peer);
 			MP.appendOneLine(sb, name);
-			if (dialog.has("unread")) {
-				sb.append(" +").append(dialog.getInt("unread"));
-			}
-			
-			JSONObject message = dialog.getObject("msg", null)/*messages.getObject(id)*/;
-			if (message != null) {
-				sb.append('\n')
-				.append(MP.localizeDate(message.getLong("date"), 2)).append(' ');
-				if (!peer.getBoolean("c", false)) {
-					if (message.getBoolean("out", false)) {
-						sb.append(MP.L[You_Prefix]);
-					} else if (id.charAt(0) == '-' && message.has("from_id")) {
-						MP.appendOneLine(sb, MP.getName(message.getString("from_id"), true)).append(": ");
-					}
+			if (peerId == null) {
+				if (dialog.has("unread")) {
+					sb.append(" +").append(dialog.getInt("unread"));
 				}
-				if (message.has("media")) {
-					sb.append(MP.L[Media]);
-				} else if (message.has("fwd")) {
-					sb.append(MP.L[ForwardedMessage]);
-				} else  if (message.has("act")) {
-					sb.append(MP.L[Action]);
-				} else {
-					MP.appendOneLine(sb, message.getString("text"));
+				
+				JSONObject message = dialog.getObject("msg", null)/*messages.getObject(id)*/;
+				if (message != null) {
+					sb.append('\n')
+					.append(MP.localizeDate(message.getLong("date"), 2)).append(' ');
+					if (!peer.getBoolean("c", false)) {
+						if (message.getBoolean("out", false)) {
+							sb.append(MP.L[You_Prefix]);
+						} else if (id.charAt(0) == '-' && message.has("from_id")) {
+							MP.appendOneLine(sb, MP.getName(message.getString("from_id"), true)).append(": ");
+						}
+					}
+					if (message.has("media")) {
+						sb.append(MP.L[Media]);
+					} else if (message.has("fwd")) {
+						sb.append(MP.L[ForwardedMessage]);
+					} else  if (message.has("act")) {
+						sb.append(MP.L[Action]);
+					} else {
+						MP.appendOneLine(sb, message.getString("text"));
+					}
 				}
 			}
 			
@@ -196,6 +211,14 @@ public class ChatsList extends MPList implements LangConstants {
 		if (i == -1) return;
 		String id = (String) ids.elementAt(i);
 		if (id == null) return;
+		
+		if (peerId != null) {
+			// forward
+			MP.deleteFromHistory(this);
+			MP.display(new ChatForm(id, null, 0, 0));
+			MP.display(MP.writeForm(id, null, "", null, peerId, msgId));
+			return;
+		}
 		
 		MP.openChat(id, -1);
 	}

@@ -64,7 +64,7 @@ public abstract class MPList extends List {
 				// ignore exception if cancel detected
 				return;
 			}
-			MP.display(MP.errorAlert(e.toString()), this);
+			MP.display(MP.errorAlert(e), this);
 			e.printStackTrace();
 		} finally {
 			setTicker(null);

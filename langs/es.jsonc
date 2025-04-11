@@ -192,6 +192,7 @@
 	"LoadMediaThumbnails": "Cargar miniaturas de medios",
 	"LoadAvatars": "Cargar avatares",
 	"MultiThreadedLoading": "Carga multihilo",
+	"RoundAvatars": "Rounded avatars", // Untranslated
 	
 	// Cache settings
 	"AvatarsCaching": "Almacenar cache de avatares",
@@ -212,6 +213,8 @@
 	// Write form
 	"Reply_Title": "Respuesta",
 	"Write_Title": "Escribir",
+	"Edit_Title": "Edit", // Untranslated
+	"Forward_Title": "Forward", // Untranslated
 	"Message": "Mensaje",
 	"File": "File", // Untranslated
 	"File_Prefix": "File: ", // Untranslated

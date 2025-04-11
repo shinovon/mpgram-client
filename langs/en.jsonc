@@ -192,6 +192,7 @@
 	"LoadMediaThumbnails": "Load media thumbnails",
 	"LoadAvatars": "Load avatars",
 	"MultiThreadedLoading": "Multi-threaded loading",
+	"RoundAvatars": "Rounded avatars",
 	
 	// Cache settings
 	"AvatarsCaching": "Avatars caching",
@@ -212,6 +213,8 @@
 	// Write form
 	"Reply_Title": "Reply",
 	"Write_Title": "Write",
+	"Edit_Title": "Edit",
+	"Forward_Title": "Forward",
 	"Message": "Message",
 	"File": "File",
 	"File_Prefix": "File: ",

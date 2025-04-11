@@ -192,6 +192,7 @@
 	"LoadMediaThumbnails": "Загружать медиа",
 	"LoadAvatars": "Загружать аватарки",
 	"MultiThreadedLoading": "Многопоточная загрузка",
+	"RoundAvatars": "Закругленные аватарки",
 	
 	// Cache settings
 	"AvatarsCaching": "Кэшироние аватарок",
@@ -212,6 +213,8 @@
 	// Write form
 	"Reply_Title": "Ответ",
 	"Write_Title": "Сообщение",
+	"Edit_Title": "Редактирование",
+	"Forward_Title": "Пересылка",
 	"Message": "Сообщение",
 	"File": "Файл",
 	"File_Prefix": "Файл: ",

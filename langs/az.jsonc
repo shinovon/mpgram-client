@@ -192,6 +192,7 @@
 	"LoadMediaThumbnails": "Media yükləyin",
 	"LoadAvatars": "Avatarları yükləyin",
 	"MultiThreadedLoading": "Çox yivli yükləmə",
+	"RoundAvatars": "Rounded avatars", // Untranslated
 	
 	// Cache settings
 	"AvatarsCaching": "Avatar keşləmə",
@@ -212,6 +213,8 @@
 	// Write form
 	"Reply_Title": "Cavab verinв",
 	"Write_Title": "Mesaj",
+	"Edit_Title": "Edit", // Untranslated
+	"Forward_Title": "Forward", // Untranslated
 	"Message": "Mesaj",
 	"File": "File", // Untranslated
 	"File_Prefix": "File: ", // Untranslated

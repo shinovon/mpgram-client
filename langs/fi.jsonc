@@ -192,6 +192,7 @@
 	"LoadMediaThumbnails": "Kuvien esikatselu",
 	"LoadAvatars": "Profiilikuvat",
 	"MultiThreadedLoading": "Monisäikeinen lataus",
+	"RoundAvatars": "Rounded avatars", // Untranslated
 	
 	// Cache settings
 	"AvatarsCaching": "Prof.kuvien välimuisti",
@@ -212,6 +213,8 @@
 	// Write form
 	"Reply_Title": "Vastaa",
 	"Write_Title": "Kirjoita",
+	"Edit_Title": "Edit", // Untranslated
+	"Forward_Title": "Forward", // Untranslated
 	"Message": "Viesti",
 	"File": "File", // Untranslated
 	"File_Prefix": "File: ", // Untranslated

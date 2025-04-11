@@ -176,6 +176,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static String deviceName;
 	static String systemName;
 	static boolean chatField;
+	static boolean roundAvatars;
 
 	// threading
 	private static int run;
@@ -185,6 +186,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Hashtable threadConnections = new Hashtable();
 	static Vector closingConnections = new Vector();
 	private static boolean sending;
+	static boolean updatesRunning;
 	
 	private static Object imagesLoadLock = new Object();
 	private static Vector imagesToLoad = new Vector(); // TODO hashtable?
@@ -309,10 +311,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 	// temp
 	private static String richTextUrl;
-	private static String writeTo;
-	private static String replyTo;
-	private static String sendFile;
-	private static String edit;
+	private static String writeTo, replyTo, sendFile, edit, fwdPeer, fwdMsg;
 	private static String updateUrl;
 	private static long lastType;
 	
@@ -423,6 +422,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			chatsListFontSize = j.getInt("chatsListFontSize", chatsListFontSize);
 			keepAlive = j.getBoolean("keepAlive", keepAlive);
 			chatField = j.getBoolean("chatField", chatField);
+			roundAvatars = j.getBoolean("roundAvatars", roundAvatars);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -631,18 +631,20 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				}
 				
 				start(RUN_KEEP_ALIVE, null);
+				break;
 			} catch (APIException e) {
 				if (param != null) mainDisplayable = authForm;
 				if (e.code == 401) {
 					userState = 0;
 					user = null;
-					display(errorAlert(e.toString()), mainDisplayable);
+					display(errorAlert(e), mainDisplayable);
 					break;
 				}
-				display(errorAlert(e.toString()), mainDisplayable);
+				display(errorAlert(e), mainDisplayable);
 			} catch (Exception e) {
-				display(errorAlert(e.toString()), mainDisplayable);
+				display(errorAlert(e), mainDisplayable);
 			}
+			// TODO show settings if failed on start
 			break;
 		}
 		case RUN_IMAGES: { // avatars loading loop
@@ -677,7 +679,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							String recordName = null;
 							if (src instanceof String) { // avatar
 								recordName = AVATAR_RECORD_PREFIX + avatarSize + "r" + (String) src;
-								url = instanceUrl + AVA_URL + "?a&c=" + ((String) src) + "&p=r" + avatarSize;
+								url = instanceUrl + AVA_URL + "?a&c=" + ((String) src)
+										+ "&p=r" + /*(roundAvatars ? "c" : "")*/ + avatarSize;
 
 								// load avatar from cache
 								if ((avatarsCache & 1) == 1 && imagesCache.containsKey(src)) {
@@ -809,7 +812,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							}
 						} catch (APIException e) {
 							commandAction(backCmd, current);
-							display(errorAlert(e.toString()), null);
+							display(errorAlert(e), null);
 							break;
 						}
 					} else {
@@ -843,7 +846,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				}
 
 			} catch (Exception e) {
-				display(errorAlert(e.toString()), null);
+				display(errorAlert(e), null);
 			}
 			break;
 		}
@@ -856,7 +859,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				commandAction(refreshCmd, current);
 //				display(infoAlert(L[MessageDeleted_Alert]), current);
 			} catch (Exception e) {
-				display(errorAlert(e.toString()), current);
+				display(errorAlert(e), current);
 			}
 			break;
 		}
@@ -868,6 +871,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				String edit = (String) ((Object[]) param)[3];
 				String file = (String) ((Object[]) param)[4];
 				ChoiceGroup sendChoice = (ChoiceGroup) ((Object[]) param)[5];
+				String fwdPeer = (String)  ((Object[]) param)[6];
+				String fwdMsg = (String)  ((Object[]) param)[7];
 				if (file != null && file.length() <= 8) {
 					file = null;
 				}
@@ -895,6 +900,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							sb.append("&spoiler=1");
 						}
 					}
+					if (fwdPeer != null && fwdMsg != null) {
+						sb.append("&fwd_from=").append(fwdPeer)
+						.append("&id=").append(fwdMsg);
+					}
 				}
 				postMessage(sb.toString(), file, text);
 				
@@ -908,7 +917,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 //				display(infoAlert(L[MessageSent_Alert]), current);
 			} catch (Exception e) {
 				e.printStackTrace();
-				display(errorAlert(e.toString()), current);
+				display(errorAlert(e), current);
 			} finally {
 				sending = false;
 			}
@@ -928,7 +937,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				
 				openLoad(new ChatInfoForm(id, (String) param, getNameRaw(rawPeer), "chatInvitePeek".equals(type) ? 2 : 3));
 			} catch (Exception e) {
-				display(errorAlert(e.toString()), current);
+				display(errorAlert(e), current);
 			}
 			break;
 		}
@@ -940,7 +949,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				commandAction(backCmd, current);
 				openChat(d.id, 0);
 			} catch (Exception e) {
-				display(errorAlert(e.toString()), current);
+				display(errorAlert(e), current);
 			}
 			break;
 		}
@@ -956,7 +965,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					commandAction(refreshCmd, current);
 				}
 			} catch (Exception e) {
-				display(errorAlert(e.toString()), current);
+				display(errorAlert(e), current);
 			}
 			break;
 		}
@@ -979,6 +988,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		case RUN_CHAT_UPDATES: { // chat updates loop
 			Thread thread;
 			updatesThread = thread = Thread.currentThread();
+			updatesRunning = true;
 			try {
 				StringBuffer sb = new StringBuffer();
 				ChatForm form = (ChatForm) param;
@@ -1062,6 +1072,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			} finally {
 				if (updatesThread == thread)
 					updatesThread = null;
+				updatesRunning = false;
 			}
 			break;
 		}
@@ -1099,7 +1110,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		case RUN_BOT_CALLBACK: {
 			try {
-				StringBuffer sb = new StringBuffer("botCallback");
+				StringBuffer sb = new StringBuffer("botCallback&timeout=1");
 				sb.append("&peer=").append(((String[]) param)[0]);
 				sb.append("&id=").append(((String[]) param)[1]);
 				sb.append("&data=").append(((String[]) param)[2]);
@@ -1110,7 +1121,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 
 				commandAction(latestCmd, current);
 			} catch (Exception e) {
-				display(errorAlert(e.toString()), current);
+				display(errorAlert(e), current);
 			} finally {
 				sending = false;
 			}
@@ -1123,7 +1134,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 
 				display(infoAlert(L[MemberBanned_Alert]), current);
 			} catch (Exception e) {
-				display(errorAlert(e.toString()), current);
+				display(errorAlert(e), current);
 			}
 			break;
 		}
@@ -1146,7 +1157,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 	static void cancel(Thread thread, boolean updates) {
 		if (thread == null) return;
-//		if (updates) updatesThread = null;
+		if (updates) updatesThread = null;
 		thread.interrupt();
 		if (symbianJrt)
 			return;
@@ -1218,7 +1229,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 			if (c == writeCmd) {
-				display(writeForm(((ChatForm) d).id, null, "", null));
+				display(writeForm(((ChatForm) d).id, null, "", null, null, null));
 				return;
 			}
 			if (c == searchMsgCmd) {
@@ -1244,9 +1255,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				((ChatForm) current).query = ((TextBox) d).getString();
 				((ChatForm) current).switched = true;
 				start(RUN_LOAD_FORM, current);
-			} else {
-				openLoad(new ChatForm(((ChatInfoForm) current).id, ((TextBox) d).getString(), 0, 0));
+				return;
 			}
+			
+			ChatForm form = new ChatForm(((ChatInfoForm) current).id, ((TextBox) d).getString(), 0, 0);
+			form.parent = ((ChatInfoForm) current).chatForm;
+			openLoad(form);
 			return;
 		}
 		if (d instanceof TextBox && c == searchChatsCmd) {
@@ -1502,11 +1516,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					imagesChoice = new ChoiceGroup(L[Images], Choice.MULTIPLE, new String[] {
 							L[LoadMediaThumbnails],
 							L[LoadAvatars],
-							L[MultiThreadedLoading]
+							L[MultiThreadedLoading],
+//							L[RoundAvatars]
 					}, null);
 					imagesChoice.setSelectedIndex(0, loadThumbs);
 					imagesChoice.setSelectedIndex(1, loadAvatars);
 					imagesChoice.setSelectedIndex(2, threadedImages);
+					imagesChoice.setSelectedIndex(3, roundAvatars);
 					imagesChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(imagesChoice);
 
@@ -1589,6 +1605,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				loadThumbs = imagesChoice.isSelected(0);
 				loadAvatars = imagesChoice.isSelected(1);
 				threadedImages = imagesChoice.isSelected(2);
+				roundAvatars = imagesChoice.isSelected(3);
 				
 				avatarsCache = avaCacheChoice.getSelectedIndex();
 				avatarsCacheThreshold = avaCacheGauge.getValue() * 5;
@@ -1625,6 +1642,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					j.put("chatsListFontSize", chatsListFontSize);
 					j.put("keepAlive", keepAlive);
 					j.put("chatField", chatField);
+					j.put("roundAvatars", roundAvatars);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
@@ -1662,14 +1680,14 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				if (sending) return;
 				sending = true;
 				String t = messageField.getString();
-				if (t.trim().length() == 0 && sendFile == null) {
+				if (t.trim().length() == 0 && sendFile == null && fwdPeer == null) {
 					return;
 				}
 				if (MP.updatesThread != null) {
 					MP.cancel(MP.updatesThread, true);
 				}
 				display(loadingAlert(L[Sending]), d);
-				start(RUN_SEND_MESSAGE, new Object[] { t, writeTo, replyTo, edit, sendFile, sendChoice });
+				start(RUN_SEND_MESSAGE, new Object[] { t, writeTo, replyTo, edit, sendFile, sendChoice, fwdPeer, fwdMsg });
 				return;
 			}
 			if (c == openTextBoxCmd) {
@@ -1773,20 +1791,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			return;
 		}
 		if (c == cancelCmd && d instanceof List) { // go back to write form
-			Displayable t = writeForm;
-			System.out.println("c: " + t + ", h: " + formHistory);
-			synchronized (formHistory) {
-				int i = formHistory.size();
-				while (i-- != 0) {
-					if (formHistory.elementAt(i) == t) {
-						break;
-					}
-					formHistory.removeElementAt(i);
-				}
-			}
-			System.out.println("a: " + formHistory);
-			
-			display(t, true);
+			goBackTo(writeForm);
 			return;
 		}
 		if (c == goCmd) { // url dialog submit
@@ -1810,6 +1815,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		if (c == updateCmd) {
 			browse(updateUrl);
+			return;
+		}
+		if (c == cancelCmd && d == writeForm && fwdPeer != null) {
+			// cancel forwarding
+			commandAction(backCmd, d);
+			commandAction(backCmd, current);
 			return;
 		}
 		if (c == backCmd || c == cancelCmd) {
@@ -1857,11 +1868,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		if (c == replyMsgCmd) {
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
-			display(writeForm(((ChatForm) current).id, s[1], "", null));
+			display(writeForm(((ChatForm) current).id, s[1], "", null, null, null));
 			return;
 		}
 		if (c == forwardMsgCmd) {
-			// TODO
+			String[] s = (String[]) ((MPForm) current).urls.get(item);
+			if (s == null) return;
+			openLoad(new ChatsList(s[0], s[1]));
 			return;
 		}
 		if (c == copyMsgCmd) {
@@ -1922,13 +1935,20 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		if (c == editMsgCmd) {
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
-			display(writeForm(s[0], null, (String) ((MPForm) current).urls.get(s[1]), s[1]));
+			display(writeForm(s[0], null, (String) ((MPForm) current).urls.get(s[1]), s[1], null, null));
 			return;
 		}
 		if (c == gotoMsgCmd) {
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
-			if (s[0] == null || s[0].equals(((ChatForm) current).id)) {
+			if (((ChatForm) current).parent != null) {
+				// search
+				goBackTo(((ChatForm) current).parent);
+				((ChatForm) current).openMessage(s[1], -1);
+				return;
+			}
+			if ((s[0] == null || s[0].equals(((ChatForm) current).id))
+					&& ((ChatForm) current).query == null) {
 				((ChatForm) current).openMessage(s[1], -1);
 				return;
 			}
@@ -1936,8 +1956,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			openLoad(new ChatForm(s[0], null, Integer.parseInt(s[1]), 0));
 			return;
 		}
-		if (c == sendCmd) { 
-			if (sending || !(current instanceof ChatForm))
+		if (c == sendCmd && current instanceof ChatForm) { 
+			if (sending)
 				return;
 			sending = true;
 			
@@ -2238,16 +2258,21 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return l;
 	}
 	
-	static Form writeForm(String id, String reply, String text, String editId) {
+	static Form writeForm(String id, String reply, String text, String editId, String fwdPeerId, String fwdMsgId) {
 		writeTo = id;
 		replyTo = reply;
 		edit = editId;
 		sendFile = null;
+		fwdPeer = fwdPeerId;
+		fwdMsg = fwdMsgId;
 		
-		Form f = new Form(editId != null ? editId : reply != null ? L[Reply_Title] : L[Write_Title]);
+		Form f = new Form(fwdPeerId != null ? L[Forward_Title] :
+			editId != null ? L[Edit_Title] :
+				reply != null ? L[Reply_Title] :
+					L[Write_Title]);
 		f.setCommandListener(midlet);
 		f.setItemStateListener(midlet);
-		f.addCommand(backCmd);
+		f.addCommand(cancelCmd);
 		f.addCommand(sendCmd);
 		
 		TextField t = new TextField(L[Message], text, 500, TextField.ANY);
@@ -2559,7 +2584,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			display(list);
 		} catch (Exception e) {
-			display(errorAlert(e.toString()), current);
+			display(errorAlert(e), current);
 			e.printStackTrace();
 		}
 	}
@@ -2586,6 +2611,25 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static void openLoad(Displayable d) {
 		display(d);
 		midlet.start(d instanceof MPList ? RUN_LOAD_LIST : RUN_LOAD_FORM, d);
+	}
+	
+	static void goBackTo(Displayable d) {
+		synchronized (formHistory) {
+			int i = formHistory.size();
+			while (i-- != 0) {
+				if (formHistory.elementAt(i) == d) {
+					break;
+				}
+				formHistory.removeElementAt(i);
+			}
+		}
+		display(d, true);
+	}
+	
+	static void deleteFromHistory(Displayable d) {
+		synchronized (formHistory) {
+			formHistory.removeElement(d);
+		}
 	}
 	
 	static void display(Alert a, Displayable d) {
@@ -2651,6 +2695,18 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		if (d != mainDisplayable && (formHistory.isEmpty() || formHistory.lastElement() != d)) {
 			formHistory.addElement(d);
 		}
+	}
+
+	static Alert errorAlert(Exception e) {
+		if (!(e instanceof APIException)) {
+			return errorAlert(e.toString());
+		}
+		// TODO
+		Alert a = new Alert("");
+		a.setType(AlertType.ERROR);
+		a.setString(e.toString());
+		a.setTimeout(3000);
+		return a;
 	}
 
 	static Alert errorAlert(String text) {

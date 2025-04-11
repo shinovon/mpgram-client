@@ -192,6 +192,7 @@
 	"LoadMediaThumbnails": "تحميل صور مصغرة للوسائط",
 	"LoadAvatars": "تحميل صور الحسابات",
 	"MultiThreadedLoading": "تحميل متعدد الخيوط",
+	"RoundAvatars": "Rounded avatars", // Untranslated
 	
 	// Cache settings
 	"AvatarsCaching": "تخزين صور الحسابات مؤقتا",
@@ -212,6 +213,8 @@
 	// Write form
 	"Reply_Title": "رد",
 	"Write_Title": "كتابة",
+	"Edit_Title": "Edit", // Untranslated
+	"Forward_Title": "Forward", // Untranslated
 	"Message": "رسالة",
 	"File": "File", // Untranslated
 	"File_Prefix": "File: ", // Untranslated

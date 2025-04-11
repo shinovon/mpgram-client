@@ -192,6 +192,7 @@
 	"LoadMediaThumbnails": "Завантажувати медіа",
 	"LoadAvatars": "Завантажувати аватарки",
 	"MultiThreadedLoading": "Багатопоточне завантаження",
+	"RoundAvatars": "Rounded avatars", // Untranslated
 	
 	// Cache settings
 	"AvatarsCaching": "Кешування аватарок",
@@ -212,6 +213,8 @@
 	// Write form
 	"Reply_Title": "Відповідь",
 	"Write_Title": "Повідомлення",
+	"Edit_Title": "Edit", // Untranslated
+	"Forward_Title": "Forward", // Untranslated
 	"Message": "Повідомлення",
 	"File": "Файл", 
 	"File_Prefix": "Файл: ", 

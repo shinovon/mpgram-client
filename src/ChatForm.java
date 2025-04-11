@@ -83,6 +83,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 	long wasOnline;
 	
 	TextField textField;
+	ChatForm parent;
 	
 	public ChatForm(String id, String query, int message, int topMsg) {
 		super(id);
@@ -94,7 +95,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 		this.messageId = message;
 		this.topMsgId = topMsg;
 		
-		if (MP.chatField) {
+		if (MP.chatField && query == null) {
 			setItemStateListener(MP.midlet);
 			textField = new TextField("", "", 500, TextField.ANY);
 			textField.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -147,7 +148,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 					messageId = 0;
 					int maxId = full.getInt("read_inbox_max_id");
 					if (maxId != 0 && full.getInt("unread_count", 0) > limit) {
-						offsetId = maxId;
+						offsetId = messageId = maxId;
 						addOffset = -limit;
 						dir = 1;
 					}
@@ -270,7 +271,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 		} else if (textField != null) {
 			safeInsert(thread, reverse ? size() : 0, textField);
 			if (!reverse) top += 1;
-			if (endReached && dir == 0) {
+			if (endReached && dir == 0 && messageId == 0) {
 				focus = textField;
 			}
 		}
@@ -300,9 +301,10 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 		
 		super.focusOnFinish = focus;
 		
-		if (endReached && MP.chatUpdates && mediaFilter == null && thread == this.thread) {
+		if (endReached && !hasOffset && query == null && mediaFilter == null
+				&& MP.chatUpdates && thread == this.thread) {
 			// start updater thread
-			if (MP.updatesThread != null) {
+			if (MP.updatesThread != null || MP.updatesRunning) {
 				MP.display(MP.loadingAlert(MP.L[WaitingForPrevChat]), this);
 				
 				MP.cancel(MP.updatesThread, true);
@@ -364,8 +366,10 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 			if (text != null && text.length() != 0) {
 				s.addCommand(MP.copyMsgCmd);
 			}
-			if (mediaFilter == null) {
-//				s.addCommand(MP.forwardMsgCmd); // TODO
+			if (query != null || mediaFilter != null) {
+				s.setDefaultCommand(MP.gotoMsgCmd);
+			} else {
+				s.addCommand(MP.forwardMsgCmd);
 				if (canWrite) {
 					s.addCommand(MP.replyMsgCmd);
 				}
@@ -772,7 +776,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 	}
 
 	public void openMessage(String msg, int topMsg) {
-		if (urls != null && urls.containsKey(msg)) { // TODO doesn't work
+		if (urls != null && urls.containsKey(msg)) {
 			Item focus = null;
 			for (Enumeration en = urls.keys(); en.hasMoreElements(); ) {
 				Object key = en.nextElement();
@@ -795,7 +799,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 		cancel();
 		this.messageId = Integer.parseInt(msg);
 		if (topMsg != -1) this.topMsgId = topMsg;
-		load();
+		MP.openLoad(this);
 	}
 	
 	void paginate(int dir) {
@@ -833,7 +837,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 		super.cancel();
 		// close updater thread
 		update = false;
-		if (MP.updatesThread != null) {
+		if (MP.updatesThread != null || MP.updatesRunning) {
 			MP.cancel(MP.updatesThread, true);
 		}
 	}

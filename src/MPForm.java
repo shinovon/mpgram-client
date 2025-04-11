@@ -69,7 +69,7 @@ public abstract class MPForm extends Form {
 				// ignore exception if cancel detected
 				return;
 			}
-			MP.display(MP.errorAlert(e.toString()), this);
+			MP.display(MP.errorAlert(e), this);
 			e.printStackTrace();
 		} finally {
 			if (getTicker() == ticker) {
