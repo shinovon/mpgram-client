@@ -535,6 +535,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			try {
 				userDefaultImg = resize(Image.createImage("/us.png"), avatarSize, avatarSize);
 				chatDefaultImg = resize(Image.createImage("/gr.png"), avatarSize, avatarSize);
+				if (roundAvatars) {
+					userDefaultImg = roundImage(userDefaultImg);
+					chatDefaultImg = roundImage(chatDefaultImg);
+				}
 			} catch (Throwable ignored) {}
 		}
 		
@@ -691,6 +695,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 										try {
 											byte[] b = r.getRecord(1);
 											img = Image.createImage(b, 0, b.length);
+											if (recordName != null && roundAvatars)
+												img = roundImage(img);
 										} finally {
 											r.closeRecordStore();
 										}
@@ -724,6 +730,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 										}
 									}
 									img = Image.createImage(b, 0, b.length);
+									if (recordName != null && roundAvatars)
+										img = roundImage(img);
 								} catch (Exception e) {
 									e.printStackTrace();
 									if (src instanceof String) {
@@ -1517,7 +1525,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							L[LoadMediaThumbnails],
 							L[LoadAvatars],
 							L[MultiThreadedLoading],
-//							L[RoundAvatars]
+							L[RoundAvatars]
 					}, null);
 					imagesChoice.setSelectedIndex(0, loadThumbs);
 					imagesChoice.setSelectedIndex(1, loadAvatars);
@@ -3230,6 +3238,29 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		String[] r = new String[v.size()];
 		v.copyInto(r);
 		return r;
+	}
+	
+	public static Image roundImage(Image img) {
+		if (img == null) return null;
+		try {
+			int w = img.getWidth(), h = img.getHeight();
+			int[] c = new int[w * h];
+			img.getRGB(c, 0, w, 0, 0, w, h);
+			for (int i = 0; i < h; i++) {
+				float y = (float) (h / 2 - i) / (h - 1);
+				y = y * 2;
+				float xf = (float) Math.sqrt(1 - y * y);
+				int x = (int) (xf * (w - 1));
+				x = (w - x) / 2;
+				for (int j = 0; j < x; j++) {
+					c[i * w + j] = 0x00FFFFFF;
+					c[i * w + w - j - 1] = 0x00FFFFFF;
+				}
+			}
+			return Image.createRGBImage(c, w, h, true);
+		} catch (Exception e) {
+			return img;
+		}
 	}
 	
 	// Rich text
