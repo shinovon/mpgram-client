@@ -36,18 +36,18 @@
 	"Today": "hoy",
 	"Yesterday": "ayer",
 	"LastWeek": "la semana pasada",
-	"LastMonth": "last month", // Untranslated
-	"ALongTimeAgo": "a long time ago", // Untranslated
-	"Recently": "recently", // Untranslated
+	"LastMonth": "el mes pasado",
+	"ALongTimeAgo": "hace mucho tiempo",
+	"Recently": "recientemente",
 	// Date suffixes
 	"on_Date": "sobre ",
-	"at_Time": " at ",
+	"at_Time": " en ",
 	// Months
-	"Jan": "Enero",
+	"Jan": "Ene",
 	"Feb": "Feb",
 	"Mar": "Mar",
-	"Apr": "Abril",
-	"May": "Mayo",
+	"Apr": "Abr",
+	"May": "May",
 	"Jun": "Jun",
 	"Jul": "Jul",
 	"Aug": "Ago",
@@ -79,7 +79,7 @@
 	
 	// Settings commands
 	"Logout": "Cerrar sesion",
-	"ClearCache": "Eliminar mugre",
+	"ClearCache": "Liberar datos",
 	
 	// Chats list commands
 	"Folders": "Carpetas",
@@ -87,7 +87,7 @@
 	"ArchivedChats": "Chats archivados",
 	"Contacts": "Contactos",
 	"Search": "Busqueda",
-	"OpenByLink": "Open by link", // Untranslated
+	"OpenByLink": "Abrir por enlace",
 	
 	// Message commands
 	"OpenChat": "Abrir chat",
@@ -99,8 +99,8 @@
 	"Delete": "Eliminar",
 	"Edit": "Editar",
 	"GoTo": "Ir a",
-	"Pin": "Pin", // Untranslated
-	"BanMember": "Ban member", // Untranslated
+	"Pin": "Fijado",
+	"BanMember": "Prohibir miembro",
 	
 	// Item commands
 	"Link_Cmd": "Enlace",
@@ -111,15 +111,15 @@
 	// Chat form commands
 	"WriteMessage": "Escribir mensaje",
 	"LatestMessages_Cmd": "Actualizar",
-	"ChatInfo": "Chat info",
+	"ChatInfo": "Info del chat",
 	"Older": "Mensajes antiguos",
 	"Newer": "Mensajes mas recientes",
-	"SendSticker": "Send sticker", // Untranslated
+	"SendSticker": "Enviar pegatina",
 	
 	// Message writing form commands
 	"Send": "Enviar",
 	"OpenTextBox": "Abrir cuadro de texto",
-	"ChooseFile": "Choose file", // Untranslated
+	"ChooseFile": "Elija archivo",
 	
 	// Profile/chat info commands
 	"Join": "Unirse",
@@ -127,7 +127,7 @@
 	"LeaveGroup": "Dejar el grupo",
 	"ChatMedia": "Documentos del chat",
 	"Members": "Miembros",
-	"AddToContacts": "Add to contacts", // Untranslated
+	"AddToContacts": "Añadir a contactos",
 	
 	// Dialog commands
 	"Ok": "Aceptar",
@@ -142,11 +142,11 @@
 	"Authorizing": "Autorizando",
 	"WaitingForServerResponse": "Esperando respuesta del servidor...",
 	"Sending": "Enviando",
-	"WaitingForPrevChat": "Waiting for previous chat to disconnect...", // Untranslated
+	"WaitingForPrevChat": "Esperando a que se desconecte el chat anterior...",
 	
 	// Authorization process
 	"Auth_Title": "Autorizacion",
-	"InstanceURL": "Instancia URL",
+	"InstanceURL": "URL de la Instancia",
 	"InstancePassword": "Contraseña de Instancia",
 	"ChooseAuthMethod": "Elija el método de autorización",
 	"PhoneNumber": "Numero de telefono",
@@ -159,7 +159,7 @@
 	"CodeExpired_Alert": "Codigo caducado!",
 	
 	// Settings sections
-	"UI": "UI",
+	"UI": "Interfaz de usuario",
 	"Behaviour": "Caracteristicas",
 	"Images": "Imagenes",
 	"Authorization": "Autorizacion",
@@ -172,12 +172,12 @@
 	"ThumbnailsSize": "Tamaño de miniaturas",
 	"ChatsCount": "Contador de chats",
 	"MessagesCount": " Contador de mensajes",
-	"ChatsListFontSize": "Chats list font size", // Untranslated
-	"Default": "Default", // Untranslated
-	"Small": "Small", // Untranslated
-	"Medium": "Medium", // Untranslated
-	"FocusNewMessages": "Focus new messages", // Untranslated
-	"ChatTextField": "Text field in chat", // Untranslated
+	"ChatsListFontSize": "Tamaño de fuente de la lista de chats",
+	"Default": "Por defecto",
+	"Small": "Pequeño",
+	"Medium": "Mediano",
+	"FocusNewMessages": "Enfocar nuevos mensajes",
+	"ChatTextField": "Campo de texto en el chat",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Espere a que se cargue la pagina",
@@ -186,13 +186,13 @@
 	"ParseLinks": "Analizar enlaces",
 	"ChatAutoUpdate": "Actualización automatica del chat",
 	"UpdatesTimeout": "Tiempo de espera de actualizaciones",
-	"KeepSessionAlive": "Keep session alive", // Untranslated
+	"KeepSessionAlive": "Mantener la sesión activa",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Cargar miniaturas de medios",
 	"LoadAvatars": "Cargar avatares",
 	"MultiThreadedLoading": "Carga multihilo",
-	"RoundAvatars": "Rounded avatars", // Untranslated
+	"RoundAvatars": "Avatares redondeados",
 	
 	// Cache settings
 	"AvatarsCaching": "Almacenar cache de avatares",
@@ -213,25 +213,25 @@
 	// Write form
 	"Reply_Title": "Respuesta",
 	"Write_Title": "Escribir",
-	"Edit_Title": "Edit", // Untranslated
-	"Forward_Title": "Forward", // Untranslated
+	"Edit_Title": "Editar",
+	"Forward_Title": "Reenviar",
 	"Message": "Mensaje",
-	"File": "File", // Untranslated
-	"File_Prefix": "File: ", // Untranslated
-	"NotSelected": "Not selected", // Untranslated
-	"SendUncompressed": "Send uncompressed", // Untranslated
-	"SendAsVoice": "Send as voice message", // Untranslated
-	"HideWithSpoiler": "Hide with spoiler", // Untranslated
+	"File": "Archivo",
+	"File_Prefix": "Archivo: ",
+	"NotSelected": "No seleccionado",
+	"SendUncompressed": "Enviar uncompressed",
+	"SendAsVoice": "Enviar como mensaje de voz",
+	"HideWithSpoiler": "Ocultar con spoiler",
 	"EnableHTMLFormatting": "HTML formato",
 	
 	// Alert messages
 	"MessageSent_Alert": "Mensaje enviado",
 	"MessageDeleted_Alert": "Mensaje eliminado",
-	"UpdateAvailable_Alert": "Nueva actualización disponible",
-	"MemberBanned_Alert": "Member banned", // Untranslated
+	"UpdateAvailable_Alert": "Nueva actualizacion disponible",
+	"MemberBanned_Alert": "Miembro prohibido",
 	
 	// Chat form
-	"ChatMedia_Title": "Media",
+	"ChatMedia_Title": "Archivos",
 	"Search_TitlePrefix": "Buscar - ",
 	"OlderMessages": "Mensajes antiguos",
 	"NewerMessages": "Mensajes mas recientes",
@@ -242,20 +242,20 @@
 	"You_Prefix": "Tu: ",
 	"ForwardedMessage": "Mensaje reenviado",
 	"Action": "Accion",
-	"Edited": "edited", // Untranslated
+	"Edited": "editado",
 	
 	// Message media
-	"Media": "Medios",
+	"Media": "archivo",
 	"Poll": "Encuesta",
-	"Geo": "Geo: ",
+	"Geo": "Localizacion: ",
 	
 	// Chat actions
 	"PinnedMessage_Action": " mensaje anclado",
-	"Joined_Action": " se unió al grupo",
+	"Joined_Action": " se unio al grupo",
 	"Added_Action": " agregado ",
-	"Left_Action": " dejó el grupo",
+	"Left_Action": " dejo el grupo",
 	"Removed_Action": " removido ",
-	"JoinedByLink_Action": " se unió al grupo a través del enlace de invitación",
+	"JoinedByLink_Action": " se unio al grupo a través del enlace de invitacion",
 	"JoinedByRequest_Action": " fue aceptado en el grupo",
 	"ChatHistoryCleared_Action": "Se borró el historial de chat",
 	"GroupCreated_Action": "Grupo creado",
@@ -273,18 +273,18 @@
 	"LastSeen": "visto por última vez ",
 	"About_User": "Bio",
 	"About_Chat": "Sobre",
-	"Mobile": "Mobile", // Untranslated
+	"Mobile": "Movil",
 	"Username": "Nombre de Usuario",
 	"Link": "Enlace",
 	"SearchMessages": "Buscar mensajes",
 	"ViewGroup": "Ver grupo",
 	"GoToPinnedMessage": "Ver mensaje anclado",
-	"Owner": "owner", // Untranslated
-	"Admin": "admin", // Untranslated
-	"Bot": "bot", // Untranslated
-	"UserInfo": "User info", // Untranslated
-	"GroupInfo": "Group info", // Untranslated
-	"ChannelInfo": "Channel info", // Untranslated
+	"Owner": "dueño",
+	"Admin": "administrador",
+	"Bot": "bot",
+	"UserInfo": "User info",
+	"GroupInfo": "Info del grupo",
+	"ChannelInfo": "Info del canal",
 	
 	"_member": " miembro",
 	"_members": " miembros",
@@ -294,23 +294,23 @@
 	"_subscribers": " suscriptores",
 	"_subscribers2": "",
 	
-	"_photo": " photo", // Untranslated
-	"_photos": " photos", // Untranslated
+	"_photo": " foto",
+	"_photos": " fotos",
 	"_photos2": "",
 	
-	"_video": " video", // Untranslated
-	"_videos": " videos", // Untranslated
+	"_video": " video",
+	"_videos": " videos",
 	"_videos2": "",
 	
-	"_file": " file", // Untranslated
-	"_files": " files", // Untranslated
+	"_file": " archivo",
+	"_files": " archivos",
 	"_files2": "",
 	
-	"_audioFile": " audio file", // Untranslated
-	"_audioFiles": " audio files", // Untranslated
+	"_audioFile": " archivo de audio",
+	"_audioFiles": " archivos de audio",
 	"_audioFiles2": "",
 	
-	"_voiceMessage": " voice message", // Untranslated
-	"_voiceMessages": " voice messages", // Untranslated
+	"_voiceMessage": " mensaje de voz",
+	"_voiceMessages": " mensajes de voz",
 	"_voiceMessages2": ""
 }
