@@ -590,26 +590,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		
 		start(RUN_CHECK_OTA, null);
 	}
-
-	public void itemStateChanged(Item item) {
-		if (item == messageField
-				|| (current instanceof ChatForm && item instanceof TextField)) {
-			String s;
-			// auto send on two returns
-			if (item != messageField &&
-				((s = ((TextField) item).getString()).endsWith("\n\n")
-					|| s.endsWith("\r\n\r\n"))) {
-				commandAction(sendCmd, item);
-				return;
-			}
-			if (!sendTyping) return;
-			long l = System.currentTimeMillis();
-			if (l - lastType < 5000L) return;
-			
-			lastType = l;
-			start(RUN_SET_TYPING, ((TextField) item).getString().length() == 0 ? "Cancel" : null);
-		}
-	}
 	
 	// threading
 	public void run() {
@@ -1112,6 +1092,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		case RUN_CLOSE_CONNECTION: {
 			try {
 				closingConnections.addElement(param);
+				InputStream in = (InputStream) threadConnections.get(param);
+				if (in != null) {
+					try {
+						in.close();
+					} catch (Exception e) {}
+				}
 				((Connection) param).close();
 			} catch (Exception ignored) {}
 			break;
@@ -1998,6 +1984,26 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		commandAction(c, display.getCurrent());
 	}
 
+	public void itemStateChanged(Item item) {
+		if (item == messageField
+				|| (current instanceof ChatForm && item instanceof TextField)) {
+			String s;
+			// auto send on two returns
+			if (item != messageField &&
+				((s = ((TextField) item).getString()).endsWith("\n\n")
+					|| s.endsWith("\r\n\r\n"))) {
+				commandAction(sendCmd, item);
+				return;
+			}
+			if (!sendTyping) return;
+			long l = System.currentTimeMillis();
+			if (l - lastType < 5000L) return;
+			
+			lastType = l;
+			start(RUN_SET_TYPING, ((TextField) item).getString().length() == 0 ? "Cancel" : null);
+		}
+	}
+
 	private void loadLocale(String lang) throws IOException {
 		InputStreamReader r = new InputStreamReader(getClass().getResourceAsStream("/l/".concat(lang)), "UTF-8");
 		StringBuffer s = new StringBuffer();
@@ -2706,10 +2712,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	}
 
 	static Alert errorAlert(Exception e) {
+		// TODO human readable errors
 		if (!(e instanceof APIException)) {
 			return errorAlert(e.toString());
 		}
-		// TODO
 		Alert a = new Alert("");
 		a.setType(AlertType.ERROR);
 		a.setString(e.toString());
@@ -2789,10 +2795,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				c = hc.getResponseCode();
 			}
 			try {
+				threadConnections.put(hc, in = hc.openInputStream());
 				if (jsonStream) {
-					res = JSONStream.getStream(in = hc.openInputStream()).nextValue();
+					res = JSONStream.getStream(in).nextValue();
 				} else {
-					res = JSONObject.parseJSON(readUtf(in = hc.openInputStream(), (int) hc.getLength()));
+					res = JSONObject.parseJSON(readUtf(in, (int) hc.getLength()));
 				}
 			} catch (RuntimeException e) {
 				if (c >= 400) {
@@ -2805,6 +2812,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		} finally {
 			closingConnections.removeElement(hc);
 			threadConnections.remove(thread);
+			threadConnections.remove(hc);
 			if (in != null) try {
 				in.close();
 			} catch (IOException e) {}
