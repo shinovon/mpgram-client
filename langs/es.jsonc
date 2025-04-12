@@ -268,8 +268,8 @@
 	"Archive": "Archivo",
 	
 	// Profile/chat info
-	"Online": "En linea",
-	"Offline": "Apagado",
+	"Online": "en linea",
+	"Offline": "apagado",
 	"LastSeen": "visto por última vez ",
 	"About_User": "Bio",
 	"About_Chat": "Sobre",

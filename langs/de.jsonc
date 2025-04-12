@@ -1,0 +1,316 @@
+{
+	// About this locale file
+	"LocaleInfo": "German, by Ricardo",
+	"LocaleSlavicPlurals": "",
+	
+	// Common commands
+	"Exit": "Beenden",
+	"Back": "Zurück",
+	"Settings": "Einstellungen",
+	"About": "Über",
+	
+	// Date offsets
+	"_secondAgo": " vor einer Sekunde",
+	"_secondsAgo": " vor Sekunden",
+	"_secondsAgo2": "",
+	"_minuteAgo": " vor einer Minute",
+	"_minutesAgo": " vor Minuten",
+	"_minutesAgo2": "",
+	"_hourAgo": " vor einer Stunde",
+	"_hoursAgo": " vor Stunden",
+	"_hoursAgo2": "",
+	"_dayAgo": " vor einem Tag",
+	"_daysAgo": " vor Tagen",
+	"_daysAgo2": "",
+	"_weekAgo": " vor einer Woche",
+	"_weeksAgo": " vor Wochen",
+	"_weeksAgo2": "",
+	"_monthAgo": " vor einem Monat",
+	"_monthsAgo": " vor Monaten",
+	"_monthsAgo2": "",
+	"_yearAgo": " vor einem Jahr",
+	"_yearsAgo": " vor Jahren",
+	"_yearsAgo2": "",
+	"Now": "jetzt",
+	"JustNow": "gerade Eben",
+	"Today": "heute",
+	"Yesterday": "gestern",
+	"LastWeek": "letzte Woche",
+	"LastMonth": "letzten Monat",
+	"ALongTimeAgo": "vor langer Zeit",
+	"Recently": "kürzlich",
+	// Date suffixes
+	"on_Date": "am ",
+	"at_Time": " um ",
+	// Months
+	"Jan": "Jan",
+	"Feb": "Feb",
+	"Mar": "Mar",
+	"Apr": "Apr",
+	"May": "Mai",
+	"Jun": "Jun",
+	"Jul": "Jul",
+	"Aug": "Aug",
+	"Sep": "Sep",
+	"Oct": "Okt",
+	"Nov": "Nov",
+	"Dec": "Dez",
+	// Days of week
+	"Sun": "So",
+	"Mon": "Mo",
+	"Tue": "Di",
+	"Wed": "Mi",
+	"Thu": "Do",
+	"Fri": "Fr",
+	"Sat": "Sa",
+	"Sunday": "Sonntag",
+	"Monday": "Montag",
+	"Tuesday": "Dienstag",
+	"Wednesday": "Mittwoch",
+	"Thursday": "Donnerstag",
+	"Friday": "Freitag",
+	"Saturday": "Samstag",
+	
+	// Auth commands
+	"Auth": "Autorisierung",
+	"Next": "Weiter",
+	"NewSession": "Neue Sitzung",
+	"ImportSession": "Importiere Sitzung",
+	
+	// Settings commands
+	"Logout": "Ausloggen",
+	"ClearCache": "Cache löschen",
+	
+	// Chats list commands
+	"Folders": "Ordner",
+	"Refresh": "Aktualisieren",
+	"ArchivedChats": "Archivierte Chats",
+	"Contacts": "Kontakte",
+	"Search": "Suche",
+	"OpenByLink": "Link öffnen",
+	
+	// Message commands
+	"OpenChat": "Öffne Chat",
+	"Profile": "Profil",
+	"Reply": "Antwort",
+	"Forward": "Weiterleiten",
+	"CopyMessage": "Nachricht kopieren",
+	"CopyMessageLink": "Nachrichten Link kopieren",
+	"Delete": "Entfernen",
+	"Edit": "Ändern",
+	"GoTo": "Gehe zu",
+	"Pin": "Anheften",
+	"BanMember": "Mitglied Sperren",
+	
+	// Item commands
+	"Link_Cmd": "Link",
+	"ViewImage": "Zeige Bild",
+	"Call": "Anruf",
+	"Download": "Download",
+	
+	// Chat form commands
+	"WriteMessage": "Schreibe Nachricht",
+	"LatestMessages_Cmd": "Aktualisieren",
+	"ChatInfo": "Chat Info",
+	"Older": "Älter",
+	"Newer": "Neuer",
+	"SendSticker": "Sende Sticker",
+	
+	// Message writing form commands
+	"Send": "Sende",
+	"OpenTextBox": "Öffne Text-Box",
+	"ChooseFile": "Datei auswählen",
+	
+	// Profile/chat info commands
+	"Join": "Join",
+	"JoinGroup": "Gruppe beitreten",
+	"LeaveGroup": "Gruppe verlassen",
+	"ChatMedia": "Chat Medien",
+	"Members": "Mitglieder",
+	"AddToContacts": "Zu Kontakten hinzufügen",
+	
+	// Dialog commands
+	"Ok": "OK",
+	"Cancel": "Abrechen",
+	
+	// Pagination commands
+	"NextPage": "Nächste Seite",
+	"PrevPage": "Vorherige Seite",
+	
+	// Loading states
+	"Loading": "Lade",
+	"Authorizing": "Autorisierung...",
+	"WaitingForServerResponse": "Warten auf Serverantwort...",
+	"Sending": "Senden...",
+	"WaitingForPrevChat": "Warten auf die Trennung des vorherigen Chats...",
+	
+	// Authorization process
+	"Auth_Title": "Authentifizierung",
+	"InstanceURL": "Instanz-URL",
+	"InstancePassword": "Instanz Passwort",
+	"ChooseAuthMethod": "Autorisierungsmethode auswählen",
+	"PhoneNumber": "Telefonnummer",
+	"SessionCode": "Sitzungs Code",
+	"Code": "Code",
+	"CloudPassword": "Cloud Passwort",
+	"Captcha": "Captcha",
+	"Auth_Btn": "Authorizierung",
+	"InvalidCode_Alert": "Falscher Code!",
+	"CodeExpired_Alert": "Code abgelaufen!",
+	
+	// Settings sections
+	"UI": "UI",
+	"Behaviour": "Verhalten",
+	"Images": "Bilder",
+	"Authorization": "Autorisierung",
+	
+	// UI Settings
+	"Language": "Sprache",
+	"ReversedChat": "Umgekehrter Chat",
+	"ShowMedia": "Zeige Medien",
+	"ShowChatStatus": "Zeige Chat Status",
+	"ThumbnailsSize": "Größe der Miniaturansichten",
+	"ChatsCount": "Anzahl der Chats",
+	"MessagesCount": "Anzahl der Nachrichten",
+	"ChatsListFontSize": "Schriftgröße Chat Liste",
+	"Default": "Standard",
+	"Small": "Klein",
+	"Medium": "Mittel",
+	"FocusNewMessages": "Fokussiere Neue Nachrichten",
+	"ChatTextField": "Text Feld im Chat",
+	
+	// Behaviour settings
+	"WaitForPageToLoad": "Warte bis Seite geladen",
+	"UseJSONStream": "Nutze JSONStream",
+	"FormatText": "Formatiere Text",
+	"ParseLinks": "Links analysieren",
+	"ChatAutoUpdate": "Chat automatisch aktualisieren",
+	"UpdatesTimeout": "Updates Timeout",
+	"KeepSessionAlive": "Sitzung aufrecht erhalten",
+	
+	// Images settings
+	"LoadMediaThumbnails": "Lade Medien-Miniaturansichten",
+	"LoadAvatars": "Lade Avatars",
+	"MultiThreadedLoading": "Multithread Laden",
+	"RoundAvatars": "Abgerundete Avatars",
+	
+	// Cache settings
+	"AvatarsCaching": "Avatar Zwischenspeicher",
+	"Disabled": "Deaktiviert",
+	"HoldInRAM": "Im RAM",
+	"Store": "Speicher",
+	"HoldInRAMandStore": "In RAM & Speicher",
+	"AvatarsCacheThreshold": "Avatar-Cache Schwellenwert",
+	"ProfilesCacheThreshold": "Profile-Cache Schwellenwert",
+	
+	// About
+	"AboutText": "Serverunterstützter Telegram client für J2ME, basierend auf der MPGram Web API.",
+	"Developer": "Entwickler",
+	"Author": "Autor",
+	"Donate": "Spenden",
+	"Chat": "Chat",
+	
+	// Write form
+	"Reply_Title": "Antworten",
+	"Write_Title": "Schreiben",
+	"Edit_Title": "Ändern",
+	"Forward_Title": "Weiterleiten",
+	"Message": "Nachricht",
+	"File": "Datei",
+	"File_Prefix": "Datei: ",
+	"NotSelected": "Nicht ausgewählt",
+	"SendUncompressed": "Sende unkomprimiert",
+	"SendAsVoice": "Sprachnachricht senden",
+	"HideWithSpoiler": "Versteckt mit Spoiler",
+	"EnableHTMLFormatting": "HTML-formatting aktivieren",
+	
+	// Alert messages
+	"MessageSent_Alert": "Nachricht gesendet",
+	"MessageDeleted_Alert": "Nachricht gelöscht",
+	"UpdateAvailable_Alert": "Update vorhanden",
+	"MemberBanned_Alert": "Mitglied gesperrt",
+	
+	// Chat form
+	"ChatMedia_Title": "Mediem",
+	"Search_TitlePrefix": "Suche - ",
+	"OlderMessages": "Ältere Nachrichten",
+	"NewerMessages": "Neuere Nachrichten",
+	
+	// Message
+	"ForwardedFrom": "Weitergeleitet von",
+	"You": "Du",
+	"You_Prefix": "Du: ",
+	"ForwardedMessage": "Weitergeleitete Nachricht",
+	"Action": "Aktion",
+	"Edited": "geändert",
+	
+	// Message media
+	"Media": "Medien",
+	"Poll": "Umfrage",
+	"Geo": "Geo: ",
+	
+	// Chat actions
+	"PinnedMessage_Action": " anghängte Nachricht",
+	"Joined_Action": " hat die Gruppe betreten",
+	"Added_Action": " hinzugefügt",
+	"Left_Action": " hat die Gruppe verlassen",
+	"Removed_Action": " entfernt",
+	"JoinedByLink_Action": " hat die Gruppe über die Einladung betreten",
+	"JoinedByRequest_Action": " wurde in die Gruppe aufgenommen",
+	"ChatHistoryCleared_Action": "Chat Historie wurde gelöscht",
+	"GroupCreated_Action": "Gruppe erstellt",
+	"ChannelCreated_Action": "Kanal erstellt",
+	"PhotoUpdated_Action": "Bild aktualisiert",
+	"NameChanged_Action": "Name wurde geändert in",
+	
+	// Folders
+	"AllChats": "Alle Chats",
+	"Archive": "Archiv",
+	
+	// Profile/chat info
+	"Online": "online",
+	"Offline": "offline",
+	"LastSeen": "zuletzt gesehen",
+	"About_User": "Über den Nutzer",
+	"About_Chat": "Beschreibung",
+	"Mobile": "Mobil",
+	"Username": "Nutzername",
+	"Link": "Link",
+	"SearchMessages": "Suche Nachrichten",
+	"ViewGroup": "View group",
+	"GoToPinnedMessage": "Zeige angeheftete Nachricht",
+	"Owner": "besitzer",
+	"Admin": "admin",
+	"Bot": "bot",
+	"UserInfo": "Nutzerinfo",
+	"GroupInfo": "Gruppeninfo",
+	"ChannelInfo": "Kanalinfo info",
+	
+	"_member": " mitglied",
+	"_members": " mitglieder",
+	"_members2": "",
+	
+	"_subscriber": " teilnehmer",
+	"_subscribers": " teilnehmer",
+	"_subscribers2": "",
+	
+	"_photo": " foto",
+	"_photos": " fotos",
+	"_photos2": "",
+	
+	"_video": " video",
+	"_videos": " videos",
+	"_videos2": "",
+	
+	"_file": " datei",
+	"_files": " dateien",
+	"_files2": "",
+	
+	"_audioFile": " audio Datei",
+	"_audioFiles": " audio Dateien",
+	"_audioFiles2": "",
+	
+	"_voiceMessage": " sprach Nachricht",
+	"_voiceMessages": " sprach Nachrichten",
+	"_voiceMessages2": ""
+}
