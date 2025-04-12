@@ -28,6 +28,8 @@ import java.io.Reader;
 
 import javax.microedition.io.StreamConnection;
 
+import MP;
+
 // Streaming JSON
 
 public class JSONStream extends Reader {
@@ -43,7 +45,7 @@ public class JSONStream extends Reader {
 	private JSONStream() {}
 	
 	private void init(InputStream in) throws IOException {
-		reader = new InputStreamReader(in, "UTF-8");
+		reader = new InputStreamReader(in, MP.encoding);
         iBuf = new char[BUF_SIZE];
 	}
 	

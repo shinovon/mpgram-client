@@ -834,12 +834,15 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 	}
 	
 	void cancel() {
-		super.cancel();
 		// close updater thread
-		update = false;
-		if (MP.updatesThread != null || MP.updatesRunning) {
-			MP.cancel(MP.updatesThread, true);
+		if (update) {
+			update = false;
+			if (MP.updatesThread != null || MP.updatesRunning) {
+				MP.cancel(MP.updatesThread, true);
+			}
 		}
+		
+		super.cancel();
 	}
 	
 //	void closed(boolean destroy) {

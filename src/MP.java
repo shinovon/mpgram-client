@@ -19,6 +19,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -177,6 +178,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static String systemName;
 	static boolean chatField;
 	static boolean roundAvatars;
+	public static String encoding = "UTF-8";
 
 	// threading
 	private static int run;
@@ -372,6 +374,22 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			systemName = p;
 		}
+		
+		// Test UTF-8 support
+		try {
+			byte[] b = "выф".getBytes(encoding = "UTF-8");
+			new String(b, encoding);
+			new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
+		} catch (Exception e) {
+			try {
+				byte[] b = "выф".getBytes(encoding = "UTF8");
+				new String(b, encoding);
+				new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
+			} catch (Exception e2) {
+				utf = false;
+				encoding = "ISO-8859-1";
+			}
+		}
 
 		// init platform dependent settings
 		useLoadingForm = !symbianJrt;
@@ -423,6 +441,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			keepAlive = j.getBoolean("keepAlive", keepAlive);
 			chatField = j.getBoolean("chatField", chatField);
 			roundAvatars = j.getBoolean("roundAvatars", roundAvatars);
+			utf = j.getBoolean("utf", utf);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -959,7 +978,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		case RUN_CHECK_OTA: { // check for client updates
 			try {
-				JSONObject j = JSONObject.parseObject(new String(get(OTA_URL + "?v=" + version + "&l=" + lang), "UTF-8"));
+				JSONObject j = JSONObject.parseObject(new String(get(OTA_URL + "?v=" + version + "&l=" + lang), encoding));
 				if (j.getBoolean("update_available", false) && checkUpdates) {
 					updateUrl = j.getString("download_url");
 					Alert a = new Alert("", "", null, AlertType.INFO);
@@ -1152,12 +1171,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static void cancel(Thread thread, boolean updates) {
 		if (thread == null) return;
 		if (updates) updatesThread = null;
-		thread.interrupt();
-		if (symbianJrt)
+		if (symbianJrt) {
+			thread.interrupt();
 			return;
+		}
 		Connection c = (Connection) threadConnections.get(thread);
-		if (c == null || closingConnections.contains(c))
+		if (c == null || closingConnections.contains(c)) {
+			thread.interrupt();
 			return;
+		}
 		midlet.start(RUN_CLOSE_CONNECTION, c);
 	}
 
@@ -1492,7 +1514,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							L[FormatText],
 							L[ParseLinks],
 							L[ChatAutoUpdate],
-							L[KeepSessionAlive]
+							L[KeepSessionAlive],
+							"Unicode" // TODO unlocalized
 					}, null);
 					behChoice.setSelectedIndex(0, useLoadingForm);
 					behChoice.setSelectedIndex(1, jsonStream);
@@ -1500,6 +1523,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					behChoice.setSelectedIndex(3, parseLinks);
 					behChoice.setSelectedIndex(4, chatUpdates);
 					behChoice.setSelectedIndex(5, keepAlive);
+					behChoice.setSelectedIndex(6, utf);
 					behChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(behChoice);
 					
@@ -1591,6 +1615,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				parseLinks = behChoice.isSelected(3);
 				chatUpdates = behChoice.isSelected(4);
 				keepAlive = behChoice.isSelected(5);
+				utf = behChoice.isSelected(6);
 				
 				if ((updatesTimeout = updateTimeoutGauge.getValue() * 5) < 5) {
 					updateTimeoutGauge.setValue((updatesTimeout = 5) / 5);
@@ -1637,6 +1662,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					j.put("keepAlive", keepAlive);
 					j.put("chatField", chatField);
 					j.put("roundAvatars", roundAvatars);
+					j.put("utf", utf);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
@@ -2980,7 +3006,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				System.arraycopy(buf, 0, buf = new byte[i + 2048], 0, i);
 			}
 		}
-		return new String(buf, 0, i, "UTF-8");
+		return new String(buf, 0, i, encoding);
 	}
 	
 	private static byte[] readBytes(InputStream inputStream, int initialSize, int bufferSize, int expandSize)
