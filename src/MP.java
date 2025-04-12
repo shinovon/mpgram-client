@@ -100,6 +100,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 	static final String[][] LANGS = {
 		{
+			"az",
 			"de",
 			"en",
 			"es",
@@ -109,6 +110,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			"ar",
 		},
 		{
+			"Azerbaijani",
 			"Deutsch",
 			"English",
 			"Español",
