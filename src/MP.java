@@ -1785,7 +1785,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			String path = d.getTitle();
 			
 			if ("/".equals(path)) path = "";
-			path = path.concat("/").concat(name);
+			path = path.concat(name);
 			
 			if (dir) {
 				openFilePicker(path.concat("/"));
@@ -1794,7 +1794,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			
 			// file selected
 			commandAction(cancelCmd, d);
-			sendFile = "file://".concat(path);
+			sendFile = "file:///".concat(path);
 			fileLabel.setText(L[File_Prefix].concat(path));
 			return;
 		}
@@ -2575,7 +2575,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					list.append(s, folderImg);
 				}
 			} else {
-				FileConnection fc = (FileConnection) Connector.open("file://".concat(path));
+				FileConnection fc = (FileConnection) Connector.open("file:///".concat(path));
 				try {
 					Enumeration en = fc.list();
 					while (en.hasMoreElements()) {
