@@ -1962,7 +1962,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				MP.cancel(MP.updatesThread, true);
 			}
 			display(loadingAlert(L[Sending]), current);
-			start(RUN_SEND_MESSAGE, new Object[] { t, ((ChatForm) current).id, null, null, null, null });
+			start(RUN_SEND_MESSAGE, new Object[] { t, ((ChatForm) current).id, null, null, null, null, null, null });
 			return;
 		}
 		if (c == botCallbackCmd) {
