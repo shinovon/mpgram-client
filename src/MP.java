@@ -380,18 +380,32 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		
 		// Test UTF-8 support
+		byte[] b = new byte[] { (byte) 0xF0, (byte) 0x9F, (byte) 0x98, (byte) 0x83 };
 		try {
-			byte[] b = "выф".getBytes(encoding = "UTF-8");
-			new String(b, encoding);
+			encoding = "UTF-8";
 			new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
+			if (new String(b, encoding).length() != 2) throw new Exception();
 		} catch (Exception e) {
 			try {
-				byte[] b = "выф".getBytes(encoding = "UTF8");
-				new String(b, encoding);
+				encoding = "UTF8";
 				new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
+				if (new String(b, encoding).length() != 2) throw new Exception();
 			} catch (Exception e2) {
 				utf = false;
-				encoding = "ISO-8859-1";
+				b = new byte[] { (byte) 0xD0, (byte) 0xB2, (byte) 0xD1, (byte) 0x8B, (byte) 0xD1, (byte) 0x84 };
+				try {
+					encoding = "UTF-8";
+					new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
+					if (new String(b, encoding).length() != 3) throw new Exception();
+				} catch (Exception e3) {
+					try {
+						encoding = "UTF8";
+						new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
+						if (new String(b, encoding).length() != 3) throw new Exception();
+					} catch (Exception e4) {
+						encoding = "ISO-8859-1";
+					}
+				}
 			}
 		}
 
