@@ -268,7 +268,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 			s.setItemCommandListener(MP.midlet);
 			safeInsert(thread, reverse ? size() : 0, s);
 			if (!reverse) top += 1;
-		} else if (textField != null) {
+		} else if (textField != null && canWrite) {
 			safeInsert(thread, reverse ? size() : 0, textField);
 			if (!reverse) top += 1;
 			if (endReached && dir == 0 && messageId == 0) {

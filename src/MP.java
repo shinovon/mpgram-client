@@ -110,7 +110,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			"ar",
 		},
 		{
-			"Azerbaijani",
+			"Azərbaycan",
 			"Deutsch",
 			"English",
 			"Español",
@@ -2677,6 +2677,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	}
 	
 	static void display(Alert a, Displayable d) {
+		if (updateUrl != null) {
+			return;
+		}
 		if (d == null) {
 			if (display.getCurrent() instanceof Alert && current != null) {
 				display.setCurrent(a, current);

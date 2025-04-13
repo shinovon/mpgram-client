@@ -199,7 +199,9 @@ public class ChatsList extends MPList implements LangConstants {
 			
 			int itemIdx = safeAppend(thread, sb.toString(), null);
 			if (MP.chatsListFontSize != 0) {
-				setFont(itemIdx, MP.chatsListFontSize == 1 ? MP.smallPlainFont : MP.medPlainFont);
+				try {
+					setFont(itemIdx, MP.chatsListFontSize == 1 ? MP.smallPlainFont : MP.medPlainFont);
+				} catch (Exception ignored) {}
 			}
 			
 			if (noAvas || !MP.loadAvatars) continue;
