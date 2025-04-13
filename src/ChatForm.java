@@ -598,6 +598,9 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 							| ((text != null && text.length() != 0 || !reverse || mediaFilter != null) ?
 									Item.LAYOUT_NEWLINE_BEFORE : 0));
 					img.setDefaultCommand(MP.openImageCmd);
+					if (MP.useView) {
+						img.addCommand(MP.documentCmd);
+					}
 					img.setItemCommandListener(MP.midlet);
 					safeInsert(thread, insert++, lastItem = img);
 					

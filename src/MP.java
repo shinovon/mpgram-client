@@ -85,6 +85,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static final int RUN_CLOSE_CONNECTION = 16;
 	static final int RUN_BOT_CALLBACK = 17;
 	static final int RUN_BAN_MEMBER = 18;
+	static final int RUN_ZOOM_VIEW = 19;
 	
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
@@ -183,6 +184,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static boolean chatField;
 	static boolean roundAvatars;
 	public static String encoding = "UTF-8";
+	static boolean useView = true;
 
 	// threading
 	private static int run;
@@ -530,7 +532,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		richTextLinkCmd = new Command(L[Link_Cmd], Command.ITEM, 1);
 		openImageCmd = new Command(L[ViewImage], Command.ITEM, 1);
 		callItemCmd = new Command(L[Call], Command.ITEM, 1);
-		documentCmd = new Command(L[Download], Command.ITEM, 1);
+		documentCmd = new Command(L[Download], Command.ITEM, 2);
 		
 		writeCmd = new Command(L[WriteMessage], Command.SCREEN, 5);
 		latestCmd = new Command(L[LatestMessages_Cmd], Command.SCREEN, 6);
@@ -1166,6 +1168,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				display(infoAlert(L[MemberBanned_Alert]), current);
 			} catch (Exception e) {
 				display(errorAlert(e), current);
+			}
+			break;
+		}
+		case RUN_ZOOM_VIEW: {
+			try {
+				((ViewCanvas) param).resize((int) ((ViewCanvas) param).zoom);
+				((ViewCanvas) param).repaint();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 			break;
 		}
@@ -1946,10 +1957,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			return;
 		}
 		if (c == openImageCmd) {
-			// TODO
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
-			browse(instanceUrl + FILE_URL + "?c=" + s[0] + "&m=" + s[1] + "&user=" + user);
+			if (useView) {
+				display(new ViewCanvas(s[0], s[1]));
+			} else {
+				browse(instanceUrl + FILE_URL + "?c=" + s[0] + "&m=" + s[1] + "&user=" + user);
+			}
 			return;
 		}
 		if (c == callItemCmd) {
@@ -3052,7 +3066,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return res;
 	}
 	
-	private static byte[] get(String url) throws IOException {
+	static byte[] get(String url) throws IOException {
 		HttpConnection hc = null;
 		InputStream in = null;
 		try {
@@ -3705,6 +3719,32 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						| (c2_RB + ((((c34 & 0x00FF00FF) - c2_RB) * v1) >> 8)) & 0x00FF00FF;
 			}
 		}
+	}
+
+	/**
+	 * Part of tube42 imagelib. Blends 2 colors.
+	 * 
+	 * @param c1
+	 * @param c2
+	 * @param value256
+	 * @return Blended value.
+	 */
+	public static final int blend(final int c1, final int c2, final int value256) {
+
+		final int v1 = value256 & 0xFF;
+		final int c1_RB = c1 & 0x00FF00FF;
+		final int c2_RB = c2 & 0x00FF00FF;
+
+		final int c1_AG = (c1 >>> 8) & 0x00FF00FF;
+
+		final int c2_AG_org = c2 & 0xFF00FF00;
+		final int c2_AG = (c2_AG_org) >>> 8;
+
+		// the world-famous tube42 blend with one mult per two components:
+		final int rb = (c2_RB + (((c1_RB - c2_RB) * v1) >> 8)) & 0x00FF00FF;
+		final int ag = (c2_AG_org + ((c1_AG - c2_AG) * v1)) & 0xFF00FF00;
+		return ag | rb;
+
 	}
 
 }

@@ -20,6 +20,8 @@ en_json = None
 with open("en.jsonc", encoding="utf-8") as f:
     en_json = load_jsonc(f,en_lines)
 
+print(len(en_json), "keys")
+
 err=False
 for s in en_json.keys():
     if " " in s:
