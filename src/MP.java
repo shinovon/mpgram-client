@@ -181,7 +181,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static long keepAliveInterval = 30000L;
 	static String deviceName;
 	static String systemName;
-	static boolean chatField;
+	static boolean chatField = true;
 	static boolean roundAvatars;
 	public static String encoding = "UTF-8";
 	static boolean useView = true;
