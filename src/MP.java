@@ -86,6 +86,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static final int RUN_BOT_CALLBACK = 17;
 	static final int RUN_BAN_MEMBER = 18;
 	static final int RUN_ZOOM_VIEW = 19;
+	static final int RUN_PIN_MESSAGE = 20;
 	
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
@@ -204,6 +205,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static int userState;
 	private static String phone;
 	static String selfId;
+//	private static String phoneCodeHash; // TODO resend code
 
 	// commands
 	private static Command exitCmd;
@@ -240,6 +242,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command gotoMsgCmd;
 	static Command botCallbackCmd;
 	static Command banMemberCmd;
+	static Command pinMsgCmd;
 	
 	static Command richTextLinkCmd;
 	static Command openImageCmd;
@@ -527,7 +530,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		editMsgCmd = new Command(L[Edit], Command.ITEM, 9);
 		gotoMsgCmd = new Command(L[GoTo], Command.ITEM, 1);
 		botCallbackCmd = new Command("", Command.ITEM, 1); // TODO unlocalized
-		banMemberCmd = new Command(L[BanMember], Command.ITEM, 10);
+		pinMsgCmd = new Command(L[Pin], Command.ITEM, 10);
+		banMemberCmd = new Command(L[BanMember], Command.ITEM, 11);
 		
 		richTextLinkCmd = new Command(L[Link_Cmd], Command.ITEM, 1);
 		openImageCmd = new Command(L[ViewImage], Command.ITEM, 1);
@@ -599,15 +603,30 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		f.setCommandListener(midlet);
 		
 		TextField t = new TextField(L[InstanceURL], instanceUrl, 200, TextField.URL);
+		t.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 		instanceField = t;
 		f.append(t);
 		
 		t = new TextField(L[InstancePassword], instancePassword, 200, TextField.NON_PREDICTIVE);
+		t.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 		instancePasswordField = t;
 		f.append(t);
 		
-		StringItem s = new StringItem(null, L[Auth_Btn], StringItem.BUTTON);
-		s.setDefaultCommand(authCmd);
+		StringItem s;
+		
+		s = new StringItem(null, L[Auth_Hint1]);
+		s.setFont(smallPlainFont);
+		s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+		f.append(s);
+		
+		s = new StringItem(null, L[CreateNewSession_Btn], StringItem.BUTTON);
+		s.setDefaultCommand(authNewSessionCmd);
+		s.setItemCommandListener(midlet);
+		s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+		f.append(s);
+
+		s = new StringItem(null, L[ImportSession_Btn], StringItem.BUTTON);
+		s.setDefaultCommand(authImportSessionCmd);
 		s.setItemCommandListener(midlet);
 		s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 		f.append(s);
@@ -644,6 +663,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		case RUN_VALIDATE_AUTH: {
 			display(loadingAlert(L[Authorizing]), null);
 			
+			Displayable returnTo = param == null ? authForm : current;
 			try {
 				selfId = ((JSONObject) api("me&status=1")).getString("id");
 				userState = 4;
@@ -656,18 +676,20 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				start(RUN_KEEP_ALIVE, null);
 				break;
 			} catch (APIException e) {
-				if (param != null) mainDisplayable = authForm;
 				if (e.code == 401) {
 					userState = 0;
 					user = null;
-					display(errorAlert(e), mainDisplayable);
+					display(errorAlert(e), returnTo);
 					break;
 				}
-				display(errorAlert(e), mainDisplayable);
+				display(errorAlert(e), returnTo);
 			} catch (Exception e) {
-				display(errorAlert(e), mainDisplayable);
+				display(errorAlert(e), returnTo);
+				e.printStackTrace();
 			}
-			// TODO show settings if failed on start
+			if (param == null) {
+				mainDisplayable = returnTo;
+			}
 			break;
 		}
 		case RUN_IMAGES: { // avatars loading loop
@@ -804,14 +826,21 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					if (j.has("user")) {
 						user = j.getString("user");
 					}
+//					if (j.has("phone_code_hash")) {
+//						phoneCodeHash = j.getString("phone_code_hash");
+//					}
 					if (res.indexOf("captcha") != -1) {
-						display(errorAlert(res), null);
+						display(errorAlert(L[InvalidCaptcha_Alert]), null);
 						((CaptchaForm) param).load();
 						break;
 					}
 					if (!"code_sent".equals(res)) {
+						if ("phone_number_invalid".equals(res)) {
+							display(errorAlert(L[InvalidPhoneNumber_Alert]), null);
+						} else {
+							display(errorAlert(res), null);
+						}
 						userState = 1;
-						display(errorAlert(res), null);
 						break;
 					}
 
@@ -834,6 +863,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							}
 							
 							if (!"1".equals(res)) {
+								if ("password_hash_invalid".equals(res)) {
+									display(errorAlert(L[InvalidPassword_Alert]), null);
+									break;
+								}
 								display(errorAlert(res), null);
 								break;
 							}
@@ -1180,6 +1213,17 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			break;
 		}
+		case RUN_PIN_MESSAGE: {
+			try {
+				String[] s = (String[]) param;
+				MP.api("pinMessage&peer=".concat(s[0].concat("&id=").concat(s[1])));
+				
+				commandAction(latestCmd, current);
+			} catch (Exception e) {
+				display(errorAlert(e), current);
+			}
+			break;
+		}
 		}
 //		running--;
 	}
@@ -1229,7 +1273,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 			if (c == contactsCmd) {
-				openLoad(new ChatsList(L[Contacts], "getContacts&fields=status", null));
+				openLoad(new ChatsList(L[Contacts], "getContacts&fields=status", null, null, false));
 				return;
 			}
 			if (c == nextPageCmd) {
@@ -1312,7 +1356,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			commandAction(backCmd, d);
 			openLoad(new ChatsList(L[Search],
 					appendUrl(new StringBuffer("searchChats&q="), ((TextBox) d).getString()).toString(),
-					"results"));
+					"results", null, false));
 			return;
 		}
 		if (d instanceof ChatInfoForm) { // profile commands
@@ -1360,7 +1404,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 			if (c == chatMembersCmd) {
-				openLoad(new ChatsList(L[Members], "getParticipants&peer=" + ((ChatInfoForm) current).id + "&fields=status", null));
+				openLoad(new ChatsList(L[Members],
+						"getParticipants&peer=" + ((ChatInfoForm) current).id + "&fields=status",
+						null,
+						((ChatInfoForm) d).id, ((ChatInfoForm) d).canBan));
 				return;
 			}
 		}
@@ -1370,7 +1417,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					// user code
 					user = ((TextBox) d).getString();
 					if (user.length() < 32) {
-						display(errorAlert(""), null);
+						display(errorAlert(""), null); // TODO unlocalized
 						return;
 					}
 					writeAuth();
@@ -1379,34 +1426,48 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					start(RUN_VALIDATE_AUTH, user);
 					return;
 				}
+//				instanceUrl = instanceField.getString();
+//				if ((instancePassword = instancePasswordField.getString()).length() == 0) {
+//					instancePassword = null;
+//				}
+//				
+//				if (instanceUrl == null || instanceUrl.length() < 6 || !instanceUrl.startsWith("http")) {
+//					display(errorAlert(L[InvalidInstance_Alert]), null);
+//					return;
+//				}
+//				writeAuth();
+//				
+//				Alert a = new Alert("", L[ChooseAuthMethod], null, null);
+//				a.addCommand(authImportSessionCmd);
+//				a.addCommand(authNewSessionCmd);
+//				a.setCommandListener(this);
+//				
+//				display(a, null);
+//				return;
+			}
+			if (c == authImportSessionCmd || c == authNewSessionCmd) {
 				instanceUrl = instanceField.getString();
 				if ((instancePassword = instancePasswordField.getString()).length() == 0) {
 					instancePassword = null;
 				}
 				
 				if (instanceUrl == null || instanceUrl.length() < 6 || !instanceUrl.startsWith("http")) {
-					display(errorAlert(""), null);
+					display(errorAlert(L[InvalidInstance_Alert]), null);
+					return;
 				}
 				writeAuth();
 				
-				Alert a = new Alert("", L[ChooseAuthMethod], null, null);
-				a.addCommand(authImportSessionCmd);
-				a.addCommand(authNewSessionCmd);
-				a.setCommandListener(this);
+				if (c == authImportSessionCmd) {
+					TextBox t = new TextBox(L[SessionCode], user == null ? "" : user, 200, TextField.NON_PREDICTIVE);
+					t.addCommand(cancelCmd);
+					t.addCommand(authCmd);
+					t.setCommandListener(this);
+					
+					display(t);
+					return;
+				}
 				
-				display(a, null);
-				return;
-			}
-			if (c == authImportSessionCmd) {
-				TextBox t = new TextBox(L[SessionCode], user == null ? "" : user, 200, TextField.NON_PREDICTIVE);
-				t.addCommand(cancelCmd);
-				t.addCommand(authCmd);
-				t.setCommandListener(this);
-				
-				display(t);
-				return;
-			}
-			if (c == authNewSessionCmd) {
+				// new session
 				user = null;
 				userState = 0;
 				
@@ -1423,7 +1484,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					// phone number
 					phone = ((TextBox) d).getString();
 					if (phone.length() < 10 && !phone.startsWith("+")) {
-						display(errorAlert(""), null);
+						display(errorAlert(L[InvalidPhoneNumber_Alert]), null);
 						return;
 					}
 					writeAuth();
@@ -1436,7 +1497,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					// captcha
 					String key = ((CaptchaForm) d).field.getString();
 					if (key.length() < 4) {
-						display(errorAlert(""), null);
+						display(errorAlert(L[InvalidCaptcha_Alert]), null);
 						return;
 					}
 					display(loadingAlert(L[WaitingForServerResponse]), null);
@@ -1449,7 +1510,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				// code
 				String code = ((TextBox) d).getString();
 				if (code.length() < 5) {
-					display(errorAlert(""), null);
+					display(errorAlert(L[InvalidCode_Alert]), null);
 					return;
 				}
 
@@ -1461,7 +1522,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				// password
 				String pass = ((TextBox) d).getString();
 				if (pass.length() == 0) {
-					display(errorAlert(""), null);
+					display(errorAlert(L[CloudPasswordEmpty_Alert]), null);
 					return;
 				}
 
@@ -1544,7 +1605,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							L[ParseLinks],
 							L[ChatAutoUpdate],
 							L[KeepSessionAlive],
-							"Unicode" // TODO unlocalized
+							L[UseUnicode]
 					}, null);
 					behChoice.setSelectedIndex(0, useLoadingForm);
 					behChoice.setSelectedIndex(1, jsonStream);
@@ -1812,6 +1873,17 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			display(f);
 			return;
 		}
+		if (c == banMemberCmd && d instanceof ChatsList) {
+			int i = ((List) d).getSelectedIndex();
+			if (i == -1) return;
+			
+			String id = (String) ((ChatsList) d).ids.elementAt(i);
+			if (id == null) return;
+
+			display(loadingAlert(L[Loading]), current);
+			start(RUN_BAN_MEMBER, new String[] {((ChatsList) d).peerId, null, id});
+			return;
+		}
 		if (c == List.SELECT_COMMAND) {
 			if (d instanceof MPList) {
 				((MPList) d).select(((List) d).getSelectedIndex());
@@ -2027,6 +2099,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			String[] p = (String[]) ((MPForm) current).urls.get(item);
 			if (sending || p == null) return;
 			sending = true;
+			
+			if (MP.updatesThread != null) {
+				MP.cancel(MP.updatesThread, true);
+			}
 			display(loadingAlert(L[Sending]), current);
 			start(RUN_BOT_CALLBACK, p);
 			return;
@@ -2037,6 +2113,17 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 
 			display(loadingAlert(L[Loading]), current);
 			start(RUN_BAN_MEMBER, s);
+			return;
+		}
+		if (c == pinMsgCmd) {
+			String[] s = (String[]) ((MPForm) current).urls.get(item);
+			if (s == null) return;
+			
+			if (MP.updatesThread != null) {
+				MP.cancel(MP.updatesThread, true);
+			}
+			display(loadingAlert(L[Loading]), current);
+			start(RUN_PIN_MESSAGE, s);
 			return;
 		}
 		commandAction(c, display.getCurrent());
@@ -2773,14 +2860,49 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	}
 
 	static Alert errorAlert(Exception e) {
-		// TODO human readable errors
+		e.printStackTrace();
 		if (!(e instanceof APIException)) {
 			return errorAlert(e.toString());
 		}
+		Object r = ((APIException) e).response;
+		StringBuffer sb = new StringBuffer();
+		sb.append(r);
+		String stackTrace = null;
+		if (r instanceof JSONObject) {
+			if (((JSONObject) r).has("error")) {
+				String message = ((JSONObject) r).getObject("error").getString("message", null);
+				if (message != null) {
+					if ("Unsupported API version".equals(message)) {
+						sb.setLength(0);
+						sb.append(L[ClientOutdated_Alert]);
+					} else if ("Login API is disabled".equals(message)) {
+						sb.setLength(0);
+						sb.append(L[LoginDisabled_Alert]);
+					} else if ("API is disabled".equals(message)) {
+						sb.setLength(0);
+						sb.append(L[APIDisabled_Alert]);
+					} else if ("Wrong instance password".equals(message) || "Instance password is required".equals(message)) {
+						sb.setLength(0);
+						sb.append(L[InvalidInstancePassword_Alert]);
+					} else {
+						sb.setLength(0);
+						sb.append(message);
+					}
+					stackTrace = ((JSONObject) r).getObject("error").getString("stack_trace", null);
+				}
+			}
+		}
+		
+		sb.append(" \n\nDetails: \n")
+		.append(((APIException) e).code).append(' ').append(((APIException) e).url);
+		if (stackTrace != null) {
+			sb.append(" \nStack trace: \n").append(stackTrace);
+		}
+		
 		Alert a = new Alert("");
 		a.setType(AlertType.ERROR);
-		a.setString(e.toString());
-		a.setTimeout(3000);
+		a.setString(sb.toString());
+		a.setTimeout(4000);
 		return a;
 	}
 
@@ -2871,9 +2993,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				throw new APIException(url, c, res);
 			}
 		} finally {
-			closingConnections.removeElement(hc);
 			threadConnections.remove(thread);
-			threadConnections.remove(hc);
+			if (hc != null) {
+				closingConnections.removeElement(hc);
+				threadConnections.remove(hc);
+			}
 			if (in != null) try {
 				in.close();
 			} catch (IOException e) {}

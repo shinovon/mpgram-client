@@ -157,6 +157,18 @@
 	"Auth_Btn": "Авторизоваться",
 	"InvalidCode_Alert": "Неправильный код!",
 	"CodeExpired_Alert": "Код истек!",
+	"Auth_Hint1": "(оставьте пустым если используете mp.nnchan.ru или у вашего инстанса нет пароля)",
+	"InvalidInstance_Alert": "Неправильный URL инстанса!",
+	"InvalidPhoneNumber_Alert": "Недопустимый номер телефона!",
+	"InvalidCaptcha_Alert": "Неправильная капча!",
+	"CloudPasswordEmpty_Alert": "Облачный пароль не может быть пустым!",
+	"CreateNewSession_Btn": "Создать новую сессию",
+	"ImportSession_Btn": "Импортировать сессию",
+	"InvalidPassword_Alert": "Неправильный пароль!",
+	"LoginDisabled_Alert": "Этот инстанс не поддерживает создание новой сессии через API!",
+	"APIDisabled_Alert": "Этот инстанс не поддерживает API!",
+	"ClientOutdated_Alert": "Клиент устарел!",
+	"InvalidInstancePassword_Alert": "Неправильный пароль инстанса!",
 	
 	// Settings sections
 	"UI": "Вид интерфейса",
@@ -187,6 +199,7 @@
 	"ChatAutoUpdate": "Авто-обновление чата",
 	"UpdatesTimeout": "Таймаут обновлений",
 	"KeepSessionAlive": "Удерживать сессию активной",
+	"UseUnicode": "Исп. Unicode",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Загружать медиа",
@@ -202,6 +215,7 @@
 	"HoldInRAMandStore": "Хранить в ОЗУ и в RMS",
 	"AvatarsCacheThreshold": "Порог кэширования аватарок",
 	"ProfilesCacheThreshold": "Порог кэширования профилей",
+	"RMSCacheCount": "Записей кэша в хранилище RMS: ",
 	
 	// About
 	"AboutText": "Клиент Telegram для J2ME, основанный на API MPGram Web.",
@@ -282,9 +296,9 @@
 	"Owner": "владелец",
 	"Admin": "админ",
 	"Bot": "бот",
-	"UserInfo": "User info", // Untranslated
-	"GroupInfo": "Group info", // Untranslated
-	"ChannelInfo": "Channel info", // Untranslated
+	"UserInfo": "Пользователь",
+	"GroupInfo": "Группа",
+	"ChannelInfo": "Канал",
 	
 	"_member": " участник",
 	"_members": " участника",

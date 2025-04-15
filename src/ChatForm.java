@@ -59,7 +59,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 
 	boolean infoLoaded;
 	boolean left, broadcast, forum;
-	boolean canWrite, canDelete, canBan;
+	boolean canWrite, canDelete, canBan, canPin;
 	
 	// pagination
 	int dir;
@@ -139,9 +139,13 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 						canWrite = !broadcast || adminRights.getBoolean("post_messages", false);
 						canDelete = adminRights.getBoolean("delete_messages", false);
 						canBan = !broadcast && adminRights.getBoolean("ban_users", false);
+						canPin = adminRights.getBoolean("pin_messages", false);
 					}
-				} else if (MP.chatStatus && fullInfo.getObject("User").has("status")) {
-					setStatus(fullInfo.getObject("User").getObject("status"));
+				} else {
+					canPin = true;
+					if (MP.chatStatus && fullInfo.getObject("User").has("status")) {
+						setStatus(fullInfo.getObject("User").getObject("status"));
+					}
 				}
 				JSONObject full = fullInfo.getObject("full");
 				if (messageId == -1 && full.has("read_inbox_max_id")) {
@@ -372,6 +376,9 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 				s.addCommand(MP.forwardMsgCmd);
 				if (canWrite) {
 					s.addCommand(MP.replyMsgCmd);
+				}
+				if (canPin) {
+					s.addCommand(MP.pinMsgCmd);
 				}
 				if (canBan && !out) {
 					s.addCommand(MP.banMemberCmd);

@@ -157,6 +157,18 @@
 	"Auth_Btn": "Authorize",
 	"InvalidCode_Alert": "Invalid code!",
 	"CodeExpired_Alert": "Code expired!",
+	"Auth_Hint1": "(leave empty if using mp.nnchan.ru or your instance doesn't have a password)",
+	"InvalidInstance_Alert": "Invalid instance URL!",
+	"InvalidPhoneNumber_Alert": "Invalid phone number!",
+	"InvalidCaptcha_Alert": "Invalid captcha!",
+	"CloudPasswordEmpty_Alert": "Cloud password can't be empty!",
+	"CreateNewSession_Btn": "Create new session",
+	"ImportSession_Btn": "Import existing session",
+	"InvalidPassword_Alert": "Invalid password!",
+	"LoginDisabled_Alert": "This instance does not support session creation with API!",
+	"APIDisabled_Alert": "This instance does not support API!",
+	"ClientOutdated_Alert": "Client outdated!",
+	"InvalidInstancePassword_Alert": "Invalid instance password!",
 	
 	// Settings sections
 	"UI": "UI",
@@ -187,6 +199,7 @@
 	"ChatAutoUpdate": "Chat auto-update",
 	"UpdatesTimeout": "Updates timeout",
 	"KeepSessionAlive": "Keep session alive",
+	"UseUnicode": "Use Unicode",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Load media thumbnails",
@@ -202,6 +215,7 @@
 	"HoldInRAMandStore": "Hold in RAM & Store",
 	"AvatarsCacheThreshold": "Avatars cache threshold",
 	"ProfilesCacheThreshold": "Profiles cache threshold",
+	"RMSCacheCount": "Stored cache count: ",
 	
 	// About
 	"AboutText": "Server-assisted Telegram client for J2ME, based on MPGram Web API.",

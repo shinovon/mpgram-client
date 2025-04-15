@@ -38,6 +38,7 @@ public class ChatsList extends MPList implements LangConstants {
 	String arrayName;
 	boolean users;
 	boolean noAvas;
+	boolean canBan;
 	String peerId, msgId;
 
 	public ChatsList(String title, int folder) {
@@ -53,14 +54,17 @@ public class ChatsList extends MPList implements LangConstants {
 	}
 	
 	// contacts, members
-	public ChatsList(String title, String url, String arrayName) {
+	public ChatsList(String title, String url, String arrayName, String peerId, boolean canBan) {
 		super(title);
 		this.url = url;
 		this.arrayName = arrayName;
 		this.users = true;
 		this.noAvas = true;
+		this.peerId = peerId;
+		this.canBan = canBan;
 		addCommand(MP.backCmd);
 		setFitPolicy(List.TEXT_WRAP_ON);
+		if (canBan) addCommand(MP.banMemberCmd);
 	}
 	
 	// forward
@@ -169,7 +173,7 @@ public class ChatsList extends MPList implements LangConstants {
 			sb.setLength(0);
 			String name = MP.getName(peer);
 			MP.appendOneLine(sb, name);
-			if (peerId == null) {
+			if (msgId == null) {
 				if (dialog.has("unread")) {
 					sb.append(" +").append(dialog.getInt("unread"));
 				}
@@ -214,7 +218,7 @@ public class ChatsList extends MPList implements LangConstants {
 		String id = (String) ids.elementAt(i);
 		if (id == null) return;
 		
-		if (peerId != null) {
+		if (msgId != null) {
 			// forward
 			MP.deleteFromHistory(this);
 			MP.display(new ChatForm(id, null, 0, 0));

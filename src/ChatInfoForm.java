@@ -33,6 +33,7 @@ public class ChatInfoForm extends MPForm implements LangConstants {
 	ChatForm chatForm;
 	int mode; // 0 - chat info or profile by id, 1 - phone, 2 - invite peek, 3 - invite
 	int pinnedMessageId;
+	boolean canBan;
 	
 	public ChatInfoForm(String id, ChatForm chatForm, int mode) {
 		super(id);
@@ -142,6 +143,10 @@ public class ChatInfoForm extends MPForm implements LangConstants {
 			if (mode != 3) {
 				if (full.getBoolean("can_view_participants", false)) {
 					addCommand(MP.chatMembersCmd);
+				}
+				
+				if (rawPeer.has("admin_rights")) {
+					canBan = rawPeer.getObject("admin_rights").getBoolean("ban_users", false);
 				}
 				
 				if (full.has("participants_count")) {

@@ -157,6 +157,18 @@
 	"Auth_Btn": "Autorizar",
 	"InvalidCode_Alert": "Codigo invalido",
 	"CodeExpired_Alert": "Codigo caducado!",
+	"Auth_Hint1": "(leave empty if using mp.nnchan.ru or your instance doesn't have a password)", // Untranslated
+	"InvalidInstance_Alert": "Invalid instance URL!", // Untranslated
+	"InvalidPhoneNumber_Alert": "Invalid phone number!", // Untranslated
+	"InvalidCaptcha_Alert": "Invalid captcha!", // Untranslated
+	"CloudPasswordEmpty_Alert": "Cloud password can't be empty!", // Untranslated
+	"CreateNewSession_Btn": "Create new session", // Untranslated
+	"ImportSession_Btn": "Import existing session", // Untranslated
+	"InvalidPassword_Alert": "Invalid password!", // Untranslated
+	"LoginDisabled_Alert": "This instance does not support session creation with API!", // Untranslated
+	"APIDisabled_Alert": "This instance does not support API!", // Untranslated
+	"ClientOutdated_Alert": "Client outdated!", // Untranslated
+	"InvalidInstancePassword_Alert": "Invalid instance password!", // Untranslated
 	
 	// Settings sections
 	"UI": "Interfaz de usuario",
@@ -187,6 +199,7 @@
 	"ChatAutoUpdate": "Actualización automatica del chat",
 	"UpdatesTimeout": "Tiempo de espera de actualizaciones",
 	"KeepSessionAlive": "Mantener la sesión activa",
+	"UseUnicode": "Use Unicode", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "Cargar miniaturas de medios",
@@ -202,6 +215,7 @@
 	"HoldInRAMandStore": "Mantener en RAM y almacenar",
 	"AvatarsCacheThreshold": "Limite de cache de avatares",
 	"ProfilesCacheThreshold": "Limite de cache de perfiles",
+	"RMSCacheCount": "Stored cache count: ", // Untranslated
 	
 	// About
 	"AboutText": "Cliente de Telegram asistido por servidor para J2ME, basado en la API web de MPGram.",
