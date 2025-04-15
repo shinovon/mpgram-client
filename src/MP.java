@@ -1415,7 +1415,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			if (c == authCmd) {
 				if (d instanceof TextBox) {
 					// user code
-					user = ((TextBox) d).getString();
+					user = ((TextBox) d).getString().trim();
 					if (user.length() < 32) {
 						display(errorAlert(""), null); // TODO unlocalized
 						return;
