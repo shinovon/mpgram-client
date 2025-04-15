@@ -104,7 +104,7 @@
 	"BanMember": "Prohibeix membre",
 	
 	// Item commands
-	"Link_Cmd": "Enllaç", // assuming noun, if adjective - Enllaça
+	"Link_Cmd": "Enllaç", // assuming noun, if verb - Enllaça
 	"ViewImage": "Veges imatge",
 	"Call": "Truca",
 	"Download": "Baixa",
@@ -158,18 +158,18 @@
 	"Auth_Btn": "Autoritza",
 	"InvalidCode_Alert": "Codi no vàlid!",
 	"CodeExpired_Alert": "Codi caducat!",
-	"Auth_Hint1": "(leave empty if using mp.nnchan.ru or your instance doesn't have a password)", // Untranslated
-	"InvalidInstance_Alert": "Invalid instance URL!", // Untranslated
-	"InvalidPhoneNumber_Alert": "Invalid phone number!", // Untranslated
-	"InvalidCaptcha_Alert": "Invalid captcha!", // Untranslated
-	"CloudPasswordEmpty_Alert": "Cloud password can't be empty!", // Untranslated
-	"CreateNewSession_Btn": "Create new session", // Untranslated
-	"ImportSession_Btn": "Import existing session", // Untranslated
-	"InvalidPassword_Alert": "Invalid password!", // Untranslated
-	"LoginDisabled_Alert": "This instance does not support session creation with API!", // Untranslated
-	"APIDisabled_Alert": "This instance does not support API!", // Untranslated
-	"ClientOutdated_Alert": "Client outdated!", // Untranslated
-	"InvalidInstancePassword_Alert": "Invalid instance password!", // Untranslated
+	"Auth_Hint1": "(deixa en blanc si utilitzes mp.nnchan.ru o teu instància no té un mot de pas)",
+	"InvalidInstance_Alert": "URL d'instància no vàlid!",
+	"InvalidPhoneNumber_Alert": "Número de telèfon no vàlid!",
+	"InvalidCaptcha_Alert": "CAPTCHA no vàlid!",
+	"CloudPasswordEmpty_Alert": "Mot de pas de núvol no pot estar buida!",
+	"CreateNewSession_Btn": "Crea sessió nova",
+	"ImportSession_Btn": "Importa sessió existent",
+	"InvalidPassword_Alert": "Mot de pas no vàlid!",
+	"LoginDisabled_Alert": "Aquesta instància no admet creació de sessions amb API!",
+	"APIDisabled_Alert": "Aquesta instància no admet API!",
+	"ClientOutdated_Alert": "Client obsolet!",
+	"InvalidInstancePassword_Alert": "Mot de pas d'instància no vàlid!",
 	
 	// Settings sections
 	"UI": "IU",
@@ -200,7 +200,7 @@
 	"ChatAutoUpdate": "Actualització auto de xat",
 	"UpdatesTimeout": "Temps d'espera d'actualitzacions",
 	"KeepSessionAlive": "Mantén viva sessió",
-	"UseUnicode": "Use Unicode", // Untranslated
+	"UseUnicode": "Utilitza Unicode",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Carrega miniatures mèdia",
@@ -216,14 +216,14 @@
 	"HoldInRAMandStore": "Mantén memòria RAM i emmagatzema",
 	"AvatarsCacheThreshold": "Llindar de memòria cau d'avatars",
 	"ProfilesCacheThreshold": "Llindar de memòria cau de perfils",
-	"RMSCacheCount": "Stored cache count: ", // Untranslated
+	"RMSCacheCount": "Recompte de memòria cau emmagatzemada: ",
 	
 	// About
 	"AboutText": "Client de Telegram assistit per servidor per a J2ME, basat en API web MPGram.",
 	"Developer": "Desenvolupador",
 	"Author": "Autor",
 	"Donate": "Dona diners",
-	"Chat": "Xat", // assuming noun, if adjective - Xateja
+	"Chat": "Xat", // assuming noun, if verb - Xateja
  	
 	// Write form
 	"Reply_Title": "Respon",
