@@ -2,6 +2,7 @@
 	// About this locale file
 	"LocaleInfo": "German, by Ricardo",
 	"LocaleSlavicPlurals": "",
+	"LocaleCustomPlurals": "",
 	
 	// Common commands
 	"Exit": "Beenden",

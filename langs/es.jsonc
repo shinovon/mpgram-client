@@ -2,6 +2,7 @@
 	// About this locale file
 	"LocaleInfo": "Spanish, by @jazminrocio",
 	"LocaleSlavicPlurals": "",
+	"LocaleCustomPlurals": "",
 	
 	// Common commands
 	"Exit": "Salir",

@@ -2,6 +2,7 @@
 	// About this locale file
 	"LocaleInfo": "Finnish, by gtrxAC",
 	"LocaleSlavicPlurals": "",
+	"LocaleCustomPlurals": "",
 	
 	// Common commands
 	"Exit": "Poistu",

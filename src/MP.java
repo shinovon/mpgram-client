@@ -103,6 +103,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static final String[][] LANGS = {
 		{
 			"az",
+			"ca",
 			"de",
 			"en",
 			"es",
@@ -113,6 +114,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		},
 		{
 			"Azərbaycan",
+			"Catalan",
 			"Deutsch",
 			"English",
 			"Español",
@@ -3297,8 +3299,16 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 
 	static String localizePlural(int n, int i) {
 		String s = Integer.toString(n);
-		if (L[LocaleSlavicPlurals].length() == 0)
-			return s.concat(L[n == 1 ? i : i + 1]);
+		if (L[LocaleSlavicPlurals].length() == 0) {
+			String l = L[n == 1 ? i : i + 1];
+			if (L[LocaleCustomPlurals].length() != 0) {
+				int idx;
+				if ((idx = l.indexOf('%')) != -1) {
+					return l.substring(0, idx).concat(s.concat(l.substring(idx + 1)));
+				}
+			}
+			return s.concat(l);
+		}
 		
 		int a = n % 10;
 		int b = n % 100;
@@ -3311,8 +3321,16 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 	static StringBuffer appendLocalizedPlural(StringBuffer sb, int n, int i) {
 		sb.append(n);
-		if (L[LocaleSlavicPlurals].length() == 0)
-			return sb.append(L[n == 1 ? i : i + 1]);
+		if (L[LocaleSlavicPlurals].length() == 0) {
+			String l = L[n == 1 ? i : i + 1];
+			if (L[LocaleCustomPlurals].length() != 0) {
+				int idx;
+				if ((idx = l.indexOf('%')) != -1) {
+					return sb.insert(0, l.substring(0, idx)).append(l.substring(idx + 1));
+				}
+			}
+			return sb.append(n).append(l);
+		}
 		
 		int a = n % 10;
 		int b = n % 100;

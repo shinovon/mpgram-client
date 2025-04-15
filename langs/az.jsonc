@@ -2,6 +2,7 @@
 	// About this locale file
 	"LocaleInfo": "Azerbaijani, by Red Fixrai",
 	"LocaleSlavicPlurals": "",
+	"LocaleCustomPlurals": "",
 	
 	// Common commands
 	"Exit": "Çıxış",

@@ -2,6 +2,7 @@
 	// About this locale file
 	"LocaleInfo": "Catalan, by Dragan232",
 	"LocaleSlavicPlurals": "",
+	"LocaleCustomPlurals": "1",
 	
 	// Common commands
 	"Exit": "Surt",
@@ -10,26 +11,26 @@
 	"About": "Sobre",
 	
 	// Date offsets
-	"_secondAgo": " segon fa", // please add the option to have it like: fa 1 segon
-	"_secondsAgo": " segons fa",
+	"_secondAgo": "fa % segon",
+	"_secondsAgo": "fa % segons",
 	"_secondsAgo2": "",
-	"_minuteAgo": " minut fa",
-	"_minutesAgo": " minuts fa",
+	"_minuteAgo": "fa % minut",
+	"_minutesAgo": "fa % minuts",
 	"_minutesAgo2": "",
-	"_hourAgo": " hora fa",
-	"_hoursAgo": " hores fa",
+	"_hourAgo": "fa % hora",
+	"_hoursAgo": "fa % hores",
 	"_hoursAgo2": "",
-	"_dayAgo": " dia fa",
-	"_daysAgo": " dies fa",
+	"_dayAgo": "fa % dia",
+	"_daysAgo": "fa % dies",
 	"_daysAgo2": "",
-	"_weekAgo": " setmana fa",
-	"_weeksAgo": " setmanes fa",
+	"_weekAgo": "fa % setmana",
+	"_weeksAgo": "fa % setmanes",
 	"_weeksAgo2": "",
-	"_monthAgo": " mes fa",
-	"_monthsAgo": " mesos ago",
+	"_monthAgo": "fa % mes",
+	"_monthsAgo": "fa % mesos",
 	"_monthsAgo2": "",
-	"_yearAgo": " any fa",
-	"_yearsAgo": " anys fa",
+	"_yearAgo": "fa % any",
+	"_yearsAgo": "fa % anys",
 	"_yearsAgo2": "",
 	"Now": "ara",
 	"JustNow": "just ara",
@@ -157,6 +158,18 @@
 	"Auth_Btn": "Autoritza",
 	"InvalidCode_Alert": "Codi no vàlid!",
 	"CodeExpired_Alert": "Codi caducat!",
+	"Auth_Hint1": "(leave empty if using mp.nnchan.ru or your instance doesn't have a password)", // Untranslated
+	"InvalidInstance_Alert": "Invalid instance URL!", // Untranslated
+	"InvalidPhoneNumber_Alert": "Invalid phone number!", // Untranslated
+	"InvalidCaptcha_Alert": "Invalid captcha!", // Untranslated
+	"CloudPasswordEmpty_Alert": "Cloud password can't be empty!", // Untranslated
+	"CreateNewSession_Btn": "Create new session", // Untranslated
+	"ImportSession_Btn": "Import existing session", // Untranslated
+	"InvalidPassword_Alert": "Invalid password!", // Untranslated
+	"LoginDisabled_Alert": "This instance does not support session creation with API!", // Untranslated
+	"APIDisabled_Alert": "This instance does not support API!", // Untranslated
+	"ClientOutdated_Alert": "Client outdated!", // Untranslated
+	"InvalidInstancePassword_Alert": "Invalid instance password!", // Untranslated
 	
 	// Settings sections
 	"UI": "IU",
@@ -187,6 +200,7 @@
 	"ChatAutoUpdate": "Actualització auto de xat",
 	"UpdatesTimeout": "Temps d'espera d'actualitzacions",
 	"KeepSessionAlive": "Mantén viva sessió",
+	"UseUnicode": "Use Unicode", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "Carrega miniatures mèdia",
@@ -202,6 +216,7 @@
 	"HoldInRAMandStore": "Mantén memòria RAM i emmagatzema",
 	"AvatarsCacheThreshold": "Llindar de memòria cau d'avatars",
 	"ProfilesCacheThreshold": "Llindar de memòria cau de perfils",
+	"RMSCacheCount": "Stored cache count: ", // Untranslated
 	
 	// About
 	"AboutText": "Client de Telegram assistit per servidor per a J2ME, basat en API web MPGram.",

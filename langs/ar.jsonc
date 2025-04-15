@@ -2,6 +2,7 @@
 	// About this locale file
 	"LocaleInfo": "Arab, by @ZAIOOD999",
 	"LocaleSlavicPlurals": "",
+	"LocaleCustomPlurals": "",
 	
 	// Common commands
 	"Exit": "خروج",
