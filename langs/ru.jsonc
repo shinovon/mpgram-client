@@ -183,7 +183,7 @@
 	"WaitForPageToLoad": "Ждать полной загрузки",
 	"UseJSONStream": "Исп. JSONStream",
 	"FormatText": "Форматировать текст",
-	"ParseLinks": "Парсить ссылки",
+	"ParseLinks": "Отображать ссылки",
 	"ChatAutoUpdate": "Авто-обновление чата",
 	"UpdatesTimeout": "Таймаут обновлений",
 	"KeepSessionAlive": "Удерживать сессию активной",

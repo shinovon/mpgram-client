@@ -494,8 +494,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		
 		// commands
 		
-		exitCmd = new Command(L[Exit], Command.EXIT, 15);
-		backCmd = new Command(L[Back], Command.BACK, 15);
+		exitCmd = new Command(L[Exit], Command.EXIT, 25);
+		backCmd = new Command(L[Back], Command.BACK, 25);
 		
 		settingsCmd = new Command(L[Settings], Command.SCREEN, 20);
 		aboutCmd = new Command(L[About], Command.SCREEN, 21);
