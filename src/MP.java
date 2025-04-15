@@ -114,7 +114,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		},
 		{
 			"Azərbaycan",
-			"Catalan",
+			"Català",
 			"Deutsch",
 			"English",
 			"Español",
