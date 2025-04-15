@@ -3329,7 +3329,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					return sb.insert(0, l.substring(0, idx)).append(l.substring(idx + 1));
 				}
 			}
-			return sb.append(n).append(l);
+			return sb.append(l);
 		}
 		
 		int a = n % 10;
