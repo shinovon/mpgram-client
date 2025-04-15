@@ -1,0 +1,316 @@
+{
+	// About this locale file
+	"LocaleInfo": "Catalan, by Dragan232",
+	"LocaleSlavicPlurals": "",
+	
+	// Common commands
+	"Exit": "Surt",
+	"Back": "Enrere",
+	"Settings": "Configuració",
+	"About": "Sobre",
+	
+	// Date offsets
+	"_secondAgo": " segon fa", // please add the option to have it like: fa 1 segon
+	"_secondsAgo": " segons fa",
+	"_secondsAgo2": "",
+	"_minuteAgo": " minut fa",
+	"_minutesAgo": " minuts fa",
+	"_minutesAgo2": "",
+	"_hourAgo": " hora fa",
+	"_hoursAgo": " hores fa",
+	"_hoursAgo2": "",
+	"_dayAgo": " dia fa",
+	"_daysAgo": " dies fa",
+	"_daysAgo2": "",
+	"_weekAgo": " setmana fa",
+	"_weeksAgo": " setmanes fa",
+	"_weeksAgo2": "",
+	"_monthAgo": " mes fa",
+	"_monthsAgo": " mesos ago",
+	"_monthsAgo2": "",
+	"_yearAgo": " any fa",
+	"_yearsAgo": " anys fa",
+	"_yearsAgo2": "",
+	"Now": "ara",
+	"JustNow": "just ara",
+	"Today": "avui",
+	"Yesterday": "ahir",
+	"LastWeek": "la setmana passada",
+	"LastMonth": "el mes passat",
+	"ALongTimeAgo": "fa molt de temps",
+	"Recently": "recentment",
+	// Date suffixes
+	"on_Date": "el ",
+	"at_Time": " a ",
+	// Months
+	"Jan": "gen.",
+	"Feb": "febr.",
+	"Mar": "març",
+	"Apr": "abr.",
+	"May": "maig",
+	"Jun": "juny",
+	"Jul": "jul.",
+	"Aug": "ag.",
+	"Sep": "set.",
+	"Oct": "oct.",
+	"Nov": "nov.",
+	"Dec": "des.",
+	// Days of week
+	"Sun": "dg.",
+	"Mon": "dl.",
+	"Tue": "dt.",
+	"Wed": "dc.",
+	"Thu": "dj.",
+	"Fri": "dv.",
+	"Sat": "ds.",
+	"Sunday": "diumenge",
+	"Monday": "dilluns",
+	"Tuesday": "dimarts",
+	"Wednesday": "dimecres",
+	"Thursday": "dijous",
+	"Friday": "divendres",
+	"Saturday": "dissabte",
+	
+	// Auth commands
+	"Auth": "Autorització",
+	"Next": "Següent",
+	"NewSession": "Nova sessió",
+	"ImportSession": "Importa sessió",
+	
+	// Settings commands
+	"Logout": "Tanca sessió",
+	"ClearCache": "Esborra memòria cau",
+	
+	// Chats list commands
+	"Folders": "Carpetes",
+	"Refresh": "Actualitza",
+	"ArchivedChats": "Xats arxivats",
+	"Contacts": "Contactes",
+	"Search": "Cerca",
+	"OpenByLink": "Obre per enllaç",
+	
+	// Message commands
+	"OpenChat": "Obre xat",
+	"Profile": "Perfil",
+	"Reply": "Respon",
+	"Forward": "Reenvia",
+	"CopyMessage": "Copia missatge",
+	"CopyMessageLink": "Copia enllaç de missatge",
+	"Delete": "Suprimeix",
+	"Edit": "Edita",
+	"GoTo": "Ves a",
+	"Pin": "Fixa",
+	"BanMember": "Prohibeix membre",
+	
+	// Item commands
+	"Link_Cmd": "Enllaç", // assuming noun, if adjective - Enllaça
+	"ViewImage": "Veges imatge",
+	"Call": "Truca",
+	"Download": "Baixa",
+	
+	// Chat form commands
+	"WriteMessage": "Escriu missatge",
+	"LatestMessages_Cmd": "Actualitza",
+	"ChatInfo": "Info de xat",
+	"Older": "Més vell",
+	"Newer": "Més nou",
+	"SendSticker": "Envia adhesiu",
+	
+	// Message writing form commands
+	"Send": "Envia",
+	"OpenTextBox": "Obre quadre de text",
+	"ChooseFile": "Selecciona fitxer",
+	
+	// Profile/chat info commands
+	"Join": "Uneix-te",
+	"JoinGroup": "Uneix-te a grup",
+	"LeaveGroup": "Deixa grup",
+	"ChatMedia": "Chat media",
+	"Members": "Mèdia de xat",
+	"AddToContacts": "Afegeix a contactes",
+	
+	// Dialog commands
+	"Ok": "D'acord",
+	"Cancel": "Canceŀla",
+	
+	// Pagination commands
+	"NextPage": "Pàgina següent",
+	"PrevPage": "Pàgina anterior",
+	
+	// Loading states
+	"Loading": "Carregant...",
+	"Authorizing": "Autoritzant...",
+	"WaitingForServerResponse": "Esperant resposta de servidor...",
+	"Sending": "Enviant...",
+	"WaitingForPrevChat": "Esperant que xat anterior es desconnecti...",
+	
+	// Authorization process
+	"Auth_Title": "Autorització",
+	"InstanceURL": "URL d'instància",
+	"InstancePassword": "Mot de pas d'instància",
+	"ChooseAuthMethod": "Selecciona mètode d'autorització",
+	"PhoneNumber": "Número de telèfon",
+	"SessionCode": "Codi de sessió",
+	"Code": "Codi",
+	"CloudPassword": "Mot de pas de núvol",
+	"Captcha": "CAPTCHA",
+	"Auth_Btn": "Autoritza",
+	"InvalidCode_Alert": "Codi no vàlid!",
+	"CodeExpired_Alert": "Codi caducat!",
+	
+	// Settings sections
+	"UI": "IU",
+	"Behaviour": "Comportament",
+	"Images": "Imatges",
+	"Authorization": "Autorització",
+	
+	// UI Settings
+	"Language": "Idioma",
+	"ReversedChat": "Xat invertit",
+	"ShowMedia": "Mostra mèdia",
+	"ShowChatStatus": "Mostra estat de xat",
+	"ThumbnailsSize": "Mida de miniatures",
+	"ChatsCount": "Quantitat de xats",
+	"MessagesCount": "Quantitat de missatges",
+	"ChatsListFontSize": "Mida de lletra de llista de xats",
+	"Default": "Predeterminat",
+	"Small": "Petit",
+	"Medium": "Mitjà",
+	"FocusNewMessages": "Centra nous missatges",
+	"ChatTextField": "Camp de text a xat",
+	
+	// Behaviour settings
+	"WaitForPageToLoad": "Espera que pàgina es carregui",
+	"UseJSONStream": "Utilitza JSONStream",
+	"FormatText": "Formatació de text",
+	"ParseLinks": "Analitza enllaços",
+	"ChatAutoUpdate": "Actualització auto de xat",
+	"UpdatesTimeout": "Temps d'espera d'actualitzacions",
+	"KeepSessionAlive": "Mantén viva sessió",
+	
+	// Images settings
+	"LoadMediaThumbnails": "Carrega miniatures mèdia",
+	"LoadAvatars": "Carrega avatars",
+	"MultiThreadedLoading": "Càrrega multifils",
+	"RoundAvatars": "Avatars arrodonits",
+	
+	// Cache settings
+	"AvatarsCaching": "Avatars a memòria cau",
+	"Disabled": "Desactivat",
+	"HoldInRAM": "Mantén memòria RAM",
+	"Store": "Emmagatzema",
+	"HoldInRAMandStore": "Mantén memòria RAM i emmagatzema",
+	"AvatarsCacheThreshold": "Llindar de memòria cau d'avatars",
+	"ProfilesCacheThreshold": "Llindar de memòria cau de perfils",
+	
+	// About
+	"AboutText": "Client de Telegram assistit per servidor per a J2ME, basat en API web MPGram.",
+	"Developer": "Desenvolupador",
+	"Author": "Autor",
+	"Donate": "Dona diners",
+	"Chat": "Xat", // assuming noun, if adjective - Xateja
+ 	
+	// Write form
+	"Reply_Title": "Respon",
+	"Write_Title": "Escriu",
+	"Edit_Title": "Edita",
+	"Forward_Title": "Reenvia",
+	"Message": "Missatge",
+	"File": "Fitxer",
+	"File_Prefix": "Fitxer: ",
+	"NotSelected": "No seleccionat",
+	"SendUncompressed": "Envia sense comprimir",
+	"SendAsVoice": "Envia com a missatge de veu",
+	"HideWithSpoiler": "Amaga amb spoiler",
+	"EnableHTMLFormatting": "Activa formatació HTML",
+	
+	// Alert messages
+	"MessageSent_Alert": "Missatge enviat",
+	"MessageDeleted_Alert": "Missatge suprimit",
+	"UpdateAvailable_Alert": "Actualització de client disponible",
+	"MemberBanned_Alert": "Membre prohibit",
+	
+	// Chat form
+	"ChatMedia_Title": "Mèdia",
+	"Search_TitlePrefix": "Cerce - ",
+	"OlderMessages": "Missatges més vell",
+	"NewerMessages": "Missatges més nou",
+	
+	// Message
+	"ForwardedFrom": "Reenviat des ",
+	"You": "Tu",
+	"You_Prefix": "Tu: ",
+	"ForwardedMessage": "Missatge reenviat",
+	"Action": "Acció",
+	"Edited": "editat",
+	
+	// Message media
+	"Media": "Mèdia",
+	"Poll": "Enquesta",
+	"Geo": "Geo: ",
+	
+	// Chat actions
+	"PinnedMessage_Action": " fixar missatge",
+	"Joined_Action": " s'ha unit al grup",
+	"Added_Action": " afegit",
+	"Left_Action": " deixat al grup",
+	"Removed_Action": " tret",
+	"JoinedByLink_Action": " s'ha unit al grup via enllaç d'invitació",
+	"JoinedByRequest_Action": " was accepted to the group",
+	"ChatHistoryCleared_Action": " ser acceptat al grup",
+	"GroupCreated_Action": "Grup creat",
+	"ChannelCreated_Action": "Canal creat",
+	"PhotoUpdated_Action": "Foto actualitzat",
+	"NameChanged_Action": "Nom s'ha canviat a ",
+	
+	// Folders
+	"AllChats": "Tots xats",
+	"Archive": "Arxivat",
+	
+	// Profile/chat info
+	"Online": "en línia",
+	"Offline": "fora de línia",
+	"LastSeen": "vist ",
+	"About_User": "Sobre mi",
+	"About_Chat": "Descripció",
+	"Mobile": "Mòbil",
+	"Username": "Nom d'usuari",
+	"Link": "Enllaç",
+	"SearchMessages": "Cerca missatges",
+	"ViewGroup": "Veges grup",
+	"GoToPinnedMessage": "Mostra missatge fixat",
+	"Owner": "propietari",
+	"Admin": "admin",
+	"Bot": "bot",
+	"UserInfo": "Info d'usuari",
+	"GroupInfo": "Info de grup",
+	"ChannelInfo": "Info de canal",
+	
+	"_member": " membre",
+	"_members": " membres",
+	"_members2": "",
+	
+	"_subscriber": " subscriptor",
+	"_subscribers": " subcriptors",
+	"_subscribers2": "",
+	
+	"_photo": " foto",
+	"_photos": " fotos",
+	"_photos2": "",
+	
+	"_video": " vídeo",
+	"_videos": " vídeos",
+	"_videos2": "",
+	
+	"_file": " fitxer",
+	"_files": " fitxers",
+	"_files2": "",
+	
+	"_audioFile": " fitxer d'àudio",
+	"_audioFiles": " fitxers d'àudio",
+	"_audioFiles2": "",
+	
+	"_voiceMessage": " missatge de veu",
+	"_voiceMessages": " missatges de veu",
+	"_voiceMessages2": ""
+}
