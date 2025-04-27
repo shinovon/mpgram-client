@@ -156,7 +156,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static String instanceUrl = DEFAULT_INSTANCE_URL;
 	private static String instancePassword;
 	private static int tzOffset;
-	static boolean symbianJrt;
 	static boolean useLoadingForm;
 	private static int avatarSize;
 	private static int photoSize = 120;
@@ -185,13 +184,16 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static boolean keepAlive = true;
 	static boolean utf = true;
 	static long keepAliveInterval = 30000L;
-	static String deviceName;
-	static String systemName;
 	static boolean chatField = true;
 	static boolean roundAvatars;
-	public static String encoding = "UTF-8";
 	static boolean useView = true;
-	static boolean compress;
+	static boolean compress = true;
+	
+	// platform
+	static boolean symbianJrt;
+	static String deviceName;
+	static String systemName;
+	public static String encoding = "UTF-8";
 
 	// threading
 	private static int run;
@@ -418,6 +420,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					}
 				}
 			}
+		}
+		
+		// get system language
+		if ((p = System.getProperty("user.language")) == null) {
+			p = System.getProperty("microedition.locale");
+		}
+		
+		if (p != null) {
+			lang = p.length() > 2 ? p.substring(0, 2) : p;
 		}
 
 		// init platform dependent settings
