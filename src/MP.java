@@ -197,7 +197,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static int run;
 	private static Object runParam;
 //	private static int running;
-	static Thread updatesThread;
+	static Thread updatesThread, updatesThreadCopy;
 	static Hashtable threadConnections = new Hashtable();
 	static Vector closingConnections = new Vector();
 	private static boolean sending;
@@ -1054,7 +1054,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		case RUN_CHAT_UPDATES: { // chat updates loop
 			Thread thread;
-			updatesThread = thread = Thread.currentThread();
+			updatesThread = updatesThreadCopy = thread = Thread.currentThread();
 			updatesRunning = true;
 			try {
 				StringBuffer sb = new StringBuffer();

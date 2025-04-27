@@ -117,6 +117,17 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 		// TODO forum
 		deleteAll();
 		
+		if (MP.updatesThread != null || MP.updatesRunning) {
+			MP.display(MP.loadingAlert(MP.L[WaitingForPrevChat]), this);
+			
+			MP.cancel(MP.updatesThreadCopy, true);
+			while (MP.updatesThread != null || MP.updatesRunning) {
+				Thread.sleep(1000L);
+			}
+			
+			if (MP.current == this) MP.display(this);
+		}
+		
 		StringBuffer sb = new StringBuffer();
 		if (!infoLoaded) {
 			JSONObject peer = MP.getPeer(id, true);
@@ -308,16 +319,6 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 		if (endReached && !hasOffset && query == null && mediaFilter == null
 				&& MP.chatUpdates && thread == this.thread) {
 			// start updater thread
-			if (MP.updatesThread != null || MP.updatesRunning) {
-				MP.display(MP.loadingAlert(MP.L[WaitingForPrevChat]), this);
-				
-				MP.cancel(MP.updatesThread, true);
-				while (MP.updatesThread != null) {
-					Thread.sleep(1000L);
-				}
-				
-				if (MP.current == this) MP.display(this);
-			}
 			update = true;
 			MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
 			(typingThread = new Thread(this)).start();
