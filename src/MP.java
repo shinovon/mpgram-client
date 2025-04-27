@@ -1254,7 +1254,21 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			break;
 		}
 		case RUN_SEND_STICKER: {
-			// TODO
+			try {
+				JSONObject s = (JSONObject) param;
+				StickerPackForm form = (StickerPackForm) current;
+				
+				StringBuffer sb = new StringBuffer("sendMedia&peer=").append(form.chatForm.id);
+				sb.append("&doc_id=").append(s.getString("id"))
+				.append("&doc_access_hash=").append(s.getString("access_hash"));
+				
+				MP.api(sb.toString());
+				
+				goBackTo(form.chatForm);
+				commandAction(latestCmd, form.chatForm);
+			} catch (Exception e) {
+				display(errorAlert(e), current);
+			}
 			break;
 		}
 		case RUN_INSTALL_STICKER_SET: {
@@ -2192,6 +2206,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			if (MP.updatesThread != null) {
 				MP.cancel(MP.updatesThread, true);
 			}
+			imagesToLoad.removeAllElements();
+			
 			display(loadingAlert(L[Loading]), current);
 			start(RUN_SEND_STICKER, s);
 			return;
