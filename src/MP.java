@@ -64,6 +64,9 @@ import javax.microedition.rms.RecordStore;
 import cc.nnproject.json.JSONArray;
 import cc.nnproject.json.JSONObject;
 import cc.nnproject.json.JSONStream;
+import zip.GZIPInputStream;
+import zip.Inflater;
+import zip.InflaterInputStream;
 
 public class MP extends MIDlet implements CommandListener, ItemCommandListener, ItemStateListener, Runnable, LangConstants {
 
@@ -188,6 +191,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static boolean roundAvatars;
 	public static String encoding = "UTF-8";
 	static boolean useView = true;
+	static boolean compress;
 
 	// threading
 	private static int run;
@@ -467,6 +471,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			chatField = j.getBoolean("chatField", chatField);
 			roundAvatars = j.getBoolean("roundAvatars", roundAvatars);
 			utf = j.getBoolean("utf", utf);
+			compress = j.getBoolean("compress", compress);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -1755,6 +1760,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					j.put("chatField", chatField);
 					j.put("roundAvatars", roundAvatars);
 					j.put("utf", utf);
+					j.put("compress", compress);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
@@ -2980,7 +2986,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				c = hc.getResponseCode();
 			}
 			try {
-				threadConnections.put(hc, in = hc.openInputStream());
+				threadConnections.put(hc, in = openInputStream(hc));
 				if (jsonStream) {
 					res = JSONStream.getStream(in).nextValue();
 				} else {
@@ -3127,9 +3133,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			int c = http.getResponseCode();
 			try {
 				if (jsonStream) {
-					res = JSONStream.getStream(httpIn = http.openInputStream()).nextValue();
+					res = JSONStream.getStream(httpIn = openInputStream(http)).nextValue();
 				} else {
-					res = JSONObject.parseJSON(readUtf(httpIn = http.openInputStream(), (int) http.getLength()));
+					res = JSONObject.parseJSON(readUtf(httpIn = openInputStream(http), (int) http.getLength()));
 				}
 			} catch (RuntimeException e) {
 				if (c >= 400) {
@@ -3202,8 +3208,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			if ((r = hc.getResponseCode()) >= 400) {
 				throw new IOException("HTTP ".concat(Integer.toString(r)));
 			}
-			in = hc.openInputStream();
-			return readBytes(in, (int) hc.getLength(), 8*1024, 16*1024);
+			return readBytes(in = openInputStream(hc), (int) hc.getLength(), 8*1024, 16*1024);
 		} finally {
 			try {
 				if (in != null) in.close();
@@ -3214,11 +3219,25 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 	}
 	
+	private static InputStream openInputStream(HttpConnection hc) throws IOException {
+		InputStream i = hc.openInputStream();
+		String enc = hc.getHeaderField("Content-Encoding");
+		if ("deflate".equalsIgnoreCase(enc))
+			i = new InflaterInputStream(i, new Inflater(true));
+		else if ("gzip".equalsIgnoreCase(enc))
+			i = new GZIPInputStream(i);
+		return i;
+	}
+	
 	private static HttpConnection openHttpConnection(String url) throws IOException {
 		System.out.println(url);
+		boolean u;
 		HttpConnection hc = (HttpConnection) Connector.open(url, Connector.READ_WRITE,
-				url.indexOf("method=updates") == -1 || OTA_URL.equals(url));
+				u = (url.indexOf("method=updates") == -1 || OTA_URL.equals(url)));
 		hc.setRequestProperty("User-Agent", "mpgram4/".concat(version).concat(" (https://github.com/shinovon/mpgram-client)"));
+		if (!u && compress) {
+			hc.setRequestProperty("Accept-Encoding", "gzip, deflate");
+		}
 		if (url.startsWith(instanceUrl)) {
 			if (user != null) {
 				hc.setRequestProperty("X-mpgram-user", user);
