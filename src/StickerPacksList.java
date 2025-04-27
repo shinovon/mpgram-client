@@ -1,3 +1,6 @@
+import cc.nnproject.json.JSONArray;
+import cc.nnproject.json.JSONObject;
+
 /*
 Copyright (c) 2022-2025 Arman Jussupgaliyev
 
@@ -20,20 +23,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 public class StickerPacksList extends MPList {
+	
+	JSONArray sets;
+	ChatForm chatForm;
 
-	public StickerPacksList(String title) {
-		super(title);
-		// TODO Auto-generated constructor stub
+	public StickerPacksList(ChatForm form) {
+		super(MP.L[Stickers_Title]);
+		this.chatForm = form;
+		addCommand(MP.backCmd);
 	}
 
 	void loadInternal(Thread thread) throws Exception {
-		// TODO Auto-generated method stub
-
+		JSONObject j = (JSONObject) MP.api("getStickerSets");
+		
+		JSONArray sets = this.sets = j.getArray("res");
+		int l = sets.size();
+		
+		for (int i = 0; i < l; ++i) {
+			safeAppend(thread, sets.getObject(i).getString("title"), null);
+		}
 	}
 
 	void select(int i) {
-		// TODO Auto-generated method stub
-		MP.openLoad(new StickerPackForm(null));
+		if (i == -1) return;
+		MP.openLoad(new StickerPackForm(chatForm, sets.getObject(i)));
 	}
 
 }

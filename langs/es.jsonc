@@ -283,6 +283,11 @@
 	"AllChats": "Todos los chats",
 	"Archive": "Archivo",
 	
+	// Stickers
+	"Stickers_Title": "Stickers", // Untranslated
+	"Sticker": "Sticker", // Untranslated
+	"AddStickers": "Add stickers", // Untranslated
+	
 	// Profile/chat info
 	"Online": "en linea",
 	"Offline": "apagado",

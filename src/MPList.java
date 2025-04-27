@@ -25,7 +25,7 @@ import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.Ticker;
 
-public abstract class MPList extends List {
+public abstract class MPList extends List implements LangConstants {
 
 	boolean loaded, finished, canceled;
 	Thread thread;

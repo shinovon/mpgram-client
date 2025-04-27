@@ -283,6 +283,11 @@
 	"AllChats": "All chats",
 	"Archive": "Archive",
 	
+	// Stickers
+	"Stickers_Title": "Stickers",
+	"Sticker": "Sticker",
+	"AddStickers": "Add stickers",
+	
 	// Profile/chat info
 	"Online": "online",
 	"Offline": "offline",

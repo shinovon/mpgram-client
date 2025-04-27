@@ -283,6 +283,11 @@
 	"AllChats": "Все чаты",
 	"Archive": "Архив",
 	
+	// Stickers
+	"Stickers_Title": "Стикеры",
+	"Sticker": "Стикер",
+	"AddStickers": "Добавить стикер",
+	
 	// Profile/chat info
 	"Online": "в сети",
 	"Offline": "офлайн",

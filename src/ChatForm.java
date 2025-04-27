@@ -25,6 +25,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.ImageItem;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.Spacer;
@@ -35,7 +37,7 @@ import javax.microedition.lcdui.Ticker;
 import cc.nnproject.json.JSONArray;
 import cc.nnproject.json.JSONObject;
 
-public class ChatForm extends MPForm implements LangConstants, Runnable {
+public class ChatForm extends MPForm implements Runnable {
 	
 	private static final int SPACER_HEIGHT = 8;
 	
@@ -84,6 +86,8 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 	
 	TextField textField;
 	ChatForm parent;
+
+	JSONObject botAnswer;
 	
 	public ChatForm(String id, String query, int message, int topMsg) {
 		super(id);
@@ -173,6 +177,7 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 					addCommand(MP.joinChatCmd);
 				} else if (canWrite) {
 					addCommand(MP.writeCmd);
+					addCommand(MP.sendStickerCmd);
 				}
 			}
 			infoLoaded = true;
@@ -315,13 +320,33 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 		}
 		
 		super.focusOnFinish = focus;
-		
-		if (endReached && !hasOffset && query == null && mediaFilter == null
-				&& MP.chatUpdates && thread == this.thread) {
+	}
+	
+	protected void postLoad(boolean success) {
+		if (!success)
+			return;
+		if (endReached && !hasOffset && query == null && mediaFilter == null && MP.chatUpdates) {
 			// start updater thread
 			update = true;
 			MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
 			(typingThread = new Thread(this)).start();
+		}
+		
+		if (botAnswer != null) {
+			JSONObject j = botAnswer;
+			botAnswer = null;
+			
+			if (j.has("message")) {
+				Alert a = new Alert(title);
+				a.setType(AlertType.CONFIRMATION);
+				a.setString(j.getString("message"));
+				a.setTimeout(1500);
+				MP.display(a, this);
+			}
+			
+			if (j.has("url")) {
+				MP.openUrl(j.getString("url"));
+			}
 		}
 	}
 

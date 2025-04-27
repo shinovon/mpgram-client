@@ -283,6 +283,11 @@
 	"AllChats": "Kaikki keskustelut",
 	"Archive": "Arkisto",
 	
+	// Stickers
+	"Stickers_Title": "Stickers", // Untranslated
+	"Sticker": "Sticker", // Untranslated
+	"AddStickers": "Add stickers", // Untranslated
+	
 	// Profile/chat info
 	"Online": "paikalla",
 	"Offline": "ei paikalla",
