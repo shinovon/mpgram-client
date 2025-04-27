@@ -1917,34 +1917,34 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			s.setLayout(Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_NEWLINE_BEFORE);
 			f.append(s);
 
-			s = new StringItem(L[Developer], "shinovon");
+			s = new StringItem(L[Developer], "\nshinovon");
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 
-			s = new StringItem(L[Author], "twsparkle");
+			s = new StringItem(L[Author], "\ntwsparkle");
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setItemCommandListener(this);
 			f.append(s);
 
-			s = new StringItem("GitHub", "github.com/shinovon");
+			s = new StringItem("GitHub", "\ngithub.com/shinovon");
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
 			s.setItemCommandListener(this);
 			f.append(s);
 
-			s = new StringItem("Web", "nnproject.cc");
+			s = new StringItem("Web", "\nnnproject.cc");
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
 			s.setItemCommandListener(this);
 			f.append(s);
 
-			s = new StringItem(MP.L[Donate], "boosty.to/nnproject/donate");
+			s = new StringItem(MP.L[Donate], "\nboosty.to/nnproject/donate");
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
 			s.setItemCommandListener(this);
 			f.append(s);
 
-			s = new StringItem(MP.L[Chat], "t.me/nnmidletschat");
+			s = new StringItem(MP.L[Chat], "\nt.me/nnmidletschat");
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
 			s.setItemCommandListener(this);
