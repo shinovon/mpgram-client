@@ -263,6 +263,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command newerMessagesCmd;
 	static Command latestCmd;
 	static Command searchMsgCmd;
+	static Command sendStickerCmd;
 	
 	static Command sendCmd;
 	static Command openTextBoxCmd;
@@ -276,6 +277,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command chatMediaCmd;
 	static Command gotoPinnedMsgCmd;
 	static Command chatMembersCmd;
+	
+	static Command stickerItemCmd;
+	static Command addStickerPackCmd;
 
 	static Command okCmd;
 	static Command cancelCmd;
@@ -562,6 +566,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		olderMessagesCmd = new Command(L[Older], Command.ITEM, 1);
 		newerMessagesCmd = new Command(L[Newer], Command.ITEM, 1);
 		searchMsgCmd = new Command(L[Search], Command.SCREEN, 10);
+		sendStickerCmd = new Command(L[SendSticker], Command.SCREEN, 8);
 		
 		sendCmd = new Command(L[Send], Command.OK, 1);
 		openTextBoxCmd = new Command(L[OpenTextBox], Command.ITEM, 1);
@@ -575,6 +580,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		chatMediaCmd = new Command(L[Media], Command.ITEM, 1);
 		gotoPinnedMsgCmd = new Command(L[GoTo], Command.ITEM, 1);
 		chatMembersCmd = new Command(L[Members], Command.SCREEN, 6);
+		
+		stickerItemCmd = new Command(L[Sticker], Command.ITEM, 1);
+		addStickerPackCmd = new Command(L[AddStickers], Command.SCREEN, 2);
 		
 		okCmd = new Command(L[Ok], Command.OK, 1);
 		cancelCmd = new Command(L[Cancel], Command.CANCEL, 20);
@@ -766,6 +774,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 								String id = ((String[]) src)[1];
 								String p = ((String[]) src)[3];
 								url = instanceUrl + FILE_URL + "?a&c=" + peer + "&m=" + id + "&p=" + p + "&s=" + photoSize;
+							} else if (src instanceof JSONObject) { // sticker or document
+								url = instanceUrl + FILE_URL + "?a&sticker=" + ((JSONObject) src).getString("id")
+										+ "&access_hash=" + ((JSONObject) src).getString("access_hash") + "&p=rsprevs&s=32";
 							} else {
 								continue;
 							}
@@ -1199,11 +1210,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				sb.append("&id=").append(((String[]) param)[1]);
 				sb.append("&data=").append(((String[]) param)[2]);
 				
-				JSONObject j = (JSONObject) api(sb.toString());
-				
-				if (j.has("message")) {
-					((ChatForm) current).botMessage = j.getString("message");
-				}
+				((ChatForm) current).botAnswer = (JSONObject) api(sb.toString());
 
 				commandAction(latestCmd, current);
 			} catch (Exception e) {
@@ -1322,6 +1329,17 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				display(t);
 				return;
 			}
+			if (c == banMemberCmd) {
+				int i = ((List) d).getSelectedIndex();
+				if (i == -1) return;
+				
+				String id = (String) ((ChatsList) d).ids.elementAt(i);
+				if (id == null) return;
+
+				display(loadingAlert(L[Loading]), current);
+				start(RUN_BAN_MEMBER, new String[] {((ChatsList) d).peerId, null, id});
+				return;
+			}
 		}
 		if (d instanceof ChatForm) { // chat form commands
 			if (c == latestCmd) {
@@ -1348,6 +1366,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				t.setCommandListener(this);
 				
 				display(t);
+				return;
+			}
+			if (c == sendStickerCmd) {
+				openLoad(new StickerPacksList((ChatForm) d));
 				return;
 			}
 			if (c == backCmd && ((ChatForm) d).query != null && ((ChatForm) d).switched) {
@@ -1897,15 +1919,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			display(f);
 			return;
 		}
-		if (c == banMemberCmd && d instanceof ChatsList) {
-			int i = ((List) d).getSelectedIndex();
-			if (i == -1) return;
-			
-			String id = (String) ((ChatsList) d).ids.elementAt(i);
-			if (id == null) return;
-
-			display(loadingAlert(L[Loading]), current);
-			start(RUN_BAN_MEMBER, new String[] {((ChatsList) d).peerId, null, id});
+		if (c == addStickerPackCmd) {
+			// TODO
+//			start(RUN_IMPORT_STICKER_PACK, d);
 			return;
 		}
 		if (c == List.SELECT_COMMAND) {
@@ -2150,6 +2166,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			start(RUN_PIN_MESSAGE, s);
 			return;
 		}
+		if (c == stickerItemCmd) {
+			// TODO send sticker
+			return;
+		}
 		commandAction(c, display.getCurrent());
 	}
 
@@ -2248,7 +2268,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	}
 	
 	static void queueImage(Object src, Object target) {
-		if (target == null || src == null || !loadThumbs) return;
+		if (target == null || src == null
+				// always load stickers for StickerPackForm
+				|| (!loadThumbs && !(target instanceof JSONObject)))
+			return;
 		synchronized (imagesLoadLock) {
 			imagesToLoad.addElement(new Object[] { src, target });
 			imagesLoadLock.notifyAll();
@@ -2697,7 +2720,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					
 					return true;
 				} else if (stickers != null) {
-					// add stickers TODO
+					// add stickers
+					openLoad(new StickerPackForm(stickers));
 					
 					return true;
 				}

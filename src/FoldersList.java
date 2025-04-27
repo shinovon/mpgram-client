@@ -22,7 +22,7 @@ SOFTWARE.
 import cc.nnproject.json.JSONArray;
 import cc.nnproject.json.JSONObject;
 
-public class FoldersList extends MPList implements LangConstants {
+public class FoldersList extends MPList {
 	
 	boolean hasArchive;
 	JSONArray folders;
@@ -34,7 +34,7 @@ public class FoldersList extends MPList implements LangConstants {
 
 	void loadInternal(Thread thread) throws Exception {
 		JSONObject j = (JSONObject) MP.api("getFolders");
-		JSONArray folders = j.getArray("folders", null);
+		JSONArray folders = j.getArray("res", null);
 		if (folders != null) {
 			this.folders = folders;
 			int l = folders.size();

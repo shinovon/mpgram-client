@@ -76,10 +76,10 @@ if not err:
                 for s in en_lines:
                     if s.strip().startswith("//") and s.strip() != lines[i].strip():
                         print(i, s.strip())
-                        if lines[i].strip().starswith("//"):
-                            lines[i] = s
-                        else:
-                            lines.insert(i, s)
+                        #if lines[i].strip().startswith("//"):
+                        #    lines[i] = s
+                        #else:
+                        lines.insert(i, s)  
                     elif s.strip() == "" and lines[i].strip() != "":
                         lines.insert(i, s)
                     elif s.strip().split(":")[0] == "\"" + k + "\"":

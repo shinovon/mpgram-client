@@ -283,6 +283,11 @@
 	"AllChats": "جميع المحادثات",
 	"Archive": "ارشيف",
 	
+	// Stickers
+	"Stickers_Title": "Stickers", // Untranslated
+	"Sticker": "Sticker", // Untranslated
+	"AddStickers": "Add stickers", // Untranslated
+	
 	// Profile/chat info
 	"Online": "متصل",
 	"Offline": "غير متصل",

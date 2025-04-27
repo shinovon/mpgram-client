@@ -283,6 +283,11 @@
 	"AllChats": "Tots xats",
 	"Archive": "Arxivat",
 	
+	// Stickers
+	"Stickers_Title": "Stickers", // Untranslated
+	"Sticker": "Sticker", // Untranslated
+	"AddStickers": "Add stickers", // Untranslated
+	
 	// Profile/chat info
 	"Online": "en línia",
 	"Offline": "fora de línia",

@@ -1,3 +1,11 @@
+import java.util.Hashtable;
+
+import javax.microedition.lcdui.ImageItem;
+import javax.microedition.lcdui.Item;
+
+import cc.nnproject.json.JSONArray;
+import cc.nnproject.json.JSONObject;
+
 /*
 Copyright (c) 2022-2025 Arman Jussupgaliyev
 
@@ -21,13 +29,54 @@ SOFTWARE.
 */
 public class StickerPackForm extends MPForm {
 
-	public StickerPackForm(String title) {
-		super(title);
+	String id;
+	String accessHash;
+	String slug;
+	ChatForm chatForm;
+	
+	public StickerPackForm(ChatForm chatForm, JSONObject json) {
+		super(json.getString("title", json.getString("short_name", MP.L[Stickers_Title])));
+		this.id = json.getString("id");
+		this.accessHash = json.getString("access_hash");
+		this.chatForm = chatForm;
+	}
+	
+	public StickerPackForm(String slug) {
+		super(slug);
+		this.slug = slug;
 	}
 
 	void loadInternal(Thread thread) throws Exception {
-		// TODO Auto-generated method stub
-
+		StringBuffer sb = new StringBuffer("getStickerSet&");
+		if (slug != null) {
+			sb.append("slug=").append(slug);
+		} else {
+			sb.append("id=").append(id)
+			.append("&access_hash=").append(accessHash);
+		}
+		
+		JSONObject j = (JSONObject) MP.api(sb.toString());
+		System.out.println(j.format(0));
+		
+		if (!j.has("installed")) {
+			addCommand(MP.addStickerPackCmd);
+		}
+		
+		JSONArray arr = j.getArray("res");
+		int l = arr.size();
+		urls = new Hashtable();
+		
+		for (int i = 0; i < l; ++i) {
+			JSONObject s = arr.getObject(i);
+			
+			ImageItem img = new ImageItem("", null, Item.LAYOUT_LEFT, null);
+			img.setDefaultCommand(MP.stickerItemCmd);
+			img.setItemCommandListener(MP.midlet);
+			safeAppend(thread, img);
+			urls.put(img, s);
+			
+			MP.queueImage(s, img);
+		}
 	}
 
 }

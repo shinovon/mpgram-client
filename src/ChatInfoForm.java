@@ -25,7 +25,7 @@ import javax.microedition.lcdui.StringItem;
 
 import cc.nnproject.json.JSONObject;
 
-public class ChatInfoForm extends MPForm implements LangConstants {
+public class ChatInfoForm extends MPForm {
 
 	String id;
 	String phone;

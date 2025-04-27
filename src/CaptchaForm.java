@@ -26,7 +26,7 @@ import javax.microedition.lcdui.TextField;
 
 import cc.nnproject.json.JSONObject;
 
-public class CaptchaForm extends MPForm implements LangConstants {
+public class CaptchaForm extends MPForm {
 	
 	TextField field;
 	String id;
