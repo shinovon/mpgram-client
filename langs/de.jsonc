@@ -245,6 +245,7 @@
 	"MessageDeleted_Alert": "Nachricht gelöscht",
 	"UpdateAvailable_Alert": "Update vorhanden",
 	"MemberBanned_Alert": "Mitglied gesperrt",
+	"StickersAdded_Alert": "Stickers added", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Mediem",

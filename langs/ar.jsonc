@@ -245,6 +245,7 @@
 	"MessageDeleted_Alert": "الرسالة ممسوحة",
 	"UpdateAvailable_Alert": "تحديث جديد متوفر",
 	"MemberBanned_Alert": "Member banned", // Untranslated
+	"StickersAdded_Alert": "Stickers added", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "وسائط",

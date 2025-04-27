@@ -245,6 +245,7 @@
 	"MessageDeleted_Alert": "Missatge suprimit",
 	"UpdateAvailable_Alert": "Actualització de client disponible",
 	"MemberBanned_Alert": "Membre prohibit",
+	"StickersAdded_Alert": "Stickers added", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Mèdia",

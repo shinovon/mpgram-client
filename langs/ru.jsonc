@@ -245,6 +245,7 @@
 	"MessageDeleted_Alert": "Сообщение удалено",
 	"UpdateAvailable_Alert": "Доступно обновление клиента",
 	"MemberBanned_Alert": "Участник забанен",
+	"StickersAdded_Alert": "Стикеры добавлены",
 	
 	// Chat form
 	"ChatMedia_Title": "Медиафайлы",
@@ -286,7 +287,7 @@
 	// Stickers
 	"Stickers_Title": "Стикеры",
 	"Sticker": "Стикер",
-	"AddStickers": "Добавить стикер",
+	"AddStickers": "Добавить стикеры",
 	
 	// Profile/chat info
 	"Online": "в сети",

@@ -56,7 +56,9 @@ public class StickerPackForm extends MPForm {
 		}
 		
 		JSONObject j = (JSONObject) MP.api(sb.toString());
-		System.out.println(j.format(0));
+		
+		id = j.getString("id");
+		accessHash = j.getString("access_hash");
 		
 		if (!j.has("installed")) {
 			addCommand(MP.addStickerPackCmd);
@@ -69,9 +71,11 @@ public class StickerPackForm extends MPForm {
 		for (int i = 0; i < l; ++i) {
 			JSONObject s = arr.getObject(i);
 			
-			ImageItem img = new ImageItem("", null, Item.LAYOUT_LEFT, null);
-			img.setDefaultCommand(MP.stickerItemCmd);
-			img.setItemCommandListener(MP.midlet);
+			ImageItem img = new ImageItem("", null, Item.LAYOUT_LEFT | Item.LAYOUT_TOP, null);
+			if (chatForm != null) {
+				img.setDefaultCommand(MP.stickerItemCmd);
+				img.setItemCommandListener(MP.midlet);
+			}
 			safeAppend(thread, img);
 			urls.put(img, s);
 			

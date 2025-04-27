@@ -90,6 +90,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static final int RUN_BAN_MEMBER = 18;
 	static final int RUN_ZOOM_VIEW = 19;
 	static final int RUN_PIN_MESSAGE = 20;
+	static final int RUN_SEND_STICKER = 21;
+	static final int RUN_INSTALL_STICKER_SET = 22;
 	
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
@@ -101,7 +103,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static final String FILE_URL = "file.php";
 	static final String OTA_URL = "http://nnproject.cc/mp/upd.php";
 	
-	static final String API_VERSION = "6";
+	static final String API_VERSION = "7";
 	
 	static final String[][] LANGS = {
 		{
@@ -582,7 +584,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		chatMembersCmd = new Command(L[Members], Command.SCREEN, 6);
 		
 		stickerItemCmd = new Command(L[Sticker], Command.ITEM, 1);
-		addStickerPackCmd = new Command(L[AddStickers], Command.SCREEN, 2);
+		addStickerPackCmd = new Command(L[AddStickers], Command.OK, 2);
 		
 		okCmd = new Command(L[Ok], Command.OK, 1);
 		cancelCmd = new Command(L[Cancel], Command.CANCEL, 20);
@@ -1246,6 +1248,23 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				MP.api("pinMessage&peer=".concat(s[0].concat("&id=").concat(s[1])));
 				
 				commandAction(latestCmd, current);
+			} catch (Exception e) {
+				display(errorAlert(e), current);
+			}
+			break;
+		}
+		case RUN_SEND_STICKER: {
+			// TODO
+			break;
+		}
+		case RUN_INSTALL_STICKER_SET: {
+			try {
+				StickerPackForm s = (StickerPackForm) param;
+				MP.api("installStickerSet&id=".concat(s.id.concat("&access_hash=").concat(s.accessHash)));
+				
+//				s.removeCommand(addStickerPackCmd);
+				commandAction(backCmd, s);
+				display(infoAlert(L[StickersAdded_Alert]), current);
 			} catch (Exception e) {
 				display(errorAlert(e), current);
 			}
@@ -1920,8 +1939,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			return;
 		}
 		if (c == addStickerPackCmd) {
-			// TODO
-//			start(RUN_IMPORT_STICKER_PACK, d);
+			display(loadingAlert(L[Loading]), current);
+			start(RUN_INSTALL_STICKER_SET, d);
 			return;
 		}
 		if (c == List.SELECT_COMMAND) {
@@ -2167,7 +2186,14 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			return;
 		}
 		if (c == stickerItemCmd) {
-			// TODO send sticker
+			JSONObject s = (JSONObject) ((MPForm) current).urls.get(item);
+			if (s == null) return;
+			
+			if (MP.updatesThread != null) {
+				MP.cancel(MP.updatesThread, true);
+			}
+			display(loadingAlert(L[Loading]), current);
+			start(RUN_SEND_STICKER, s);
 			return;
 		}
 		commandAction(c, display.getCurrent());
@@ -2971,7 +2997,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	}
 
 	static Alert loadingAlert(String s) {
-		Alert a = new Alert("", s, null, null);
+		Alert a = new Alert("", s == null ? L[Loading] : s, null, null);
 		a.setCommandListener(midlet);
 		a.addCommand(Alert.DISMISS_COMMAND);
 		a.setIndicator(new Gauge(null, false, Gauge.INDEFINITE, Gauge.CONTINUOUS_RUNNING));

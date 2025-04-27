@@ -245,6 +245,7 @@
 	"MessageDeleted_Alert": "Повідомлення видалено",
 	"UpdateAvailable_Alert": "Доступне оновлення клієнта",
 	"MemberBanned_Alert": "Member banned", // Untranslated
+	"StickersAdded_Alert": "Stickers added", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Медіафайли",

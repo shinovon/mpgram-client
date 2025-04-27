@@ -245,6 +245,7 @@
 	"MessageDeleted_Alert": "Message deleted",
 	"UpdateAvailable_Alert": "Client update available",
 	"MemberBanned_Alert": "Member banned",
+	"StickersAdded_Alert": "Stickers added",
 	
 	// Chat form
 	"ChatMedia_Title": "Media",

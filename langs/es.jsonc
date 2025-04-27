@@ -245,6 +245,7 @@
 	"MessageDeleted_Alert": "Mensaje eliminado",
 	"UpdateAvailable_Alert": "Nueva actualizacion disponible",
 	"MemberBanned_Alert": "Miembro prohibido",
+	"StickersAdded_Alert": "Stickers added", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Archivos",
