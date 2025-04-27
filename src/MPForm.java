@@ -62,6 +62,10 @@ public abstract class MPForm extends Form {
 				MP.display.setCurrentItem(focusOnFinish);
 				focusOnFinish = null;
 			}
+			if (this.thread == thread) {
+				postLoad(true);
+			}
+			return;
 		} catch (InterruptedException e) {
 		} catch (InterruptedIOException e) {
 		} catch (Exception e) {
@@ -80,6 +84,7 @@ public abstract class MPForm extends Form {
 				this.thread = null;
 			}
 		}
+		postLoad(false);
 	}
 
 	void cancel() {
@@ -106,6 +111,8 @@ public abstract class MPForm extends Form {
 	}
 	
 	abstract void loadInternal(Thread thread) throws Exception;
+	
+	protected void postLoad(boolean success) {}
 
 	void closed(boolean destroy) {
 		if (destroy) cancel();

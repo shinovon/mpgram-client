@@ -1200,8 +1200,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				sb.append("&data=").append(((String[]) param)[2]);
 				
 				JSONObject j = (JSONObject) api(sb.toString());
-				System.out.println(j);
-				// TODO alert
+				
+				if (j.has("message")) {
+					((ChatForm) current).botMessage = j.getString("message");
+				}
 
 				commandAction(latestCmd, current);
 			} catch (Exception e) {

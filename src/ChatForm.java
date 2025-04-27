@@ -84,6 +84,8 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 	
 	TextField textField;
 	ChatForm parent;
+
+	String botMessage;
 	
 	public ChatForm(String id, String query, int message, int topMsg) {
 		super(id);
@@ -315,13 +317,21 @@ public class ChatForm extends MPForm implements LangConstants, Runnable {
 		}
 		
 		super.focusOnFinish = focus;
-		
-		if (endReached && !hasOffset && query == null && mediaFilter == null
-				&& MP.chatUpdates && thread == this.thread) {
+	}
+	
+	protected void postLoad(Thread thread, boolean success) {
+		if (!success || thread != this.thread)
+			return;
+		if (endReached && !hasOffset && query == null && mediaFilter == null && MP.chatUpdates) {
 			// start updater thread
 			update = true;
 			MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
 			(typingThread = new Thread(this)).start();
+		}
+		
+		if (botMessage != null) {
+			MP.display(MP.infoAlert(botMessage), this);
+			botMessage = null;
 		}
 	}
 
