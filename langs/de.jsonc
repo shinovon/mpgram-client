@@ -201,6 +201,7 @@
 	"UpdatesTimeout": "Updates Timeout",
 	"KeepSessionAlive": "Sitzung aufrecht erhalten",
 	"UseUnicode": "Use Unicode", // Untranslated
+	"UseCompression": "Use compression", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "Lade Medien-Miniaturansichten",

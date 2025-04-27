@@ -201,6 +201,7 @@
 	"UpdatesTimeout": "Таймаут обновлений",
 	"KeepSessionAlive": "Удерживать сессию активной",
 	"UseUnicode": "Исп. Unicode",
+	"UseCompression": "Исп. сжатие",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Загружать медиа",

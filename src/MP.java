@@ -187,7 +187,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static boolean chatField = true;
 	static boolean roundAvatars;
 	static boolean useView = true;
-	static boolean compress = true;
+	static boolean compress;
 	
 	// platform
 	static boolean symbianJrt;
@@ -1623,7 +1623,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							L[ParseLinks],
 							L[ChatAutoUpdate],
 							L[KeepSessionAlive],
-							L[UseUnicode]
+							L[UseUnicode],
+							L[UseCompression]
 					}, null);
 					behChoice.setSelectedIndex(0, useLoadingForm);
 					behChoice.setSelectedIndex(1, jsonStream);
@@ -1632,6 +1633,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					behChoice.setSelectedIndex(4, chatUpdates);
 					behChoice.setSelectedIndex(5, keepAlive);
 					behChoice.setSelectedIndex(6, utf);
+					behChoice.setSelectedIndex(7, compress);
 					behChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(behChoice);
 					
@@ -1724,6 +1726,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				chatUpdates = behChoice.isSelected(4);
 				keepAlive = behChoice.isSelected(5);
 				utf = behChoice.isSelected(6);
+				compress = behChoice.isSelected(7);
 				
 				if ((updatesTimeout = updateTimeoutGauge.getValue() * 5) < 5) {
 					updateTimeoutGauge.setValue((updatesTimeout = 5) / 5);

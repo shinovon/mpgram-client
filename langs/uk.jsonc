@@ -201,6 +201,7 @@
 	"UpdatesTimeout": "Таймаут оновлення",
 	"KeepSessionAlive": "Keep session alive", // Untranslated
 	"UseUnicode": "Use Unicode", // Untranslated
+	"UseCompression": "Use compression", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "Завантажувати медіа",

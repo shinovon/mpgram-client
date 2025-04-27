@@ -201,6 +201,7 @@
 	"UpdatesTimeout": "Yeniləmə vaxtı aşımı",
 	"KeepSessionAlive": "Keep session alive", // Untranslated
 	"UseUnicode": "Use Unicode", // Untranslated
+	"UseCompression": "Use compression", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "Media yükləyin",

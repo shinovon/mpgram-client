@@ -201,6 +201,7 @@
 	"UpdatesTimeout": "Updates timeout",
 	"KeepSessionAlive": "Keep session alive",
 	"UseUnicode": "Use Unicode",
+	"UseCompression": "Use compression",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Load media thumbnails",
