@@ -563,12 +563,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		documentCmd = new Command(L[Download], Command.ITEM, 2);
 		
 		writeCmd = new Command(L[WriteMessage], Command.SCREEN, 5);
-		latestCmd = new Command(L[LatestMessages_Cmd], Command.SCREEN, 6);
-		chatInfoCmd = new Command(L[ChatInfo], Command.SCREEN, 7);
+		latestCmd = new Command(L[LatestMessages_Cmd], Command.SCREEN, 7);
+		chatInfoCmd = new Command(L[ChatInfo], Command.SCREEN, 8);
 		olderMessagesCmd = new Command(L[Older], Command.ITEM, 1);
 		newerMessagesCmd = new Command(L[Newer], Command.ITEM, 1);
 		searchMsgCmd = new Command(L[Search], Command.SCREEN, 10);
-		sendStickerCmd = new Command(L[SendSticker], Command.SCREEN, 8);
+		sendStickerCmd = new Command(L[SendSticker], Command.SCREEN, 6);
 		
 		sendCmd = new Command(L[Send], Command.OK, 1);
 		openTextBoxCmd = new Command(L[OpenTextBox], Command.ITEM, 1);
