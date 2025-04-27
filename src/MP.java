@@ -1919,35 +1919,83 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			s.setFont(Font.getDefaultFont());
 			s.setLayout(Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_NEWLINE_BEFORE);
 			f.append(s);
+			
+			f.append(new Spacer(2, 2));
 
-			s = new StringItem(L[Developer], "shinovon");
+			s = new StringItem(null, L[Developer]);
+			s.setFont(smallPlainFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 
-			s = new StringItem(L[Author], "twsparkle");
+			s = new StringItem(null, "shinovon");
+			s.setFont(medBoldFont);
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			f.append(s);
+			
+			f.append(new Spacer(2, 2));
+
+			s = new StringItem(null, L[Author]);
+			s.setFont(smallPlainFont);
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			f.append(s);
+
+			s = new StringItem(null, "twsparkle");
+			s.setFont(medBoldFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setItemCommandListener(this);
 			f.append(s);
+			
+			f.append(new Spacer(2, 2));
 
-			s = new StringItem("GitHub", "github.com/shinovon");
+			s = new StringItem(null, "GitHub");
+			s.setFont(smallPlainFont);
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			f.append(s);
+
+			s = new StringItem(null, "github.com/shinovon");
+			s.setFont(medBoldFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
 			s.setItemCommandListener(this);
 			f.append(s);
+			
+			f.append(new Spacer(2, 2));
 
-			s = new StringItem("Web", "nnproject.cc");
+			s = new StringItem(null, "Web");
+			s.setFont(smallPlainFont);
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			f.append(s);
+
+			s = new StringItem(null, "nnproject.cc");
+			s.setFont(medBoldFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
 			s.setItemCommandListener(this);
 			f.append(s);
+			
+			f.append(new Spacer(2, 2));
 
-			s = new StringItem(MP.L[Donate], "boosty.to/nnproject/donate");
+			s = new StringItem(null, MP.L[Donate]);
+			s.setFont(smallPlainFont);
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			f.append(s);
+
+			s = new StringItem(null, "boosty.to/nnproject/donate");
+			s.setFont(medBoldFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
 			s.setItemCommandListener(this);
 			f.append(s);
+			
+			f.append(new Spacer(2, 2));
 
-			s = new StringItem(MP.L[Chat], "t.me/nnmidletschat");
+			s = new StringItem(null, MP.L[Chat]);
+			s.setFont(smallPlainFont);
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			f.append(s);
+
+			s = new StringItem(null, "t.me/nnmidletschat");
+			s.setFont(medBoldFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
 			s.setItemCommandListener(this);
