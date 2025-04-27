@@ -129,7 +129,9 @@ public class ChatForm extends MPForm implements Runnable {
 				Thread.sleep(1000L);
 			}
 			
-			if (MP.current == this) MP.display(this);
+			if (MP.current == this) {
+				MP.display(MP.useLoadingForm ? MP.loadingForm : this);
+			}
 		}
 		
 		StringBuffer sb = new StringBuffer();
@@ -361,7 +363,8 @@ public class ChatForm extends MPForm implements Runnable {
 		String fromId = message.has("from_id") ? message.getString("from_id") : this.id;
 		boolean out = message.getBoolean("out", false);
 		String text = message.getString("text", null);
-		String[] key = new String[] { this.id, idString, fromId, null };
+		// 0: peer id, 1: message id, 2: from id, 3: image quality, 4: file name
+		String[] key = new String[] { this.id, idString, fromId, null, null };
 		
 		loadedMsgs.addElement(idString);
 
@@ -572,6 +575,7 @@ public class ChatForm extends MPForm implements Runnable {
 						if (msgItem == null) msgItem = img;
 					} else {
 						boolean nameSet = false;
+						key[4] = media.getString("name", null);
 						if (media.has("audio")) {
 							JSONObject audio = media.getObject("audio");
 							if ((t = audio.getString("artist", null)) != null && t.length() != 0) {
@@ -820,7 +824,7 @@ public class ChatForm extends MPForm implements Runnable {
 					continue;
 				Object value = urls.get(key);
 				if (!(value instanceof String[])
-						|| ((String[]) value).length != 4
+						|| ((String[]) value).length != 5
 						|| (!msg.equals(((String[]) value)[1])))
 					continue;
 				

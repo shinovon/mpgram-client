@@ -37,8 +37,6 @@ public abstract class MPList extends List implements LangConstants {
 		setCommandListener(MP.midlet);
 	}
 	
-	// TODO
-	
 	void load() {
 		if (loaded) return;
 		loaded = true;

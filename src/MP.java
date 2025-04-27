@@ -163,7 +163,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static int photoSize = 120;
 	static boolean loadAvatars = true;
 	static boolean loadThumbs = true;
-	static boolean reverseChat = true;
+	static boolean reverseChat;
 	static boolean showMedia = true;
 	static int avatarsCache = 3; // 0 - off, 1 - hashtable, 2 - storage, 3 - both
 	static boolean threadedImages;
@@ -190,6 +190,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static boolean roundAvatars;
 	static boolean useView = true;
 	static boolean compress;
+	static boolean fileRewrite;
 	
 	// platform
 	static boolean symbianJrt;
@@ -453,6 +454,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		try {
 			tzOffset = TimeZone.getDefault().getRawOffset() / 1000;
 		} catch (Throwable e) {} // just to be sure
+		
+		reverseChat = f.getHeight() >= 360;
 		
 		// load settings
 		try {
@@ -2126,7 +2129,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			// TODO
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
-			browse(instanceUrl + FILE_URL + "?c=" + s[0] + "&m=" + s[1] + "&user=" + user);
+			if (fileRewrite && s[4] != null) {
+				browse(instanceUrl + "file/" + s[4] + "?c=" + s[0] + "&m=" + s[1] + "&user=" + user);
+			} else {
+				browse(instanceUrl + FILE_URL + "?c=" + s[0] + "&m=" + s[1] + "&user=" + user);
+			}
 			return;
 		}
 		if (c == editMsgCmd) {
@@ -2437,15 +2444,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		String ln = p.getString("ln");
 		
 		if (fn != null && ln != null) {
-			return fn.concat(" ").concat(ln);
+			return fn.concat(" ".concat(ln));
+		}
+		
+		if (fn != null && fn.length() != 0) {
+			return fn;
 		}
 		
 		if (ln != null) {
 			return ln;
-		}
-		
-		if (fn != null) {
-			return fn;
 		}
 		
 		return "Deleted";
@@ -2461,15 +2468,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		String ln = p.getString("last_name");
 		
 		if (fn != null && ln != null) {
-			return fn.concat(" ").concat(ln);
+			return fn.concat(" ".concat(ln));
+		}
+		
+		if (fn != null && fn.length() != 0) {
+			return fn;
 		}
 		
 		if (ln != null) {
 			return ln;
-		}
-		
-		if (fn != null) {
-			return fn;
 		}
 		
 		return "Deleted";
@@ -2483,7 +2490,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		String fn = p.getString("fn");
 		String ln = p.getString("ln");
 		
-		if (fn != null) {
+		if (fn != null && fn.length() != 0) {
 			return fn;
 		}
 		
@@ -3067,6 +3074,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				
 				c = hc.getResponseCode();
 			}
+			try {
+				if (hc.getHeaderField("X-file-rewrite-supported") != null) {
+					fileRewrite = true;
+				}
+			} catch (Exception ignored) {}
 			try {
 				threadConnections.put(hc, in = openInputStream(hc));
 				if (jsonStream) {

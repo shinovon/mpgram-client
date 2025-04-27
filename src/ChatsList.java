@@ -257,7 +257,7 @@ public class ChatsList extends MPList {
 	void shown() {
 		if (!finished || ids == null || noAvas) return;
 		for (int i = ids.size() - 1; i >= 0; i--) {
-			if (getImage(i) != null) continue; // TODO break?
+			if (getImage(i) != null) continue;
 			MP.queueAvatar((String) ids.elementAt(i), new Object[] { this, new Integer(i) });
 		}
 	}
