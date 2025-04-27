@@ -201,7 +201,7 @@
 	"UpdatesTimeout": "Temps d'espera d'actualitzacions",
 	"KeepSessionAlive": "Mantén viva sessió",
 	"UseUnicode": "Utilitza Unicode",
-	"UseCompression": "Use compression", // Untranslated
+	"UseCompression": "Utilitza compressió",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Carrega miniatures mèdia",
@@ -285,9 +285,9 @@
 	"Archive": "Arxivat",
 	
 	// Stickers
-	"Stickers_Title": "Stickers", // Untranslated
-	"Sticker": "Sticker", // Untranslated
-	"AddStickers": "Add stickers", // Untranslated
+	"Stickers_Title": "Adhesius",
+	"Sticker": "Adhesiu",
+	"AddStickers": "Afegeix adhesius",
 	
 	// Profile/chat info
 	"Online": "en línia",
