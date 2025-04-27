@@ -201,7 +201,7 @@
 	"UpdatesTimeout": "Temps d'espera d'actualitzacions",
 	"KeepSessionAlive": "Mantén viva sessió",
 	"UseUnicode": "Utilitza Unicode",
-	"UseCompression": "Use compression", // Untranslated
+	"UseCompression": "Utilitza compressió",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Carrega miniatures mèdia",
