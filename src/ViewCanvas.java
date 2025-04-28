@@ -54,8 +54,6 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 		return null;
 	}
 
-	long lastTime = System.currentTimeMillis();
-
 	public final void run() {
 		try {
 			synchronized (this) {
@@ -382,8 +380,8 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 		}
 		if (touchHoldPos != 0)
 			return;
-		x += (tx - lx) * panDeltaMul() / 1f;
-		y += (ty - ly) * panDeltaMul() / 1f;
+		x += (tx - lx) * panDeltaMul();
+		y += (ty - ly) * panDeltaMul();
 		lx = tx;
 		ly = ty;
 		repaint();

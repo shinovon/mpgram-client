@@ -45,7 +45,7 @@ public class ChatInfoForm extends MPForm {
 		}
 	}
 	
-	public ChatInfoForm(String id, String invite, String title, int mode) {
+	public ChatInfoForm(String id, String title, int mode) {
 		super(title);
 		this.id = id;
 		this.mode = mode;

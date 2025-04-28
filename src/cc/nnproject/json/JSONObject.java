@@ -350,7 +350,7 @@ public class JSONObject {
 		while (true) {
 			String k = (String) keys.nextElement();
 			out.write((byte) '"');
-			writeString(out, k.toString());
+			writeString(out, k);
 			out.write((byte) '"');
 			out.write((byte) ':');
 			Object v = table.get(k);

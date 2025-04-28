@@ -321,7 +321,7 @@ public class GZIPInputStream extends InflaterInputStream {
 			throw new IOException("Number of bytes mismatch");
 
 		/*
-		 * FIXME" XXX Should we support multiple members. Difficult, since there may be
+		 * Should we support multiple members. Difficult, since there may be
 		 * some bytes still in buf
 		 */
 		eos = true;

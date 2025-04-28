@@ -317,7 +317,7 @@ public class ChatForm extends MPForm implements Runnable {
 			insert = message(message, insert, sb, c, reverse, selfChat, false, item);
 
 			if (focus == null && (this.messageId != 0 ? (messageId == id)
-					: (i == 0 ? ((endReached && dir == 0) || dir == -1) : (i == l - 1 ? (dir == 1) : false)))) {
+					: (i == 0 ? ((endReached && dir == 0) || dir == -1) : (i == l - 1 && dir == 1)))) {
 				focus = item[0];
 			}
 		}
@@ -711,7 +711,7 @@ public class ChatForm extends MPForm implements Runnable {
 						}
 					}
 					urls.put(s, key);
-					safeInsert(thread, insert++, lastItem = s);
+					safeInsert(thread, insert++, s);
 					if (msgItem == null) msgItem = s;
 					
 					if ("PinMessage".equals(type)) {
@@ -955,7 +955,7 @@ public class ChatForm extends MPForm implements Runnable {
 			Item[] item = new Item[1];
 			int o = (textField != null ? 1 : 0);
 			message(update.getObject("message"),
-					reverse ? size() - o : 0 + o,
+					reverse ? size() - o : o,
 					new StringBuffer(),
 					Calendar.getInstance(),
 					reverse,

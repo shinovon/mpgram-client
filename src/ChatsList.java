@@ -41,6 +41,7 @@ public class ChatsList extends MPList {
 	boolean canBan;
 	String peerId, msgId;
 
+	// main mode
 	public ChatsList(String title, int folder) {
 		super(title);
 		this.folder = folder;
@@ -67,7 +68,7 @@ public class ChatsList extends MPList {
 		if (canBan) addCommand(MP.banMemberCmd);
 	}
 	
-	// forward
+	// forward message mode
 	public ChatsList(String peerId, String msgId) {
 		super(MP.L[Forward]);
 		this.folder = 0;
@@ -250,7 +251,6 @@ public class ChatsList extends MPList {
 				offset = 0;
 			}
 			load();
-			return;
 		}
 	}
 	
