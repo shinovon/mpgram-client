@@ -5,7 +5,7 @@
       <element id="directory" name="META-INF">
         <element id="file-copy" path="$PROJECT_DIR$/out/META-INF/MANIFEST.MF" />
       </element>
-      <element id="module-output" name="mpgram3" />
+      <element id="module-output" name="mpgram" />
     </root>
   </artifact>
 </component>
