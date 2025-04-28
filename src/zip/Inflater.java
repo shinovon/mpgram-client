@@ -97,6 +97,9 @@ public class Inflater {
 	//private static final int DECODE_CHKSUM           = 11;
 	//private static final int FINISHED                = 12;
 
+	/** largest prime smaller than 65536 */
+	private static final int BASE = 65521;
+
 	/** This variable contains the current state. */
 	private int mode;
 
@@ -141,7 +144,7 @@ public class Inflater {
 	private OutputWindow outputWindow;
 	private InflaterDynHeader dynHeader;
 	private InflaterHuffmanTree litlenTree, distTree;
-	private Adler32 adler;
+	private int adler;
 
 	public Inflater() {
 		this(false);
@@ -150,7 +153,7 @@ public class Inflater {
 	public Inflater(final boolean nowrap) {
 		super();
 		this.nowrap = nowrap;
-		this.adler = new Adler32();
+		this.adler = 1;
 		this.input = new StreamManipulator();
 		this.outputWindow = new OutputWindow();
 		this.mode = (nowrap ? 2 : 0);
@@ -183,7 +186,33 @@ public class Inflater {
 		do {
 			if (this.mode != 11) {
 				final int more = this.outputWindow.copyOutput(buf, off, len);
-				this.adler.update(buf, off, more);
+				
+				//this.adler.update(buf, off, more);
+				{
+					int len2 = more;
+					// (By Per Bothner)
+					int s1 = this.adler & 0xffff;
+					int s2 = this.adler >>> 16;
+
+					while (len2 > 0) {
+						// We can defer the modulo operation:
+						// s1 maximally grows from 65521 to 65521 + 255 * 3800
+						// s2 maximally grows by 3800 * median(s1) = 2090079800 < 2^31
+						int n = 3800;
+						if (n > len2)
+							n = len2;
+						len2 -= n;
+						while (--n >= 0) {
+							s1 = s1 + (buf[off++] & 0xFF);
+							s2 = s2 + s1;
+						}
+						s1 %= BASE;
+						s2 %= BASE;
+					}
+
+					this.adler = (s2 << 16) | s1;
+				}
+				
 				off += more;
 				count += more;
 				this.totalOut += more;
@@ -215,7 +244,7 @@ public class Inflater {
 		this.litlenTree = null;
 		this.distTree = null;
 		this.isLastBlock = false;
-		this.adler.reset();
+		this.adler = 1;
 	}
 
 	public final void setInput(final byte[] buf, final int off, final int len) {
@@ -341,9 +370,10 @@ public class Inflater {
 			this.readAdler = (this.readAdler << 8 | chkByte);
 			this.neededBits -= 8;
 		}
-		if ((int) this.adler.getValue() != this.readAdler) {
+		int adler = (int) ((long) this.adler & 0xffffffffL);
+		if ((int) adler != this.readAdler) {
 			throw new Exception("Data format: Adler chksum doesn't match: "
-					+ Integer.toHexString((int) this.adler.getValue()) + " vs. " + Integer.toHexString(this.readAdler));
+					+ Integer.toHexString((int) adler) + " vs. " + Integer.toHexString(this.readAdler));
 		}
 		this.mode = 12;
 		return false;
