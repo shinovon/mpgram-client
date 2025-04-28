@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2021-2024 Arman Jussupgaliyev
+Copyright (c) 2021-2025 Arman Jussupgaliyev
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -170,17 +170,17 @@ public class JSONArray {
 		}
 	}
 	
-	public double getDouble(int index) {
-		return JSONObject.getDouble(get(index));
-	}
+//	public double getDouble(int index) {
+//		return JSONObject.getDouble(get(index));
+//	}
 
-	public double getDouble(int index, double def) {
-		try {
-			return getDouble(index);
-		} catch (Exception e) {
-			return def;
-		}
-	}
+//	public double getDouble(int index, double def) {
+//		try {
+//			return getDouble(index);
+//		} catch (Exception e) {
+//			return def;
+//		}
+//	}
 	
 	public boolean getBoolean(int index) {
 		Object o = get(index);
@@ -217,11 +217,11 @@ public class JSONArray {
 	}
 	
 	public void add(JSONObject json) {
-		addElement(json);
+		addElement(json == null ? JSONObject.json_null : json);
 	}
 	
 	public void add(String s) {
-		addElement(s);
+		addElement(s == null ? JSONObject.json_null : s);
 	}
 	
 	public void add(int i) {
@@ -232,12 +232,12 @@ public class JSONArray {
 		addElement(new Long(l));
 	}
 
-	public void add(double d) {
-		addElement(new Double(d));
-	}
+//	public void add(double d) {
+//		addElement(new Double(d));
+//	}
 	
 	public void add(boolean b) {
-		addElement(new Boolean(b));
+		addElement(b ? JSONObject.TRUE : JSONObject.FALSE);
 	}
 
 	/**
@@ -279,18 +279,18 @@ public class JSONArray {
 		elements[index] = new Long(l);
 	}
 
-	public void set(int index, double d) {
-		if (index < 0 || index >= count) {
-			throw new RuntimeException("JSON: Index out of bounds: " + index);
-		}
-		elements[index] = new Double(d);
-	}
+//	public void set(int index, double d) {
+//		if (index < 0 || index >= count) {
+//			throw new RuntimeException("JSON: Index out of bounds: " + index);
+//		}
+//		elements[index] = new Double(d);
+//	}
 	
 	public void set(int index, boolean b) {
 		if (index < 0 || index >= count) {
 			throw new RuntimeException("JSON: Index out of bounds: " + index);
 		}
-		elements[index] = new Boolean(b);
+		elements[index] = b ? JSONObject.TRUE : JSONObject.FALSE;
 	}
 	
 	/**
@@ -322,7 +322,7 @@ public class JSONArray {
 	}
 
 	public void put(int index, boolean b) {
-		insertElementAt(new Boolean(b), index);
+		insertElementAt(b ? JSONObject.TRUE : JSONObject.FALSE, index);
 	}
 	
 	public boolean has(Object object) {
@@ -342,7 +342,7 @@ public class JSONArray {
 	}
 	
 	public boolean has(boolean b) {
-		return _indexOf(new Boolean(b), 0) != -1;
+		return _indexOf(b ? JSONObject.TRUE : JSONObject.FALSE, 0) != -1;
 	}
 	
 	public int indexOf(Object object) {
