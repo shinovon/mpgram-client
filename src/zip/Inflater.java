@@ -160,7 +160,7 @@ public class Inflater {
 	}
 
 	public final boolean finished() {
-		return this.mode == 12 && this.outputWindow.getAvailable() == 0;
+		return this.mode == 12 && this.outputWindow.window_filled == 0;
 	}
 
 	public final int getRemaining() {
@@ -221,7 +221,7 @@ public class Inflater {
 				}
 				continue;
 			}
-		} while (this.decode() || (this.outputWindow.getAvailable() > 0 && this.mode != 11));
+		} while (this.decode() || (this.outputWindow.window_filled > 0 && this.mode != 11));
 		return count;
 	}
 

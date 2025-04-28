@@ -53,7 +53,7 @@ class OutputWindow {
 
 	byte[] window = new byte[WINDOW_SIZE]; // The window is 2^15 bytes
 	private int window_end = 0;
-	private int window_filled = 0;
+	int window_filled = 0;
 
 	public void write(int abyte) {
 		if (window_filled++ == WINDOW_SIZE)

@@ -83,7 +83,7 @@ public class GZIPInputStream extends InflaterInputStream {
 	/**
 	 * The CRC-32 checksum value for uncompressed data.
 	 */
-	protected CRC32 crc;
+	private int crc = 0;
 
 	/**
 	 * Indicates whether or not the end of the stream has been reached.
@@ -118,7 +118,7 @@ public class GZIPInputStream extends InflaterInputStream {
 	 */
 	public GZIPInputStream(InputStream in, int size) throws IOException {
 		super(in, new Inflater(true), size);
-		crc = new CRC32();
+		crc = 0;
 	}
 
 	/**
@@ -163,8 +163,12 @@ public class GZIPInputStream extends InflaterInputStream {
 		 * We don't have to read the header, so we just grab data from the superclass.
 		 */
 		int numRead = super.read(buf, offset, len);
-		if (numRead > 0)
-			crc.update(buf, offset, numRead);
+		if (numRead > 0) {
+			int c = ~crc;
+			while (--numRead >= 0)
+				c = CRC32.crc_table[(c ^ buf[offset++]) & 0xff] ^ (c >>> 8);
+			crc = ~c;
+		}
 
 		if (inf.finished())
 			readFooter();
@@ -307,9 +311,10 @@ public class GZIPInputStream extends InflaterInputStream {
 		}
 
 		int crcval = (footer[0] & 0xff) | ((footer[1] & 0xff) << 8) | ((footer[2] & 0xff) << 16) | (footer[3] << 24);
-		if (crcval != (int) crc.getValue())
+		int crc = (int) ((long) this.crc & 0xffffffffL);
+		if (crcval != (int) crc)
 			throw new IOException("GZIP crc sum mismatch, theirs \"" + Integer.toHexString(crcval) + "\" and ours \""
-					+ Integer.toHexString((int) crc.getValue()));
+					+ Integer.toHexString((int) crc));
 
 		int total = (footer[4] & 0xff) | ((footer[5] & 0xff) << 8) | ((footer[6] & 0xff) << 16) | (footer[7] << 24);
 		if (total != inf.getTotalOut())
