@@ -121,7 +121,8 @@ public class ChatForm extends MPForm implements Runnable {
 		// TODO forum
 		deleteAll();
 		
-		if (MP.updatesThread != null || MP.updatesRunning) {
+		if (query == null && mediaFilter == null && MP.chatUpdates
+				&& (MP.updatesThread != null || MP.updatesRunning)) {
 			MP.display(MP.loadingAlert(MP.L[WaitingForPrevChat]), this);
 			
 			MP.cancel(MP.updatesThreadCopy, true);

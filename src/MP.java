@@ -2263,7 +2263,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			imagesToLoad.removeAllElements();
 			
-			display(loadingAlert(L[Loading]), current);
+			display(loadingAlert(L[Sending]), current);
 			start(RUN_SEND_STICKER, s);
 			return;
 		}
