@@ -191,6 +191,7 @@
 	"Medium": "Medium",
 	"FocusNewMessages": "Focus new messages",
 	"ChatTextField": "Text field in chat",
+	"BuiltinImageViewer": "Built-in image viewer",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Wait for page to load",

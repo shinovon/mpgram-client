@@ -499,6 +499,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			roundAvatars = j.getBoolean("roundAvatars", roundAvatars);
 			utf = j.getBoolean("utf", utf);
 			compress = j.getBoolean("compress", compress);
+			useView = j.getBoolean("useView", useView);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -1655,7 +1656,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							L[ShowMedia],
 							L[ShowChatStatus],
 							L[FocusNewMessages],
-							L[ChatTextField]
+							L[ChatTextField],
+							L[BuiltinImageViewer]
 					}, null);
 					uiChoice.setSelectedIndex(0, reverseChat);
 					uiChoice.setSelectedIndex(1, showMedia);
@@ -1782,6 +1784,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				chatStatus = uiChoice.isSelected(2);
 				focusNewMessages = uiChoice.isSelected(3);
 				chatField = uiChoice.isSelected(4);
+				useView = uiChoice.isSelected(5);
 				
 				if ((photoSize = (photoSizeGauge.getValue() * 8)) < 16) {
 					photoSizeGauge.setValue((photoSize = 16) / 8);
@@ -1851,6 +1854,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					j.put("roundAvatars", roundAvatars);
 					j.put("utf", utf);
 					j.put("compress", compress);
+					j.put("useView", useView);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);

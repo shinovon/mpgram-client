@@ -191,6 +191,7 @@
 	"Medium": "Medium", // Untranslated
 	"FocusNewMessages": "Focus new messages", // Untranslated
 	"ChatTextField": "Text field in chat", // Untranslated
+	"BuiltinImageViewer": "Built-in image viewer", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Tam yükləməni gözləyin",

@@ -191,6 +191,7 @@
 	"Medium": "Mitjà",
 	"FocusNewMessages": "Centra nous missatges",
 	"ChatTextField": "Camp de text a xat",
+	"BuiltinImageViewer": "Built-in image viewer", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Espera que pàgina es carregui",

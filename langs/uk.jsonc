@@ -191,6 +191,7 @@
 	"Medium": "Середній",
 	"FocusNewMessages": "Фокус нових повідомлень",
 	"ChatTextField": "Text field in chat", // Untranslated
+	"BuiltinImageViewer": "Built-in image viewer", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Чекати повного завантаження",

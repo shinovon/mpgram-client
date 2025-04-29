@@ -191,6 +191,7 @@
 	"Medium": "Средний",
 	"FocusNewMessages": "Авто-прокрутка до новых сообщений",
 	"ChatTextField": "Текстовое поле в чате",
+	"BuiltinImageViewer": "Встроен. просмотр изображений",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Ждать полной загрузки",
