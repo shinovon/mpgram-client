@@ -75,7 +75,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 			}
 		} catch (OutOfMemoryError e) {
 			toDraw = null;
-			MP.display(null);
+			MP.midlet.commandAction(MP.backCmd, this);
 			try {
 				Thread.sleep(100);
 			} catch (Exception ignored) {}
@@ -217,7 +217,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 			} catch (RuntimeException e) {
 				e.printStackTrace();
 			}
-			MP.display(null);
+			MP.midlet.commandAction(MP.backCmd, this);
 			toDraw = null;
 			return;
 		}
