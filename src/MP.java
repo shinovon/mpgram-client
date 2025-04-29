@@ -70,7 +70,7 @@ import zip.InflaterInputStream;
 
 public class MP extends MIDlet implements CommandListener, ItemCommandListener, ItemStateListener, Runnable, LangConstants {
 
-	//#region Constants
+	// region Constants
 	static final int RUN_SEND_MESSAGE = 1;
 	static final int RUN_VALIDATE_AUTH = 2;
 	static final int RUN_IMAGES = 3;
@@ -130,7 +130,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			"العربية"
 		}
 	};
-	//#endregion
+	// endregion
 	
 	static final Font largePlainFont = Font.getFont(0, 0, Font.SIZE_LARGE);
 	static final Font medPlainFont = Font.getFont(0, 0, Font.SIZE_MEDIUM);
@@ -156,7 +156,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	// localization
 	static String[] L;
 	
-	//#region Settings
+	// region Settings
 	static String instanceUrl = DEFAULT_INSTANCE_URL;
 	private static String instancePassword;
 	private static int tzOffset;
@@ -199,7 +199,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static String deviceName;
 	static String systemName;
 	public static String encoding = "UTF-8";
-	//#endregion
+	// endregion
 
 	// threading
 	private static int run;
@@ -221,7 +221,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static String selfId;
 //	private static String phoneCodeHash; // TODO resend code
 
-	//#region Commands
+	// region Commands
 	private static Command exitCmd;
 	static Command backCmd;
 
@@ -295,7 +295,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command prevPageCmd;
 	
 	private static Command updateCmd;
-	//#endregion
+	// endregion
 	
 	// ui
 	private static Displayable mainDisplayable;
@@ -348,7 +348,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	// file picker
 	private static Vector rootsList;
 	
-	//#region MIDlet
+	// region MIDlet
 	
 	protected void destroyApp(boolean u) {
 	}
@@ -368,7 +368,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		Form f = new Form("MPGram");
 		f.append("Loading");
 		display.setCurrent(mainDisplayable = f);
-		
+//#ifndef NO_J2ME_LOADER_CHECK
 		try {
 			// check for j2me loader
 			Class.forName("javax.microedition.shell.MicroActivity");
@@ -378,7 +378,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			f.append("J2ME Loader is not supported.");
 			return;
 		} catch (Exception ignored) {}
-		
+//#endif	
 		// get device name
 		String p, v;
 		if ((p = System.getProperty("microedition.platform")) != null) {
@@ -687,9 +687,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		start(RUN_CHECK_OTA, null);
 	}
 	
-	//#endregion
+	// endregion
 	
-	//#region Threading
+	// region Threading
 
 	public void run() {
 		int run;
@@ -1328,9 +1328,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		midlet.start(RUN_CLOSE_CONNECTION, c);
 	}
 
-	//#endregion
+	// endregion
 	
-	//#region UI Listeners
+	// region UI Listeners
 
 	public void commandAction(Command c, Displayable d) {
 		if (d instanceof ChatsList) { // chats list commands
@@ -2318,9 +2318,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 	}
 	
-	//#endregion
+	// endregion
 	
-	//#region Image queue
+	// region Image queue
 	
 	static void queueAvatar(String id, Object target) {
 		if (target == null || id == null || !loadAvatars) return;
@@ -2368,7 +2368,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 	//endregion
 	
-	//#region Peers
+	// region Peers
 
 	static void fillPeersCache(JSONObject r) {
 		JSONObject users = r.getObject("users", null);
@@ -2531,9 +2531,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return "Deleted";
 	}
 
-	//#endregion
+	// endregion
 	
-	//#region UI builders
+	// region UI builders
 	
 	static ChatsList mainChatsList() {
 		ChatsList l = chatsList = new ChatsList(L[mpgram], 0);
@@ -2748,9 +2748,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return a;
 	}
 	
-	//#endregion
+	// endregion
 	
-	//#region Display logic
+	// region Display logic
 	
 	static void openLoad(Displayable d) {
 		display(d);
@@ -2845,9 +2845,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 	}
 	
-	//#endregion
+	// endregion
 	
-	//#region URLs
+	// region URLs
 
 	void browse(String url) {
 		try {
@@ -3081,9 +3081,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return url.startsWith("tg://");
 	}
 	
-	//#endregion
+	// endregion
 	
-	//#region Networking
+	// region Networking
 	
 	static Object api(String url) throws IOException {
 		Object res;
@@ -3454,9 +3454,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return sb;
 	}
 	
-	//#endregion
+	// endregion
 	
-	//#region Localizations
+	// region Localizations
 	
 	private void loadLocale(String lang) throws IOException {
 		InputStreamReader r = new InputStreamReader(getClass().getResourceAsStream("/l/".concat(lang)), "UTF-8");
@@ -3622,9 +3622,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		} else return Integer.toString(n);
 	}
 	
-	//#endregion
+	// endregion
 	
-	//#region Misc utils
+	// region Misc utils
 
 	static String[] split(String str, char d) {
 		int i = str.indexOf(d);
@@ -3701,9 +3701,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		} catch (Exception e) {}
 	}
 	
-	//#endregion
+	// endregion
 	
-	//#region Rich text
+	// region Rich text
 	
 	private static final int
 			RT_BOLD = 0,
@@ -3981,9 +3981,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return Font.getFont(face, style, size);
 	}
 	
-	//#endregion
+	// endregion
 	
-	//#region ImageUtils
+	// region ImageUtils
 	
 /*
  * Part of the TUBE42 imagelib, released under the LGPL license.
@@ -4122,6 +4122,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 
 	}
 	
-	//#endregion
+	// endregion
 
 }

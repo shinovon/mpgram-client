@@ -6,6 +6,11 @@
 	</projects>
 	<buildSpec>
 		<buildCommand>
+			<name>org.eclipse.mtj.core.preprocessor</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
 			<name>org.eclipse.mtj.core.validator</name>
 			<arguments>
 			</arguments>
@@ -28,6 +33,7 @@
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.eclipse.mtj.core.preprocessingNature</nature>
 		<nature>org.eclipse.mtj.core.nature</nature>
 	</natures>
 </projectDescription>
