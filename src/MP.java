@@ -2624,8 +2624,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 //		f.append(fileField = t);
 		
 		f.append(sendChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
-				"Send uncompressed",
-				"Hide with spoiler"
+				L[SendUncompressed],
+				L[HideWithSpoiler]
 		}, null));
 		
 		return writeForm = f;
