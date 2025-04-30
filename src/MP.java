@@ -35,8 +35,10 @@ import java.util.Vector;
 import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
+//#ifndef NO_FILE_SENDING
 import javax.microedition.io.file.FileConnection;
 import javax.microedition.io.file.FileSystemRegistry;
+//#endif
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Choice;
@@ -63,10 +65,14 @@ import javax.microedition.rms.RecordStore;
 
 import cc.nnproject.json.JSONArray;
 import cc.nnproject.json.JSONObject;
+//#ifndef NO_JSON_STREAM
 import cc.nnproject.json.JSONStream;
+//#endif
+//#ifndef NO_ZIP
 import zip.GZIPInputStream;
 import zip.Inflater;
 import zip.InflaterInputStream;
+//#endif
 
 public class MP extends MIDlet implements CommandListener, ItemCommandListener, ItemStateListener, Runnable, LangConstants {
 
@@ -96,7 +102,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
+//#ifndef NO_AVATARS
 	private static final String AVATAR_RECORD_PREFIX = "mcA";
+//#endif
 	
 	private static final String DEFAULT_INSTANCE_URL = "http://mp.nnchan.ru/";
 	static final String API_URL = "api.php";
@@ -105,7 +113,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static final String OTA_URL = "http://nnproject.cc/mp/upd.php";
 	
 	static final String API_VERSION = "7";
-	
+
+//#ifndef ENGLISH_ONLY
 	static final String[][] LANGS = {
 		{
 			"az",
@@ -130,6 +139,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			"العربية"
 		}
 	};
+//#endif
 	// endregion
 	
 	static final Font largePlainFont = Font.getFont(0, 0, Font.SIZE_LARGE);
@@ -318,7 +328,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static ChoiceGroup avaCacheChoice;
 	private static ChoiceGroup uiChoice;
 	private static ChoiceGroup behChoice;
+//#ifndef ENGLISH_ONLY
 	private static ChoiceGroup langChoice;
+//#endif
 	private static ChoiceGroup chatsFontSizeCoice;
 	private static ChoiceGroup networkChoice;
 	private static Gauge avaCacheGauge;
@@ -338,18 +350,26 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static final JSONObject usersCache = new JSONObject();
 	private static final JSONObject chatsCache = new JSONObject();
 	private static final Hashtable imagesCache = new Hashtable();
-	
+
+//#ifndef NO_AVATARS
 	private static Image userDefaultImg, chatDefaultImg;
+//#endif
+//#ifndef NO_FILE_SENDING
 	private static Image fileImg, folderImg;
+//#endif
 	
 	// temp
+//#ifndef NO_RICH_TEXT
 	private static String richTextUrl;
+//#endif
 	private static String writeTo, replyTo, sendFile, edit, fwdPeer, fwdMsg;
 	private static String updateUrl;
 	private static long lastType;
-	
+
+//#ifndef NO_FILE_SENDING
 	// file picker
 	private static Vector rootsList;
+//#endif
 	
 	// region MIDlet
 	
@@ -408,7 +428,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			systemName = p;
 		}
-		
+
+//#ifndef NO_UTF8
 		// Test UTF-8 support
 		byte[] b = new byte[] { (byte) 0xF0, (byte) 0x9F, (byte) 0x98, (byte) 0x83 };
 		try {
@@ -438,7 +459,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				}
 			}
 		}
+//#else
+//		encoding = "ISO-8859-1";
+//#endif
+//#ifndef NO_JSON_STREAM
 		JSONStream.encoding = encoding;
+//#endif
 		
 		// get system language
 		if ((p = System.getProperty("user.language")) == null) {
@@ -456,9 +482,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				System.getProperty("com.symbian.default.to.suite.icon") == null));
 		threadedImages = symbianJrt;
 		
+//#ifndef NO_AVATARS
 		avatarSize = Math.min(display.getBestImageHeight(Display.LIST_ELEMENT), display.getBestImageWidth(Display.LIST_ELEMENT));
 		if (avatarSize < 8) avatarSize = 16;
 		else if (avatarSize > 120) avatarSize = 120;
+//#endif
 		
 		photoSize = Math.min(f.getWidth(), f.getHeight()) / 3;
 		
@@ -523,6 +551,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		
 		// load locale
 		(L = new String[300])[0] = "MPGram";
+//#ifdef ENGLISH_ONLY
+//#		try {
+//#			loadLocale("en");
+//#		} catch (IOException e) {
+//#			throw new RuntimeException(e.toString());
+//#		}
+//#else
 		try {
 			loadLocale(lang);
 		} catch (Exception e) {
@@ -534,6 +569,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				throw new RuntimeException(e2.toString());
 			}
 		}
+//#endif
 		
 		// commands
 		
@@ -617,7 +653,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		loadingForm.setCommandListener(this);
 		
 		// load resources
-		
+//#ifndef NO_AVATARS
 		if (loadAvatars) {
 			try {
 				userDefaultImg = resize(Image.createImage("/us.png"), avatarSize, avatarSize);
@@ -628,6 +664,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				}
 			} catch (Throwable ignored) {}
 		}
+//#endif
 		
 		// start image loader threads
 
@@ -724,8 +761,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					openLoad(mainDisplayable = mainChatsList());
 					writeAuth();
 				}
-				
+//#ifndef NO_UPDATES
 				start(RUN_KEEP_ALIVE, null);
+//#endif
 				break;
 			} catch (APIException e) {
 				if (e.code == 401) {
@@ -773,6 +811,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						try {
 							String url;
 							Image img = null;
+//#ifndef NO_AVATARS
 							String recordName = null;
 							if (src instanceof String) { // avatar
 								recordName = AVATAR_RECORD_PREFIX + avatarSize + "r" + (String) src;
@@ -795,7 +834,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 										}
 									} catch (Exception ignored) {}
 								}
-							} else if (src instanceof String[]) { // message file
+							} else
+//#endif
+							if (src instanceof String[]) { // message file
 								String peer = ((String[]) src)[0];
 								String id = ((String[]) src)[1];
 								String p = ((String[]) src)[3];
@@ -809,6 +850,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							if (img == null) {
 								try {
 									byte[] b = get(url);
+//#ifndef NO_AVATARS
 									if (recordName != null) {
 										// save avatar to storage cache
 										if ((avatarsCache & 2) == 2) {
@@ -825,19 +867,25 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 											} catch (Exception ignored) {}
 										}
 									}
+//#endif
 									img = Image.createImage(b, 0, b.length);
+//#ifndef NO_AVATARS
 									if (recordName != null && roundAvatars)
 										img = roundImage(img);
+//#endif
 								} catch (Exception e) {
 									e.printStackTrace();
+//#ifndef NO_AVATARS
 									if (src instanceof String) {
 										img = ((String) src).charAt(0) == '-' ? chatDefaultImg : userDefaultImg;
 									}
+//#endif
 								}
 							}
 							
 							if (img == null) continue;
 							
+//#ifndef NO_AVATARS
 							// save avatar to hashtable cache
 							if (recordName != null && (avatarsCache & 1) == 1) {
 								if (imagesCache.size() > avatarsCacheThreshold) {
@@ -845,6 +893,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 								}
 								imagesCache.put(src, img);
 							}
+//#endif
 							
 							putImage(target, img);
 						} catch (Exception e) {
@@ -1020,7 +1069,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						.append("&id=").append(fwdMsg);
 					}
 				}
+//#ifdef NO_FILE_SENDING
+//#				api(appendUrl(sb.append("&text="), text).toString());
+//#else
 				postMessage(sb.toString(), file, text);
+//#endif
 				
 				// go to latest message after sending
 				if (!(current instanceof ChatForm)) {
@@ -1100,6 +1153,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			} catch (Exception ignored) {}
 			break;
 		}
+//#ifndef NO_UPDATES
 		case RUN_CHAT_UPDATES: { // chat updates loop
 			Thread thread;
 			updatesThread = updatesThreadCopy = thread = Thread.currentThread();
@@ -1215,6 +1269,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			} catch (Exception ignored) {}
 			break;
 		}
+//#endif
 		case RUN_CLOSE_CONNECTION: {
 			try {
 				closingConnections.addElement(param);
@@ -1256,6 +1311,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			break;
 		}
+//#ifndef NO_VIEW_CANVAS
 		case RUN_ZOOM_VIEW: {
 			try {
 				((ViewCanvas) param).resize((int) ((ViewCanvas) param).zoom);
@@ -1265,6 +1321,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			break;
 		}
+//#endif
 		case RUN_PIN_MESSAGE: {
 			try {
 				String[] s = (String[]) param;
@@ -1276,6 +1333,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			break;
 		}
+//#ifndef NO_STICKERS
 		case RUN_SEND_STICKER: {
 			try {
 				JSONObject s = (JSONObject) param;
@@ -1307,6 +1365,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			break;
 		}
+//#endif
 		}
 //		running--;
 	}
@@ -1326,7 +1385,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 	static void cancel(Thread thread, boolean updates) {
 		if (thread == null) return;
+//#ifndef NO_UPDATES
 		if (updates) updatesThread = null;
+//#endif
 		if (symbianJrt) {
 			thread.interrupt();
 			return;
@@ -1428,10 +1489,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				display(t);
 				return;
 			}
+//#ifndef NO_STICKERS
 			if (c == sendStickerCmd) {
 				openLoad(new StickerPacksList((ChatForm) d));
 				return;
 			}
+//#endif
 			if (c == backCmd && ((ChatForm) d).query != null && ((ChatForm) d).switched) {
 				// close search
 				((ChatForm) current).reset();
@@ -1650,7 +1713,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					s.setFont(largePlainFont);
 					f.append(s);
-					
+//#ifndef ENGLISH_ONLY
 					langChoice = new ChoiceGroup(L[Language], Choice.POPUP, LANGS[1], null);
 					for (int i = 0; i < LANGS[0].length; ++i) {
 						if (lang.equals(LANGS[0][i])) {
@@ -1660,6 +1723,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					}
 					langChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(langChoice);
+//#endif
 					
 					uiChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
 							L[ReversedChat],
@@ -1723,7 +1787,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 							L[ChatAutoUpdate],
 							L[KeepSessionAlive],
 							L[UseUnicode],
+//#ifndef NO_ZIP
 							L[UseCompression]
+//#endif
 					}, null);
 					behChoice.setSelectedIndex(0, useLoadingForm);
 					behChoice.setSelectedIndex(1, jsonStream);
@@ -1732,7 +1798,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					behChoice.setSelectedIndex(4, chatUpdates);
 					behChoice.setSelectedIndex(5, keepAlive);
 					behChoice.setSelectedIndex(6, utf);
+//#ifndef NO_ZIP
 					behChoice.setSelectedIndex(7, compress);
+//#endif
 					behChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(behChoice);
 					
@@ -1803,7 +1871,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			if (c == backCmd && d == settingsForm) {
 				// apply and save settings
+//#ifndef ENGLISH_ONLY
 				lang = LANGS[0][langChoice.getSelectedIndex()];
+//#endif
 				
 				reverseChat = uiChoice.isSelected(0);
 				showMedia = uiChoice.isSelected(1);
@@ -1834,7 +1904,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				chatUpdates = behChoice.isSelected(4);
 				keepAlive = behChoice.isSelected(5);
 				utf = behChoice.isSelected(6);
+//#ifndef NO_ZIP
 				compress = behChoice.isSelected(7);
+//#endif
 				
 				if ((updatesTimeout = updateTimeoutGauge.getValue() * 5) < 5) {
 					updateTimeoutGauge.setValue((updatesTimeout = 5) / 5);
@@ -1899,6 +1971,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				return;
 			}
 			if (c == clearCacheCmd) {
+//#ifndef NO_AVATARS
 				try {
 					// clear avatars in storage
 					String[] s = RecordStore.listRecordStores();
@@ -1910,6 +1983,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						}
 					}
 				} catch (Exception ignored) {}
+//#endif
 				// clear hashtables
 				usersCache.clear();
 				chatsCache.clear();
@@ -1927,9 +2001,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				if (t.trim().length() == 0 && sendFile == null && fwdPeer == null) {
 					return;
 				}
+//#ifndef NO_UPDATES
 				if (MP.updatesThread != null) {
 					MP.cancel(MP.updatesThread, true);
 				}
+//#endif
 				display(loadingAlert(L[Sending]), d);
 				start(RUN_SEND_MESSAGE, new Object[] { t, writeTo, replyTo, edit, sendFile, sendChoice, fwdPeer, fwdMsg });
 				return;
@@ -1942,10 +2018,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				display(t);
 				return;
 			}
+//#ifndef NO_FILE_SENDING
 			if (c == chooseFileCmd) {
 				openFilePicker("");
 				return;
 			}
+//#endif
 			if (c == okCmd) {
 				// full texbox finished
 				messageField.setString(((TextBox) d).getString());
@@ -1953,12 +2031,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				c = backCmd;
 			}
 		}
+//#ifndef NO_STICKERS
 		// stickers
 		if (c == addStickerPackCmd) {
 			display(loadingAlert(L[Loading]), current);
 			start(RUN_INSTALL_STICKER_SET, d);
 			return;
 		}
+//#endif
+//#ifndef NO_ABOUT
 		if (c == aboutCmd) {
 			// about form
 			Form f = new Form(L[About]);
@@ -2063,12 +2144,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			display(f);
 			return;
 		}
+//#endif
 		if (c == List.SELECT_COMMAND) {
 			if (d instanceof MPList) {
 				((MPList) d).select(((List) d).getSelectedIndex());
 				return;
 			}
-			
+//#ifndef NO_FILE_SENDING
 			// file picker
 			int i = ((List) d).getSelectedIndex();
 			if (i == -1) return;
@@ -2088,6 +2170,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			commandAction(cancelCmd, d);
 			sendFile = "file:///".concat(path);
 			fileLabel.setText(L[File_Prefix].concat(path));
+//#endif
 			return;
 		}
 		if (c == cancelCmd && d instanceof List) { // go back to write form
@@ -2201,11 +2284,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			if (c == openImageCmd) {
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
+//#ifndef NO_VIEW_CANVAS
 				if (useView) {
 					display(new ViewCanvas(s[0], s[1]));
 				} else {
+//#endif
 					browse(instanceUrl + FILE_URL + "?c=" + s[0] + "&m=" + s[1] + "&user=" + user);
+//#ifndef NO_VIEW_CANVAS
 				}
+//#endif
 				return;
 			}
 			if (c == deleteMsgCmd) {
@@ -2257,9 +2344,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				if (sending || p == null) return;
 				sending = true;
 				
+//#ifndef NO_UPDATES
 				if (MP.updatesThread != null) {
 					MP.cancel(MP.updatesThread, true);
 				}
+//#endif
 				display(loadingAlert(L[Sending]), current);
 				start(RUN_BOT_CALLBACK, p);
 				return;
@@ -2276,9 +2365,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
 				
+//#ifndef NO_UPDATES
 				if (MP.updatesThread != null) {
 					MP.cancel(MP.updatesThread, true);
 				}
+//#endif
 				display(loadingAlert(L[Loading]), current);
 				start(RUN_PIN_MESSAGE, s);
 				return;
@@ -2307,9 +2398,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			String t;
 			if ((t = ((TextField) item).getString().trim()).length() == 0)
 				return;
+//#ifndef NO_UPDATES
 			if (MP.updatesThread != null) {
 				MP.cancel(MP.updatesThread, true);
 			}
+//#endif
 			display(loadingAlert(L[Sending]), current);
 			start(RUN_SEND_MESSAGE, new Object[] { t, ((ChatForm) current).id, null, null, null, null, null, null });
 			return;
@@ -2318,10 +2411,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			// sticker selected, send it
 			JSONObject s = (JSONObject) ((MPForm) current).urls.get(item);
 			if (s == null) return;
-			
+//#ifndef NO_UPDATES
 			if (MP.updatesThread != null) {
 				MP.cancel(MP.updatesThread, true);
 			}
+//#endif
 			imagesToLoad.removeAllElements();
 			
 			display(loadingAlert(L[Sending]), current);
@@ -2357,6 +2451,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	// region Image queue
 	
 	static void queueAvatar(String id, Object target) {
+//#ifndef NO_AVATARS
 		if (target == null || id == null || !loadAvatars) return;
 		
 		JSONObject peer = getPeer(id, false);
@@ -2373,6 +2468,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			imagesToLoad.addElement(new Object[] { id, target });
 			imagesLoadLock.notifyAll();
 		}
+//#endif
 	}
 
 	private static void putImage(Object target, Image img) {
@@ -2380,6 +2476,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			((ImageItem) target).setImage(img);
 			return;
 		}
+//#ifndef NO_AVATARS
 		if (target instanceof Object[]) {
 			if (((Object[]) target)[0] instanceof List) {
 				List list = ((List) ((Object[]) target)[0]);
@@ -2387,6 +2484,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				list.set(idx, list.getString(idx), img);
 			}
 		}
+//#endif
 	}
 	
 	static void queueImage(Object src, Object target) {
@@ -2607,9 +2705,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		s.setDefaultCommand(openTextBoxCmd);
 		s.setItemCommandListener(midlet);
 		f.append(s);
-		
+
+//#ifndef NO_FILE_SENDING
 		// file
-		
 		s = new StringItem(null, L[File_Prefix].concat(L[NotSelected]));
 		s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 		f.append(fileLabel = s);
@@ -2627,10 +2725,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				L[SendUncompressed],
 				L[HideWithSpoiler]
 		}, null));
+//#endif
 		
 		return writeForm = f;
 	}
 	
+//#ifndef NO_FILE_SENDING
 	static void openFilePicker(String path) {
 		if (path.length() == 0) path = "/";
 		display(loadingAlert(L[Loading]), current);
@@ -2688,6 +2788,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			e.printStackTrace();
 		}
 	}
+//#endif
 	
 	static void openChat(String id, int msg) {
 		openLoad(new ChatForm(id, null, msg, 0));
@@ -2901,6 +3002,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	}
 	
 	static boolean handleDeepLink(String url) {
+//#ifndef NO_DEEP_LINKS
 		if (url.startsWith("@")) {
 			openChat(url.substring(1), -1);
 			return true;
@@ -3113,6 +3215,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		System.out.println("Unhandled deep link: " + url);
 		return url.startsWith("tg://");
+//#else
+//#		return false;
+//#endif
 	}
 	
 	// endregion
@@ -3166,11 +3271,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			
 			try {
 				threadConnections.put(hc, in = openInputStream(hc));
+//#ifndef NO_JSON_STREAM
 				if (jsonStream) {
 					res = JSONStream.getStream(in).nextValue();
 				} else {
+//#endif
 					res = JSONObject.parseJSON(readUtf(in, (int) hc.getLength()));
+//#ifndef NO_JSON_STREAM
 				}
+//#endif
 			} catch (RuntimeException e) {
 				if (c >= 400) {
 					throw new APIException(url, c, null);
@@ -3198,6 +3307,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return res;
 	}
 
+//#ifndef NO_JSON_STREAM
 	// unused
 	static JSONStream apiStream(String url) throws IOException {
 		JSONStream res = null;
@@ -3225,7 +3335,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		return res;
 	}
+//#endif
 	
+//#ifndef NO_FILE_SENDING
 	static Object postMessage(String url, String fileUrl, String text) throws IOException {
 		Object res;
 
@@ -3310,11 +3422,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			
 			int c = http.getResponseCode();
 			try {
+//#ifndef NO_JSON_STREAM
 				if (jsonStream) {
 					res = JSONStream.getStream(httpIn = openInputStream(http)).nextValue();
 				} else {
+//#endif
 					res = JSONObject.parseJSON(readUtf(httpIn = openInputStream(http), (int) http.getLength()));
+//#ifndef NO_JSON_STREAM
 				}
+//#endif
 			} catch (RuntimeException e) {
 				if (c >= 400) {
 					throw new APIException(url, c, null);
@@ -3336,6 +3452,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			} catch (IOException e) {}
 		}
 	}
+//#endif
 
 	static Image getImage(String url) throws IOException {
 		byte[] b = get(url);
@@ -3400,11 +3517,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	// wrapper for compression handling
 	private static InputStream openInputStream(HttpConnection hc) throws IOException {
 		InputStream i = hc.openInputStream();
+//#ifndef NO_ZIP
 		String enc = hc.getHeaderField("Content-Encoding");
 		if ("deflate".equalsIgnoreCase(enc))
 			i = new InflaterInputStream(i, new Inflater(true));
 		else if ("gzip".equalsIgnoreCase(enc))
 			i = new GZIPInputStream(i);
+//#endif
 		return i;
 	}
 	
@@ -3417,9 +3536,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		HttpConnection hc = (HttpConnection) Connector.open(url, Connector.READ_WRITE,
 				u = (url.indexOf("method=updates") == -1 || OTA_URL.equals(url)));
 		hc.setRequestProperty("User-Agent", "mpgram4/".concat(version).concat(" (https://github.com/shinovon/mpgram-client)"));
+//#ifndef NO_ZIP
 		if (!u && compress) {
 			hc.setRequestProperty("Accept-Encoding", "gzip, deflate");
 		}
+//#endif
 		if (url.startsWith(instanceUrl)) {
 			if (user != null) {
 				hc.setRequestProperty("X-mpgram-user", user);
@@ -3525,15 +3646,20 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 
 	static String localizePlural(int n, int i) {
 		String s = Integer.toString(n);
+//#ifndef ENGLISH_ONLY
 		if (L[LocaleSlavicPlurals].length() == 0) {
+//#endif
 			String l = L[n == 1 ? i : i + 1];
+//#ifndef ENGLISH_ONLY
 			if (L[LocaleCustomPlurals].length() != 0) {
 				int idx;
 				if ((idx = l.indexOf('%')) != -1) {
 					return l.substring(0, idx).concat(s.concat(l.substring(idx + 1)));
 				}
 			}
+//#endif
 			return s.concat(l);
+//#ifndef ENGLISH_ONLY
 		}
 		
 		int a = n % 10;
@@ -3543,19 +3669,25 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		if ((a >= 2 && a <= 4) && !(b >= 12 && b <= 14))
 			return s.concat(L[i + 1]);
 		return s.concat(L[i + 2]);
+//#endif
 	}
 	
 	static StringBuffer appendLocalizedPlural(StringBuffer sb, int n, int i) {
 		sb.append(n);
+//#ifndef ENGLISH_ONLY
 		if (L[LocaleSlavicPlurals].length() == 0) {
+//#endif
 			String l = L[n == 1 ? i : i + 1];
+//#ifndef ENGLISH_ONLY
 			if (L[LocaleCustomPlurals].length() != 0) {
 				int idx;
 				if ((idx = l.indexOf('%')) != -1) {
 					return sb.insert(0, l.substring(0, idx)).append(l.substring(idx + 1));
 				}
 			}
+//#endif
 			return sb.append(l);
+//#ifndef ENGLISH_ONLY
 		}
 		
 		int a = n % 10;
@@ -3565,6 +3697,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		if ((a >= 2 && a <= 4) && !(b >= 12 && b <= 14))
 			return sb.append(L[i + 1]);
 		return sb.append(L[i + 2]);
+//#endif
 	}
 
 	// mode: 0 - date, 1 - detailed date, 2 - short date, 3 - last seen detailed, 4 - last seen
@@ -3694,7 +3827,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		if (i == ONE_LINE_LENGTH) sb.append("..");
 		return sb;
 	}
-	
+
+//#ifndef NO_AVATARS
 	public static Image roundImage(Image img) {
 		if (img == null) return null;
 		try {
@@ -3717,6 +3851,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			return img;
 		}
 	}
+//#endif
 
 	private static void writeAuth() {
 		try {
@@ -3741,7 +3876,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	// endregion
 	
 	// region Rich text
-	
+//#ifndef NO_RICH_TEXT
 	private static final int
 			RT_BOLD = 0,
 			RT_ITALIC = 1,
@@ -4017,10 +4152,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		return Font.getFont(face, style, size);
 	}
-	
+//#endif
 	// endregion
 	
 	// region ImageUtils
+//#ifndef NO_AVATARS
 	
 /*
  * Part of the TUBE42 imagelib, released under the LGPL license.
@@ -4132,7 +4268,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 		}
 	}
+//#endif
 
+//#ifndef NO_VIEW_CANVAS
 	/**
 	 * Part of tube42 imagelib. Blends 2 colors.
 	 * 
@@ -4158,6 +4296,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		return ag | rb;
 
 	}
+//#endif
+
 	
 	// endregion
 

@@ -141,9 +141,10 @@ public class ChatsList extends MPList {
 				if (MP.chatsListFontSize != 0) {
 					setFont(itemIdx, MP.chatsListFontSize == 1 ? MP.smallPlainFont : MP.medPlainFont);
 				}
-				
+//#ifndef NO_AVATARS
 				if (noAvas || !MP.loadAvatars) continue;
 				MP.queueAvatar(id, new Object[] { this, new Integer(itemIdx) });
+//#endif
 			}
 			
 			if (l == limit && j.has("count")) {
@@ -208,9 +209,10 @@ public class ChatsList extends MPList {
 					setFont(itemIdx, MP.chatsListFontSize == 1 ? MP.smallPlainFont : MP.medPlainFont);
 				} catch (Exception ignored) {}
 			}
-			
+//#ifndef NO_AVATARS
 			if (noAvas || !MP.loadAvatars) continue;
 			MP.queueAvatar(id, new Object[] { this, new Integer(itemIdx) });
+//#endif
 		}
 	}
 	
@@ -253,7 +255,8 @@ public class ChatsList extends MPList {
 			load();
 		}
 	}
-	
+
+//#ifndef NO_AVATARS
 	void shown() {
 		if (!finished || ids == null || noAvas) return;
 		for (int i = ids.size() - 1; i >= 0; i--) {
@@ -261,5 +264,6 @@ public class ChatsList extends MPList {
 			MP.queueAvatar((String) ids.elementAt(i), new Object[] { this, new Integer(i) });
 		}
 	}
+//#endif
 
 }

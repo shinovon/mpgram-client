@@ -37,7 +37,11 @@ import javax.microedition.lcdui.Ticker;
 import cc.nnproject.json.JSONArray;
 import cc.nnproject.json.JSONObject;
 
-public class ChatForm extends MPForm implements Runnable {
+public class ChatForm extends MPForm
+//#ifndef NO_UPDATES
+		implements Runnable
+//#endif
+{
 	
 	private static final int SPACER_HEIGHT = 8;
 	
@@ -78,9 +82,11 @@ public class ChatForm extends MPForm implements Runnable {
 	long group;
 	Vector loadedMsgs = new Vector();
 
+//#ifndef NO_UPDATES
 	long typing;
 	private final Object typingLock = new Object();
 	private Thread typingThread;
+//#endif
 	
 	long wasOnline;
 	
@@ -120,7 +126,7 @@ public class ChatForm extends MPForm implements Runnable {
 	void loadInternal(Thread thread) throws Exception {
 		// TODO forum
 		deleteAll();
-		
+//#ifndef NO_UPDATES
 		if (query == null && mediaFilter == null && MP.chatUpdates
 				&& (MP.updatesThread != null || MP.updatesRunning)) {
 			MP.display(MP.loadingAlert(MP.L[WaitingForPrevChat]), this);
@@ -134,6 +140,7 @@ public class ChatForm extends MPForm implements Runnable {
 				MP.display(MP.useLoadingForm ? MP.loadingForm : this);
 			}
 		}
+//#endif
 		
 		StringBuffer sb = new StringBuffer();
 		if (!infoLoaded) {
@@ -161,9 +168,11 @@ public class ChatForm extends MPForm implements Runnable {
 					}
 				} else {
 					canPin = true;
+//#ifndef NO_UPDATES
 					if (MP.chatStatus && fullInfo.getObject("User").has("status")) {
 						setStatus(fullInfo.getObject("User").getObject("status"));
 					}
+//#endif
 				}
 				JSONObject full = fullInfo.getObject("full");
 				if (messageId == -1 && full.has("read_inbox_max_id")) {
@@ -180,7 +189,9 @@ public class ChatForm extends MPForm implements Runnable {
 					addCommand(MP.joinChatCmd);
 				} else if (canWrite) {
 					addCommand(MP.writeCmd);
+//#ifndef NO_STICKERS
 					addCommand(MP.sendStickerCmd);
+//#endif
 				}
 			}
 			infoLoaded = true;
@@ -328,12 +339,14 @@ public class ChatForm extends MPForm implements Runnable {
 	protected void postLoad(boolean success) {
 		if (!success)
 			return;
+//#ifndef NO_UPDATES
 		if (endReached && !hasOffset && query == null && mediaFilter == null && MP.chatUpdates) {
 			// start updater thread
 			update = true;
 			MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
 			(typingThread = new Thread(this)).start();
 		}
+//#endif
 		
 		if (botAnswer != null) {
 			JSONObject j = botAnswer;
@@ -507,11 +520,18 @@ public class ChatForm extends MPForm implements Runnable {
 		
 			// text
 			if (text != null && text.length() != 0) {
+//#ifndef NO_RICH_TEXT
 				if (MP.parseRichtext && message.has("entities")) {
 					insert = MP.wrapRichText(this, thread, text, message.getArray("entities"), insert);
 				} else {
 					insert = MP.flush(this, thread, text, insert, null);
 				}
+//#else
+//#				s = new StringItem(null, text);
+//#				s.setFont(MP.smallPlainFont);
+//#				s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+//#				safeInsert(thread, insert++, s);
+//#endif
 				lastItem = get(insert - 1);
 				if (firstItem == null) firstItem = lastItem;
 				space = true;
@@ -869,11 +889,14 @@ public class ChatForm extends MPForm implements Runnable {
 		messageId = 0;
 		addOffset = 0;
 		offsetId = 0;
+//#ifndef NO_UPDATES
 		typing = 0;
+//#endif
 		loadedMsgs.removeAllElements();
 		switched = false;
 	}
-	
+
+//#ifndef NO_UPDATES
 	void cancel() {
 		// close updater thread
 		if (update) {
@@ -885,6 +908,7 @@ public class ChatForm extends MPForm implements Runnable {
 		
 		super.cancel();
 	}
+//#endif
 	
 //	void closed(boolean destroy) {
 //		if (destroy) cancel();
@@ -908,6 +932,7 @@ public class ChatForm extends MPForm implements Runnable {
 		}
 	}
 	
+//#ifndef NO_UPDATES
 	void handleUpdate(int type, JSONObject update) {
 		if (!this.update) return;
 //		System.out.println("update: " + type);
@@ -1078,5 +1103,6 @@ public class ChatForm extends MPForm implements Runnable {
 			typing = 0;
 		} catch (Exception e) {}
 	}
+//#endif
 
 }

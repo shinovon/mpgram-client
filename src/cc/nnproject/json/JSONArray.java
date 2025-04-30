@@ -384,10 +384,7 @@ public class JSONArray {
 		return count == 0;
 	}
 	
-	public String toString() {
-		return build();
-	}
-	
+//#ifndef NO_JSON_PRECISION
 	public boolean equals(Object obj) {
 		return this == obj || super.equals(obj) || similar(obj);
 	}
@@ -419,6 +416,10 @@ public class JSONArray {
 		}
 		return true;
 	}
+	
+	public String toString() {
+		return build();
+	}
 
 	public String build() {
 		int size = count;
@@ -449,6 +450,7 @@ public class JSONArray {
 		s.append("]");
 		return s.toString();
 	}
+//#endif
 
 	public String format(int l) {
 		int size = count;

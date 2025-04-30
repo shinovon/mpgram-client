@@ -267,11 +267,8 @@ public class JSONObject {
 	public boolean isEmpty() {
 		return table.isEmpty();
 	}
-	
-	public String toString() {
-		return build();
-	}
-	
+
+//#ifndef NO_JSON_PRECISION
 	public boolean equals(Object obj) {
 		return this == obj || super.equals(obj) || similar(obj);
 	}
@@ -308,6 +305,11 @@ public class JSONObject {
 		}
 		return true;
 	}
+//#endif
+	
+	public String toString() {
+		return build();
+	}
 
 	public String build() {
 		if (size() == 0)
@@ -320,8 +322,10 @@ public class JSONObject {
 			Object v = table.get(k);
 			if (v instanceof JSONObject) {
 				s.append(((JSONObject) v).build());
+//#ifndef NO_JSON_PRECISION
 			} else if (v instanceof JSONArray) {
 				s.append(((JSONArray) v).build());
+//#endif
 			} else if (v instanceof String) {
 				s.append("\"").append(escape_utf8((String) v)).append("\"");
 			} else if (v instanceof String[]) {

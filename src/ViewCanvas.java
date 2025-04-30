@@ -2,6 +2,8 @@
  * Copyright (c) 2021 Fyodor Ryzhov
  * Copyright (c) 2024-2025 Arman Jussupgaliyev
  */
+
+//#ifndef NO_VIEW_CANVAS
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Canvas;
@@ -592,3 +594,4 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 		}
 	}
 }
+//#endif
