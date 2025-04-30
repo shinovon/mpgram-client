@@ -1,8 +1,8 @@
 Nokia-MIDlet-Background-Event: pause
-MIDlet-Version: 0.11.0
+MIDlet-Version: 0.11.1
 MIDlet-Vendor: nnproject
 MIDlet-Icon: /m.png
-MicroEdition-Configuration: CLDC-1.1
+MicroEdition-Configuration: CLDC-1.0
 MIDlet-Name: MPGram
 MIDlet-1: MPGram,/m.png,MP
 MicroEdition-Profile: MIDP-2.0
