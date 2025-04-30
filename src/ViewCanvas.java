@@ -11,9 +11,9 @@ import javax.microedition.lcdui.Image;
 
 // from njtai
 public class ViewCanvas extends Canvas implements Runnable, LangConstants {
-	protected float zoom = 1;
-	protected float x = 0;
-	protected float y = 0;
+	protected int zoom = 1;
+	protected int x = 0;
+	protected int y = 0;
 
 	protected Thread loader;
 	protected boolean error;
@@ -257,13 +257,13 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 					resize((int) zoom);
 				} else if (k == -1 || k == KEY_NUM2 || k == 'w') {
 					// up
-					y += getHeight() * panDeltaMul() / 4;
+					y += getHeight() / 4;
 				} else if (k == -2 || k == KEY_NUM8 || k == 's') {
-					y -= getHeight() * panDeltaMul() / 4;
+					y -= getHeight() / 4;
 				} else if (k == -3 || k == KEY_NUM4 || k == 'a') {
-					x += getWidth() * panDeltaMul() / 4;
+					x += getWidth() / 4;
 				} else if (k == -4 || k == KEY_NUM6 || k == 'd') {
-					x -= getWidth() * panDeltaMul() / 4;
+					x -= getWidth() / 4;
 				}
 			} else {
 				// zoom inactive
@@ -289,13 +289,13 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 		if (zoom != 1) {
 			if (k == -1 || k == KEY_NUM2 || k == 'w') {
 				// up
-				y += getHeight() * panDeltaMul() / 4;
+				y += getHeight() / 4;
 			} else if (k == -2 || k == KEY_NUM8 || k == 's') {
-				y -= getHeight() * panDeltaMul() / 4;
+				y -= getHeight() / 4;
 			} else if (k == -3 || k == KEY_NUM4 || k == 'a') {
-				x += getWidth() * panDeltaMul() / 4;
+				x += getWidth() / 4;
 			} else if (k == -4 || k == KEY_NUM6 || k == 'd') {
-				x -= getWidth() * panDeltaMul() / 4;
+				x -= getWidth() / 4;
 			}
 		}
 
@@ -355,33 +355,15 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 		repaint();
 	}
 
-	protected final void setSmoothZoom(int dx, int w) {
-		dx -= 25;
-		w -= 50;
-		zoom = 1 + 4f * ((float) dx / w);
-		if (zoom < 1.01f)
-			zoom = 1;
-		if (zoom > 4.99f)
-			zoom = 5;
-	}
-
-	/**
-	 * @return -1 if drag must be inverted, 1 overwise.
-	 */
-	protected float panDeltaMul() {
-		return 1;
-	}
-
 	protected final void pointerDragged(int tx, int ty) {
 		if (touchHoldPos == 8) {
-			setSmoothZoom(tx, getWidth());
 			repaint();
 			return;
 		}
 		if (touchHoldPos != 0)
 			return;
-		x += (tx - lx) * panDeltaMul();
-		y += (ty - ly) * panDeltaMul();
+		x += (tx - lx);
+		y += (ty - ly);
 		lx = tx;
 		ly = ty;
 		repaint();
