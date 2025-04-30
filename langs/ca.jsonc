@@ -191,7 +191,7 @@
 	"Medium": "Mitjà",
 	"FocusNewMessages": "Centra nous missatges",
 	"ChatTextField": "Camp de text a xat",
-	"BuiltinImageViewer": "Built-in image viewer", // Untranslated
+	"BuiltinImageViewer": "Visualitzador d'imatges integrat",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Espera que pàgina es carregui",
@@ -246,7 +246,7 @@
 	"MessageDeleted_Alert": "Missatge suprimit",
 	"UpdateAvailable_Alert": "Actualització de client disponible",
 	"MemberBanned_Alert": "Membre prohibit",
-	"StickersAdded_Alert": "Stickers added", // Untranslated
+	"StickersAdded_Alert": "Adhesius afegits",
 	
 	// Chat form
 	"ChatMedia_Title": "Mèdia",
