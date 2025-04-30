@@ -1824,7 +1824,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				
 				chatsListFontSize = chatsFontSizeCoice.getSelectedIndex();
 				
-				blackberryNetwork = networkChoice.getSelectedIndex();
+				if (networkChoice != null)
+					blackberryNetwork = networkChoice.getSelectedIndex();
 				
 				useLoadingForm = behChoice.isSelected(0);
 				jsonStream = behChoice.isSelected(1);
