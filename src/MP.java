@@ -167,7 +167,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static boolean loadThumbs = true;
 	static boolean reverseChat;
 	static boolean showMedia = true;
-	static int avatarsCache = 3; // 0 - off, 1 - hashtable, 2 - storage, 3 - both
+	static int avatarsCache = 3; // 0: off, 1: hashtable, 2: storage, 3: both
 	static boolean threadedImages;
 	static int avatarsCacheThreshold = 20;
 	static int chatsLimit = 20;
@@ -184,7 +184,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static long updatesDelay = 3000L;
 	static int updatesTimeout = 30;
 	static boolean sendTyping = true;
-	static int chatsListFontSize = 0; // 0 - default, 1 - small, 2 - medium
+	static int chatsListFontSize = 0; // 0: default, 1: small, 2: medium
 	static boolean keepAlive = true;
 	static boolean utf = true;
 	static long keepAliveInterval = 30000L;
@@ -193,12 +193,14 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static boolean useView = true;
 	static boolean compress;
 	static boolean fileRewrite;
+	static int blackberryNetwork = -1; // -1: undefined, 0: data, 1: wifi
 	
 	// platform
 	static boolean symbianJrt;
 	static String deviceName;
 	static String systemName;
 	public static String encoding = "UTF-8";
+	static boolean blackberry;
 	// endregion
 
 	// threading
@@ -318,6 +320,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static ChoiceGroup behChoice;
 	private static ChoiceGroup langChoice;
 	private static ChoiceGroup chatsFontSizeCoice;
+	private static ChoiceGroup networkChoice;
 	private static Gauge avaCacheGauge;
 	private static Gauge photoSizeGauge;
 	private static Gauge profileCacheGauge;
@@ -383,6 +386,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		String p, v;
 		if ((p = System.getProperty("microedition.platform")) != null) {
 			symbianJrt = p.indexOf("platform=S60") != -1;
+			blackberry = p.toLowerCase().startsWith("blackberry");
 			try {
 				Class.forName("emulator.custom.CustomMethod");
 				p = "KEmulator";
@@ -500,6 +504,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			utf = j.getBoolean("utf", utf);
 			compress = j.getBoolean("compress", compress);
 			useView = j.getBoolean("useView", useView);
+			blackberryNetwork = j.getInt("blackberryNetwork", blackberryNetwork);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -676,6 +681,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		
 		if (user == null || userState < 3) {
 			display(mainDisplayable = authForm);
+			if (blackberry && blackberryNetwork == -1) {
+				commandAction(settingsCmd, current);
+				display(infoAlert("Choose network access point"), current); // TODO untranslated
+				return;
+			}
 		} else {
 			run = RUN_VALIDATE_AUTH;
 			run();
@@ -1694,6 +1704,17 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					s.setFont(largePlainFont);
 					f.append(s);
 					
+					if (blackberry) {
+						// TODO untranslated
+						networkChoice = new ChoiceGroup("Network access", Choice.POPUP, new String[] {
+								"Data",
+								"Wi-Fi"
+						}, null);
+						networkChoice.setSelectedIndex(blackberryNetwork == -1 ? 0 : blackberryNetwork, true);
+						networkChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						f.append(networkChoice);
+					}
+					
 					behChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
 							L[WaitForPageToLoad],
 							L[UseJSONStream],
@@ -1773,6 +1794,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				}
 				
 				display(settingsForm);
+				if (blackberry && blackberryNetwork == -1) {
+					try {
+						display.setCurrentItem(networkChoice);
+					} catch (Exception ignored) {}
+				}
 				return;
 			}
 			if (c == backCmd && d == settingsForm) {
@@ -1797,6 +1823,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				}
 				
 				chatsListFontSize = chatsFontSizeCoice.getSelectedIndex();
+				
+				blackberryNetwork = networkChoice.getSelectedIndex();
 				
 				useLoadingForm = behChoice.isSelected(0);
 				jsonStream = behChoice.isSelected(1);
@@ -1855,6 +1883,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					j.put("utf", utf);
 					j.put("compress", compress);
 					j.put("useView", useView);
+					j.put("blackberryNetwork", blackberryNetwork);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
@@ -3380,6 +3409,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 	private static HttpConnection openHttpConnection(String url) throws IOException {
 		System.out.println(url);
+		if (blackberry && blackberryNetwork == 1) {
+			url = url.concat(";deviceside=true;interface=wifi");
+		}
 		boolean u;
 		HttpConnection hc = (HttpConnection) Connector.open(url, Connector.READ_WRITE,
 				u = (url.indexOf("method=updates") == -1 || OTA_URL.equals(url)));
