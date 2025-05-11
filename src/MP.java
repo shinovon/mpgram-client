@@ -708,6 +708,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		synchronized (this) {
 			run = MP.run;
 			param = MP.runParam;
+			MP.run = 0;
+			MP.runParam = null;
 			notify();
 		}
 //		running++;
@@ -2220,7 +2222,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
 				if (fileRewrite && s[4] != null) {
-					browse(instanceUrl + "file/" + s[4] + "?c=" + s[0] + "&m=" + s[1] + "&user=" + user);
+					browse(instanceUrl + "file/" + url(s[4]) + "?c=" + s[0] + "&m=" + s[1] + "&user=" + user);
 				} else {
 					browse(instanceUrl + FILE_URL + "?c=" + s[0] + "&m=" + s[1] + "&user=" + user);
 				}
