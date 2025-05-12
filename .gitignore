@@ -9,6 +9,8 @@ bin
 *.tmp
 /out/
 
+!tools/*
+
 # see langs/compile.py
 src/LangConstants.java
 res/l
