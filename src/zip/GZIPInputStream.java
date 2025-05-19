@@ -165,7 +165,7 @@ public class GZIPInputStream extends InflaterInputStream {
 		int numRead = super.read(buf, offset, len);
 		if (numRead > 0) {
 			int c = ~crc;
-			while (--numRead >= 0)
+			for (int i = 0; i < numRead; ++i)
 				c = CRC32.crc_table[(c ^ buf[offset++]) & 0xff] ^ (c >>> 8);
 			crc = ~c;
 		}
