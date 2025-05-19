@@ -959,6 +959,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					// auth complete
 					userState = 3;
 					MP.run = RUN_VALIDATE_AUTH;
+					MP.runParam = user;
 					run();
 				}
 
