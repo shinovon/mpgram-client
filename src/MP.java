@@ -959,6 +959,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					// auth complete
 					userState = 3;
 					MP.run = RUN_VALIDATE_AUTH;
+					MP.runParam = user;
 					run();
 				}
 
@@ -3417,7 +3418,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		boolean u;
 		HttpConnection hc = (HttpConnection) Connector.open(url, Connector.READ_WRITE,
-				u = (url.indexOf("method=updates") == -1 || OTA_URL.equals(url)));
+				u = (url.indexOf("method=updates") != -1 || OTA_URL.equals(url)));
 		hc.setRequestProperty("User-Agent", "mpgram4/".concat(version).concat(" (https://github.com/shinovon/mpgram-client)"));
 		if (!u && compress) {
 			hc.setRequestProperty("Accept-Encoding", "gzip, deflate");

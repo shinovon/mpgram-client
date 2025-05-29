@@ -8,6 +8,7 @@ bin
 /mtj-build/
 *.tmp
 /out/
+.pydevproject
 
 !tools/*
 
