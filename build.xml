@@ -60,15 +60,30 @@
         <wtkpackage
             jarfile="out/MPGram.jar"
             jadfile="out/MPGram.jad"
-            preverify="false"
+            preverify="true"
             obfuscate="false"
-            bootclasspath="tools/proguard.jar"
         >
             <fileset dir="classes"/>
             <fileset dir="res"/>
+        </wtkpackage>
+    </target>
+
+    <target name="obfuscate" depends="package">
+        <wtkobfuscate
+            jarfile="out/MPGram.jar"
+            classpath="tools/proguard.jar"
+        >
             <preserve class="javax.microedition.shell.MicroActivity" />
             <preserve class="emulator.custom.CustomMethod" />
-        </wtkpackage>
+
+            <argument value="-ignorewarnings" />
+            <argument value="-dontusemixedcaseclassnames" />
+            <argument value="-defaultpackage ''" />
+            <argument value="-keep 'public class * extends javax.microedition.midlet.MIDlet'" />
+            <argument value="-keep 'public class net.wstech2.me.httpsclient.*'" />
+            <argument value="-overloadaggressively" />
+            <argument value="-dontoptimize" />
+        </wtkobfuscate>
     </target>
 
     <target name="run" depends="package">
