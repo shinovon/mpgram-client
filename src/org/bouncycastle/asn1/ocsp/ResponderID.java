@@ -1,4 +1,4 @@
-
+package org.bouncycastle.asn1.ocsp;
 
 import org.bouncycastle.asn1.ASN1Choice;
 import org.bouncycastle.asn1.ASN1Encodable;

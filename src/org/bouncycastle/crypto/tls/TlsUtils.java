@@ -1,4 +1,4 @@
-
+package org.bouncycastle.crypto.tls;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -946,7 +946,7 @@ public class TlsUtils
         }
     }
 
-    static void validateKeyUsage(org.bouncycastle.asn1.x509.X509Certificate c, int keyUsageBits)
+    static void validateKeyUsage(org.bouncycastle.asn1.x509.Certificate c, int keyUsageBits)
         throws IOException
     {
         Extensions exts = c.getTBSCertificate().getExtensions();
@@ -1174,7 +1174,7 @@ public class TlsUtils
             return -1;
         }
 
-        org.bouncycastle.asn1.x509.X509Certificate x509Cert = clientCertificate.getCertificateAt(0);
+        org.bouncycastle.asn1.x509.Certificate x509Cert = clientCertificate.getCertificateAt(0);
         SubjectPublicKeyInfo keyInfo = x509Cert.getSubjectPublicKeyInfo();
         try
         {

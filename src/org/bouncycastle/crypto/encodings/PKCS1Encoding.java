@@ -1,4 +1,4 @@
-
+package org.bouncycastle.crypto.encodings;
 
 import java.security.SecureRandom;
 

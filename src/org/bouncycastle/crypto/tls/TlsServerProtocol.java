@@ -1,4 +1,4 @@
-
+package org.bouncycastle.crypto.tls;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -446,7 +446,7 @@ public class TlsServerProtocol
                 certificateVerifyHash = TlsProtocol.getCurrentPRFHash(getContext(), prepareFinishHash, null);
             }
 
-            org.bouncycastle.asn1.x509.X509Certificate x509Cert = this.peerCertificate.getCertificateAt(0);
+            org.bouncycastle.asn1.x509.Certificate x509Cert = this.peerCertificate.getCertificateAt(0);
             SubjectPublicKeyInfo keyInfo = x509Cert.getSubjectPublicKeyInfo();
             AsymmetricKeyParameter publicKey = PublicKeyFactory.createKey(keyInfo);
 

@@ -1,4 +1,4 @@
-
+package org.bouncycastle.crypto;
 
 /**
  * General interface for a stream cipher that supports skipping.

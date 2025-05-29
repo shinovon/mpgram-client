@@ -1,4 +1,4 @@
-
+package org.bouncycastle.crypto;
 
 /**
  * this exception is thrown if a buffer that is meant to have output

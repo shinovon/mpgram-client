@@ -1,4 +1,4 @@
-
+package org.bouncycastle.crypto;
 
 /**
  * Generic signer interface for hash based and message recovery signers.

@@ -1,4 +1,4 @@
-
+package org.bouncycastle.crypto.tls;
 
 /**
  * A queue for bytes. This file could be more optimized.

@@ -1,4 +1,4 @@
-
+package org.bouncycastle.crypto.tls;
 
 public class NameType
 {

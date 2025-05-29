@@ -1,4 +1,4 @@
-
+package org.bouncycastle.asn1;
 
 /**
  * Basic interface to produce serialisers for ASN.1 encodings.

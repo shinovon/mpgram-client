@@ -1,4 +1,4 @@
-
+package org.bouncycastle.crypto.prng;
 
 import org.bouncycastle.crypto.Digest;
 

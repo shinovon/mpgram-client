@@ -1,4 +1,4 @@
-
+package org.bouncycastle.crypto.params;
 
 public class ECKeyParameters
     extends AsymmetricKeyParameter

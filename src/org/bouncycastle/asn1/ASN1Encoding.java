@@ -1,4 +1,4 @@
-
+package org.bouncycastle.asn1;
 
 /**
  * Supported encoding formats.

@@ -1,4 +1,4 @@
-
+package org.bouncycastle.crypto.digests;
 
 import java.io.ByteArrayOutputStream;
 

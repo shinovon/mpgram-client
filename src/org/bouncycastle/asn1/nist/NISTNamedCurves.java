@@ -1,4 +1,4 @@
-
+package org.bouncycastle.asn1.nist;
 
 import java.util.Enumeration;
 import java.util.Hashtable;

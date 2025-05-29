@@ -1,4 +1,4 @@
-
+package org.bouncycastle.asn1.x509;
 
 import java.util.Enumeration;
 import java.util.Hashtable;

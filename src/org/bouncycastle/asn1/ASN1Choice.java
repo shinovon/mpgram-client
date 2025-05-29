@@ -1,4 +1,4 @@
-
+package org.bouncycastle.asn1;
 
 /**
  * Marker interface for CHOICE objects - if you implement this in a role your

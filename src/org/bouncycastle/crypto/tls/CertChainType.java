@@ -1,4 +1,4 @@
-
+package org.bouncycastle.crypto.tls;
 
 /*
  * RFC 3546 3.3.

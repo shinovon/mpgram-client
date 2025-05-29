@@ -1,4 +1,4 @@
-
+package org.bouncycastle.crypto.tls;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -80,7 +80,7 @@ public class TlsDHKeyExchange
             throw new TlsFatalAlert(AlertDescription.bad_certificate);
         }
 
-        org.bouncycastle.asn1.x509.X509Certificate x509Cert = serverCertificate.getCertificateAt(0);
+        org.bouncycastle.asn1.x509.Certificate x509Cert = serverCertificate.getCertificateAt(0);
 
         SubjectPublicKeyInfo keyInfo = x509Cert.getSubjectPublicKeyInfo();
         try

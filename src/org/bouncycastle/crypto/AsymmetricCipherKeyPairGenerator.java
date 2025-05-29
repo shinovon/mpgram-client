@@ -1,4 +1,4 @@
-
+package org.bouncycastle.crypto;
 
 /**
  * interface that a public/private key pair generator should conform to.
