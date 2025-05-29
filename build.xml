@@ -1,6 +1,5 @@
-<!-- CALL AS "JAVA_HOME=/path/to/jdk8 ant targetname" -->
-
 <?xml version="1.0" encoding="utf-8" ?>
+<!-- CALL AS "JAVA_HOME=/path/to/jdk8 ant targetname" -->
 <project name="mpgram" default="package">
     
     <!-- EDIT THE PATH TO YOUR WIRELESS TOOLKIT FOLDER HERE -->
@@ -61,8 +60,8 @@
         <wtkpackage
             jarfile="out/MPGram.jar"
             jadfile="out/MPGram.jad"
-            preverify="true"
-            obfuscate="true"
+            preverify="false"
+            obfuscate="false"
             bootclasspath="tools/proguard.jar"
         >
             <fileset dir="classes"/>
