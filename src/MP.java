@@ -321,7 +321,7 @@ public class MP extends MIDlet
 	private static Form authForm;
 	private static Form writeForm;
 	private static Form playerForm;
-	private static List playlistList;
+	private static List playlistList; // TODO
 	private static final Vector formHistory = new Vector();
 
 	// auth items
@@ -608,7 +608,7 @@ public class MP extends MIDlet
 		openImageCmd = new Command(L[ViewImage], Command.ITEM, 1);
 		callItemCmd = new Command(L[Call], Command.ITEM, 1);
 		documentCmd = new Command(L[Download], Command.ITEM, 2);
-		playItemCmd = new Command("Play", Command.ITEM, 1); // TODO unlocalized
+		playItemCmd = new Command(L[Play_Item], Command.ITEM, 1);
 		
 		writeCmd = new Command(L[WriteMessage], Command.SCREEN, 5);
 		latestCmd = new Command(L[LatestMessages_Cmd], Command.SCREEN, 7);
@@ -643,11 +643,11 @@ public class MP extends MIDlet
 		
 		updateCmd = new Command(L[Download], Command.OK, 1);
 		
-		playlistPlayCmd = new Command("Play", Command.ITEM, 1); // TODO unlocalized
-		playlistPauseCmd = new Command("Pause", Command.ITEM, 1); // TODO unlocalized
-		playlistNextCmd = new Command("Next", Command.ITEM, 1); // TODO unlocalized
-		playlistPrevCmd = new Command("Prev", Command.ITEM, 1); // TODO unlocalized
-		playerCmd = new Command("Player", Command.SCREEN, 20); // TODO unlocalized
+		playlistPlayCmd = new Command(L[Play_Player], Command.ITEM, 1);
+		playlistPauseCmd = new Command(L[Pause_Player], Command.ITEM, 1);
+		playlistNextCmd = new Command(L[Next_Player], Command.ITEM, 1);
+		playlistPrevCmd = new Command(L[Prev_Player], Command.ITEM, 1);
+		playerCmd = new Command(L[OpenPlayer], Command.SCREEN, 20);
 		
 		loadingForm = new Form(L[mpgram]);
 		loadingForm.append(L[Loading]);
@@ -1348,7 +1348,7 @@ public class MP extends MIDlet
 			}
 			break;
 		}
-		case RUN_LOAD_PLAYLIST: { // TODO
+		case RUN_LOAD_PLAYLIST: {
 			int mode;
 			{
 				String s = ((String[]) param)[1];
@@ -1807,10 +1807,9 @@ public class MP extends MIDlet
 					f.append(s);
 					
 					if (blackberry) {
-						// TODO untranslated
-						networkChoice = new ChoiceGroup("Network access", Choice.POPUP, new String[] {
-								"Data",
-								"Wi-Fi"
+						networkChoice = new ChoiceGroup(L[NetworkAccess], Choice.POPUP, new String[] {
+								L[MobileData],
+								L[WiFi]
 						}, null);
 						networkChoice.setSelectedIndex(blackberryNetwork == -1 ? 0 : blackberryNetwork, true);
 						networkChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -2225,7 +2224,7 @@ public class MP extends MIDlet
 			commandAction(backCmd, current);
 			return;
 		}
-		{ // Playlist commands TODO
+		{ // Playlist commands
 			if (c == playlistPlayCmd) {
 				if (currentPlayer != null) {
 					try {
@@ -2243,11 +2242,13 @@ public class MP extends MIDlet
 					}
 				}
 			} else if (c == playlistNextCmd) {
+				if (playerState == 3) return;
 				startNextMusic(true, playlistIndex);
 			} else if (c == playlistPrevCmd) {
+				if (playerState == 3) return;
 				startNextMusic(false, playlistIndex);
 			} else if (c == playlistCmd) {
-				
+				// TODO
 			} else if (c == playerCmd) {
 				display(initPlayerForm());
 			}
@@ -2500,7 +2501,7 @@ public class MP extends MIDlet
 				playerProgress.setValue(100);
 			}
 			if (playerPlaypauseBtn != null) {
-				playerPlaypauseBtn.setText("Play");
+				playerPlaypauseBtn.setText(L[Play_Player]);
 				playerPlaypauseBtn.removeCommand(playlistPauseCmd);
 				playerPlaypauseBtn.setDefaultCommand(playlistPlayCmd);
 			}
@@ -2510,14 +2511,14 @@ public class MP extends MIDlet
 		if (PlayerListener.STARTED.equals(event)) {
 			playerState = 1;
 			if (playerPlaypauseBtn != null) {
-				playerPlaypauseBtn.setText("Pause");
+				playerPlaypauseBtn.setText(L[Pause_Player]);
 				playerPlaypauseBtn.removeCommand(playlistPlayCmd);
 				playerPlaypauseBtn.setDefaultCommand(playlistPauseCmd);
 			}
 		} else if (PlayerListener.STOPPED.equals(event) || PlayerListener.STOPPED_AT_TIME.equals(event)) {
 			playerState = 2;
 			if (playerPlaypauseBtn != null) {
-				playerPlaypauseBtn.setText("Play");
+				playerPlaypauseBtn.setText(L[Play_Player]);
 				playerPlaypauseBtn.removeCommand(playlistPauseCmd);
 				playerPlaypauseBtn.setDefaultCommand(playlistPlayCmd);
 			}
@@ -2536,22 +2537,24 @@ public class MP extends MIDlet
 	}
 	
 	private void startNextMusic(boolean dir, int start) {
+		int tmp = playerState;
+		playerState = 3;
 		if (playlist != null) {
 			int idx = start;
 			for (;;) {
 				if (playlistDirection == dir) {
 					if (++idx >= playlist.size()) {
 						if (playlist.size() != playlistSize) {
-							// TODO load more
 							start(RUN_LOAD_PLAYLIST, new String[] {null, "1"});
+							return;
 						}
 						break;
 					}
 				} else {
 					if (--idx < 0) {
 						if (playlistOffset != 0) {
-							// TODO load more
 							start(RUN_LOAD_PLAYLIST, new String[] {null, "2"});
+							return;
 						}
 						break;
 					}
@@ -2561,9 +2564,10 @@ public class MP extends MIDlet
 					continue;
 				playlistIndex = idx;
 				startPlayer(currentMusic = msg);
-				break;
+				return;
 			}
 		}
+		playerState = tmp;
 	}
 
 	static void startPlayer(JSONObject msg) {
@@ -2593,7 +2597,7 @@ public class MP extends MIDlet
 			if (playerTitleLabel != null) {
 				if ((t = msg.getObject("media").getObject("audio").getString("title", null)) == null) {
 					if ((t = name) == null) {
-						t = "Unknown Track";
+						t = L[UnknownTrack];
 					}
 				}
 				playerTitleLabel.setText(t);
@@ -2972,36 +2976,36 @@ public class MP extends MIDlet
 			return playerForm;
 		}
 		
-		Form f = new Form("Music player"); // TODO unlocalized
+		Form f = new Form(L[Player_Title].concat(" - mpgram"));
 		f.addCommand(backCmd);
 		f.setCommandListener(midlet);
 		
 		StringItem s;
 		
-		s = new StringItem(null, "Title");
+		s = new StringItem(null, L[UnknownTrack]);
 		s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 		f.append(playerTitleLabel = s);
 		
-		s = new StringItem(null, "Artist");
+		s = new StringItem(null, "");
 		s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 		f.append(playerArtistLabel = s);
 		
 		Gauge g = new Gauge(null, false, 100, 0);
 		f.append(playerProgress = g);
 		
-		s = new StringItem(null, "Prev", Item.BUTTON);
+		s = new StringItem(null, L[Prev_Player], Item.BUTTON);
 		s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE);
 		s.setDefaultCommand(playlistPrevCmd);
 		s.setItemCommandListener(midlet);
 		f.append(s);
 		
-		s = new StringItem(null, "Play", Item.BUTTON);
+		s = new StringItem(null, L[Play_Player], Item.BUTTON);
 		s.setLayout(Item.LAYOUT_LEFT);
 		s.setDefaultCommand(playlistPlayCmd);
 		s.setItemCommandListener(midlet);
 		f.append(playerPlaypauseBtn = s);
 		
-		s = new StringItem(null, "Next", Item.BUTTON);
+		s = new StringItem(null, L[Next_Player], Item.BUTTON);
 		s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_AFTER);
 		s.setDefaultCommand(playlistNextCmd);
 		s.setItemCommandListener(midlet);

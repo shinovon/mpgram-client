@@ -108,6 +108,7 @@
 	"ViewImage": "View image",
 	"Call": "Call",
 	"Download": "Download",
+	"Play_Item": "Play",
 	
 	// Chat form commands
 	"WriteMessage": "Write message",
@@ -203,6 +204,9 @@
 	"KeepSessionAlive": "Keep session alive",
 	"UseUnicode": "Use Unicode",
 	"UseCompression": "Use compression",
+	"NetworkAccess": "Network access",
+	"MobileData": "Data",
+	"WiFi": "Wi-Fi",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Load media thumbnails",
@@ -289,6 +293,15 @@
 	"Stickers_Title": "Stickers",
 	"Sticker": "Sticker",
 	"AddStickers": "Add stickers",
+	
+	// Music player
+	"Player_Title": "Music player",
+	"OpenPlayer": "Player",
+	"Play_Player": "Play",
+	"Pause_Player": "Pause",
+	"Prev_Player": "Prev",
+	"Next_Player": "Next",
+	"UnknownTrack": "Unknown Track",
 	
 	// Profile/chat info
 	"Online": "online",

@@ -108,6 +108,7 @@
 	"ViewImage": "اظهار الصورة",
 	"Call": "اتصال",
 	"Download": "تحميل",
+	"Play_Item": "Play", // Untranslated
 	
 	// Chat form commands
 	"WriteMessage": "كتابة رسالة",
@@ -203,6 +204,9 @@
 	"KeepSessionAlive": "Keep session alive", // Untranslated
 	"UseUnicode": "Use Unicode", // Untranslated
 	"UseCompression": "Use compression", // Untranslated
+	"NetworkAccess": "Network access", // Untranslated
+	"MobileData": "Data", // Untranslated
+	"WiFi": "Wi-Fi", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "تحميل صور مصغرة للوسائط",
@@ -290,6 +294,14 @@
 	"Sticker": "Sticker", // Untranslated
 	"AddStickers": "Add stickers", // Untranslated
 	
+	// Music player
+	"Player_Title": "Music player", // Untranslated
+	"OpenPlayer": "Player", // Untranslated
+	"Play_Player": "Play", // Untranslated
+	"Pause_Player": "Pause", // Untranslated
+	"Prev_Player": "Prev", // Untranslated
+	"Next_Player": "Next", // Untranslated
+	"UnknownTrack": "Unknown Track", // Untranslated
 	// Profile/chat info
 	"Online": "متصل",
 	"Offline": "غير متصل",
