@@ -317,9 +317,9 @@ public class JSONArray {
 		insertElementAt(new Long(l), index);
 	}
 
-	public void put(int index, double d) {
-		insertElementAt(new Double(d), index);
-	}
+//	public void put(int index, double d) {
+//		insertElementAt(new Double(d), index);
+//	}
 
 	public void put(int index, boolean b) {
 		insertElementAt(b ? JSONObject.TRUE : JSONObject.FALSE, index);
@@ -337,9 +337,9 @@ public class JSONArray {
 		return _indexOf(new Long(l), 0) != -1;
 	}
 
-	public boolean has(double d) {
-		return _indexOf(new Double(d), 0) != -1;
-	}
+//	public boolean has(double d) {
+//		return _indexOf(new Double(d), 0) != -1;
+//	}
 	
 	public boolean has(boolean b) {
 		return _indexOf(b ? JSONObject.TRUE : JSONObject.FALSE, 0) != -1;
