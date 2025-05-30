@@ -130,6 +130,10 @@
 	"ChatMedia": "Chat Medien",
 	"Members": "Mitglieder",
 	"AddToContacts": "Zu Kontakten hinzufügen",
+	"Photos": "Photos", // Untranslated
+	"Videos": "Videos", // Untranslated
+	"Files": "Files", // Untranslated
+	"AudioFiles": "Music", // Untranslated
 	
 	// Dialog commands
 	"Ok": "OK",
@@ -297,11 +301,14 @@
 	// Music player
 	"Player_Title": "Music player", // Untranslated
 	"OpenPlayer": "Player", // Untranslated
+	"OpenPlaylist": "Playlist", // Untranslated
 	"Play_Player": "Play", // Untranslated
 	"Pause_Player": "Pause", // Untranslated
 	"Prev_Player": "Prev", // Untranslated
 	"Next_Player": "Next", // Untranslated
 	"UnknownTrack": "Unknown Track", // Untranslated
+	"Playlist_Title": "Playlist", // Untranslated
+	
 	// Profile/chat info
 	"Online": "online",
 	"Offline": "offline",

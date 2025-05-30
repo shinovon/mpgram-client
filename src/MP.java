@@ -289,7 +289,10 @@ public class MP extends MIDlet
 	static Command acceptInviteCmd;
 	static Command joinChatCmd;
 	static Command leaveChatCmd;
-	static Command chatMediaCmd;
+	static Command chatPhotosCmd;
+	static Command chatVideosCmd;
+	static Command chatFilesCmd;
+	static Command chatMusicCmd;
 	static Command gotoPinnedMsgCmd;
 	static Command chatMembersCmd;
 	
@@ -628,7 +631,10 @@ public class MP extends MIDlet
 		acceptInviteCmd = new Command(L[Join], Command.ITEM, 1);
 		joinChatCmd = new Command(L[JoinGroup], Command.SCREEN, 1);
 		leaveChatCmd = new Command(L[LeaveGroup], Command.ITEM, 1);
-		chatMediaCmd = new Command(L[Media], Command.ITEM, 1);
+		chatPhotosCmd = new Command(L[Photos], Command.ITEM, 1);
+		chatVideosCmd = new Command(L[Videos], Command.ITEM, 1);
+		chatFilesCmd = new Command(L[Files], Command.ITEM, 1);
+		chatMusicCmd = new Command(L[AudioFiles], Command.ITEM, 1);
 		gotoPinnedMsgCmd = new Command(L[GoTo], Command.ITEM, 1);
 		chatMembersCmd = new Command(L[Members], Command.SCREEN, 6);
 		
@@ -648,6 +654,7 @@ public class MP extends MIDlet
 		playlistPauseCmd = new Command(L[Pause_Player], Command.ITEM, 1);
 		playlistNextCmd = new Command(L[Next_Player], Command.ITEM, 1);
 		playlistPrevCmd = new Command(L[Prev_Player], Command.ITEM, 1);
+		playlistCmd = new Command(L[OpenPlaylist], Command.SCREEN, 2);
 		playerCmd = new Command(L[OpenPlayer], Command.SCREEN, 20);
 		
 		loadingForm = new Form(L[mpgram]);
@@ -1376,6 +1383,15 @@ public class MP extends MIDlet
 					.append("&add_offset=-1");
 				}
 				
+				if (playlistList == null) {
+					List list = new List(L[Playlist_Title], List.IMPLICIT);
+					list.addCommand(backCmd);
+					list.addCommand(List.SELECT_COMMAND);
+					list.setCommandListener(midlet);
+					
+					playlistList = list;
+				}
+				
 				JSONObject j = (JSONObject) MP.api(sb.toString());
 				JSONArray messages = j.getArray("messages");
 				int l = messages.size();
@@ -1390,6 +1406,8 @@ public class MP extends MIDlet
 						initPlayerForm();
 						startPlayer(currentMusic);
 						display(playerForm);
+					} else {
+						display(playlistList);
 					}
 				} else if (mode == 1) {
 					for (int i = 0; i < l; ++i) {
@@ -1404,6 +1422,26 @@ public class MP extends MIDlet
 						playlist.put(0, messages.getObject(i));
 					}
 					startNextMusic(!playlistDirection, playlistIndex);
+				}
+				
+				if (playlistList != null) {
+					playlistList.deleteAll();
+					l = playlist.size();
+					String t;
+					for (int i = 0; i < l; ++i) {
+						JSONObject msg = playlist.getObject(i);
+						sb.setLength(0);
+						if ((t = msg.getObject("media").getObject("audio").getString("artist", null)) != null) {
+							sb.append(t).append(" - ");
+						}
+						if ((t = msg.getObject("media").getObject("audio").getString("title", null)) != null) {
+							sb.append(t);
+						} else {
+							sb.append(msg.getObject("media").getString("name", ""));
+						}
+						playlistList.append(sb.toString(), null);
+					}
+					playlistList.setSelectedIndex(playlistIndex, true);
 				}
 			} catch (Exception e) {
 				display(errorAlert(e), current);
@@ -1603,8 +1641,20 @@ public class MP extends MIDlet
 				display(t);
 				return;
 			}
-			if (c == chatMediaCmd) {
+			if (c == chatPhotosCmd) {
 				openLoad(new ChatForm(((ChatInfoForm) current).id, "Photos"));
+				return;
+			}
+			if (c == chatVideosCmd) {
+				openLoad(new ChatForm(((ChatInfoForm) current).id, "Video"));
+				return;
+			}
+			if (c == chatFilesCmd) {
+				openLoad(new ChatForm(((ChatInfoForm) current).id, "Document"));
+				return;
+			}
+			if (c == chatMusicCmd) {
+				openLoad(new ChatForm(((ChatInfoForm) current).id, "Music"));
 				return;
 			}
 			if (c == gotoPinnedMsgCmd) {
@@ -2179,6 +2229,11 @@ public class MP extends MIDlet
 				((MPList) d).select(((List) d).getSelectedIndex());
 				return;
 			}
+			if (d == playlistList) {
+				if (playerState == 3) return;
+				startPlayer(playlist.getObject(playlistIndex = ((List) d).getSelectedIndex()));
+				return;
+			}
 			
 			// file picker
 			int i = ((List) d).getSelectedIndex();
@@ -2258,7 +2313,8 @@ public class MP extends MIDlet
 				if (playerState == 3) return;
 				startNextMusic(false, playlistIndex);
 			} else if (c == playlistCmd) {
-				// TODO
+				if (playlistList == null) return;
+				display(playlistList);
 			} else if (c == playerCmd) {
 				display(initPlayerForm());
 			}
@@ -2595,6 +2651,8 @@ public class MP extends MIDlet
 			playerState = 0;
 		}
 		try {
+			playerState = 3;
+			
 			StringBuffer url = new StringBuffer(instanceUrl);
 			String name;
 			if ((name = msg.getObject("media").getString("name", null)) != null && fileRewrite) {
@@ -2622,7 +2680,11 @@ public class MP extends MIDlet
 				playerArtistLabel.setText(t);
 			}
 			
-			playerState = 3;
+			if (playlistList != null) {
+				try {
+					playlistList.setSelectedIndex(playlistIndex, true);
+				} catch (Exception ignored) {}
+			}
 			
 			// TODO
 			Player p = Manager.createPlayer(url.toString());
@@ -2992,6 +3054,7 @@ public class MP extends MIDlet
 		
 		Form f = new Form(L[Player_Title].concat(" - mpgram"));
 		f.addCommand(backCmd);
+		f.addCommand(playlistCmd);
 		f.setCommandListener(midlet);
 		
 		StringItem s;

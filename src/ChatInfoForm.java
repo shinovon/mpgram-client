@@ -204,9 +204,27 @@ public class ChatInfoForm extends MPForm {
 			s.setItemCommandListener(MP.midlet);
 			append(s);
 			
-			s = new StringItem(null, MP.L[ChatMedia], Item.BUTTON);
+			s = new StringItem(null, MP.L[Photos], Item.BUTTON);
 			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-			s.setDefaultCommand(MP.chatMediaCmd);
+			s.setDefaultCommand(MP.chatPhotosCmd);
+			s.setItemCommandListener(MP.midlet);
+			append(s);
+			
+			s = new StringItem(null, MP.L[Videos], Item.BUTTON);
+			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+			s.setDefaultCommand(MP.chatVideosCmd);
+			s.setItemCommandListener(MP.midlet);
+			append(s);
+			
+			s = new StringItem(null, MP.L[Files], Item.BUTTON);
+			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+			s.setDefaultCommand(MP.chatFilesCmd);
+			s.setItemCommandListener(MP.midlet);
+			append(s);
+			
+			s = new StringItem(null, MP.L[AudioFiles], Item.BUTTON);
+			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+			s.setDefaultCommand(MP.chatMusicCmd);
 			s.setItemCommandListener(MP.midlet);
 			append(s);
 		}

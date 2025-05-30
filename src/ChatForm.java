@@ -188,7 +188,7 @@ public class ChatForm extends MPForm implements Runnable {
 		setTitle(title);
 		
 		boolean selfChat = MP.selfId.equals(id);
-		boolean reverse = MP.reverseChat && !"Photos".equals(mediaFilter);
+		boolean reverse = MP.reverseChat && mediaFilter == null;
 		
 		if (startBot != null) {
 			try {

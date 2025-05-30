@@ -130,6 +130,10 @@
 	"ChatMedia": "Chat media",
 	"Members": "Members",
 	"AddToContacts": "Add to contacts",
+	"Photos": "Photos",
+	"Videos": "Videos",
+	"Files": "Files",
+	"AudioFiles": "Music",
 	
 	// Dialog commands
 	"Ok": "Ok",
@@ -297,11 +301,13 @@
 	// Music player
 	"Player_Title": "Music player",
 	"OpenPlayer": "Player",
+	"OpenPlaylist": "Playlist",
 	"Play_Player": "Play",
 	"Pause_Player": "Pause",
 	"Prev_Player": "Prev",
 	"Next_Player": "Next",
 	"UnknownTrack": "Unknown Track",
+	"Playlist_Title": "Playlist",
 	
 	// Profile/chat info
 	"Online": "online",
