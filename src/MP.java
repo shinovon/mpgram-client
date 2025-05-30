@@ -98,6 +98,7 @@ public class MP extends MIDlet
 	static final int RUN_SEND_STICKER = 21;
 	static final int RUN_INSTALL_STICKER_SET = 22;
 	static final int RUN_LOAD_PLAYLIST = 23;
+	static final int RUN_PLAYER_LOOP = 24;
 	
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
@@ -379,7 +380,7 @@ public class MP extends MIDlet
 	private static boolean playlistDirection = true;
 	private static String playlistPeer;
 	private static JSONObject currentMusic;
-	private static int playerState; // 1 - playing, 2 - paused
+	private static int playerState; // 1 - playing, 2 - paused, 3 - loading
 	private static Player currentPlayer;
 	
 	// region MIDlet
@@ -1407,6 +1408,15 @@ public class MP extends MIDlet
 			} catch (Exception e) {
 				display(errorAlert(e), current);
 			}
+			break;
+		}
+		case RUN_PLAYER_LOOP: {
+			try {
+				while (currentPlayer != null && playerState == 1) {
+					playerUpdate(currentPlayer, null, null);
+					Thread.sleep(500L);
+				}
+			} catch (Exception ignored) {}
 			break;
 		}
 		}
@@ -2515,6 +2525,7 @@ public class MP extends MIDlet
 				playerPlaypauseBtn.removeCommand(playlistPlayCmd);
 				playerPlaypauseBtn.setDefaultCommand(playlistPauseCmd);
 			}
+			start(RUN_PLAYER_LOOP, player);
 		} else if (PlayerListener.STOPPED.equals(event) || PlayerListener.STOPPED_AT_TIME.equals(event)) {
 			playerState = 2;
 			if (playerPlaypauseBtn != null) {
@@ -2525,14 +2536,16 @@ public class MP extends MIDlet
 		}
 		
 		if (playerProgress != null) {
-			int progress = 0;
-			final long duration = currentMusic.getObject("media").getObject("audio").getInt("time", 0) * 1000000L;
-			progress = (int) ((player.getMediaTime() * 100) / duration);
-
-			if (progress < 0) progress = 0;
-			if (progress > 100) progress = 100;
-			
-			playerProgress.setValue(progress);
+			try {
+				int progress = 0;
+				final long duration = currentMusic.getObject("media").getObject("audio").getInt("time", 0) * 1000000L;
+				progress = (int) ((player.getMediaTime() * 100) / duration);
+	
+				if (progress < 0) progress = 0;
+				if (progress > 100) progress = 100;
+				
+				playerProgress.setValue(progress);
+			} catch (Exception e) {}
 		}
 	}
 	
@@ -2618,6 +2631,7 @@ public class MP extends MIDlet
 			
 			p.realize();
 			p.start();
+			playerState = 1;
 		} catch (Exception e) {
 			display(errorAlert(e), current);
 		}
