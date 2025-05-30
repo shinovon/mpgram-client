@@ -58,6 +58,9 @@ import javax.microedition.lcdui.Spacer;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextBox;
 import javax.microedition.lcdui.TextField;
+import javax.microedition.media.Manager;
+import javax.microedition.media.Player;
+import javax.microedition.media.PlayerListener;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.rms.RecordStore;
 
@@ -68,7 +71,8 @@ import zip.GZIPInputStream;
 import zip.Inflater;
 import zip.InflaterInputStream;
 
-public class MP extends MIDlet implements CommandListener, ItemCommandListener, ItemStateListener, Runnable, LangConstants {
+public class MP extends MIDlet
+	implements CommandListener, ItemCommandListener, ItemStateListener, Runnable, LangConstants, PlayerListener {
 
 	// region Constants
 	static final int RUN_SEND_MESSAGE = 1;
@@ -93,6 +97,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static final int RUN_PIN_MESSAGE = 20;
 	static final int RUN_SEND_STICKER = 21;
 	static final int RUN_INSTALL_STICKER_SET = 22;
+	static final int RUN_LOAD_PLAYLIST = 23;
 	
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
@@ -264,6 +269,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command openImageCmd;
 	static Command callItemCmd;
 	static Command documentCmd;
+	static Command playItemCmd;
 
 	static Command writeCmd;
 	static Command chatInfoCmd;
@@ -296,6 +302,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command nextPageCmd;
 	static Command prevPageCmd;
 	
+	static Command playlistPlayCmd;
+	static Command playlistPauseCmd;
+	static Command playlistNextCmd;
+	static Command playlistPrevCmd;
+	static Command playlistCmd;
+	static Command playerCmd;
+	
 	private static Command updateCmd;
 	// endregion
 	
@@ -307,6 +320,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static Form settingsForm;
 	private static Form authForm;
 	private static Form writeForm;
+	private static Form playerForm;
+	private static List playlistList;
 	private static final Vector formHistory = new Vector();
 
 	// auth items
@@ -333,6 +348,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 //	private static TextField fileField;
 	private static ChoiceGroup sendChoice;
 	private static StringItem fileLabel;
+	
+	// player items
+	private static StringItem playerTitleLabel, playerArtistLabel;
+	private static Gauge playerProgress;
+	private static StringItem playerPlaypauseBtn;
 
 	// cache
 	private static final JSONObject usersCache = new JSONObject();
@@ -350,6 +370,17 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	
 	// file picker
 	private static Vector rootsList;
+	
+	// music
+	private static JSONArray playlist;
+	private static int playlistIndex;
+	private static int playlistSize;
+	private static int playlistOffset;
+	private static boolean playlistDirection = true;
+	private static String playlistPeer;
+	private static JSONObject currentMusic;
+	private static int playerState; // 1 - playing, 2 - paused
+	private static Player currentPlayer;
 	
 	// region MIDlet
 	
@@ -570,13 +601,14 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		editMsgCmd = new Command(L[Edit], Command.ITEM, 9);
 		gotoMsgCmd = new Command(L[GoTo], Command.ITEM, 1);
 		botCallbackCmd = new Command("", Command.ITEM, 1); // TODO unlocalized
-		pinMsgCmd = new Command(L[Pin], Command.ITEM, 10);
 		banMemberCmd = new Command(L[BanMember], Command.ITEM, 11);
+		pinMsgCmd = new Command(L[Pin], Command.ITEM, 10);
 		
 		richTextLinkCmd = new Command(L[Link_Cmd], Command.ITEM, 1);
 		openImageCmd = new Command(L[ViewImage], Command.ITEM, 1);
 		callItemCmd = new Command(L[Call], Command.ITEM, 1);
 		documentCmd = new Command(L[Download], Command.ITEM, 2);
+		playItemCmd = new Command("Play", Command.ITEM, 1); // TODO unlocalized
 		
 		writeCmd = new Command(L[WriteMessage], Command.SCREEN, 5);
 		latestCmd = new Command(L[LatestMessages_Cmd], Command.SCREEN, 7);
@@ -610,6 +642,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		prevPageCmd = new Command(L[PrevPage], Command.SCREEN, 7);
 		
 		updateCmd = new Command(L[Download], Command.OK, 1);
+		
+		playlistPlayCmd = new Command("Play", Command.ITEM, 1); // TODO unlocalized
+		playlistPauseCmd = new Command("Pause", Command.ITEM, 1); // TODO unlocalized
+		playlistNextCmd = new Command("Next", Command.ITEM, 1); // TODO unlocalized
+		playlistPrevCmd = new Command("Prev", Command.ITEM, 1); // TODO unlocalized
+		playerCmd = new Command("Player", Command.SCREEN, 20); // TODO unlocalized
 		
 		loadingForm = new Form(L[mpgram]);
 		loadingForm.append(L[Loading]);
@@ -1305,6 +1343,67 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 //				s.removeCommand(addStickerPackCmd);
 				commandAction(backCmd, s);
 				display(infoAlert(L[StickersAdded_Alert]), current);
+			} catch (Exception e) {
+				display(errorAlert(e), current);
+			}
+			break;
+		}
+		case RUN_LOAD_PLAYLIST: { // TODO
+			int mode;
+			{
+				String s = ((String[]) param)[1];
+				if (s == null) {
+					mode = 0;
+				} else mode = s.charAt(0) - '0';
+			}
+			String peer = ((String[]) param)[0];
+			if (peer == null) {
+				peer = playlistPeer;
+			} else {
+				playlistPeer = peer;
+			}
+			try {
+				StringBuffer sb = new StringBuffer("searchMessages&filter=Music&media=1");
+				sb.append("&peer=").append(peer);
+				sb.append("&limit=").append(messagesLimit);
+				if (mode == 1) {
+					sb.append("&offset_id=").append(playlist.getObject(playlist.size() - 1).getInt("id"));
+				} else if (mode == 2) {
+					sb.append("&min_id=").append(playlist.getObject(0).getInt("id"));
+				} else if (mode == 3) {
+					sb.append("&offset_id=").append(((String[]) param)[2])
+					.append("&add_offset=-1");
+				}
+				
+				JSONObject j = (JSONObject) MP.api(sb.toString());
+				JSONArray messages = j.getArray("messages");
+				int l = messages.size();
+				playlistSize = j.getInt("count", -1);
+				
+				if (mode == 0 || mode == 3) {
+					playlist = messages;
+					playlistOffset = j.getInt("off", 0);
+					playlistIndex = 0;
+					currentMusic = playlist.getObject(0);
+					if (mode == 3) {
+						initPlayerForm();
+						startPlayer(currentMusic);
+						display(playerForm);
+					}
+				} else if (mode == 1) {
+					for (int i = 0; i < l; ++i) {
+						playlist.add(messages.getObject(i));
+					}
+					startNextMusic(playlistDirection, playlistIndex);
+				} else if (mode == 2) {
+					playlistIndex += l;
+					playlistOffset -= l;
+					if (playlistOffset < 0) playlistOffset = 0;
+					for (int i = l - 1; i >= 0; --i) {
+						playlist.put(0, messages.getObject(i));
+					}
+					startNextMusic(!playlistDirection, playlistIndex);
+				}
 			} catch (Exception e) {
 				display(errorAlert(e), current);
 			}
@@ -2126,6 +2225,33 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			commandAction(backCmd, current);
 			return;
 		}
+		{ // Playlist commands TODO
+			if (c == playlistPlayCmd) {
+				if (currentPlayer != null) {
+					try {
+						currentPlayer.start();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c == playlistPauseCmd) {
+				if (currentPlayer != null) {
+					try {
+						currentPlayer.stop();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c == playlistNextCmd) {
+				startNextMusic(true, playlistIndex);
+			} else if (c == playlistPrevCmd) {
+				startNextMusic(false, playlistIndex);
+			} else if (c == playlistCmd) {
+				
+			} else if (c == playerCmd) {
+				display(initPlayerForm());
+			}
+		}
 		if (c == backCmd || c == cancelCmd) {
 			// cancel ota update dialog
 			updateUrl = null;
@@ -2154,7 +2280,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			notifyDestroyed();
 		}
 	}
-	
+
 	public void commandAction(Command c, Item item) {
 		{ // message
 			if (c == itemChatCmd) {
@@ -2331,6 +2457,14 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			start(RUN_SEND_STICKER, s);
 			return;
 		}
+		if (c == playItemCmd) {
+			String[] s = (String[]) ((MPForm) current).urls.get(item);
+			if (s == null) return;
+			
+			display(loadingAlert(L[Loading]), current);
+			start(RUN_LOAD_PLAYLIST, new String[] {s[0], "3", s[1]});
+			return;
+		}
 		commandAction(c, display.getCurrent());
 	}
 
@@ -2352,6 +2486,136 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			
 			lastType = l;
 			start(RUN_SET_TYPING, ((TextField) item).getString().length() == 0 ? "Cancel" : null);
+		}
+	}
+	
+	// endregion
+	
+	// region Music player
+	
+	public void playerUpdate(Player player, String event, Object eventData) {
+		if (PlayerListener.END_OF_MEDIA.equals(event)) {
+			playerState = 2;
+			if (playerProgress != null) {
+				playerProgress.setValue(100);
+			}
+			if (playerPlaypauseBtn != null) {
+				playerPlaypauseBtn.setText("Play");
+				playerPlaypauseBtn.removeCommand(playlistPauseCmd);
+				playerPlaypauseBtn.setDefaultCommand(playlistPlayCmd);
+			}
+			startNextMusic(true, playlistIndex);
+			return;
+		}
+		if (PlayerListener.STARTED.equals(event)) {
+			playerState = 1;
+			if (playerPlaypauseBtn != null) {
+				playerPlaypauseBtn.setText("Pause");
+				playerPlaypauseBtn.removeCommand(playlistPlayCmd);
+				playerPlaypauseBtn.setDefaultCommand(playlistPauseCmd);
+			}
+		} else if (PlayerListener.STOPPED.equals(event) || PlayerListener.STOPPED_AT_TIME.equals(event)) {
+			playerState = 2;
+			if (playerPlaypauseBtn != null) {
+				playerPlaypauseBtn.setText("Play");
+				playerPlaypauseBtn.removeCommand(playlistPauseCmd);
+				playerPlaypauseBtn.setDefaultCommand(playlistPlayCmd);
+			}
+		}
+		
+		if (playerProgress != null) {
+			int progress = 0;
+			final long duration = currentMusic.getObject("media").getObject("audio").getInt("time", 0) * 1000000L;
+			progress = (int) ((player.getMediaTime() * 100) / duration);
+
+			if (progress < 0) progress = 0;
+			if (progress > 100) progress = 100;
+			
+			playerProgress.setValue(progress);
+		}
+	}
+	
+	private void startNextMusic(boolean dir, int start) {
+		if (playlist != null) {
+			int idx = start;
+			for (;;) {
+				if (playlistDirection == dir) {
+					if (++idx >= playlist.size()) {
+						if (playlist.size() != playlistSize) {
+							// TODO load more
+							start(RUN_LOAD_PLAYLIST, new String[] {null, "1"});
+						}
+						break;
+					}
+				} else {
+					if (--idx < 0) {
+						if (playlistOffset != 0) {
+							// TODO load more
+							start(RUN_LOAD_PLAYLIST, new String[] {null, "2"});
+						}
+						break;
+					}
+				}
+				JSONObject msg = (JSONObject) playlist.get(idx);
+				if (!"audio/mpeg".equals(msg.getObject("media").getString("mime")))
+					continue;
+				playlistIndex = idx;
+				startPlayer(currentMusic = msg);
+				break;
+			}
+		}
+	}
+
+	static void startPlayer(JSONObject msg) {
+		if (currentPlayer != null) {
+			try {
+				currentPlayer.stop();
+			} catch (Throwable ignored) {}
+			try {
+				currentPlayer.close();
+			} catch (Throwable ignored) {}
+			currentPlayer = null;
+			playerState = 0;
+		}
+		try {
+			StringBuffer url = new StringBuffer(instanceUrl);
+			String name;
+			if ((name = msg.getObject("media").getString("name", null)) != null && fileRewrite) {
+				url.append("file/").append(name);
+			} else {
+				url.append(FILE_URL);
+			}
+			url.append("?c=").append(msg.getString("peer_id"))
+			.append("&m=").append(msg.getInt("id"))
+			.append("&user=").append(user);
+			
+			String t;
+			if (playerTitleLabel != null) {
+				if ((t = msg.getObject("media").getObject("audio").getString("title", null)) == null) {
+					if ((t = name) == null) {
+						t = "Unknown Track";
+					}
+				}
+				playerTitleLabel.setText(t);
+			}
+			if (playerArtistLabel != null) {
+				if ((t = msg.getObject("media").getObject("audio").getString("artist", null)) == null) {
+					t = "";
+				}
+				playerArtistLabel.setText(t);
+			}
+			
+			playerState = 3;
+			
+			// TODO
+			Player p = Manager.createPlayer(url.toString());
+			p.addPlayerListener(midlet);
+			currentPlayer = p;
+			
+			p.realize();
+			p.start();
+		} catch (Exception e) {
+			display(errorAlert(e), current);
 		}
 	}
 	
@@ -2703,6 +2967,49 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		openLoad(new ChatInfoForm(id, chatForm, mode));
 	}
 	
+	static Form initPlayerForm() {
+		if (playerForm != null) {
+			return playerForm;
+		}
+		
+		Form f = new Form("Music player"); // TODO unlocalized
+		f.addCommand(backCmd);
+		f.setCommandListener(midlet);
+		
+		StringItem s;
+		
+		s = new StringItem(null, "Title");
+		s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+		f.append(playerTitleLabel = s);
+		
+		s = new StringItem(null, "Artist");
+		s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+		f.append(playerArtistLabel = s);
+		
+		Gauge g = new Gauge(null, false, 100, 0);
+		f.append(playerProgress = g);
+		
+		s = new StringItem(null, "Prev", Item.BUTTON);
+		s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE);
+		s.setDefaultCommand(playlistPrevCmd);
+		s.setItemCommandListener(midlet);
+		f.append(s);
+		
+		s = new StringItem(null, "Play", Item.BUTTON);
+		s.setLayout(Item.LAYOUT_LEFT);
+		s.setDefaultCommand(playlistPlayCmd);
+		s.setItemCommandListener(midlet);
+		f.append(playerPlaypauseBtn = s);
+		
+		s = new StringItem(null, "Next", Item.BUTTON);
+		s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_AFTER);
+		s.setDefaultCommand(playlistNextCmd);
+		s.setItemCommandListener(midlet);
+		f.append(s);
+		
+		return playerForm = f;
+	}
+	
 	static void copy(String title, String text) {
 		// TODO use nokiaui?
 		TextBox t = new TextBox(title, text, text.length() + 1, TextField.UNEDITABLE);
@@ -2854,6 +3161,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			formHistory.removeAllElements();
 			if (back) imagesToLoad.removeAllElements();
 		}
+		
+		if (d != playerForm) {
+			if (playerState != 0) {
+				d.addCommand(playerCmd);
+			} else {
+				d.removeCommand(playerCmd);
+			}
+		}
+		
 		Displayable p = display.getCurrent();
 		if (p == loadingForm) p = current;
 		display.setCurrent(current = d);

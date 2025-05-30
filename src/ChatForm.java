@@ -606,7 +606,12 @@ public class ChatForm extends MPForm implements Runnable {
 						if (media.getBoolean("thumb", false)) {
 							ImageItem img = new ImageItem(sb.toString(), null, 0, "");
 							img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-							img.setDefaultCommand(MP.documentCmd);
+							if (media.has("audio") && "audio/mpeg".equals(media.getString("mime", null))) {
+								img.addCommand(MP.documentCmd);
+								img.setDefaultCommand(MP.playItemCmd);
+							} else {
+								img.setDefaultCommand(MP.documentCmd);
+							}
 							img.setItemCommandListener(MP.midlet);
 							safeInsert(thread, insert++, lastItem = img);
 							
@@ -619,7 +624,12 @@ public class ChatForm extends MPForm implements Runnable {
 							s = new StringItem(null, sb.toString());
 							s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 							s.setFont(MP.smallItalicFont);
-							s.setDefaultCommand(MP.documentCmd);
+							if (media.has("audio") && "audio/mpeg".equals(media.getString("mime", null))) {
+								s.addCommand(MP.documentCmd);
+								s.setDefaultCommand(MP.playItemCmd);
+							} else {
+								s.setDefaultCommand(MP.documentCmd);
+							}
 							s.setItemCommandListener(MP.midlet);
 							safeInsert(thread, insert++, lastItem = s);
 	
