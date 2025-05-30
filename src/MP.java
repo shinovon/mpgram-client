@@ -4103,15 +4103,15 @@ public class MP extends MIDlet
 			int w = img.getWidth(), h = img.getHeight();
 			int[] c = new int[w * h];
 			img.getRGB(c, 0, w, 0, 0, w, h);
-			for (int i = 0; i < h; i++) {
-				float y = (float) (h / 2 - i) / (h - 1);
-				y = y * 2;
-				float xf = (float) Math.sqrt(1 - y * y);
-				int x = (int) (xf * (w - 1));
-				x = (w - x) / 2;
-				for (int j = 0; j < x; j++) {
-					c[i * w + j] = 0x00FFFFFF;
-					c[i * w + w - j - 1] = 0x00FFFFFF;
+			int cx = w / 2, cy = h / 2;
+			int r = Math.min(cx, cy);
+			int r2 = r * r;
+			for (int y = 0; y < h; y++) {
+				int dy = y - cy;
+				for (int x = 0; x < w; x++) {
+					int dx = x - cx;
+					if (dx * dx + dy * dy > r2)
+						c[y * w + x] = 0x00FFFFFF;
 				}
 			}
 			return Image.createRGBImage(c, w, h, true);
