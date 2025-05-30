@@ -3061,10 +3061,12 @@ public class MP extends MIDlet
 		
 		s = new StringItem(null, L[UnknownTrack]);
 		s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+		s.setFont(largePlainFont);
 		f.append(playerTitleLabel = s);
 		
 		s = new StringItem(null, "");
 		s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+		s.setFont(smallPlainFont);
 		f.append(playerArtistLabel = s);
 		
 		Gauge g = new Gauge(null, false, 100, 0);
