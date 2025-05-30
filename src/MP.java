@@ -1403,9 +1403,8 @@ public class MP extends MIDlet
 					playlistIndex = 0;
 					currentMusic = playlist.getObject(0);
 					if (mode == 3) {
-						initPlayerForm();
+						display(initPlayerForm());
 						startPlayer(currentMusic);
-						display(playerForm);
 					} else {
 						display(playlistList);
 					}
@@ -2654,9 +2653,9 @@ public class MP extends MIDlet
 			playerState = 3;
 			
 			StringBuffer url = new StringBuffer(instanceUrl);
-			String name;
+			String name = msg.getObject("media").getString("name", null);
 			if ((name = msg.getObject("media").getString("name", null)) != null && fileRewrite) {
-				url.append("file/").append(name);
+				appendUrl(url.append("file/"), name);
 			} else {
 				url.append(FILE_URL);
 			}
@@ -2692,6 +2691,7 @@ public class MP extends MIDlet
 			currentPlayer = p;
 			
 			p.realize();
+			p.prefetch();
 			p.start();
 			playerState = 1;
 		} catch (Exception e) {
