@@ -39,19 +39,11 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 	public ViewCanvas(String peer, String id) {
 		this.peer = peer;
 		this.id = id;
-		reload();
+		toDraw = null;
+		System.gc();
+		loader = new Thread(this);
+		loader.start();
 		setFullScreenMode(true);
-	}
-	
-	private final byte[] getResizedImage(int size) {
-		int s = Math.min(getWidth(), getHeight()) * size;
-		String url = MP.instanceUrl + MP.FILE_URL + "?a&c=" + peer + "&m=" + id + "&p=rprev&s=" + s;
-		try {
-			return MP.get(url);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 	public final void run() {
@@ -61,9 +53,8 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 				zoom = 1;
 				x = 0;
 				y = 0;
-				reset();
+				toDraw = null;
 				try {
-					prepare();
 					repaint();
 					resize(1);
 					zoom = 1;
@@ -85,27 +76,6 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 		}
 	}
 
-	protected void limitOffset() {
-		int hw = (toDraw.getWidth() - getWidth()) / 2;
-		int hh = (toDraw.getHeight() - getHeight()) / 2;
-		if (hw < 0) hw = 0;
-		if (hh < 0) hh = 0;
-		
-		if (x < -hw) x = -hw;
-		if (x > hw) x = hw;
-		if (y < -hh - 50) y = -hh - 50;
-		if (y > hh + 50) y = hh + 50;
-	}
-
-	/**
-	 * Clears any data, used for rendering.
-	 */
-	protected void reset() {
-		toDraw = null;
-	}
-	
-	void prepare() throws InterruptedException {}
-
 	/**
 	 * Called when image must change it's zoom.
 	 * 
@@ -121,7 +91,8 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 			int l = -1;
 			byte[] b;
 			try {
-				b = getResizedImage(size);
+				b = MP.get(MP.instanceUrl + MP.FILE_URL + "?a&c=" + peer + "&m=" + id + "&p=rprev&s="
+						+ (Math.min(getWidth(), getHeight()) * size));
 				l = b.length;
 				origImg = Image.createImage(b, 0, b.length);
 				b = null;
@@ -151,32 +122,104 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 	protected void paint(Graphics g) {
 		try {
 			Font f = MP.smallPlainFont;
+
+			int w = getWidth(), h = getHeight();
 			g.setFont(f);
+			int fh = f.getHeight();
 			if (toDraw == null) {
 				if (firstDraw) {
 					firstDraw = false;
 					g.setGrayScale(0);
-					g.fillRect(0, 0, getWidth(), getHeight());
+					g.fillRect(0, 0, w, h);
 				}
-				paintNullImg(g, f);
+				
+				String info;
+				if (error) {
+					g.setGrayScale(0);
+					g.fillRect(0, 0, w, h);
+					info = "Failed to load image.";
+				} else {
+					info = "Preparing";
+				}
+				g.setGrayScale(0);
+				int tw = f.stringWidth(info);
+				g.fillRect(w / 2 - tw / 2, h / 2, tw,  fh);
+				g.setGrayScale(255);
+				g.drawString(info, w / 2, h / 2, Graphics.HCENTER | Graphics.TOP);
+				if (hasPointerEvents()) {
+					// grads
+					fillGrad(g, w * 3 / 4, h - 50, w / 4, 51, 0, 0x222222);
+					// lines
+					g.setGrayScale(255);
+					g.drawLine(w * 3 / 4, h - 50, w, h - 50);
+					g.drawLine(w * 3 / 4, h - 50, w * 3 / 4, h);
+					// captions
+					g.setGrayScale(255);
+					g.drawString(touchCaps[6], w * 7 / 8, h - 25 - fh / 2, Graphics.TOP | Graphics.HCENTER);
+				}
 			} else {
 				// bg fill
 				g.setGrayScale(0);
-				g.fillRect(0, 0, getWidth(), getHeight());
-				limitOffset();
+				g.fillRect(0, 0, w, h);
+				
+				// limit offset
+				int hw = (toDraw.getWidth() - w) / 2;
+				int hh = (toDraw.getHeight() - h) / 2;
+				if (hw < 0) hw = 0;
+				if (hh < 0) hh = 0;
+				
+				if (x < -hw) x = -hw;
+				if (x > hw) x = hw;
+				if (y < -hh - 50) y = -hh - 50;
+				if (y > hh + 50) y = hh + 50;
+				
 				if (zoom != 1) {
-					g.drawImage(toDraw, (int) x + getWidth() / 2, (int) y + getHeight() / 2,
+					g.drawImage(toDraw, (int) x + w / 2, (int) y + h / 2,
 							Graphics.HCENTER | Graphics.VCENTER);
 				} else {
-					g.drawImage(toDraw, (getWidth() - toDraw.getWidth()) / 2, (getHeight() - toDraw.getHeight()) / 2,
+					g.drawImage(toDraw, (w - toDraw.getWidth()) / 2, (h - toDraw.getHeight()) / 2,
 							0);
 				}
 			}
 			// touch captions
 			if (hasPointerEvents() && touchCtrlShown) {
-				drawTouchControls(g, f);
+
+				// captions
+
+				fillGrad(g, w * 3 / 4, h - 50, w / 4, 51, 0,
+						touchHoldPos == 7 ? 0x357EDE : 0x222222);
+				g.setGrayScale(255);
+				g.drawString(touchCaps[6], w * (1 + 3 * 2) / 8,
+						h - 25 - fh / 2, Graphics.TOP | Graphics.HCENTER);
+				g.setGrayScale(255);
+				g.drawLine(w * 3 / 4, h - 50, w, h - 50);
+				g.drawLine(w * 3 / 4, h - 50, w * 3 / 4, h);
+
+				for (int i = 0; i < 3; i++) {
+					fillGrad(g, w * i / 3, 0, w / 3 + 1, 50, touchHoldPos == (i + 1) ? 0x357EDE : 0x222222,
+							0);
+					g.setGrayScale(255);
+					g.drawString(touchCaps[i], w * (1 + i * 2) / 6, 25 - fh / 2, Graphics.TOP | Graphics.HCENTER);
+				}
+				// bottom hor line
+				g.setGrayScale(255);
+				g.drawLine(0, 50, w, 50);
+				// vert lines between btns
+				g.drawLine(w / 3, 0, w / 3, 50);
+				g.drawLine(w * 2 / 3, 0, w * 2 / 3, 50);
 			}
-			paintHUD(g, f, true);
+			
+			// hud
+			String zoomN = Integer.toString((int) zoom);
+			if (zoomN.length() > 3)
+				zoomN = zoomN.substring(0, 3);
+			zoomN = "x" + zoomN;
+
+			// zoom
+			g.setColor(0);
+			g.fillRect(w - f.stringWidth(zoomN), 0, f.stringWidth(zoomN), fh);
+			g.setColor(-1);
+			g.drawString(zoomN, w - f.stringWidth(zoomN), 0, 0);
 		} catch (Exception e) {
 			e.printStackTrace();
 			try {
@@ -190,22 +233,6 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 	String[] touchCaps = new String[] { "x1", "x2", "x3", "<-", "goto", "->", MP.L[Back] };
 
 	boolean touchCtrlShown = true;
-
-	protected void reload() {
-		toDraw = null;
-		System.gc();
-		loader = new Thread(this);
-		loader.start();
-	}
-
-	/**
-	 * Is there something to draw?
-	 * 
-	 * @return False if view is blocked.
-	 */
-	public boolean canDraw() {
-		return toDraw != null;
-	}
 
 	protected final void keyPressed(int k) {
 		k = qwertyToNum(k);
@@ -281,7 +308,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 
 	protected final void keyRepeated(int k) {
 		k = qwertyToNum(k);
-		if (!canDraw()) {
+		if (toDraw == null) {
 			repaint();
 			return;
 		}
@@ -320,7 +347,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 	int sx, sy;
 
 	protected final void pointerPressed(int tx, int ty) {
-		if (!canDraw() && ty > getHeight() - 50 && tx > getWidth() * 2 / 3) {
+		if (toDraw == null && ty > getHeight() - 50 && tx > getWidth() * 2 / 3) {
 			keyPressed(-7);
 			return;
 		}
@@ -415,82 +442,6 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 		touchHoldPos = 0;
 		repaint();
 	}
-	
-	protected final void paintHUD(Graphics g, Font f, boolean drawZoom) {
-		int w = getWidth();
-		int fh = f.getHeight();
-		String zoomN = Integer.toString((int) zoom);
-		if (zoomN.length() > 3)
-			zoomN = zoomN.substring(0, 3);
-		zoomN = "x" + zoomN;
-
-		if (drawZoom) {
-			g.setColor(0);
-			g.fillRect(w - f.stringWidth(zoomN), 0, f.stringWidth(zoomN), fh);
-			g.setColor(-1);
-			g.drawString(zoomN, w - f.stringWidth(zoomN), 0, 0);
-		}
-	}
-
-	protected final void drawTouchControls(Graphics g, Font f) {
-		int w = getWidth(), h = getHeight();
-		int fh = f.getHeight();
-
-		// captions
-
-		fillGrad(g, w * 3 / 4, h - 50, w / 4, 51, 0,
-				touchHoldPos == 7 ? 0x357EDE : 0x222222);
-		g.setGrayScale(255);
-		g.drawString(touchCaps[6], w * (1 + 3 * 2) / 8,
-				h - 25 - fh / 2, Graphics.TOP | Graphics.HCENTER);
-		g.setGrayScale(255);
-		g.drawLine(w * 3 / 4, h - 50, w, h - 50);
-		g.drawLine(w * 3 / 4, h - 50, w * 3 / 4, h);
-
-		for (int i = 0; i < 3; i++) {
-			fillGrad(g, w * i / 3, 0, w / 3 + 1, 50, touchHoldPos == (i + 1) ? 0x357EDE : 0x222222,
-					0);
-			g.setGrayScale(255);
-			g.drawString(touchCaps[i], w * (1 + i * 2) / 6, 25 - fh / 2, Graphics.TOP | Graphics.HCENTER);
-		}
-		// bottom hor line
-		g.setGrayScale(255);
-		g.drawLine(0, 50, w, 50);
-		// vert lines between btns
-		g.drawLine(w / 3, 0, w / 3, 50);
-		g.drawLine(w * 2 / 3, 0, w * 2 / 3, 50);
-
-	}
-
-	protected final void paintNullImg(Graphics g, Font f) {
-		int w = getWidth(), h = getHeight();
-		int fh = f.getHeight();
-		
-		String info;
-		if (error) {
-			g.setGrayScale(0);
-			g.fillRect(0, 0, w, h);
-			info = "Failed to load image.";
-		} else {
-			info = "Preparing";
-		}
-		g.setGrayScale(0);
-		int tw = f.stringWidth(info);
-		g.fillRect(w / 2 - tw / 2, h / 2, tw,  fh);
-		g.setGrayScale(255);
-		g.drawString(info, w / 2, h / 2, Graphics.HCENTER | Graphics.TOP);
-		if (hasPointerEvents()) {
-			// grads
-			fillGrad(g, w * 3 / 4, h - 50, w / 4, 51, 0, 0x222222);
-			// lines
-			g.setGrayScale(255);
-			g.drawLine(w * 3 / 4, h - 50, w, h - 50);
-			g.drawLine(w * 3 / 4, h - 50, w * 3 / 4, h);
-			// captions
-			g.setGrayScale(255);
-			g.drawString(touchCaps[6], w * 7 / 8, h - 25 - fh / 2, Graphics.TOP | Graphics.HCENTER);
-		}
-	}
 
 	/**
 	 * Fills an opaque gradient on the canvas.
@@ -505,7 +456,12 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 	 */
 	public static void fillGrad(Graphics g, int x, int y, int w, int h, int c1, int c2) {
 		for (int i = 0; i < h; i++) {
-			g.setColor(MP.blend(c2, c1, i * 255 / h));
+//			g.setColor(blend(c2, c1, i * 255 / h));
+			int v = (i * 255 / h) & 0xFF;
+			final int c2_RB = c2 & 0x00FF00FF;
+			final int c2_AG_org = c2 & 0xFF00FF00;
+			g.setColor((((c2_AG_org) + ((((c1 >>> 8) & 0x00FF00FF) - ((c2_AG_org) >>> 8)) * v)) & 0xFF00FF00)
+					| ((c2_RB + ((((c1 & 0x00FF00FF) - c2_RB) * v) >> 8)) & 0x00FF00FF));
 			g.drawLine(x, y + i, x + w, y + i);
 		}
 	}
