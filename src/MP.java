@@ -200,7 +200,7 @@ public class MP extends MIDlet
 	static boolean compress;
 	static boolean fileRewrite;
 	static int blackberryNetwork = -1; // -1: undefined, 0: data, 1: wifi
-	static int playerMethod = 1; // 0 - pass url, 1 - pass connection stream
+	static int playerHttpMethod = 1; // 0 - pass url, 1 - pass connection stream
 	
 	// platform
 	static boolean symbianJrt;
@@ -208,7 +208,7 @@ public class MP extends MIDlet
 	static String systemName;
 	public static String encoding = "UTF-8";
 	static boolean blackberry;
-	static boolean s40;
+	static boolean symbianPre;
 	// endregion
 
 	// threading
@@ -423,6 +423,9 @@ public class MP extends MIDlet
 		String p, v;
 		if ((p = System.getProperty("microedition.platform")) != null) {
 			symbianJrt = p.indexOf("platform=S60") != -1;
+			// symbian 9.4- check
+			symbianPre = ((System.getProperty("com.symbian.midp.serversocket.support") == null &&
+					System.getProperty("com.symbian.default.to.suite.icon") == null));
 			blackberry = p.toLowerCase().startsWith("blackberry");
 			try {
 				Class.forName("emulator.custom.CustomMethod");
@@ -439,19 +442,32 @@ public class MP extends MIDlet
 			}
 			deviceName = p;
 		}
+		// check media capabilities
 		try {
 			// s40 check
 			Class.forName("com.nokia.mid.impl.isa.jam.Jam");
 			try {
 				Class.forName("com.sun.mmedia.protocol.CommonDS");
 				// s40v1 uses sun impl for media and i/o so it should work fine
-				playerMethod = 0;
+				playerHttpMethod = 0;
 			} catch (Exception e) {
 				// s40v2+ breaks http locator parsing
-				playerMethod = 1;
+				playerHttpMethod = 1;
 			}
 		} catch (Exception e) {
-			playerMethod = 0;
+			if (symbianPre) {
+				if (symbianJrt &&
+						(p.indexOf("java_build_version=2.") != -1
+						|| p.indexOf("java_build_version=1.4") != -1)) {
+					// emc, supports mp3 streaming
+					playerHttpMethod = 0;
+				} else {
+					// mmf
+					playerHttpMethod = 1;
+				}
+			} else {
+				playerHttpMethod = 0;
+			}
 		}
 		
 		if ((p = System.getProperty("os.name")) != null) {
@@ -2704,7 +2720,7 @@ public class MP extends MIDlet
 			
 			// TODO
 			Player p;
-			if (playerMethod == 1) {
+			if (playerHttpMethod == 1) {
 				p = Manager.createPlayer(openHttpConnection(url.toString()).openInputStream(), "audio/mpeg");
 			} else {
 				p = Manager.createPlayer(url.toString());
