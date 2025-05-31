@@ -200,6 +200,7 @@ public class MP extends MIDlet
 	static boolean compress;
 	static boolean fileRewrite;
 	static int blackberryNetwork = -1; // -1: undefined, 0: data, 1: wifi
+	static int playerMethod = 1; // 0 - pass url, 1 - pass connection stream
 	
 	// platform
 	static boolean symbianJrt;
@@ -207,6 +208,7 @@ public class MP extends MIDlet
 	static String systemName;
 	public static String encoding = "UTF-8";
 	static boolean blackberry;
+	static boolean s40;
 	// endregion
 
 	// threading
@@ -437,6 +439,21 @@ public class MP extends MIDlet
 			}
 			deviceName = p;
 		}
+		try {
+			// s40 check
+			Class.forName("com.nokia.mid.impl.isa.jam.Jam");
+			try {
+				Class.forName("com.sun.mmedia.protocol.CommonDS");
+				// s40v1 uses sun impl for media and i/o so it should work fine
+				playerMethod = 0;
+			} catch (Exception e) {
+				// s40v2+ breaks http locator parsing
+				playerMethod = 1;
+			}
+		} catch (Exception e) {
+			playerMethod = 0;
+		}
+		
 		if ((p = System.getProperty("os.name")) != null) {
 			if ((v = System.getProperty("os.version")) != null) {
 				p = p.concat(" ".concat(v));
@@ -2686,7 +2703,12 @@ public class MP extends MIDlet
 			}
 			
 			// TODO
-			Player p = Manager.createPlayer(url.toString());
+			Player p;
+			if (playerMethod == 1) {
+				p = Manager.createPlayer(openHttpConnection(url.toString()).openInputStream(), "audio/mpeg");
+			} else {
+				p = Manager.createPlayer(url.toString());
+			}
 			p.addPlayerListener(midlet);
 			currentPlayer = p;
 			
