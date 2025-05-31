@@ -67,9 +67,11 @@ import javax.microedition.rms.RecordStore;
 import cc.nnproject.json.JSONArray;
 import cc.nnproject.json.JSONObject;
 import cc.nnproject.json.JSONStream;
+//#ifndef NO_ZIP
 import zip.GZIPInputStream;
 import zip.Inflater;
 import zip.InflaterInputStream;
+//#endif
 
 public class MP extends MIDlet
 	implements CommandListener, ItemCommandListener, ItemStateListener, Runnable, LangConstants, PlayerListener {
@@ -133,7 +135,7 @@ public class MP extends MIDlet
 			"Suomi",
 			"Русский",
 			"Українська",
-			"العربية"
+			"العربية",
 		}
 	};
 	// endregion
@@ -208,7 +210,7 @@ public class MP extends MIDlet
 	static String systemName;
 	public static String encoding = "UTF-8";
 	static boolean blackberry;
-	static boolean symbianPre;
+	static boolean symbian;
 	// endregion
 
 	// threading
@@ -422,10 +424,6 @@ public class MP extends MIDlet
 		// get device name
 		String p, v;
 		if ((p = System.getProperty("microedition.platform")) != null) {
-			symbianJrt = p.indexOf("platform=S60") != -1;
-			// symbian 9.4- check
-			symbianPre = ((System.getProperty("com.symbian.midp.serversocket.support") == null &&
-					System.getProperty("com.symbian.default.to.suite.icon") == null));
 			blackberry = p.toLowerCase().startsWith("blackberry");
 			try {
 				Class.forName("emulator.custom.CustomMethod");
@@ -442,10 +440,47 @@ public class MP extends MIDlet
 			}
 			deviceName = p;
 		}
+		
+		symbian = (symbianJrt = p.indexOf("platform=S60") != -1)
+				|| System.getProperty("com.symbian.midp.serversocket.support") != null
+				|| System.getProperty("com.symbian.default.to.suite.icon") != null
+				|| checkClass("com.symbian.midp.io.protocol.http.Protocol")
+				|| checkClass("com.symbian.lcdjava.io.File");
+		if (symbian) {
+			if (symbianJrt) {
+				int i;
+				v = p.substring(i = p.indexOf("platform_version=") + 17, p.indexOf(';', i));
+				if (v.charAt(0) == '5') {
+					switch (v.charAt(2)) {
+					case '2':
+						systemName = p.indexOf("java_build_version=2.2") != -1 ? "Symbian Anna" : "Symbian^3";
+						break;
+					case '3':
+						systemName = "Symbian Belle";
+						break;
+					case '4':
+						systemName = "Symbian Belle FP1";
+						break;
+					case '5':
+						systemName = "Symbian Belle FP2";
+						break;
+					default:
+						systemName = "S60 5th Edition";
+					}
+				} else {
+					// 3.2
+					systemName = "S60 3rd Edition FP2";
+				}
+			} else {
+				systemName = "Symbian";
+			}
+		}
+		
 		// check media capabilities
 		try {
 			// s40 check
 			Class.forName("com.nokia.mid.impl.isa.jam.Jam");
+			systemName = "Series 40";
 			try {
 				Class.forName("com.sun.mmedia.protocol.CommonDS");
 				// s40v1 uses sun impl for media and i/o so it should work fine
@@ -455,22 +490,22 @@ public class MP extends MIDlet
 				playerHttpMethod = 1;
 			}
 		} catch (Exception e) {
-			if (symbianPre) {
+			playerHttpMethod = 0;
+			if (symbian) {
 				if (symbianJrt &&
 						(p.indexOf("java_build_version=2.") != -1
 						|| p.indexOf("java_build_version=1.4") != -1)) {
-					// emc, supports mp3 streaming
-					playerHttpMethod = 0;
+					// emc (s60v5+), supports mp3 streaming
+				} else if (checkClass("com.symbian.mmapi.PlayerImpl")) {
+					// uiq
 				} else {
-					// mmf
+					// mmf (s60v3.2-)
 					playerHttpMethod = 1;
 				}
-			} else {
-				playerHttpMethod = 0;
 			}
 		}
 		
-		if ((p = System.getProperty("os.name")) != null) {
+		if (systemName == null && (p = System.getProperty("os.name")) != null) {
 			if ((v = System.getProperty("os.version")) != null) {
 				p = p.concat(" ".concat(v));
 			}
@@ -519,9 +554,7 @@ public class MP extends MIDlet
 
 		// init platform dependent settings
 		useLoadingForm = !symbianJrt;
-		jsonStream = symbianJrt ||
-				((System.getProperty("com.symbian.midp.serversocket.support") == null &&
-				System.getProperty("com.symbian.default.to.suite.icon") == null));
+		jsonStream = symbianJrt || !symbian;
 		threadedImages = symbianJrt;
 		
 		avatarSize = Math.min(display.getBestImageHeight(Display.LIST_ELEMENT), display.getBestImageWidth(Display.LIST_ELEMENT));
@@ -3841,10 +3874,12 @@ public class MP extends MIDlet
 	private static InputStream openInputStream(HttpConnection hc) throws IOException {
 		InputStream i = hc.openInputStream();
 		String enc = hc.getHeaderField("Content-Encoding");
+//#ifndef NO_ZIP
 		if ("deflate".equalsIgnoreCase(enc))
 			i = new InflaterInputStream(i, new Inflater(true));
 		else if ("gzip".equalsIgnoreCase(enc))
 			i = new GZIPInputStream(i);
+//#endif
 		return i;
 	}
 	
@@ -3857,9 +3892,11 @@ public class MP extends MIDlet
 		HttpConnection hc = (HttpConnection) Connector.open(url, Connector.READ_WRITE,
 				u = (url.indexOf("method=updates") != -1 || OTA_URL.equals(url)));
 		hc.setRequestProperty("User-Agent", "mpgram4/".concat(version).concat(" (https://github.com/shinovon/mpgram-client)"));
+//#ifndef NO_ZIP
 		if (!u && compress) {
 			hc.setRequestProperty("Accept-Encoding", "gzip, deflate");
 		}
+//#endif
 		if (url.startsWith(instanceUrl)) {
 			if (user != null) {
 				hc.setRequestProperty("X-mpgram-user", user);
@@ -4176,6 +4213,15 @@ public class MP extends MIDlet
 			r.addRecord(b, 0, b.length);
 			r.closeRecordStore();
 		} catch (Exception e) {}
+	}
+	
+	private static boolean checkClass(String s) {
+		try {
+			Class.forName(s);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 	
 	// endregion
