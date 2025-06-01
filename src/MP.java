@@ -2767,7 +2767,7 @@ public class MP extends MIDlet
 			// TODO
 			Player p;
 			if (playerHttpMethod == 1) {
-				p = Manager.createPlayer(openHttpConnection(url.toString()).openInputStream(), "audio/mpeg");
+				p = Manager.createPlayer(openHttpConnection(url.toString()).openInputStream(), msg.getObject("media").getString("mime", "audio/mpeg"));
 			} else {
 				p = Manager.createPlayer(url.toString());
 			}
