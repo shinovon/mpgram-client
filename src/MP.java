@@ -335,7 +335,7 @@ public class MP extends MIDlet
 	private static Form authForm;
 	private static Form writeForm;
 	private static Form playerForm;
-	private static List playlistList; // TODO
+	private static List playlistList;
 	private static final Vector formHistory = new Vector();
 
 	// auth items
@@ -799,12 +799,12 @@ public class MP extends MIDlet
 		authForm = f;
 		
 		// load main form
-		
 		if (user == null || userState < 3) {
 			display(mainDisplayable = authForm);
+			// show network access settings on blackberry
 			if (blackberry && blackberryNetwork == -1) {
 				commandAction(settingsCmd, current);
-				display(infoAlert(L[ChooseNetwork_Alert]), current); // TODO untranslated
+				display(infoAlert(L[ChooseNetwork_Alert]), current);
 				return;
 			}
 		} else {
@@ -3218,7 +3218,8 @@ public class MP extends MIDlet
 					} else if ("API is disabled".equals(message)) {
 						sb.setLength(0);
 						sb.append(L[APIDisabled_Alert]);
-					} else if ("Wrong instance password".equals(message) || "Instance password is required".equals(message)) {
+					} else if ("Wrong instance password".equals(message)
+							|| "Instance password is required".equals(message)) {
 						sb.setLength(0);
 						sb.append(L[InvalidInstancePassword_Alert]);
 					} else {
