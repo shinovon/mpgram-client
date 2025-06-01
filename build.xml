@@ -71,6 +71,7 @@
     <target name="obfuscate" depends="package">
         <wtkobfuscate
             jarfile="out/MPGram.jar"
+            jadfile="out/MPGram.jad"
             classpath="tools/proguard.jar"
         >
             <preserve class="javax.microedition.shell.MicroActivity" />
