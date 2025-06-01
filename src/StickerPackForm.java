@@ -68,7 +68,10 @@ public class StickerPackForm extends MPForm {
 		for (int i = 0; i < l; ++i) {
 			JSONObject s = arr.getObject(i);
 			
-			ImageItem img = new ImageItem("", null, Item.LAYOUT_LEFT | Item.LAYOUT_TOP, null);
+			ImageItem img = new ImageItem("", null, 0, null);
+			try {
+				img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP);
+			} catch (Exception ignored) {}
 			if (chatForm != null) {
 				img.setDefaultCommand(MP.stickerItemCmd);
 				img.setItemCommandListener(MP.midlet);

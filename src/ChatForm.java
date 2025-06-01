@@ -604,7 +604,9 @@ public class ChatForm extends MPForm implements Runnable {
 						
 						if (media.getBoolean("thumb", false)) {
 							ImageItem img = new ImageItem(sb.toString(), null, 0, "");
-							img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+							try {
+								img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+							} catch (Exception ignored) {}
 							if (media.has("audio") && "audio/mpeg".equals(media.getString("mime", null))) {
 								img.addCommand(MP.documentCmd);
 								img.setDefaultCommand(MP.playItemCmd);
@@ -641,9 +643,11 @@ public class ChatForm extends MPForm implements Runnable {
 				} else if (type.equals("photo")) {
 					// photo
 					ImageItem img = new ImageItem("", null, 0, "");
-					img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP
-							| ((text != null && text.length() != 0 || !reverse || mediaFilter != null) ?
-									Item.LAYOUT_NEWLINE_BEFORE : 0));
+					try {
+						img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP
+								| ((text != null && text.length() != 0 || !reverse || mediaFilter != null) ?
+										Item.LAYOUT_NEWLINE_BEFORE : 0));
+					} catch (Exception ignored) {}
 					img.setDefaultCommand(MP.openImageCmd);
 					if (MP.useView) {
 						img.addCommand(MP.documentCmd);
