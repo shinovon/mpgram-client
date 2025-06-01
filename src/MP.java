@@ -2704,7 +2704,10 @@ public class MP extends MIDlet
 					}
 				}
 				JSONObject msg = (JSONObject) playlist.get(idx);
-				if (!"audio/mpeg".equals(msg.getObject("media").getString("mime")))
+				String t;
+				if (!"audio/mpeg".equals(t = msg.getObject("media").getString("mime"))
+						&& !"audio/aac".equals(t)
+						&& !"audio/m4a".equals(t))
 					continue;
 				playlistIndex = idx;
 				startPlayer(currentMusic = msg);
