@@ -3,9 +3,6 @@ import java.util.Hashtable;
 import javax.microedition.lcdui.ImageItem;
 import javax.microedition.lcdui.Item;
 
-import cc.nnproject.json.JSONArray;
-import cc.nnproject.json.JSONObject;
-
 /*
 Copyright (c) 2022-2025 Arman Jussupgaliyev
 

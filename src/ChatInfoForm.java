@@ -23,8 +23,6 @@ import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.Spacer;
 import javax.microedition.lcdui.StringItem;
 
-import cc.nnproject.json.JSONObject;
-
 public class ChatInfoForm extends MPForm {
 
 	String id;

@@ -34,9 +34,6 @@ import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 import javax.microedition.lcdui.Ticker;
 
-import cc.nnproject.json.JSONArray;
-import cc.nnproject.json.JSONObject;
-
 public class ChatForm extends MPForm implements Runnable {
 	
 	private static final int SPACER_HEIGHT = 8;
