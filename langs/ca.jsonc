@@ -255,6 +255,7 @@
 	"UpdateAvailable_Alert": "Actualització de client disponible",
 	"MemberBanned_Alert": "Membre prohibit",
 	"StickersAdded_Alert": "Adhesius afegits",
+	"ChooseNetwork_Alert": "Choose network access point", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Mèdia",

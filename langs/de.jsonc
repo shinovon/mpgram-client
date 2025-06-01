@@ -255,6 +255,7 @@
 	"UpdateAvailable_Alert": "Update vorhanden",
 	"MemberBanned_Alert": "Mitglied gesperrt",
 	"StickersAdded_Alert": "Stickers added", // Untranslated
+	"ChooseNetwork_Alert": "Choose network access point", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Mediem",

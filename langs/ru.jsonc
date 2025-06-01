@@ -255,6 +255,7 @@
 	"UpdateAvailable_Alert": "Доступно обновление клиента",
 	"MemberBanned_Alert": "Участник забанен",
 	"StickersAdded_Alert": "Стикеры добавлены",
+	"ChooseNetwork_Alert": "Выберите точку доступа",
 	
 	// Chat form
 	"ChatMedia_Title": "Медиафайлы",

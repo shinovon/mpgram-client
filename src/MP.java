@@ -804,7 +804,7 @@ public class MP extends MIDlet
 			display(mainDisplayable = authForm);
 			if (blackberry && blackberryNetwork == -1) {
 				commandAction(settingsCmd, current);
-				display(infoAlert("Choose network access point"), current); // TODO untranslated
+				display(infoAlert(L[ChooseNetwork_Alert]), current); // TODO untranslated
 				return;
 			}
 		} else {
