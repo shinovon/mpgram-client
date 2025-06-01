@@ -34,9 +34,6 @@ import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 import javax.microedition.lcdui.Ticker;
 
-import cc.nnproject.json.JSONArray;
-import cc.nnproject.json.JSONObject;
-
 public class ChatForm extends MPForm implements Runnable {
 	
 	private static final int SPACER_HEIGHT = 8;
@@ -188,7 +185,7 @@ public class ChatForm extends MPForm implements Runnable {
 		setTitle(title);
 		
 		boolean selfChat = MP.selfId.equals(id);
-		boolean reverse = MP.reverseChat && !"Photos".equals(mediaFilter);
+		boolean reverse = MP.reverseChat && mediaFilter == null;
 		
 		if (startBot != null) {
 			try {
@@ -597,16 +594,25 @@ public class ChatForm extends MPForm implements Runnable {
 						if (!media.isNull("size")) {
 							long size = media.getLong("size");
 							if (size >= 1024 * 1024) {
-								sb.append(((int) (size / (1048576D) * 100)) / 100D).append(" MB");
+								size = (size * 100) / (1024 * 1024);
+								sb.append(size / 100).append('.').append(size % 100).append(" MB");
 							} else {
-								sb.append(((int) (size / (1024D) * 100)) / 100D).append(" KB");
+								size = (size * 100) / 1024;
+								sb.append(size / 100).append('.').append(size % 100).append(" KB");
 							}
 						}
 						
 						if (media.getBoolean("thumb", false)) {
 							ImageItem img = new ImageItem(sb.toString(), null, 0, "");
-							img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-							img.setDefaultCommand(MP.documentCmd);
+							try {
+								img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+							} catch (Exception ignored) {}
+							if (media.has("audio") && "audio/mpeg".equals(media.getString("mime", null))) {
+								img.addCommand(MP.documentCmd);
+								img.setDefaultCommand(MP.playItemCmd);
+							} else {
+								img.setDefaultCommand(MP.documentCmd);
+							}
 							img.setItemCommandListener(MP.midlet);
 							safeInsert(thread, insert++, lastItem = img);
 							
@@ -619,7 +625,12 @@ public class ChatForm extends MPForm implements Runnable {
 							s = new StringItem(null, sb.toString());
 							s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 							s.setFont(MP.smallItalicFont);
-							s.setDefaultCommand(MP.documentCmd);
+							if (media.has("audio") && "audio/mpeg".equals(media.getString("mime", null))) {
+								s.addCommand(MP.documentCmd);
+								s.setDefaultCommand(MP.playItemCmd);
+							} else {
+								s.setDefaultCommand(MP.documentCmd);
+							}
 							s.setItemCommandListener(MP.midlet);
 							safeInsert(thread, insert++, lastItem = s);
 	
@@ -632,9 +643,11 @@ public class ChatForm extends MPForm implements Runnable {
 				} else if (type.equals("photo")) {
 					// photo
 					ImageItem img = new ImageItem("", null, 0, "");
-					img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP
-							| ((text != null && text.length() != 0 || !reverse || mediaFilter != null) ?
-									Item.LAYOUT_NEWLINE_BEFORE : 0));
+					try {
+						img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP
+								| ((text != null && text.length() != 0 || !reverse || mediaFilter != null) ?
+										Item.LAYOUT_NEWLINE_BEFORE : 0));
+					} catch (Exception ignored) {}
 					img.setDefaultCommand(MP.openImageCmd);
 					if (MP.useView) {
 						img.addCommand(MP.documentCmd);

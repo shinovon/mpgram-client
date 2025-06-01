@@ -108,6 +108,7 @@
 	"ViewImage": "Zeige Bild",
 	"Call": "Anruf",
 	"Download": "Download",
+	"Play_Item": "Play", // Untranslated
 	
 	// Chat form commands
 	"WriteMessage": "Schreibe Nachricht",
@@ -129,6 +130,10 @@
 	"ChatMedia": "Chat Medien",
 	"Members": "Mitglieder",
 	"AddToContacts": "Zu Kontakten hinzufügen",
+	"Photos": "Photos", // Untranslated
+	"Videos": "Videos", // Untranslated
+	"Files": "Files", // Untranslated
+	"AudioFiles": "Music", // Untranslated
 	
 	// Dialog commands
 	"Ok": "OK",
@@ -203,6 +208,9 @@
 	"KeepSessionAlive": "Sitzung aufrecht erhalten",
 	"UseUnicode": "Use Unicode", // Untranslated
 	"UseCompression": "Use compression", // Untranslated
+	"NetworkAccess": "Network access", // Untranslated
+	"MobileData": "Data", // Untranslated
+	"WiFi": "Wi-Fi", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "Lade Medien-Miniaturansichten",
@@ -289,6 +297,17 @@
 	"Stickers_Title": "Stickers", // Untranslated
 	"Sticker": "Sticker", // Untranslated
 	"AddStickers": "Add stickers", // Untranslated
+	
+	// Music player
+	"Player_Title": "Music player", // Untranslated
+	"OpenPlayer": "Player", // Untranslated
+	"OpenPlaylist": "Playlist", // Untranslated
+	"Play_Player": "Play", // Untranslated
+	"Pause_Player": "Pause", // Untranslated
+	"Prev_Player": "Prev", // Untranslated
+	"Next_Player": "Next", // Untranslated
+	"UnknownTrack": "Unknown Track", // Untranslated
+	"Playlist_Title": "Playlist", // Untranslated
 	
 	// Profile/chat info
 	"Online": "online",

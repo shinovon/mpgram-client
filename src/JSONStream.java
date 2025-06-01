@@ -19,7 +19,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-package cc.nnproject.json;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,80 +31,19 @@ import javax.microedition.io.StreamConnection;
 
 public class JSONStream extends Reader {
 
-	public static String encoding = "UTF-8";
-	private Reader reader;
-	private boolean isObject;
+	Reader reader;
+	boolean isObject;
 	int index;
 	private boolean eof;
 	private char prev;
-	private boolean usePrev;
-	private StreamConnection connection;
+	boolean usePrev;
+	StreamConnection connection;
 	
-	private JSONStream() {}
+	JSONStream() {}
 	
-	private void init(InputStream in) throws IOException {
-		reader = new InputStreamReader(in, encoding);
+	void init(InputStream in) throws IOException {
+		reader = new InputStreamReader(in, MP.encoding);
 		iBuf = new char[BUF_SIZE];
-	}
-	
-	// Static functions
-	
-	public static JSONStream getStream(InputStream in) throws IOException {
-		JSONStream json = new JSONStream();
-		json.init(in);
-		char c = json.nextTrim();
-		if (c != '{' && c != '[')
-			throw new RuntimeException("JSON: getStream: Not json");
-		json.isObject = c == '{';
-		json.usePrev = true;
-		return json;
-	}
-	
-	public static JSONStream getStream(StreamConnection sc) throws IOException {
-		JSONStream json = new JSONStream();
-		json.connection = sc;
-		json.init(sc.openInputStream());
-		char c = json.nextTrim();
-		if (c != '{' && c != '[')
-			throw new RuntimeException("JSON: getStream: Not json");
-		json.isObject = c == '{';
-		json.usePrev = true;
-		return json;
-	}
-	
-	public static JSONStream getStream(Reader r) throws IOException {
-		JSONStream json = new JSONStream();
-		json.reader = r;
-		char c = json.nextTrim();
-		if (c != '{' && c != '[')
-			throw new RuntimeException("JSON: getStream: Not json");
-		json.isObject = c == '{';
-		json.usePrev = true;
-		return json;
-	}
-	
-	public static JSONObject getObject(InputStream in) throws IOException {
-		JSONStream json = new JSONStream();
-		try {
-			json.init(in);
-			char c = json.nextTrim();
-			if (c != '{') throw new RuntimeException("JSON: getObject: not object");
-			return json.nextObject(false);
-		} finally {
-			json.close();
-		}
-	}
-	
-	public static JSONArray getArray(InputStream in) throws IOException {
-		JSONStream json = new JSONStream();
-		try {
-			json.init(in);
-			char c = json.nextTrim();
-			if (c != '[') throw new RuntimeException("JSON: getArray: not array");
-			return json.nextArray(false);
-		} finally {
-			json.close();
-		}
 	}
 	
 	// Streaming JSON functions
@@ -121,13 +59,13 @@ public class JSONStream extends Reader {
 			return nextString(false);
 		case 't': // true
 			skip(3);
-			return JSONObject.TRUE;
+			return MP.TRUE;
 		case 'f': // false
 			skip(4);
-			return JSONObject.FALSE;
+			return MP.FALSE;
 		case 'n': // null
 			skip(3);
-			return JSONObject.json_null;
+			return MP.json_null;
 		default:
 			back();
 			return nextValue(true);
@@ -381,7 +319,7 @@ public class JSONStream extends Reader {
 	
 	//
 	
-	private JSONObject nextObject(boolean check) throws IOException {
+	JSONObject nextObject(boolean check) throws IOException {
 		if (check && nextTrim() != '{') {
 			back();
 			throw new RuntimeException("JSON: nextObject: not object at ".concat(Integer.toString(index)));
@@ -411,15 +349,15 @@ public class JSONStream extends Reader {
 				break;
 			case 'n': // null
 				skip(3);
-				val = JSONObject.json_null;
+				val = MP.json_null;
 				break;
 			case 't': // true
 				skip(3);
-				val = JSONObject.TRUE;
+				val = MP.TRUE;
 				break;
 			case 'f': // false
 				skip(4);
-				val = JSONObject.FALSE;
+				val = MP.FALSE;
 				break;
 			default:
 				back();
@@ -440,7 +378,7 @@ public class JSONStream extends Reader {
 		return r;
 	}
 	
-	private JSONArray nextArray(boolean check) throws IOException {
+	JSONArray nextArray(boolean check) throws IOException {
 		if (check && nextTrim() != '[') {
 			back();
 			throw new RuntimeException("JSON: nextArray: not array at ".concat(Integer.toString(index)));
@@ -464,15 +402,15 @@ public class JSONStream extends Reader {
 				break;
 			case 'n': // null
 				skip(3);
-				val = JSONObject.json_null;
+				val = MP.json_null;
 				break;
 			case 't': // true
 				skip(3);
-				val = JSONObject.TRUE;
+				val = MP.TRUE;
 				break;
 			case 'f': // false
 				skip(4);
-				val = JSONObject.FALSE;
+				val = MP.FALSE;
 				break;
 			default:
 				back();

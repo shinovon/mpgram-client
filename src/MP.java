@@ -35,8 +35,11 @@ import java.util.Vector;
 import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
+import javax.microedition.io.StreamConnection;
+//#ifndef NO_FILE
 import javax.microedition.io.file.FileConnection;
 import javax.microedition.io.file.FileSystemRegistry;
+//#endif
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Choice;
@@ -58,17 +61,20 @@ import javax.microedition.lcdui.Spacer;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextBox;
 import javax.microedition.lcdui.TextField;
+import javax.microedition.media.Manager;
+import javax.microedition.media.Player;
+import javax.microedition.media.PlayerListener;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.rms.RecordStore;
 
-import cc.nnproject.json.JSONArray;
-import cc.nnproject.json.JSONObject;
-import cc.nnproject.json.JSONStream;
+//#ifndef NO_ZIP
 import zip.GZIPInputStream;
 import zip.Inflater;
 import zip.InflaterInputStream;
+//#endif
 
-public class MP extends MIDlet implements CommandListener, ItemCommandListener, ItemStateListener, Runnable, LangConstants {
+public class MP extends MIDlet
+	implements CommandListener, ItemCommandListener, ItemStateListener, Runnable, LangConstants, PlayerListener {
 
 	// region Constants
 	static final int RUN_SEND_MESSAGE = 1;
@@ -93,6 +99,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static final int RUN_PIN_MESSAGE = 20;
 	static final int RUN_SEND_STICKER = 21;
 	static final int RUN_INSTALL_STICKER_SET = 22;
+	static final int RUN_LOAD_PLAYLIST = 23;
+	static final int RUN_PLAYER_LOOP = 24;
 	
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
@@ -127,7 +135,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			"Suomi",
 			"Русский",
 			"Українська",
-			"العربية"
+			"العربية",
 		}
 	};
 	// endregion
@@ -194,6 +202,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static boolean compress;
 	static boolean fileRewrite;
 	static int blackberryNetwork = -1; // -1: undefined, 0: data, 1: wifi
+	static int playerHttpMethod = 1; // 0 - pass url, 1 - pass connection stream
 	
 	// platform
 	static boolean symbianJrt;
@@ -201,6 +210,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static String systemName;
 	public static String encoding = "UTF-8";
 	static boolean blackberry;
+	static boolean symbian;
 	// endregion
 
 	// threading
@@ -264,6 +274,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command openImageCmd;
 	static Command callItemCmd;
 	static Command documentCmd;
+	static Command playItemCmd;
 
 	static Command writeCmd;
 	static Command chatInfoCmd;
@@ -282,7 +293,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command acceptInviteCmd;
 	static Command joinChatCmd;
 	static Command leaveChatCmd;
-	static Command chatMediaCmd;
+	static Command chatPhotosCmd;
+	static Command chatVideosCmd;
+	static Command chatFilesCmd;
+	static Command chatMusicCmd;
 	static Command gotoPinnedMsgCmd;
 	static Command chatMembersCmd;
 	
@@ -296,6 +310,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	static Command nextPageCmd;
 	static Command prevPageCmd;
 	
+	static Command playlistPlayCmd;
+	static Command playlistPauseCmd;
+	static Command playlistNextCmd;
+	static Command playlistPrevCmd;
+	static Command playlistCmd;
+	static Command playerCmd;
+	
 	private static Command updateCmd;
 	// endregion
 	
@@ -307,6 +328,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static Form settingsForm;
 	private static Form authForm;
 	private static Form writeForm;
+	private static Form playerForm;
+	private static List playlistList; // TODO
 	private static final Vector formHistory = new Vector();
 
 	// auth items
@@ -333,6 +356,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 //	private static TextField fileField;
 	private static ChoiceGroup sendChoice;
 	private static StringItem fileLabel;
+	
+	// player items
+	private static StringItem playerTitleLabel, playerArtistLabel;
+	private static Gauge playerProgress;
+	private static StringItem playerPlaypauseBtn;
 
 	// cache
 	private static final JSONObject usersCache = new JSONObject();
@@ -340,7 +368,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static final Hashtable imagesCache = new Hashtable();
 	
 	private static Image userDefaultImg, chatDefaultImg;
+//#ifndef NO_FILE
 	private static Image fileImg, folderImg;
+//#endif
 	
 	// temp
 	private static String richTextUrl;
@@ -348,8 +378,21 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	private static String updateUrl;
 	private static long lastType;
 	
+//#ifndef NO_FILE
 	// file picker
 	private static Vector rootsList;
+//#endif
+	
+	// music
+	private static JSONArray playlist;
+	private static int playlistIndex;
+	private static int playlistSize;
+	private static int playlistOffset;
+	private static boolean playlistDirection = true;
+	private static String playlistPeer;
+	private static JSONObject currentMusic;
+	private static int playerState; // 1 - playing, 2 - paused, 3 - loading
+	private static Player currentPlayer;
 	
 	// region MIDlet
 	
@@ -402,7 +445,72 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			deviceName = p;
 		}
-		if ((p = System.getProperty("os.name")) != null) {
+		
+		symbian = symbianJrt
+				|| System.getProperty("com.symbian.midp.serversocket.support") != null
+				|| System.getProperty("com.symbian.default.to.suite.icon") != null
+				|| checkClass("com.symbian.midp.io.protocol.http.Protocol")
+				|| checkClass("com.symbian.lcdjava.io.File");
+		if (symbian) {
+			if (symbianJrt) {
+				int i;
+				v = p.substring(i = p.indexOf("platform_version=") + 17, p.indexOf(';', i));
+				if (v.charAt(0) == '5') {
+					switch (v.charAt(2)) {
+					case '2':
+						systemName = p.indexOf("java_build_version=2.2") != -1 ? "Symbian Anna" : "Symbian^3";
+						break;
+					case '3':
+						systemName = "Symbian Belle";
+						break;
+					case '4':
+						systemName = "Symbian Belle FP1";
+						break;
+					case '5':
+						systemName = "Symbian Belle FP2";
+						break;
+					default:
+						systemName = "S60 5th Edition";
+					}
+				} else {
+					// 3.2
+					systemName = "S60 3rd Edition FP2";
+				}
+			} else {
+				systemName = "Symbian";
+			}
+		}
+		
+		// check media capabilities
+		try {
+			// s40 check
+			Class.forName("com.nokia.mid.impl.isa.jam.Jam");
+			systemName = "Series 40";
+			try {
+				Class.forName("com.sun.mmedia.protocol.CommonDS");
+				// s40v1 uses sun impl for media and i/o so it should work fine
+				playerHttpMethod = 0;
+			} catch (Exception e) {
+				// s40v2+ breaks http locator parsing
+				playerHttpMethod = 1;
+			}
+		} catch (Exception e) {
+			playerHttpMethod = 0;
+			if (symbian) {
+				if (symbianJrt &&
+						(p.indexOf("java_build_version=2.") != -1
+						|| p.indexOf("java_build_version=1.4") != -1)) {
+					// emc (s60v5+), supports mp3 streaming
+				} else if (checkClass("com.symbian.mmapi.PlayerImpl")) {
+					// uiq
+				} else {
+					// mmf (s60v3.2-)
+					playerHttpMethod = 1;
+				}
+			}
+		}
+		
+		if (systemName == null && (p = System.getProperty("os.name")) != null) {
 			if ((v = System.getProperty("os.version")) != null) {
 				p = p.concat(" ".concat(v));
 			}
@@ -438,7 +546,6 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				}
 			}
 		}
-		JSONStream.encoding = encoding;
 		
 		// get system language
 		if ((p = System.getProperty("user.language")) == null) {
@@ -451,9 +558,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 
 		// init platform dependent settings
 		useLoadingForm = !symbianJrt;
-		jsonStream = symbianJrt ||
-				((System.getProperty("com.symbian.midp.serversocket.support") == null &&
-				System.getProperty("com.symbian.default.to.suite.icon") == null));
+		jsonStream = symbianJrt || !symbian;
 		threadedImages = symbianJrt;
 		
 		avatarSize = Math.min(display.getBestImageHeight(Display.LIST_ELEMENT), display.getBestImageWidth(Display.LIST_ELEMENT));
@@ -471,7 +576,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		// load settings
 		try {
 			RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, false);
-			JSONObject j = JSONObject.parseObject(new String(r.getRecord(1), "UTF-8"));
+			JSONObject j = parseObject(new String(r.getRecord(1), "UTF-8"));
 			r.closeRecordStore();
 			
 			reverseChat = j.getBoolean("reverseChat", reverseChat);
@@ -510,7 +615,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		// load auth
 		try {
 			RecordStore r = RecordStore.openRecordStore(AUTH_RECORD_NAME, false);
-			JSONObject j = JSONObject.parseObject(new String(r.getRecord(1), "UTF-8"));
+			JSONObject j = parseObject(new String(r.getRecord(1), "UTF-8"));
 			r.closeRecordStore();
 
 			user = j.getString("user", user);
@@ -570,13 +675,14 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		editMsgCmd = new Command(L[Edit], Command.ITEM, 9);
 		gotoMsgCmd = new Command(L[GoTo], Command.ITEM, 1);
 		botCallbackCmd = new Command("", Command.ITEM, 1); // TODO unlocalized
-		pinMsgCmd = new Command(L[Pin], Command.ITEM, 10);
 		banMemberCmd = new Command(L[BanMember], Command.ITEM, 11);
+		pinMsgCmd = new Command(L[Pin], Command.ITEM, 10);
 		
 		richTextLinkCmd = new Command(L[Link_Cmd], Command.ITEM, 1);
 		openImageCmd = new Command(L[ViewImage], Command.ITEM, 1);
 		callItemCmd = new Command(L[Call], Command.ITEM, 1);
 		documentCmd = new Command(L[Download], Command.ITEM, 2);
+		playItemCmd = new Command(L[Play_Item], Command.ITEM, 1);
 		
 		writeCmd = new Command(L[WriteMessage], Command.SCREEN, 5);
 		latestCmd = new Command(L[LatestMessages_Cmd], Command.SCREEN, 7);
@@ -595,7 +701,10 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		acceptInviteCmd = new Command(L[Join], Command.ITEM, 1);
 		joinChatCmd = new Command(L[JoinGroup], Command.SCREEN, 1);
 		leaveChatCmd = new Command(L[LeaveGroup], Command.ITEM, 1);
-		chatMediaCmd = new Command(L[Media], Command.ITEM, 1);
+		chatPhotosCmd = new Command(L[Photos], Command.ITEM, 1);
+		chatVideosCmd = new Command(L[Videos], Command.ITEM, 1);
+		chatFilesCmd = new Command(L[Files], Command.ITEM, 1);
+		chatMusicCmd = new Command(L[AudioFiles], Command.ITEM, 1);
 		gotoPinnedMsgCmd = new Command(L[GoTo], Command.ITEM, 1);
 		chatMembersCmd = new Command(L[Members], Command.SCREEN, 6);
 		
@@ -610,6 +719,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		prevPageCmd = new Command(L[PrevPage], Command.SCREEN, 7);
 		
 		updateCmd = new Command(L[Download], Command.OK, 1);
+		
+		playlistPlayCmd = new Command(L[Play_Player], Command.ITEM, 1);
+		playlistPauseCmd = new Command(L[Pause_Player], Command.ITEM, 1);
+		playlistNextCmd = new Command(L[Next_Player], Command.ITEM, 1);
+		playlistPrevCmd = new Command(L[Prev_Player], Command.ITEM, 1);
+		playlistCmd = new Command(L[OpenPlaylist], Command.SCREEN, 2);
+		playerCmd = new Command(L[OpenPlayer], Command.SCREEN, 20);
 		
 		loadingForm = new Form(L[mpgram]);
 		loadingForm.append(L[Loading]);
@@ -1023,7 +1139,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 						.append("&id=").append(fwdMsg);
 					}
 				}
+//#ifdef NO_FILE
+//#				api(appendUrl(sb.append("&text="), text).toString());
+//#else
 				postMessage(sb.toString(), file, text);
+//#endif
 				
 				// go to latest message after sending
 				if (!(current instanceof ChatForm)) {
@@ -1089,7 +1209,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		case RUN_CHECK_OTA: { // check for client updates
 			try {
-				JSONObject j = JSONObject.parseObject(new String(get(OTA_URL + "?v=" + version + "&l=" + lang), encoding));
+				JSONObject j = parseObject(new String(get(OTA_URL + "?v=" + version + "&l=" + lang), encoding));
 				if (j.getBoolean("update_available", false) && checkUpdates) {
 					updateUrl = j.getString("download_url");
 					Alert a = new Alert("", "", null, AlertType.INFO);
@@ -1310,6 +1430,106 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 			break;
 		}
+		case RUN_LOAD_PLAYLIST: {
+			int mode;
+			{
+				String s = ((String[]) param)[1];
+				if (s == null) {
+					mode = 0;
+				} else mode = s.charAt(0) - '0';
+			}
+			String peer = ((String[]) param)[0];
+			if (peer == null) {
+				peer = playlistPeer;
+			} else {
+				playlistPeer = peer;
+			}
+			try {
+				StringBuffer sb = new StringBuffer("searchMessages&filter=Music&media=1");
+				sb.append("&peer=").append(peer);
+				sb.append("&limit=").append(messagesLimit);
+				if (mode == 1) {
+					sb.append("&offset_id=").append(playlist.getObject(playlist.size() - 1).getInt("id"));
+				} else if (mode == 2) {
+					sb.append("&min_id=").append(playlist.getObject(0).getInt("id"));
+				} else if (mode == 3) {
+					sb.append("&offset_id=").append(((String[]) param)[2])
+					.append("&add_offset=-1");
+				}
+				
+				if (playlistList == null) {
+					List list = new List(L[Playlist_Title], List.IMPLICIT);
+					list.addCommand(backCmd);
+					list.addCommand(List.SELECT_COMMAND);
+					list.setCommandListener(midlet);
+					
+					playlistList = list;
+				}
+				
+				JSONObject j = (JSONObject) MP.api(sb.toString());
+				JSONArray messages = j.getArray("messages");
+				int l = messages.size();
+				playlistSize = j.getInt("count", -1);
+				
+				if (mode == 0 || mode == 3) {
+					playlist = messages;
+					playlistOffset = j.getInt("off", 0);
+					playlistIndex = 0;
+					currentMusic = playlist.getObject(0);
+					if (mode == 3) {
+						display(initPlayerForm());
+						startPlayer(currentMusic);
+					} else {
+						display(playlistList);
+					}
+				} else if (mode == 1) {
+					for (int i = 0; i < l; ++i) {
+						playlist.add(messages.getObject(i));
+					}
+					startNextMusic(playlistDirection, playlistIndex);
+				} else if (mode == 2) {
+					playlistIndex += l;
+					playlistOffset -= l;
+					if (playlistOffset < 0) playlistOffset = 0;
+					for (int i = l - 1; i >= 0; --i) {
+						playlist.put(0, messages.getObject(i));
+					}
+					startNextMusic(!playlistDirection, playlistIndex);
+				}
+				
+				if (playlistList != null) {
+					playlistList.deleteAll();
+					l = playlist.size();
+					String t;
+					for (int i = 0; i < l; ++i) {
+						JSONObject msg = playlist.getObject(i);
+						sb.setLength(0);
+						if ((t = msg.getObject("media").getObject("audio").getString("artist", null)) != null) {
+							sb.append(t).append(" - ");
+						}
+						if ((t = msg.getObject("media").getObject("audio").getString("title", null)) != null) {
+							sb.append(t);
+						} else {
+							sb.append(msg.getObject("media").getString("name", ""));
+						}
+						playlistList.append(sb.toString(), null);
+					}
+					playlistList.setSelectedIndex(playlistIndex, true);
+				}
+			} catch (Exception e) {
+				display(errorAlert(e), current);
+			}
+			break;
+		}
+		case RUN_PLAYER_LOOP: {
+			try {
+				while (currentPlayer != null && playerState == 1) {
+					playerUpdate(currentPlayer, null, null);
+					Thread.sleep(500L);
+				}
+			} catch (Exception ignored) {}
+			break;
+		}
 		}
 //		running--;
 	}
@@ -1494,8 +1714,20 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				display(t);
 				return;
 			}
-			if (c == chatMediaCmd) {
+			if (c == chatPhotosCmd) {
 				openLoad(new ChatForm(((ChatInfoForm) current).id, "Photos"));
+				return;
+			}
+			if (c == chatVideosCmd) {
+				openLoad(new ChatForm(((ChatInfoForm) current).id, "Video"));
+				return;
+			}
+			if (c == chatFilesCmd) {
+				openLoad(new ChatForm(((ChatInfoForm) current).id, "Document"));
+				return;
+			}
+			if (c == chatMusicCmd) {
+				openLoad(new ChatForm(((ChatInfoForm) current).id, "Music"));
 				return;
 			}
 			if (c == gotoPinnedMsgCmd) {
@@ -1708,10 +1940,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 					f.append(s);
 					
 					if (blackberry) {
-						// TODO untranslated
-						networkChoice = new ChoiceGroup("Network access", Choice.POPUP, new String[] {
-								"Data",
-								"Wi-Fi"
+						networkChoice = new ChoiceGroup(L[NetworkAccess], Choice.POPUP, new String[] {
+								L[MobileData],
+								L[WiFi]
 						}, null);
 						networkChoice.setSelectedIndex(blackberryNetwork == -1 ? 0 : blackberryNetwork, true);
 						networkChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -1945,10 +2176,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				display(t);
 				return;
 			}
+//#ifndef NO_FILE
 			if (c == chooseFileCmd) {
 				openFilePicker("");
 				return;
 			}
+//#endif
 			if (c == okCmd) {
 				// full texbox finished
 				messageField.setString(((TextBox) d).getString());
@@ -2071,7 +2304,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				((MPList) d).select(((List) d).getSelectedIndex());
 				return;
 			}
-			
+			if (d == playlistList) {
+				if (playerState == 3) return;
+				startPlayer(playlist.getObject(playlistIndex = ((List) d).getSelectedIndex()));
+				return;
+			}
+//#ifndef NO_FILE
 			// file picker
 			int i = ((List) d).getSelectedIndex();
 			if (i == -1) return;
@@ -2091,6 +2329,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			commandAction(cancelCmd, d);
 			sendFile = "file:///".concat(path);
 			fileLabel.setText(L[File_Prefix].concat(path));
+//#endif
 			return;
 		}
 		if (c == cancelCmd && d instanceof List) { // go back to write form
@@ -2126,6 +2365,36 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			commandAction(backCmd, current);
 			return;
 		}
+		{ // Playlist commands
+			if (c == playlistPlayCmd) {
+				if (currentPlayer != null) {
+					try {
+						currentPlayer.start();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c == playlistPauseCmd) {
+				if (currentPlayer != null) {
+					try {
+						currentPlayer.stop();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c == playlistNextCmd) {
+				if (playerState == 3) return;
+				startNextMusic(true, playlistIndex);
+			} else if (c == playlistPrevCmd) {
+				if (playerState == 3) return;
+				startNextMusic(false, playlistIndex);
+			} else if (c == playlistCmd) {
+				if (playlistList == null) return;
+				display(playlistList);
+			} else if (c == playerCmd) {
+				display(initPlayerForm());
+			}
+		}
 		if (c == backCmd || c == cancelCmd) {
 			// cancel ota update dialog
 			updateUrl = null;
@@ -2154,7 +2423,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			notifyDestroyed();
 		}
 	}
-	
+
 	public void commandAction(Command c, Item item) {
 		{ // message
 			if (c == itemChatCmd) {
@@ -2331,6 +2600,14 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			start(RUN_SEND_STICKER, s);
 			return;
 		}
+		if (c == playItemCmd) {
+			String[] s = (String[]) ((MPForm) current).urls.get(item);
+			if (s == null) return;
+			
+			display(loadingAlert(L[Loading]), current);
+			start(RUN_LOAD_PLAYLIST, new String[] {s[0], "3", s[1]});
+			return;
+		}
 		commandAction(c, display.getCurrent());
 	}
 
@@ -2352,6 +2629,155 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			
 			lastType = l;
 			start(RUN_SET_TYPING, ((TextField) item).getString().length() == 0 ? "Cancel" : null);
+		}
+	}
+	
+	// endregion
+	
+	// region Music player
+	
+	public void playerUpdate(Player player, String event, Object eventData) {
+		if (PlayerListener.END_OF_MEDIA.equals(event)) {
+			playerState = 2;
+			if (playerProgress != null) {
+				playerProgress.setValue(100);
+			}
+			if (playerPlaypauseBtn != null) {
+				playerPlaypauseBtn.setText(L[Play_Player]);
+				playerPlaypauseBtn.removeCommand(playlistPauseCmd);
+				playerPlaypauseBtn.setDefaultCommand(playlistPlayCmd);
+			}
+			startNextMusic(true, playlistIndex);
+			return;
+		}
+		if (PlayerListener.STARTED.equals(event)) {
+			playerState = 1;
+			if (playerPlaypauseBtn != null) {
+				playerPlaypauseBtn.setText(L[Pause_Player]);
+				playerPlaypauseBtn.removeCommand(playlistPlayCmd);
+				playerPlaypauseBtn.setDefaultCommand(playlistPauseCmd);
+			}
+			start(RUN_PLAYER_LOOP, player);
+		} else if (PlayerListener.STOPPED.equals(event) || PlayerListener.STOPPED_AT_TIME.equals(event)) {
+			playerState = 2;
+			if (playerPlaypauseBtn != null) {
+				playerPlaypauseBtn.setText(L[Play_Player]);
+				playerPlaypauseBtn.removeCommand(playlistPauseCmd);
+				playerPlaypauseBtn.setDefaultCommand(playlistPlayCmd);
+			}
+		}
+		
+		if (playerProgress != null) {
+			try {
+				int progress = 0;
+				final long duration = currentMusic.getObject("media").getObject("audio").getInt("time", 0) * 1000000L;
+				progress = (int) ((player.getMediaTime() * 100) / duration);
+	
+				if (progress < 0) progress = 0;
+				if (progress > 100) progress = 100;
+				
+				playerProgress.setValue(progress);
+			} catch (Exception e) {}
+		}
+	}
+	
+	private void startNextMusic(boolean dir, int start) {
+		int tmp = playerState;
+		playerState = 3;
+		if (playlist != null) {
+			int idx = start;
+			for (;;) {
+				if (playlistDirection == dir) {
+					if (++idx >= playlist.size()) {
+						if (playlist.size() != playlistSize) {
+							start(RUN_LOAD_PLAYLIST, new String[] {null, "1"});
+							return;
+						}
+						break;
+					}
+				} else {
+					if (--idx < 0) {
+						if (playlistOffset != 0) {
+							start(RUN_LOAD_PLAYLIST, new String[] {null, "2"});
+							return;
+						}
+						break;
+					}
+				}
+				JSONObject msg = (JSONObject) playlist.get(idx);
+				if (!"audio/mpeg".equals(msg.getObject("media").getString("mime")))
+					continue;
+				playlistIndex = idx;
+				startPlayer(currentMusic = msg);
+				return;
+			}
+		}
+		playerState = tmp;
+	}
+
+	static void startPlayer(JSONObject msg) {
+		if (currentPlayer != null) {
+			try {
+				currentPlayer.stop();
+			} catch (Throwable ignored) {}
+			try {
+				currentPlayer.close();
+			} catch (Throwable ignored) {}
+			currentPlayer = null;
+			playerState = 0;
+		}
+		try {
+			playerState = 3;
+			
+			StringBuffer url = new StringBuffer(instanceUrl);
+			String name = msg.getObject("media").getString("name", null);
+			if ((name = msg.getObject("media").getString("name", null)) != null && fileRewrite) {
+				appendUrl(url.append("file/"), name);
+			} else {
+				url.append(FILE_URL);
+			}
+			url.append("?c=").append(msg.getString("peer_id"))
+			.append("&m=").append(msg.getInt("id"))
+			.append("&user=").append(user);
+			
+			String t;
+			if (playerTitleLabel != null) {
+				if ((t = msg.getObject("media").getObject("audio").getString("title", null)) == null) {
+					if ((t = name) == null) {
+						t = L[UnknownTrack];
+					}
+				}
+				playerTitleLabel.setText(t);
+			}
+			if (playerArtistLabel != null) {
+				if ((t = msg.getObject("media").getObject("audio").getString("artist", null)) == null) {
+					t = "";
+				}
+				playerArtistLabel.setText(t);
+			}
+			
+			if (playlistList != null) {
+				try {
+					playlistList.setSelectedIndex(playlistIndex, true);
+				} catch (Exception ignored) {}
+			}
+			
+			// TODO
+			Player p;
+			if (playerHttpMethod == 1) {
+				p = Manager.createPlayer(openHttpConnection(url.toString()).openInputStream(), "audio/mpeg");
+			} else {
+				p = Manager.createPlayer(url.toString());
+			}
+			p.addPlayerListener(midlet);
+			currentPlayer = p;
+			
+			p.realize();
+			p.prefetch();
+			p.start();
+			playerState = 1;
+		} catch (Exception e) {
+			display(errorAlert(e), current);
 		}
 	}
 	
@@ -2610,7 +3036,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		s.setDefaultCommand(openTextBoxCmd);
 		s.setItemCommandListener(midlet);
 		f.append(s);
-		
+//#ifndef NO_FILE
 		// file
 		
 		s = new StringItem(null, L[File_Prefix].concat(L[NotSelected]));
@@ -2630,10 +3056,12 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 				L[SendUncompressed],
 				L[HideWithSpoiler]
 		}, null));
+//#endif
 		
 		return writeForm = f;
 	}
 	
+//#ifndef NO_FILE
 	static void openFilePicker(String path) {
 		if (path.length() == 0) path = "/";
 		display(loadingAlert(L[Loading]), current);
@@ -2691,6 +3119,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			e.printStackTrace();
 		}
 	}
+//#endif
 	
 	static void openChat(String id, int msg) {
 		openLoad(new ChatForm(id, null, msg, 0));
@@ -2701,6 +3130,52 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			chatForm = (ChatForm) current;
 		}
 		openLoad(new ChatInfoForm(id, chatForm, mode));
+	}
+	
+	static Form initPlayerForm() {
+		if (playerForm != null) {
+			return playerForm;
+		}
+		
+		Form f = new Form(L[Player_Title].concat(" - mpgram"));
+		f.addCommand(backCmd);
+		f.addCommand(playlistCmd);
+		f.setCommandListener(midlet);
+		
+		StringItem s;
+		
+		s = new StringItem(null, L[UnknownTrack]);
+		s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+		s.setFont(largePlainFont);
+		f.append(playerTitleLabel = s);
+		
+		s = new StringItem(null, "");
+		s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+		s.setFont(smallPlainFont);
+		f.append(playerArtistLabel = s);
+		
+		Gauge g = new Gauge(null, false, 100, 0);
+		f.append(playerProgress = g);
+		
+		s = new StringItem(null, L[Prev_Player], Item.BUTTON);
+		s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE);
+		s.setDefaultCommand(playlistPrevCmd);
+		s.setItemCommandListener(midlet);
+		f.append(s);
+		
+		s = new StringItem(null, L[Play_Player], Item.BUTTON);
+		s.setLayout(Item.LAYOUT_LEFT);
+		s.setDefaultCommand(playlistPlayCmd);
+		s.setItemCommandListener(midlet);
+		f.append(playerPlaypauseBtn = s);
+		
+		s = new StringItem(null, L[Next_Player], Item.BUTTON);
+		s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_AFTER);
+		s.setDefaultCommand(playlistNextCmd);
+		s.setItemCommandListener(midlet);
+		f.append(s);
+		
+		return playerForm = f;
 	}
 	
 	static void copy(String title, String text) {
@@ -2854,6 +3329,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			formHistory.removeAllElements();
 			if (back) imagesToLoad.removeAllElements();
 		}
+		
+		if (d != playerForm) {
+			if (playerState != 0) {
+				d.addCommand(playerCmd);
+			} else {
+				d.removeCommand(playerCmd);
+			}
+		}
+		
 		Displayable p = display.getCurrent();
 		if (p == loadingForm) p = current;
 		display.setCurrent(current = d);
@@ -3170,9 +3654,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			try {
 				threadConnections.put(hc, in = openInputStream(hc));
 				if (jsonStream) {
-					res = JSONStream.getStream(in).nextValue();
+					res = getJSONStream(in).nextValue();
 				} else {
-					res = JSONObject.parseJSON(readUtf(in, (int) hc.getLength()));
+					res = parseJSON(readUtf(in, (int) hc.getLength()));
 				}
 			} catch (RuntimeException e) {
 				if (c >= 400) {
@@ -3215,7 +3699,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			if (c >= 400) {
 				throw new APIException(url, c, null);
 			}
-			res = JSONStream.getStream(hc);
+			res = getJSONStream(hc);
 		} finally {
 			if (res == null) {
 				if (in != null) try {
@@ -3228,7 +3712,8 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		}
 		return res;
 	}
-	
+
+//#ifndef NO_FILE
 	static Object postMessage(String url, String fileUrl, String text) throws IOException {
 		Object res;
 
@@ -3314,9 +3799,9 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			int c = http.getResponseCode();
 			try {
 				if (jsonStream) {
-					res = JSONStream.getStream(httpIn = openInputStream(http)).nextValue();
+					res = getJSONStream(httpIn = openInputStream(http)).nextValue();
 				} else {
-					res = JSONObject.parseJSON(readUtf(httpIn = openInputStream(http), (int) http.getLength()));
+					res = parseJSON(readUtf(httpIn = openInputStream(http), (int) http.getLength()));
 				}
 			} catch (RuntimeException e) {
 				if (c >= 400) {
@@ -3339,6 +3824,7 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			} catch (IOException e) {}
 		}
 	}
+//#endif
 
 	static Image getImage(String url) throws IOException {
 		byte[] b = get(url);
@@ -3403,11 +3889,13 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 	// wrapper for compression handling
 	private static InputStream openInputStream(HttpConnection hc) throws IOException {
 		InputStream i = hc.openInputStream();
+//#ifndef NO_ZIP
 		String enc = hc.getHeaderField("Content-Encoding");
 		if ("deflate".equalsIgnoreCase(enc))
 			i = new InflaterInputStream(i, new Inflater(true));
 		else if ("gzip".equalsIgnoreCase(enc))
 			i = new GZIPInputStream(i);
+//#endif
 		return i;
 	}
 	
@@ -3420,9 +3908,11 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 		HttpConnection hc = (HttpConnection) Connector.open(url, Connector.READ_WRITE,
 				u = (url.indexOf("method=updates") != -1 || OTA_URL.equals(url)));
 		hc.setRequestProperty("User-Agent", "mpgram4/".concat(version).concat(" (https://github.com/shinovon/mpgram-client)"));
+//#ifndef NO_ZIP
 		if (!u && compress) {
 			hc.setRequestProperty("Accept-Encoding", "gzip, deflate");
 		}
+//#endif
 		if (url.startsWith(instanceUrl)) {
 			if (user != null) {
 				hc.setRequestProperty("X-mpgram-user", user);
@@ -3704,15 +4194,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			int w = img.getWidth(), h = img.getHeight();
 			int[] c = new int[w * h];
 			img.getRGB(c, 0, w, 0, 0, w, h);
-			for (int i = 0; i < h; i++) {
-				float y = (float) (h / 2 - i) / (h - 1);
-				y = y * 2;
-				float xf = (float) Math.sqrt(1 - y * y);
-				int x = (int) (xf * (w - 1));
-				x = (w - x) / 2;
-				for (int j = 0; j < x; j++) {
-					c[i * w + j] = 0x00FFFFFF;
-					c[i * w + w - j - 1] = 0x00FFFFFF;
+			int cx = w / 2, cy = h / 2;
+			int r = Math.min(cx, cy);
+			int r2 = r * r;
+			for (int y = 0; y < h; y++) {
+				int dy = y - cy;
+				for (int x = 0; x < w; x++) {
+					int dx = x - cx;
+					if (dx * dx + dy * dy > r2)
+						c[y * w + x] = 0x00FFFFFF;
 				}
 			}
 			return Image.createRGBImage(c, w, h, true);
@@ -3739,6 +4229,15 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			r.addRecord(b, 0, b.length);
 			r.closeRecordStore();
 		} catch (Exception e) {}
+	}
+	
+	private static boolean checkClass(String s) {
+		try {
+			Class.forName(s);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 	
 	// endregion
@@ -4135,31 +4634,395 @@ public class MP extends MIDlet implements CommandListener, ItemCommandListener, 
 			}
 		}
 	}
+	
+	// endregion
+	
+	// region JSON
+	
+	// cc.nnproject.json.JSON
 
-	/**
-	 * Part of tube42 imagelib. Blends 2 colors.
-	 * 
-	 * @param c1
-	 * @param c2
-	 * @param value256
-	 * @return Blended value.
-	 */
-	public static int blend(final int c1, final int c2, final int value256) {
+	// parse all nested elements once
+	static final boolean parse_members = false;
+	
+	// identation for formatting
+	static final String FORMAT_TAB = "  ";
+	
+	// used for storing nulls, get methods must return real null
+	public static final Object json_null = new Object();
+	
+	public static final Boolean TRUE = new Boolean(true);
+	public static final Boolean FALSE = new Boolean(false);
 
-		final int v1 = value256 & 0xFF;
-		final int c1_RB = c1 & 0x00FF00FF;
-		final int c2_RB = c2 & 0x00FF00FF;
+	public static JSONObject parseObject(String text) {
+		if (text == null || text.length() <= 1)
+			throw new RuntimeException("JSON: Empty text");
+		if (text.charAt(0) != '{')
+			throw new RuntimeException("JSON: Not JSON object: " + text);
+		return (JSONObject) parseJSON(text);
+	}
 
-		final int c1_AG = (c1 >>> 8) & 0x00FF00FF;
+	public static JSONArray parseArray(String text) {
+		if (text == null || text.length() <= 1)
+			throw new RuntimeException("JSON: Empty text");
+		if (text.charAt(0) != '[')
+			throw new RuntimeException("JSON: Not JSON array");
+		return (JSONArray) parseJSON(text);
+	}
 
-		final int c2_AG_org = c2 & 0xFF00FF00;
-		final int c2_AG = (c2_AG_org) >>> 8;
+	static Object getJSON(Object obj) {
+		if (obj instanceof Hashtable) {
+			return new JSONObject((Hashtable) obj);
+		}
+		if (obj instanceof Vector) {
+			return new JSONArray((Vector) obj);
+		}
+		return obj == null ? json_null : obj;
+	}
 
-		// the world-famous tube42 blend with one mult per two components:
-		final int rb = (c2_RB + (((c1_RB - c2_RB) * v1) >> 8)) & 0x00FF00FF;
-		final int ag = (c2_AG_org + ((c1_AG - c2_AG) * v1)) & 0xFF00FF00;
-		return ag | rb;
+	public static Object parseJSON(String str) {
+		char first = str.charAt(0);
+		int length;
+		char last = str.charAt(length = str.length() - 1);
+		if (last <= ' ')
+			last = (str = str.trim()).charAt(length = str.length() - 1);
+		switch(first) {
+		case '"': { // string
+			if (last != '"')
+				throw new RuntimeException("JSON: Unexpected end of text");
+			if(str.indexOf('\\') != -1) {
+				char[] chars = str.substring(1, length).toCharArray();
+				str = null;
+				int l = chars.length;
+				StringBuffer sb = new StringBuffer();
+				int i = 0;
+				// parse escaped chars in string
+				loop: {
+					while (i < l) {
+						char c = chars[i];
+						switch (c) {
+						case '\\': {
+							next: {
+								replace: {
+									if (l < i + 1) {
+										sb.append(c);
+										break loop;
+									}
+									char c1 = chars[i + 1];
+									switch (c1) {
+									case 'u':
+										i+=2;
+										sb.append((char) Integer.parseInt(
+												new String(new char[] {chars[i++], chars[i++], chars[i++], chars[i++]}),
+												16));
+										break replace;
+									case 'x':
+										i+=2;
+										sb.append((char) Integer.parseInt(
+												new String(new char[] {chars[i++], chars[i++]}),
+												16));
+										break replace;
+									case 'n':
+										sb.append('\n');
+										i+=2;
+										break replace;
+									case 'r':
+										sb.append('\r');
+										i+=2;
+										break replace;
+									case 't':
+										sb.append('\t');
+										i+=2;
+										break replace;
+									case 'f':
+										sb.append('\f');
+										i+=2;
+										break replace;
+									case 'b':
+										sb.append('\b');
+										i+=2;
+										break replace;
+									case '\"':
+									case '\'':
+									case '\\':
+									case '/':
+										i+=2;
+										sb.append((char) c1);
+										break replace;
+									default:
+										break next;
+									}
+								}
+								break;
+							}
+							sb.append(c);
+							i++;
+							break;
+						}
+						default:
+							sb.append(c);
+							i++;
+						}
+					}
+				}
+				str = sb.toString();
+				sb = null;
+				return str;
+			}
+			return str.substring(1, length);
+		}
+		case '{': // JSON object or array
+		case '[': {
+			boolean object = first == '{';
+			if (object ? last != '}' : last != ']')
+				throw new RuntimeException("JSON: Unexpected end of text");
+			int brackets = 0;
+			int i = 1;
+			char nextDelimiter = object ? ':' : ',';
+			boolean escape = false;
+			String key = null;
+			Object res = object ? (Object) new JSONObject() : (Object) new JSONArray();
+			
+			for (int splIndex; i < length; i = splIndex + 1) {
+				// skip all spaces
+				for (; i < length - 1 && str.charAt(i) <= ' '; i++);
 
+				splIndex = i;
+				boolean quote = false;
+				for (; splIndex < length && (quote || brackets > 0 || str.charAt(splIndex) != nextDelimiter); splIndex++) {
+					char c = str.charAt(splIndex);
+					if (!escape) {
+						if (c == '\\') {
+							escape = true;
+						} else if (c == '"') {
+							quote = !quote;
+						}
+					} else escape = false;
+	
+					if (!quote) {
+						if (c == '{' || c == '[') {
+							brackets++;
+						} else if (c == '}' || c == ']') {
+							brackets--;
+						}
+					}
+				}
+
+				// fail if unclosed quotes or brackets left
+				if (quote || brackets > 0) {
+					throw new RuntimeException("JSON: Corrupted JSON");
+				}
+
+				if (object && key == null) {
+					key = str.substring(i, splIndex);
+					key = key.substring(1, key.length() - 1);
+					nextDelimiter = ',';
+				} else {
+					Object value = str.substring(i, splIndex).trim();
+					// don't check length because if value is empty, then exception is going to be thrown anyway
+					char c = ((String) value).charAt(0);
+					// leave JSONString as value to parse it later, if its object or array and nested parsing is disabled
+					value = parse_members || (c != '{' && c != '[') ?
+							parseJSON((String) value) : new String[] {(String) value};
+					if (object) {
+						((JSONObject) res).table.put(key, value);
+						key = null;
+						nextDelimiter = ':';
+					} else if (splIndex > i) {
+						((JSONArray) res).addElement(value);
+					}
+				}
+			}
+			return res;
+		}
+		case 'n': // null
+			return json_null;
+		case 't': // true
+			return TRUE;
+		case 'f': // false
+			return FALSE;
+		default: // number
+			if ((first >= '0' && first <= '9') || first == '-') {
+				try {
+					// hex
+					if (length > 1 && first == '0' && str.charAt(1) == 'x') {
+						if (length > 9) // str.length() > 10
+							return new Long(Long.parseLong(str.substring(2), 16));
+						return new Integer(Integer.parseInt(str.substring(2), 16));
+					}
+					// decimal
+					if (str.indexOf('.') != -1 || str.indexOf('E') != -1 || "-0".equals(str))
+//						return new Double(Double.parseDouble(str));
+						return str;
+					if (first == '-') length--;
+					if (length > 8) // (str.length() - (str.charAt(0) == '-' ? 1 : 0)) >= 10
+						return new Long(Long.parseLong(str));
+					return new Integer(Integer.parseInt(str));
+				} catch (Exception e) {}
+			}
+			throw new RuntimeException("JSON: Couldn't be parsed: ".concat(str));
+//			return new JSONString(str);
+		}
+	}
+	
+	public static boolean isNull(Object obj) {
+		return obj == json_null || obj == null;
+	}
+
+	// transforms string for exporting
+	static String escape_utf8(String s) {
+		int len = s.length();
+		StringBuffer sb = new StringBuffer();
+		int i = 0;
+		while (i < len) {
+			char c = s.charAt(i);
+			switch (c) {
+			case '"':
+			case '\\':
+				sb.append("\\").append(c);
+				break;
+			case '\b':
+				sb.append("\\b");
+				break;
+			case '\f':
+				sb.append("\\f");
+				break;
+			case '\n':
+				sb.append("\\n");
+				break;
+			case '\r':
+				sb.append("\\r");
+				break;
+			case '\t':
+				sb.append("\\t");
+				break;
+			default:
+				if (c < 32 || c > 1103 || (c >= '\u0080' && c < '\u00a0')) {
+					String u = Integer.toHexString(c);
+					sb.append("\\u");
+					for (int z = u.length(); z < 4; z++) {
+						sb.append('0');
+					}
+					sb.append(u);
+				} else {
+					sb.append(c);
+				}
+			}
+			i++;
+		}
+		return sb.toString();
+	}
+
+//	static double getDouble(Object o) {
+//		try {
+//			if (o instanceof String[])
+//				return Double.parseDouble(((String[]) o)[0]);
+//			if (o instanceof Integer)
+//				return ((Integer) o).intValue();
+//			if (o instanceof Long)
+//				return ((Long) o).longValue();
+//			if (o instanceof Double)
+//				return ((Double) o).doubleValue();
+//		} catch (Throwable e) {}
+//		throw new RuntimeException("JSON: Cast to double failed: " + o);
+//	}
+
+	static int getInt(Object o) {
+		try {
+			if (o instanceof String[])
+				return Integer.parseInt(((String[]) o)[0]);
+			if (o instanceof Integer)
+				return ((Integer) o).intValue();
+			if (o instanceof Long)
+				return (int) ((Long) o).longValue();
+//			if (o instanceof Double)
+//				return ((Double) o).intValue();
+		} catch (Throwable e) {}
+		throw new RuntimeException("JSON: Cast to int failed: " + o);
+	}
+
+	public static long getLong(Object o) {
+		try {
+			if (o instanceof String[])
+				return Long.parseLong(((String[]) o)[0]);
+			if (o instanceof Integer)
+				return ((Integer) o).longValue();
+			if (o instanceof Long)
+				return ((Long) o).longValue();
+//			if (o instanceof Double)
+//				return ((Double) o).longValue();
+		} catch (Throwable e) {}
+		throw new RuntimeException("JSON: Cast to long failed: " + o);
+	}
+
+	public static void writeString(OutputStream out, String s) throws IOException {
+		int len = s.length();
+		for (int i = 0; i < len; ++i) {
+			char c = s.charAt(i);
+			switch (c) {
+			case '"':
+			case '\\':
+				out.write((byte) '\\');
+				out.write((byte) c);
+				break;
+			case '\b':
+				out.write((byte) '\\');
+				out.write((byte) 'b');
+				break;
+			case '\f':
+				out.write((byte) '\\');
+				out.write((byte) 'f');
+				break;
+			case '\n':
+				out.write((byte) '\\');
+				out.write((byte) 'n');
+				break;
+			case '\r':
+				out.write((byte) '\\');
+				out.write((byte) 'r');
+				break;
+			case '\t':
+				out.write((byte) '\\');
+				out.write((byte) 't');
+				break;
+			default:
+				if (c < 32 || c > 255) {
+					String u = Integer.toHexString(c);
+					out.write((byte) '\\');
+					out.write((byte) 'u');
+					for (int z = u.length(); z < 4; z++) {
+						out.write((byte) '0');
+					}
+					out.write(u.getBytes());
+				} else {
+					out.write((byte) c);
+				}
+			}
+		}
+	}
+	
+	// JSONStream static
+	
+	public static JSONStream getJSONStream(InputStream in) throws IOException {
+		JSONStream json = new JSONStream();
+		json.init(in);
+		char c = json.nextTrim();
+		if (c != '{' && c != '[')
+			throw new RuntimeException("JSON: getStream: Not json");
+		json.isObject = c == '{';
+		json.usePrev = true;
+		return json;
+	}
+	
+	public static JSONStream getJSONStream(StreamConnection sc) throws IOException {
+		JSONStream json = new JSONStream();
+		json.connection = sc;
+		json.init(sc.openInputStream());
+		char c = json.nextTrim();
+		if (c != '{' && c != '[')
+			throw new RuntimeException("JSON: getStream: Not json");
+		json.isObject = c == '{';
+		json.usePrev = true;
+		return json;
 	}
 	
 	// endregion

@@ -108,6 +108,7 @@
 	"ViewImage": "Показать",
 	"Call": "Позвонить",
 	"Download": "Скачать",
+	"Play_Item": "Воспроизвести",
 	
 	// Chat form commands
 	"WriteMessage": "Написать сообщение",
@@ -129,6 +130,10 @@
 	"ChatMedia": "Медиафайлы",
 	"Members": "Участники",
 	"AddToContacts": "Добавить в контакты",
+	"Photos": "Фото",
+	"Videos": "Видео",
+	"Files": "Файлы",
+	"AudioFiles": "Музыка",
 	
 	// Dialog commands
 	"Ok": "ОК",
@@ -203,6 +208,9 @@
 	"KeepSessionAlive": "Удерживать сессию активной",
 	"UseUnicode": "Исп. Unicode",
 	"UseCompression": "Исп. сжатие",
+	"NetworkAccess": "Сеть",
+	"MobileData": "Мобильные данные",
+	"WiFi": "Wi-Fi",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Загружать медиа",
@@ -289,6 +297,17 @@
 	"Stickers_Title": "Стикеры",
 	"Sticker": "Стикер",
 	"AddStickers": "Добавить стикеры",
+	
+	// Music player
+	"Player_Title": "Плеер",
+	"OpenPlayer": "Плеер",
+	"OpenPlaylist": "Плейлист",
+	"Play_Player": "Play",
+	"Pause_Player": "Pause",
+	"Prev_Player": "Пред.",
+	"Next_Player": "След.",
+	"UnknownTrack": "Unknown Track",
+	"Playlist_Title": "Плейлист",
 	
 	// Profile/chat info
 	"Online": "в сети",

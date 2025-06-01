@@ -23,9 +23,6 @@ import java.util.Vector;
 
 import javax.microedition.lcdui.List;
 
-import cc.nnproject.json.JSONArray;
-import cc.nnproject.json.JSONObject;
-
 public class ChatsList extends MPList {
 	
 	int limit = MP.chatsLimit;
