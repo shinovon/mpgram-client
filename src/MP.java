@@ -36,8 +36,10 @@ import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 import javax.microedition.io.StreamConnection;
+//#ifndef NO_FILE
 import javax.microedition.io.file.FileConnection;
 import javax.microedition.io.file.FileSystemRegistry;
+//#endif
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Choice;
@@ -366,7 +368,9 @@ public class MP extends MIDlet
 	private static final Hashtable imagesCache = new Hashtable();
 	
 	private static Image userDefaultImg, chatDefaultImg;
+//#ifndef NO_FILE
 	private static Image fileImg, folderImg;
+//#endif
 	
 	// temp
 	private static String richTextUrl;
@@ -374,8 +378,10 @@ public class MP extends MIDlet
 	private static String updateUrl;
 	private static long lastType;
 	
+//#ifndef NO_FILE
 	// file picker
 	private static Vector rootsList;
+//#endif
 	
 	// music
 	private static JSONArray playlist;
@@ -422,6 +428,7 @@ public class MP extends MIDlet
 		// get device name
 		String p, v;
 		if ((p = System.getProperty("microedition.platform")) != null) {
+			symbianJrt = p.indexOf("platform=S60") != -1;
 			blackberry = p.toLowerCase().startsWith("blackberry");
 			try {
 				Class.forName("emulator.custom.CustomMethod");
@@ -439,7 +446,7 @@ public class MP extends MIDlet
 			deviceName = p;
 		}
 		
-		symbian = (symbianJrt = p.indexOf("platform=S60") != -1)
+		symbian = symbianJrt
 				|| System.getProperty("com.symbian.midp.serversocket.support") != null
 				|| System.getProperty("com.symbian.default.to.suite.icon") != null
 				|| checkClass("com.symbian.midp.io.protocol.http.Protocol")
@@ -1132,7 +1139,11 @@ public class MP extends MIDlet
 						.append("&id=").append(fwdMsg);
 					}
 				}
+//#ifdef NO_FILE
+//#				api(appendUrl(sb.append("&text="), text).toString());
+//#else
 				postMessage(sb.toString(), file, text);
+//#endif
 				
 				// go to latest message after sending
 				if (!(current instanceof ChatForm)) {
@@ -2165,10 +2176,12 @@ public class MP extends MIDlet
 				display(t);
 				return;
 			}
+//#ifndef NO_FILE
 			if (c == chooseFileCmd) {
 				openFilePicker("");
 				return;
 			}
+//#endif
 			if (c == okCmd) {
 				// full texbox finished
 				messageField.setString(((TextBox) d).getString());
@@ -2296,7 +2309,7 @@ public class MP extends MIDlet
 				startPlayer(playlist.getObject(playlistIndex = ((List) d).getSelectedIndex()));
 				return;
 			}
-			
+//#ifndef NO_FILE
 			// file picker
 			int i = ((List) d).getSelectedIndex();
 			if (i == -1) return;
@@ -2316,6 +2329,7 @@ public class MP extends MIDlet
 			commandAction(cancelCmd, d);
 			sendFile = "file:///".concat(path);
 			fileLabel.setText(L[File_Prefix].concat(path));
+//#endif
 			return;
 		}
 		if (c == cancelCmd && d instanceof List) { // go back to write form
@@ -3022,7 +3036,7 @@ public class MP extends MIDlet
 		s.setDefaultCommand(openTextBoxCmd);
 		s.setItemCommandListener(midlet);
 		f.append(s);
-		
+//#ifndef NO_FILE
 		// file
 		
 		s = new StringItem(null, L[File_Prefix].concat(L[NotSelected]));
@@ -3042,10 +3056,12 @@ public class MP extends MIDlet
 				L[SendUncompressed],
 				L[HideWithSpoiler]
 		}, null));
+//#endif
 		
 		return writeForm = f;
 	}
 	
+//#ifndef NO_FILE
 	static void openFilePicker(String path) {
 		if (path.length() == 0) path = "/";
 		display(loadingAlert(L[Loading]), current);
@@ -3103,6 +3119,7 @@ public class MP extends MIDlet
 			e.printStackTrace();
 		}
 	}
+//#endif
 	
 	static void openChat(String id, int msg) {
 		openLoad(new ChatForm(id, null, msg, 0));
@@ -3695,7 +3712,8 @@ public class MP extends MIDlet
 		}
 		return res;
 	}
-	
+
+//#ifndef NO_FILE
 	static Object postMessage(String url, String fileUrl, String text) throws IOException {
 		Object res;
 
@@ -3806,6 +3824,7 @@ public class MP extends MIDlet
 			} catch (IOException e) {}
 		}
 	}
+//#endif
 
 	static Image getImage(String url) throws IOException {
 		byte[] b = get(url);

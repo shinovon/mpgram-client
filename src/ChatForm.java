@@ -594,9 +594,11 @@ public class ChatForm extends MPForm implements Runnable {
 						if (!media.isNull("size")) {
 							long size = media.getLong("size");
 							if (size >= 1024 * 1024) {
-								sb.append(((int) (size / (1048576D) * 100)) / 100D).append(" MB");
+								size = (size * 100) / (1024 * 1024);
+								sb.append(size / 100).append('.').append(size % 100).append(" MB");
 							} else {
-								sb.append(((int) (size / (1024D) * 100)) / 100D).append(" KB");
+								size = (size * 100) / 1024;
+								sb.append(size / 100).append('.').append(size % 100).append(" KB");
 							}
 						}
 						
