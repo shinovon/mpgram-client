@@ -138,6 +138,12 @@ public class MP extends MIDlet
 			"العربية",
 		}
 	};
+	
+//#ifdef MINI
+//#	static final boolean MINI_BUILD = true;
+//#else
+	static final boolean MINI_BUILD = false;
+//#endif
 	// endregion
 	
 	static final Font largePlainFont = Font.getFont(0, 0, Font.SIZE_LARGE);
@@ -1208,7 +1214,7 @@ public class MP extends MIDlet
 		}
 		case RUN_CHECK_OTA: { // check for client updates
 			try {
-				JSONObject j = parseObject(new String(get(OTA_URL + "?v=" + version + "&l=" + lang), encoding));
+				JSONObject j = parseObject(new String(get(OTA_URL + "?v=" + version + "&l=" + lang + (MINI_BUILD ? "&m=1" : "")), encoding));
 				if (j.getBoolean("update_available", false) && checkUpdates) {
 					updateUrl = j.getString("download_url");
 					Alert a = new Alert("", "", null, AlertType.INFO);
@@ -1501,15 +1507,15 @@ public class MP extends MIDlet
 					l = playlist.size();
 					String t;
 					for (int i = 0; i < l; ++i) {
-						JSONObject msg = playlist.getObject(i);
+						JSONObject media = playlist.getObject(i).getObject("media");
 						sb.setLength(0);
-						if ((t = msg.getObject("media").getObject("audio").getString("artist", null)) != null) {
+						if ((t = media.getObject("audio").getString("artist", null)) != null) {
 							sb.append(t).append(" - ");
 						}
-						if ((t = msg.getObject("media").getObject("audio").getString("title", null)) != null) {
+						if ((t = media.getObject("audio").getString("title", null)) != null) {
 							sb.append(t);
 						} else {
-							sb.append(msg.getObject("media").getString("name", ""));
+							sb.append(media.getString("name", ""));
 						}
 						playlistList.append(sb.toString(), null);
 					}
