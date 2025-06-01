@@ -428,7 +428,32 @@ public class MP extends MIDlet
 		// get device name
 		String p, v;
 		if ((p = System.getProperty("microedition.platform")) != null) {
-			symbianJrt = p.indexOf("platform=S60") != -1;
+			if ((symbianJrt = p.indexOf("platform=S60") != -1)) {
+				int i;
+				v = p.substring(i = p.indexOf("platform_version=") + 17, i = p.indexOf(';', i));
+				if (v.charAt(0) == '5') {
+					switch (v.charAt(2)) {
+					case '2':
+						systemName = p.indexOf("java_build_version=2.2") != -1 ? "Symbian Anna" : "Symbian^3";
+						break;
+					case '3':
+						systemName = "Symbian Belle";
+						break;
+					case '4':
+						systemName = "Symbian Belle FP1";
+						break;
+					case '5':
+						systemName = "Symbian Belle FP2";
+						break;
+					default:
+						systemName = "S60 5th Edition";
+					}
+				} else {
+					// 3.2
+					systemName = "S60 3rd Edition FP2";
+				}
+			}
+			
 			blackberry = p.toLowerCase().startsWith("blackberry");
 			try {
 				Class.forName("emulator.custom.CustomMethod");
@@ -451,34 +476,8 @@ public class MP extends MIDlet
 				|| System.getProperty("com.symbian.default.to.suite.icon") != null
 				|| checkClass("com.symbian.midp.io.protocol.http.Protocol")
 				|| checkClass("com.symbian.lcdjava.io.File");
-		if (symbian) {
-			if (symbianJrt) {
-				int i;
-				v = p.substring(i = p.indexOf("platform_version=") + 17, p.indexOf(';', i));
-				if (v.charAt(0) == '5') {
-					switch (v.charAt(2)) {
-					case '2':
-						systemName = p.indexOf("java_build_version=2.2") != -1 ? "Symbian Anna" : "Symbian^3";
-						break;
-					case '3':
-						systemName = "Symbian Belle";
-						break;
-					case '4':
-						systemName = "Symbian Belle FP1";
-						break;
-					case '5':
-						systemName = "Symbian Belle FP2";
-						break;
-					default:
-						systemName = "S60 5th Edition";
-					}
-				} else {
-					// 3.2
-					systemName = "S60 3rd Edition FP2";
-				}
-			} else {
-				systemName = "Symbian";
-			}
+		if (symbian && systemName == null) {
+			systemName = "Symbian";
 		}
 		
 		// check media capabilities
