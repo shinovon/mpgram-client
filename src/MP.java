@@ -209,6 +209,7 @@ public class MP extends MIDlet
 	static boolean fileRewrite;
 	static int blackberryNetwork = -1; // -1: undefined, 0: data, 1: wifi
 	static int playerHttpMethod = 1; // 0 - pass url, 1 - pass connection stream
+	static String musicCachePath; // TODO
 	
 	// platform
 	static boolean symbianJrt;
@@ -3915,7 +3916,7 @@ public class MP extends MIDlet
 		}
 		boolean u;
 		HttpConnection hc = (HttpConnection) Connector.open(url, Connector.READ_WRITE,
-				u = (url.indexOf("method=updates") != -1 || OTA_URL.equals(url)));
+				u = (url.indexOf("method=updates") != -1 || url.indexOf(OTA_URL) != -1));
 		hc.setRequestProperty("User-Agent", "mpgram4/".concat(version).concat(" (https://github.com/shinovon/mpgram-client)"));
 //#ifndef NO_ZIP
 		if (!u && compress) {
