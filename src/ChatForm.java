@@ -808,7 +808,7 @@ public class ChatForm extends MPForm implements Runnable {
 						s.setDefaultCommand(MP.botCallbackCmd);
 					} else if (markupItem.has("url")) {
 						urls.put(s, markupItem.getString("url"));
-						s.setDefaultCommand(MP.openLinkCmd);
+						s.setDefaultCommand(MP.richTextLinkCmd);
 					}
 					s.setItemCommandListener(MP.midlet);
 					safeInsert(thread, insert++, lastItem = s);
