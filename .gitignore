@@ -15,3 +15,4 @@ bin
 # see langs/compile.py
 src/LangConstants.java
 res/l
+.vscode/launch.json
