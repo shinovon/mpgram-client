@@ -255,6 +255,7 @@
 	"UpdateAvailable_Alert": "Päivitys saatavilla",
 	"MemberBanned_Alert": "Member banned", // Untranslated
 	"StickersAdded_Alert": "Stickers added", // Untranslated
+	"ChooseNetwork_Alert": "Choose network access point", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Media",

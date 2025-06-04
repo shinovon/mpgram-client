@@ -138,6 +138,12 @@ public class MP extends MIDlet
 			"العربية",
 		}
 	};
+	
+//#ifdef MINI
+//#	static final boolean MINI_BUILD = true;
+//#else
+	static final boolean MINI_BUILD = false;
+//#endif
 	// endregion
 	
 	static final Font largePlainFont = Font.getFont(0, 0, Font.SIZE_LARGE);
@@ -203,6 +209,7 @@ public class MP extends MIDlet
 	static boolean fileRewrite;
 	static int blackberryNetwork = -1; // -1: undefined, 0: data, 1: wifi
 	static int playerHttpMethod = 1; // 0 - pass url, 1 - pass connection stream
+	static String musicCachePath; // TODO
 	
 	// platform
 	static boolean symbianJrt;
@@ -329,7 +336,7 @@ public class MP extends MIDlet
 	private static Form authForm;
 	private static Form writeForm;
 	private static Form playerForm;
-	private static List playlistList; // TODO
+	private static List playlistList;
 	private static final Vector formHistory = new Vector();
 
 	// auth items
@@ -428,7 +435,32 @@ public class MP extends MIDlet
 		// get device name
 		String p, v;
 		if ((p = System.getProperty("microedition.platform")) != null) {
-			symbianJrt = p.indexOf("platform=S60") != -1;
+			if ((symbianJrt = p.indexOf("platform=S60") != -1)) {
+				int i;
+				v = p.substring(i = p.indexOf("platform_version=") + 17, i = p.indexOf(';', i));
+				if (v.charAt(0) == '5') {
+					switch (v.charAt(2)) {
+					case '2':
+						systemName = p.indexOf("java_build_version=2.2") != -1 ? "Symbian Anna" : "Symbian^3";
+						break;
+					case '3':
+						systemName = "Symbian Belle";
+						break;
+					case '4':
+						systemName = "Symbian Belle FP1";
+						break;
+					case '5':
+						systemName = "Symbian Belle FP2";
+						break;
+					default:
+						systemName = "S60 5th Edition";
+					}
+				} else {
+					// 3.2
+					systemName = "S60 3rd Edition FP2";
+				}
+			}
+			
 			blackberry = p.toLowerCase().startsWith("blackberry");
 			try {
 				Class.forName("emulator.custom.CustomMethod");
@@ -451,34 +483,8 @@ public class MP extends MIDlet
 				|| System.getProperty("com.symbian.default.to.suite.icon") != null
 				|| checkClass("com.symbian.midp.io.protocol.http.Protocol")
 				|| checkClass("com.symbian.lcdjava.io.File");
-		if (symbian) {
-			if (symbianJrt) {
-				int i;
-				v = p.substring(i = p.indexOf("platform_version=") + 17, p.indexOf(';', i));
-				if (v.charAt(0) == '5') {
-					switch (v.charAt(2)) {
-					case '2':
-						systemName = p.indexOf("java_build_version=2.2") != -1 ? "Symbian Anna" : "Symbian^3";
-						break;
-					case '3':
-						systemName = "Symbian Belle";
-						break;
-					case '4':
-						systemName = "Symbian Belle FP1";
-						break;
-					case '5':
-						systemName = "Symbian Belle FP2";
-						break;
-					default:
-						systemName = "S60 5th Edition";
-					}
-				} else {
-					// 3.2
-					systemName = "S60 3rd Edition FP2";
-				}
-			} else {
-				systemName = "Symbian";
-			}
+		if (symbian && systemName == null) {
+			systemName = "Symbian";
 		}
 		
 		// check media capabilities
@@ -794,12 +800,12 @@ public class MP extends MIDlet
 		authForm = f;
 		
 		// load main form
-		
 		if (user == null || userState < 3) {
 			display(mainDisplayable = authForm);
+			// show network access settings on blackberry
 			if (blackberry && blackberryNetwork == -1) {
 				commandAction(settingsCmd, current);
-				display(infoAlert("Choose network access point"), current); // TODO untranslated
+				display(infoAlert(L[ChooseNetwork_Alert]), current);
 				return;
 			}
 		} else {
@@ -1209,7 +1215,7 @@ public class MP extends MIDlet
 		}
 		case RUN_CHECK_OTA: { // check for client updates
 			try {
-				JSONObject j = parseObject(new String(get(OTA_URL + "?v=" + version + "&l=" + lang), encoding));
+				JSONObject j = parseObject(new String(get(OTA_URL + "?v=" + version + "&l=" + lang + (MINI_BUILD ? "&m=1" : "")), encoding));
 				if (j.getBoolean("update_available", false) && checkUpdates) {
 					updateUrl = j.getString("download_url");
 					Alert a = new Alert("", "", null, AlertType.INFO);
@@ -1502,15 +1508,15 @@ public class MP extends MIDlet
 					l = playlist.size();
 					String t;
 					for (int i = 0; i < l; ++i) {
-						JSONObject msg = playlist.getObject(i);
+						JSONObject media = playlist.getObject(i).getObject("media");
 						sb.setLength(0);
-						if ((t = msg.getObject("media").getObject("audio").getString("artist", null)) != null) {
+						if ((t = media.getObject("audio").getString("artist", null)) != null) {
 							sb.append(t).append(" - ");
 						}
-						if ((t = msg.getObject("media").getObject("audio").getString("title", null)) != null) {
+						if ((t = media.getObject("audio").getString("title", null)) != null) {
 							sb.append(t);
 						} else {
-							sb.append(msg.getObject("media").getString("name", ""));
+							sb.append(media.getString("name", ""));
 						}
 						playlistList.append(sb.toString(), null);
 					}
@@ -2705,7 +2711,10 @@ public class MP extends MIDlet
 					}
 				}
 				JSONObject msg = (JSONObject) playlist.get(idx);
-				if (!"audio/mpeg".equals(msg.getObject("media").getString("mime")))
+				String t;
+				if (!"audio/mpeg".equals(t = msg.getObject("media").getString("mime"))
+						&& !"audio/aac".equals(t)
+						&& !"audio/m4a".equals(t))
 					continue;
 				playlistIndex = idx;
 				startPlayer(currentMusic = msg);
@@ -2765,7 +2774,7 @@ public class MP extends MIDlet
 			// TODO
 			Player p;
 			if (playerHttpMethod == 1) {
-				p = Manager.createPlayer(openHttpConnection(url.toString()).openInputStream(), "audio/mpeg");
+				p = Manager.createPlayer(openHttpConnection(url.toString()).openInputStream(), msg.getObject("media").getString("mime", "audio/mpeg"));
 			} else {
 				p = Manager.createPlayer(url.toString());
 			}
@@ -3210,7 +3219,8 @@ public class MP extends MIDlet
 					} else if ("API is disabled".equals(message)) {
 						sb.setLength(0);
 						sb.append(L[APIDisabled_Alert]);
-					} else if ("Wrong instance password".equals(message) || "Instance password is required".equals(message)) {
+					} else if ("Wrong instance password".equals(message)
+							|| "Instance password is required".equals(message)) {
 						sb.setLength(0);
 						sb.append(L[InvalidInstancePassword_Alert]);
 					} else {
@@ -3407,7 +3417,8 @@ public class MP extends MIDlet
 		String stickers = null;
 		
 		try {
-			if ((i = url.indexOf("t.me")) == 0 || i == 8) {
+			if ((i = url.indexOf("t.me")) == 0
+					|| (url.startsWith("http") && (i == 7 || i == 8))) {
 				url = url.substring(i + 5);
 				if ((i = url.indexOf('#')) != -1) {
 					url = url.substring(0, i);
@@ -3906,7 +3917,7 @@ public class MP extends MIDlet
 		}
 		boolean u;
 		HttpConnection hc = (HttpConnection) Connector.open(url, Connector.READ_WRITE,
-				u = (url.indexOf("method=updates") != -1 || OTA_URL.equals(url)));
+				u = (url.indexOf("method=updates") != -1 || url.indexOf(OTA_URL) != -1));
 		hc.setRequestProperty("User-Agent", "mpgram4/".concat(version).concat(" (https://github.com/shinovon/mpgram-client)"));
 //#ifndef NO_ZIP
 		if (!u && compress) {

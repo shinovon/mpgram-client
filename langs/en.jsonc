@@ -95,7 +95,7 @@
 	"Profile": "Profile",
 	"Reply": "Reply",
 	"Forward": "Forward",
-	"CopyMessage": "Copy message",
+	"CopyMessage": "Copy text",
 	"CopyMessageLink": "Copy message link",
 	"Delete": "Delete",
 	"Edit": "Edit",
@@ -255,6 +255,7 @@
 	"UpdateAvailable_Alert": "Client update available",
 	"MemberBanned_Alert": "Member banned",
 	"StickersAdded_Alert": "Stickers added",
+	"ChooseNetwork_Alert": "Choose network access point",
 	
 	// Chat form
 	"ChatMedia_Title": "Media",

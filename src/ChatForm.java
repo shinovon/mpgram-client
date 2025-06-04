@@ -573,6 +573,11 @@ public class ChatForm extends MPForm implements Runnable {
 						if (msgItem == null) msgItem = img;
 					} else {
 						boolean nameSet = false;
+						final boolean playable = media.has("audio")
+								&& ("audio/mpeg".equals(t = media.getString("mime", null))
+										|| "audio/aac".equals(t)
+										|| "audio/m4a".equals(t));
+						
 						key[4] = media.getString("name", null);
 						if (media.has("audio")) {
 							JSONObject audio = media.getObject("audio");
@@ -607,7 +612,7 @@ public class ChatForm extends MPForm implements Runnable {
 							try {
 								img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 							} catch (Exception ignored) {}
-							if (media.has("audio") && "audio/mpeg".equals(media.getString("mime", null))) {
+							if (playable) {
 								img.addCommand(MP.documentCmd);
 								img.setDefaultCommand(MP.playItemCmd);
 							} else {
@@ -625,7 +630,7 @@ public class ChatForm extends MPForm implements Runnable {
 							s = new StringItem(null, sb.toString());
 							s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 							s.setFont(MP.smallItalicFont);
-							if (media.has("audio") && "audio/mpeg".equals(media.getString("mime", null))) {
+							if (playable) {
 								s.addCommand(MP.documentCmd);
 								s.setDefaultCommand(MP.playItemCmd);
 							} else {
@@ -803,7 +808,7 @@ public class ChatForm extends MPForm implements Runnable {
 						s.setDefaultCommand(MP.botCallbackCmd);
 					} else if (markupItem.has("url")) {
 						urls.put(s, markupItem.getString("url"));
-						s.setDefaultCommand(MP.openLinkCmd);
+						s.setDefaultCommand(MP.richTextLinkCmd);
 					}
 					s.setItemCommandListener(MP.midlet);
 					safeInsert(thread, insert++, lastItem = s);
