@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- CALL AS "JAVA_HOME=/path/to/jdk8 ant targetname" -->
+<project name="mpgram" default="package">
+    
+    <!-- EDIT THE PATH TO YOUR WIRELESS TOOLKIT FOLDER HERE -->
+    <property name="wtk.home" value="../WTK2.5.2"/>
+
+    <taskdef resource="antenna.properties" classpath="tools/antenna-bin-1.0.2.jar"/>
+
+    <property name="wtk.cldc.version" value="1.1"/>
+    <property name="wtk.midp.version" value="2.0"/>
+    <property name="wtk.optionalpda.enabled" value="true"/>
+
+    <taskdef classpath="tools/antenna-bin-1.0.2.jar" name="wtkjad" classname="de.pleumann.antenna.WtkJad"/>
+    <taskdef classpath="tools/antenna-bin-1.0.2.jar" name="wtkbuild" classname="de.pleumann.antenna.WtkBuild" />
+    <taskdef classpath="tools/antenna-bin-1.0.2.jar" name="wtkpackage" classname="de.pleumann.antenna.WtkPackage"/>
+    <taskdef classpath="tools/antenna-bin-1.0.2.jar" name="wtkmakeprc" classname="de.pleumann.antenna.WtkMakePrc"/>
+    <taskdef classpath="tools/antenna-bin-1.0.2.jar" name="wtkrun" classname="de.pleumann.antenna.WtkRun"/>
+    <taskdef classpath="tools/antenna-bin-1.0.2.jar" name="wtkpreverify" classname="de.pleumann.antenna.WtkPreverify"/>
+    <taskdef classpath="tools/antenna-bin-1.0.2.jar" name="wtkobfuscate" classname="de.pleumann.antenna.WtkObfuscate"/>
+
+    <target name="init">
+        <mkdir dir="out"/>
+        <wtkjad
+            jadfile="out/MPGram.jad"
+            jarfile="out/MPGram.jar"
+            update="false"
+            name="MPGram"
+            vendor="nnproject"
+            version="0.11.2"
+            encoding="UTF-8"
+        >
+            <midlet
+                name="MP"
+                icon="/m.png"
+                class="MP"
+            />
+            <attribute name="Nokia-MIDlet-Background-Event" value="pause"/>
+            <attribute name="Nokia-Scalable-Icon" value="/m.svg"/>
+            <attribute name="Nokia-Scalable-Icon-MIDlet-1" value="/m.svg"/>
+        </wtkjad>
+    </target>
+
+    <target name="localize">
+        <exec executable="python3" failonerror="true" dir="langs" searchpath="true">
+            <arg line="compile.py"/>
+        </exec>
+    </target>
+    
+    <target name="compile" depends="init, localize">
+        <wtkbuild
+            srcdir="src"
+            destdir="classes"
+            preverify="false"
+            target="1.4"
+        />
+    </target>
+
+    <target name="package" depends="compile, init, localize">
+        <wtkpackage
+            jarfile="out/MPGram.jar"
+            jadfile="out/MPGram.jad"
+            preverify="true"
+            obfuscate="false"
+        >
+            <fileset dir="classes"/>
+            <fileset dir="res"/>
+        </wtkpackage>
+    </target>
+
+    <target name="obfuscate" depends="package">
+        <wtkobfuscate
+            jarfile="out/MPGram.jar"
+            jadfile="out/MPGram.jad"
+            classpath="tools/proguard.jar"
+        >
+            <preserve class="javax.microedition.shell.MicroActivity" />
+            <preserve class="emulator.custom.CustomMethod" />
+
+            <argument value="-ignorewarnings" />
+            <argument value="-dontusemixedcaseclassnames" />
+            <argument value="-defaultpackage ''" />
+            <argument value="-keep 'public class * extends javax.microedition.midlet.MIDlet'" />
+            <argument value="-keep 'public class net.wstech2.me.httpsclient.*'" />
+            <argument value="-overloadaggressively" />
+            <argument value="-dontoptimize" />
+        </wtkobfuscate>
+    </target>
+
+    <target name="run" depends="package">
+        <wtkrun
+            jadfile="out/MPGram.jad"
+        />
+    </target>
+
+    <target name="debug" depends="package">
+        <wtkrun
+            jadfile="out/MPGram.jad"
+            debug="8000"
+        />
+    </target>
+</project>
