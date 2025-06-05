@@ -13,3 +13,4 @@ bin
 # see langs/compile.py
 src/LangConstants.java
 res/l
+.idea
