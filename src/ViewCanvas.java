@@ -56,7 +56,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 				toDraw = null;
 				try {
 					repaint();
-					resize(1);
+					resize();
 					zoom = 1;
 				} catch (Exception e) {
 					error = true;
@@ -81,7 +81,8 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 	 * 
 	 * @param size New zoom to apply.
 	 */
-	protected void resize(int size) {
+	protected void resize() {
+		if (resizing) return;
 		resizing = true;
 		try {
 			toDraw = null;
@@ -92,7 +93,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 			byte[] b;
 			try {
 				b = MP.get(MP.instanceUrl + MP.FILE_URL + "?a&c=" + peer + "&m=" + id + "&p=rprev&s="
-						+ (Math.min(getWidth(), getHeight()) * size));
+						+ (Math.min(getWidth(), getHeight()) * zoom));
 				l = b.length;
 				origImg = Image.createImage(b, 0, b.length);
 				b = null;
@@ -236,7 +237,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 
 	protected final void keyPressed(int k) {
 		k = qwertyToNum(k);
-		if (k == -7) {
+		if (k == -7 || k == -22 || k == 22) {
 			try {
 				if (loader != null && loader.isAlive()) {
 					loader.interrupt();
@@ -275,14 +276,15 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 			}
 	
 			// zoom is active
-			if (zoom != 1) {
-				if (k == -5) {
-					zoom++;
-					if (zoom > 3)
-						zoom = 1;
-	
-					resize((int) zoom);
-				} else if (k == -1 || k == KEY_NUM2 || k == 'w') {
+			if (k == -5 || getGameAction(k) == FIRE) {
+				if (zoom == 1) {
+					zoom = 2;
+					x = 0;
+					y = 0;
+				} else if (++zoom > 3) zoom = 1;
+				MP.midlet.start(MP.RUN_ZOOM_VIEW, this);
+			} else if (zoom != 1) {
+				if (k == -1 || k == KEY_NUM2 || k == 'w') {
 					// up
 					y += getHeight() / 4;
 				} else if (k == -2 || k == KEY_NUM8 || k == 's') {
@@ -291,14 +293,6 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 					x += getWidth() / 4;
 				} else if (k == -4 || k == KEY_NUM6 || k == 'd') {
 					x -= getWidth() / 4;
-				}
-			} else {
-				// zoom inactive
-				if (k == -5) {
-					zoom = 2;
-					x = 0;
-					y = 0;
-					MP.midlet.start(MP.RUN_ZOOM_VIEW, this);
 				}
 			}
 		}

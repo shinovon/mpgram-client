@@ -1387,7 +1387,7 @@ public class MP extends MIDlet
 		}
 		case RUN_ZOOM_VIEW: {
 			try {
-				((ViewCanvas) param).resize((int) ((ViewCanvas) param).zoom);
+				((ViewCanvas) param).resize();
 				((ViewCanvas) param).repaint();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -1915,6 +1915,7 @@ public class MP extends MIDlet
 					uiChoice.setSelectedIndex(2, chatStatus);
 					uiChoice.setSelectedIndex(3, focusNewMessages);
 					uiChoice.setSelectedIndex(4, chatField);
+					uiChoice.setSelectedIndex(5, useView);
 					uiChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(uiChoice);
 					
