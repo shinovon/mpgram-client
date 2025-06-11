@@ -70,8 +70,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 			try {
 				Thread.sleep(100);
 			} catch (Exception ignored) {}
-			MP.display(new Alert("Error", "Not enough memory to continue viewing.", null,
-					AlertType.ERROR));
+			MP.display(new Alert("Error", "Not enough memory to continue viewing.", null, AlertType.ERROR)); // TODO unlocalized
 			return;
 		}
 	}
@@ -138,9 +137,9 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 				if (error) {
 					g.setGrayScale(0);
 					g.fillRect(0, 0, w, h);
-					info = "Failed to load image.";
+					info = "Failed to load image."; // TODO unlocalized
 				} else {
-					info = "Preparing";
+					info = MP.L[Loading];
 				}
 				g.setGrayScale(0);
 				int tw = f.stringWidth(info);
@@ -156,7 +155,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 					g.drawLine(w * 3 / 4, h - 50, w * 3 / 4, h);
 					// captions
 					g.setGrayScale(255);
-					g.drawString(touchCaps[6], w * 7 / 8, h - 25 - fh / 2, Graphics.TOP | Graphics.HCENTER);
+					g.drawString(touchCaps[3], w * 7 / 8, h - 25 - fh / 2, Graphics.TOP | Graphics.HCENTER);
 				}
 			} else {
 				// bg fill
@@ -190,7 +189,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 				fillGrad(g, w * 3 / 4, h - 50, w / 4, 51, 0,
 						touchHoldPos == 7 ? 0x357EDE : 0x222222);
 				g.setGrayScale(255);
-				g.drawString(touchCaps[6], w * (1 + 3 * 2) / 8,
+				g.drawString(touchCaps[3], w * (1 + 3 * 2) / 8,
 						h - 25 - fh / 2, Graphics.TOP | Graphics.HCENTER);
 				g.setGrayScale(255);
 				g.drawLine(w * 3 / 4, h - 50, w, h - 50);
@@ -231,7 +230,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 		}
 	}
 
-	String[] touchCaps = new String[] { "x1", "x2", "x3", "<-", "goto", "->", MP.L[Back] };
+	String[] touchCaps = new String[] { "x1", "x2", "x3", MP.L[Back] };
 
 	boolean touchCtrlShown = true;
 
@@ -518,6 +517,12 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 		case 'M':
 		case 'ь':
 			return Canvas.KEY_NUM0;
+		
+		case 'o':
+		case 'O':
+		case 'p':
+		case 'P':
+			return -7;
 
 		default:
 			return k;
