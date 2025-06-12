@@ -238,7 +238,6 @@ public class MP extends MIDlet
 	private static int userState;
 	private static String phone;
 	static String selfId;
-	private static boolean userRetry;
 //	private static String phoneCodeHash; // TODO resend code
 
 	// region Commands
@@ -841,9 +840,12 @@ public class MP extends MIDlet
 		switch (run) {
 		case RUN_VALIDATE_AUTH: {
 			Displayable returnTo = param == null ? authForm : current;
-			Alert alert;
-			
-			display(loadingAlert(L[Authorizing]), param == null ? null : returnTo);
+			Alert alert = loadingAlert(L[Authorizing]);
+			if (param == null) {
+				alert.addCommand(exitCmd);
+				alert.setCommandListener(this);
+			}
+			display(alert, param == null ? null : returnTo);
 			try {
 				selfId = ((JSONObject) api("me&status=1")).getString("id");
 				userState = 4;
@@ -871,7 +873,7 @@ public class MP extends MIDlet
 			}
 			alert.addCommand(authRetryCmd);
 			alert.addCommand(cancelCmd);
-			alert.setCommandListener(midlet);
+			alert.setCommandListener(this);
 			display(alert, returnTo);
 			break;
 		}
