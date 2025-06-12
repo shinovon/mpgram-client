@@ -175,6 +175,7 @@
 	"APIDisabled_Alert": "This instance does not support API!",
 	"ClientOutdated_Alert": "Client outdated!",
 	"InvalidInstancePassword_Alert": "Invalid instance password!",
+	"Retry": "Retry",
 	
 	// Settings sections
 	"UI": "UI",
@@ -256,6 +257,7 @@
 	"MemberBanned_Alert": "Member banned",
 	"StickersAdded_Alert": "Stickers added",
 	"ChooseNetwork_Alert": "Choose network access point",
+	"FailedToLoadImage": "Failed to load image", // unwrapped, should be short
 	
 	// Chat form
 	"ChatMedia_Title": "Media",

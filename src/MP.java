@@ -238,6 +238,7 @@ public class MP extends MIDlet
 	private static int userState;
 	private static String phone;
 	static String selfId;
+	private static boolean userRetry;
 //	private static String phoneCodeHash; // TODO resend code
 
 	// region Commands
@@ -253,6 +254,7 @@ public class MP extends MIDlet
 	private static Command authPasswordCmd;
 	private static Command authNewSessionCmd;
 	private static Command authImportSessionCmd;
+	private static Command authRetryCmd;
 	
 	private static Command logoutCmd;
 	private static Command clearCacheCmd;
@@ -660,6 +662,7 @@ public class MP extends MIDlet
 		authPasswordCmd = new Command(L[Next], Command.OK, 1);
 		authNewSessionCmd = new Command(L[NewSession], Command.SCREEN, 1);
 		authImportSessionCmd = new Command(L[ImportSession], Command.SCREEN, 2);
+		authRetryCmd = new Command(L[Retry], Command.OK, 1);
 		
 		logoutCmd = new Command(L[Logout], Command.ITEM, 1);
 		clearCacheCmd = new Command(L[ClearCache], Command.ITEM, 1);
@@ -837,9 +840,10 @@ public class MP extends MIDlet
 //		running++;
 		switch (run) {
 		case RUN_VALIDATE_AUTH: {
-			display(loadingAlert(L[Authorizing]), null);
-			
 			Displayable returnTo = param == null ? authForm : current;
+			Alert alert;
+			
+			display(loadingAlert(L[Authorizing]), param == null ? null : returnTo);
 			try {
 				selfId = ((JSONObject) api("me&status=1")).getString("id");
 				userState = 4;
@@ -858,14 +862,17 @@ public class MP extends MIDlet
 					display(errorAlert(e), returnTo);
 					break;
 				}
-				display(errorAlert(e), returnTo);
+				alert = errorAlert(e);
 			} catch (Exception e) {
-				display(errorAlert(e), returnTo);
-				e.printStackTrace();
+				alert = errorAlert(e);
 			}
 			if (param == null) {
 				mainDisplayable = returnTo;
 			}
+			alert.addCommand(authRetryCmd);
+			alert.addCommand(cancelCmd);
+			alert.setCommandListener(midlet);
+			display(alert, returnTo);
 			break;
 		}
 		case RUN_IMAGES: { // avatars loading loop
@@ -1874,6 +1881,10 @@ public class MP extends MIDlet
 
 				display(loadingAlert(L[WaitingForServerResponse]), null);
 				start(RUN_AUTH, pass);
+				return;
+			}
+			if (c == authRetryCmd) {
+				start(RUN_VALIDATE_AUTH, mainDisplayable);
 				return;
 			}
 		}

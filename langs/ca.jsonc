@@ -175,6 +175,7 @@
 	"APIDisabled_Alert": "Aquesta instància no admet API!",
 	"ClientOutdated_Alert": "Client obsolet!",
 	"InvalidInstancePassword_Alert": "Mot de pas d'instància no vàlid!",
+	"Retry": "Retry", // Untranslated
 	
 	// Settings sections
 	"UI": "IU",
@@ -256,6 +257,7 @@
 	"MemberBanned_Alert": "Membre prohibit",
 	"StickersAdded_Alert": "Adhesius afegits",
 	"ChooseNetwork_Alert": "Choose network access point", // Untranslated
+	"FailedToLoadImage": "Failed to load image", // unwrapped, should be short // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Mèdia",

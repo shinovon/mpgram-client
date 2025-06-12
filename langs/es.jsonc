@@ -175,6 +175,7 @@
 	"APIDisabled_Alert": "This instance does not support API!", // Untranslated
 	"ClientOutdated_Alert": "Client outdated!", // Untranslated
 	"InvalidInstancePassword_Alert": "Invalid instance password!", // Untranslated
+	"Retry": "Retry", // Untranslated
 	
 	// Settings sections
 	"UI": "Interfaz de usuario",
@@ -256,6 +257,7 @@
 	"MemberBanned_Alert": "Miembro prohibido",
 	"StickersAdded_Alert": "Stickers added", // Untranslated
 	"ChooseNetwork_Alert": "Choose network access point", // Untranslated
+	"FailedToLoadImage": "Failed to load image", // unwrapped, should be short // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Archivos",

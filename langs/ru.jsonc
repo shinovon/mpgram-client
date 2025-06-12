@@ -175,6 +175,7 @@
 	"APIDisabled_Alert": "Этот инстанс не поддерживает API!",
 	"ClientOutdated_Alert": "Клиент устарел!",
 	"InvalidInstancePassword_Alert": "Неправильный пароль инстанса!",
+	"Retry": "Повторить",
 	
 	// Settings sections
 	"UI": "Вид интерфейса",
@@ -256,6 +257,7 @@
 	"MemberBanned_Alert": "Участник забанен",
 	"StickersAdded_Alert": "Стикеры добавлены",
 	"ChooseNetwork_Alert": "Выберите точку доступа",
+	"FailedToLoadImage": "Не удалось загр. изобр.", // unwrapped, should be short
 	
 	// Chat form
 	"ChatMedia_Title": "Медиафайлы",
