@@ -75,7 +75,8 @@ import zip.InflaterInputStream;
 //#endif
 
 public class MP extends MIDlet
-	implements CommandListener, ItemCommandListener, ItemStateListener, Runnable, LangConstants, PlayerListener {
+	implements CommandListener, ItemCommandListener, ItemStateListener, Runnable, LangConstants, PlayerListener
+{
 
 	// region Constants
 	static final int RUN_SEND_MESSAGE = 1;
@@ -216,7 +217,9 @@ public class MP extends MIDlet
 	static boolean notifications = true; // TODO
 	static boolean muteUsers, muteChats, muteBroadcasts;
 	static boolean notifySound = true;
-//	static int notifyMethod = 0; // 0: alert, 1: nokiaui, 2: pigler api TODO
+//#ifndef NO_NOTIFY
+	static int notifyMethod = 0; // 0: alert, 1: nokiaui, 2: pigler api
+//#endif
 	
 	// platform
 	static boolean symbianJrt;
@@ -361,6 +364,7 @@ public class MP extends MIDlet
 	private static ChoiceGroup chatsFontSizeCoice;
 	private static ChoiceGroup networkChoice;
 	private static ChoiceGroup notifyChoice;
+	private static ChoiceGroup notifyMethodChoice;
 	private static Gauge avaCacheGauge;
 	private static Gauge photoSizeGauge;
 	private static Gauge profileCacheGauge;
@@ -418,6 +422,9 @@ public class MP extends MIDlet
 	// region MIDlet
 	
 	protected void destroyApp(boolean u) {
+//#ifndef NO_NOTIFY
+		Notifier.close();
+//#endif
 	}
 
 	protected void pauseApp() {
@@ -593,9 +600,11 @@ public class MP extends MIDlet
 		
 		fullPlayerCover = reverseChat = f.getHeight() >= 360;
 		
-//		notifyMethod = checkClass("org.pigler.api.PiglerAPI") ? 2 :
-//			// softnotification is stubbed in s40
-//			checkClass("com.nokia.mid.ui.SoftNotification") && !checkClass("com.nokia.mid.impl.isa.jam.Jam") ? 1 : 0;
+//#ifndef NO_NOTIFY
+		notifyMethod = checkClass("org.pigler.api.PiglerAPI") ? 2 :
+			// softnotification is stubbed in s40
+			checkClass("com.nokia.mid.ui.SoftNotification") && !checkClass("com.nokia.mid.impl.isa.jam.Jam") ? 1 : 0;
+//#endif
 		
 		// load settings
 		try {
@@ -639,6 +648,7 @@ public class MP extends MIDlet
 			notifySound = j.getBoolean("notifySound", notifySound);
 			pushInterval = j.getLong("pushInterval", pushInterval);
 			pushBgInterval = j.getLong("pushBgInterval", pushBgInterval);
+			notifyMethod = j.getInt("notifyMethod", notifyMethod);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -839,6 +849,13 @@ public class MP extends MIDlet
 			if (selfId != null) {
 				openLoad(mainDisplayable = mainChatsList());
 			}
+			
+//#ifndef NO_NOTIFY
+			// init notifications api wrapper
+			try {
+				Notifier.init();
+			} catch (Throwable ignored) {}
+//#endif
 		}
 		
 		start(RUN_CHECK_OTA, null);
@@ -1398,7 +1415,8 @@ public class MP extends MIDlet
 							wasShown = shown;
 						} catch (Exception ignored) {}
 					}
-					
+
+//#ifndef NO_NOTIFY
 					// get notifications
 					if (!notifications) continue;
 					try {
@@ -1473,10 +1491,18 @@ public class MP extends MIDlet
 							if (notifySound) {
 								AlertType.ALARM.playSound(display);
 							}
-							Alert alert = new Alert("");
-							alert.setString(sb.toString());
-							alert.setTimeout(1500);
-							display(alert, null);
+							if (notifyMethod != 0) {
+								try {
+									String s = sb.toString();
+									int k = s.indexOf('\n');
+									Notifier.post(peerId, MP.getName(peerId, false), k == -1 ? "" : s.substring(k + 1), notifyMethod);
+								} catch (Throwable ignored) {}
+							} else {
+								Alert alert = new Alert("");
+								alert.setString(sb.toString());
+								alert.setTimeout(1500);
+								display(alert, null);
+							}
 						}
 						
 					} catch (Exception e) {
@@ -1486,6 +1512,7 @@ public class MP extends MIDlet
 						}
 						check = true;
 					}
+//#endif
 				}
 			} catch (Exception ignored) {}
 			break;
@@ -2123,6 +2150,7 @@ public class MP extends MIDlet
 					chatsFontSizeCoice.setSelectedIndex(chatsListFontSize, true);
 					f.append(chatsFontSizeCoice);
 					
+//#ifndef NO_NOTIFY
 					// notifications
 					
 					s = new StringItem(null, L[Notifications]);
@@ -2136,7 +2164,17 @@ public class MP extends MIDlet
 					}, null);
 					notifyChoice.setSelectedIndex(0, notifications);
 					notifyChoice.setSelectedIndex(1, notifySound);
+					notifyChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(notifyChoice);
+					
+					notifyMethodChoice = new ChoiceGroup(L[NotificationMethod], ChoiceGroup.POPUP, new String[] {
+							L[AlertWindow],
+							"Nokia UI",
+							"Pigler API"
+					}, null);
+					notifyMethodChoice.setSelectedIndex(Math.min(notifyMethod, notifyMethodChoice.size()), true);
+					notifyMethodChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(notifyMethodChoice);
 					
 					pushIntervalGauge = new Gauge(L[PushInterval], true, 120, (int) (pushInterval / 1000));
 					pushIntervalGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -2145,6 +2183,7 @@ public class MP extends MIDlet
 					pushBgIntervalGauge = new Gauge(L[PushBackgroundInterval], true, 120, (int) (pushBgInterval / 1000));
 					pushBgIntervalGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(pushBgIntervalGauge);
+//#endif
 					
 					// behaviour
 					
@@ -2275,8 +2314,11 @@ public class MP extends MIDlet
 				
 				chatsListFontSize = chatsFontSizeCoice.getSelectedIndex();
 				
+//#ifndef NO_NOTIFY
 				notifications = notifyChoice.isSelected(0);
 				notifySound = notifyChoice.isSelected(1);
+				
+				notifyMethod = notifyMethodChoice.getSelectedIndex();
 				
 				if ((pushInterval = pushIntervalGauge.getValue() * 1000L) < 5000L) {
 					pushIntervalGauge.setValue((int) ((pushInterval = 5000) / 1000L));
@@ -2284,6 +2326,7 @@ public class MP extends MIDlet
 				if ((pushBgInterval = pushBgIntervalGauge.getValue() * 1000L) < 5000L) {
 					pushBgIntervalGauge.setValue((int) ((pushBgInterval = 5000) / 1000L));
 				}
+//#endif
 				
 				if (networkChoice != null)
 					blackberryNetwork = networkChoice.getSelectedIndex();
@@ -2351,6 +2394,7 @@ public class MP extends MIDlet
 					j.put("notifySound", notifySound);
 					j.put("pushInterval", pushInterval);
 					j.put("pushBgInterval", pushBgInterval);
+					j.put("notifyMethod", notifyMethod);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
@@ -2658,6 +2702,7 @@ public class MP extends MIDlet
 			return;
 		}
 		if (c == exitCmd) {
+			destroyApp(true);
 			notifyDestroyed();
 		}
 	}
@@ -3397,6 +3442,9 @@ public class MP extends MIDlet
 //#endif
 	
 	static void openChat(String id, int msg) {
+		if (current instanceof ChatForm && id.equals(((ChatForm) current).id)) {
+			return;
+		}
 		openLoad(new ChatForm(id, null, msg, 0));
 	}
 	

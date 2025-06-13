@@ -49,6 +49,7 @@
             <symbol name="screen.isColor" value="true"/>
             <symbol name="NOKIAUI" value="1.6"/>
             <symbol name="screen.bitDepth" value="16"/>
+            <symbol name="NO_NOTIFY" value="true"/>
             <symbol name="SAMSUNGAPI" value="1.0"/>
             <symbol name="WMA" value="1.1"/>
             <symbol name="NO_FILE" value="true"/>
