@@ -382,6 +382,9 @@ public class ChatForm extends MPForm implements Runnable {
 		sb.setLength(0);
 		sb.append(out && !broadcast ? MP.L[You] : MP.getName(fromId, true));
 		MP.appendTime(sb.append(' '), /*lastDate = */message.getLong("date"));
+		if (message.has("edit")) {
+			sb.append(" ").append(MP.L[Edited]).append(')');
+		}
 
 		// author and time label
 		if (!message.has("act")
