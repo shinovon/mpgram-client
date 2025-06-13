@@ -113,7 +113,7 @@ public class MP extends MIDlet
 	static final String FILE_URL = "file.php";
 	static final String OTA_URL = "http://nnproject.cc/mp/upd.php";
 	
-	static final String API_VERSION = "7";
+	static final String API_VERSION = "8";
 	
 	static final String[][] LANGS = {
 		{
