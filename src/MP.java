@@ -108,7 +108,7 @@ public class MP extends MIDlet
 	private static final String AVATAR_RECORD_PREFIX = "mcA";
 	
 	private static final String DEFAULT_INSTANCE_URL = "http://mp.nnchan.ru/";
-	static final String API_URL = "api.php";
+	static final String API_URL = "api2.php";
 	static final String AVA_URL = "ava.php";
 	static final String FILE_URL = "file.php";
 	static final String OTA_URL = "http://nnproject.cc/mp/upd.php";
@@ -216,6 +216,7 @@ public class MP extends MIDlet
 	static boolean notifications = true; // TODO
 	static boolean muteUsers, muteChats, muteBroadcasts;
 	static boolean notifySound = true;
+//	static int notifyMethod = 0; // 0: alert, 1: nokiaui, 2: pigler api TODO
 	
 	// platform
 	static boolean symbianJrt;
@@ -359,12 +360,15 @@ public class MP extends MIDlet
 	private static ChoiceGroup langChoice;
 	private static ChoiceGroup chatsFontSizeCoice;
 	private static ChoiceGroup networkChoice;
+	private static ChoiceGroup notifyChoice;
 	private static Gauge avaCacheGauge;
 	private static Gauge photoSizeGauge;
 	private static Gauge profileCacheGauge;
 	private static Gauge chatsGauge;
 	private static Gauge msgsGauge;
 	private static Gauge updateTimeoutGauge;
+	private static Gauge pushIntervalGauge;
+	private static Gauge pushBgIntervalGauge;
 	
 	// write items
 	private static TextField messageField;
@@ -589,6 +593,10 @@ public class MP extends MIDlet
 		
 		fullPlayerCover = reverseChat = f.getHeight() >= 360;
 		
+//		notifyMethod = checkClass("org.pigler.api.PiglerAPI") ? 2 :
+//			// softnotification is stubbed in s40
+//			checkClass("com.nokia.mid.ui.SoftNotification") && !checkClass("com.nokia.mid.impl.isa.jam.Jam") ? 1 : 0;
+		
 		// load settings
 		try {
 			RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, false);
@@ -626,6 +634,11 @@ public class MP extends MIDlet
 			compress = j.getBoolean("compress", compress);
 			useView = j.getBoolean("useView", useView);
 			blackberryNetwork = j.getInt("blackberryNetwork", blackberryNetwork);
+			fullPlayerCover = j.getBoolean("fullPlayerCover", fullPlayerCover);
+			notifications = j.getBoolean("notifications", notifications);
+			notifySound = j.getBoolean("notifySound", notifySound);
+			pushInterval = j.getLong("pushInterval", pushInterval);
+			pushBgInterval = j.getLong("pushBgInterval", pushBgInterval);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -773,7 +786,7 @@ public class MP extends MIDlet
 		
 		// create auth form
 		
-		f = new Form("Auth");
+		f = new Form(L[Auth_Title]);
 		f.addCommand(exitCmd);
 		f.addCommand(aboutCmd);
 		f.addCommand(settingsCmd);
@@ -1460,7 +1473,10 @@ public class MP extends MIDlet
 							if (notifySound) {
 								AlertType.ALARM.playSound(display);
 							}
-							display(infoAlert(sb.toString()), null);
+							Alert alert = new Alert("");
+							alert.setString(sb.toString());
+							alert.setTimeout(1500);
+							display(alert, null);
 						}
 						
 					} catch (Exception e) {
@@ -2074,7 +2090,8 @@ public class MP extends MIDlet
 							L[ShowChatStatus],
 							L[FocusNewMessages],
 							L[ChatTextField],
-							L[BuiltinImageViewer]
+							L[BuiltinImageViewer],
+							L[LargeMusicCover]
 					}, null);
 					uiChoice.setSelectedIndex(0, reverseChat);
 					uiChoice.setSelectedIndex(1, showMedia);
@@ -2082,6 +2099,7 @@ public class MP extends MIDlet
 					uiChoice.setSelectedIndex(3, focusNewMessages);
 					uiChoice.setSelectedIndex(4, chatField);
 					uiChoice.setSelectedIndex(5, useView);
+					uiChoice.setSelectedIndex(6, fullPlayerCover);
 					uiChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(uiChoice);
 					
@@ -2104,6 +2122,29 @@ public class MP extends MIDlet
 					}, null);
 					chatsFontSizeCoice.setSelectedIndex(chatsListFontSize, true);
 					f.append(chatsFontSizeCoice);
+					
+					// notifications
+					
+					s = new StringItem(null, L[Notifications]);
+					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					s.setFont(largePlainFont);
+					f.append(s);
+					
+					notifyChoice = new ChoiceGroup("", ChoiceGroup.MULTIPLE, new String[] {
+							L[EnableNotifications],
+							L[EnableSound]
+					}, null);
+					notifyChoice.setSelectedIndex(0, notifications);
+					notifyChoice.setSelectedIndex(1, notifySound);
+					f.append(notifyChoice);
+					
+					pushIntervalGauge = new Gauge(L[PushInterval], true, 120, (int) (pushInterval / 1000));
+					pushIntervalGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(pushIntervalGauge);
+					
+					pushBgIntervalGauge = new Gauge(L[PushBackgroundInterval], true, 120, (int) (pushBgInterval / 1000));
+					pushBgIntervalGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(pushBgIntervalGauge);
 					
 					// behaviour
 					
@@ -2159,6 +2200,8 @@ public class MP extends MIDlet
 					imagesChoice.setSelectedIndex(3, roundAvatars);
 					imagesChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(imagesChoice);
+					
+					// cache
 
 					avaCacheChoice = new ChoiceGroup(L[AvatarsCaching], Choice.POPUP, new String[] {
 							L[Disabled],
@@ -2218,6 +2261,7 @@ public class MP extends MIDlet
 				focusNewMessages = uiChoice.isSelected(3);
 				chatField = uiChoice.isSelected(4);
 				useView = uiChoice.isSelected(5);
+				fullPlayerCover = uiChoice.isSelected(6);
 				
 				if ((photoSize = (photoSizeGauge.getValue() * 8)) < 16) {
 					photoSizeGauge.setValue((photoSize = 16) / 8);
@@ -2230,6 +2274,16 @@ public class MP extends MIDlet
 				}
 				
 				chatsListFontSize = chatsFontSizeCoice.getSelectedIndex();
+				
+				notifications = notifyChoice.isSelected(0);
+				notifySound = notifyChoice.isSelected(1);
+				
+				if ((pushInterval = pushIntervalGauge.getValue() * 1000L) < 5000L) {
+					pushIntervalGauge.setValue((int) ((pushInterval = 5000) / 1000L));
+				}
+				if ((pushBgInterval = pushBgIntervalGauge.getValue() * 1000L) < 5000L) {
+					pushBgIntervalGauge.setValue((int) ((pushBgInterval = 5000) / 1000L));
+				}
 				
 				if (networkChoice != null)
 					blackberryNetwork = networkChoice.getSelectedIndex();
@@ -2292,6 +2346,11 @@ public class MP extends MIDlet
 					j.put("compress", compress);
 					j.put("useView", useView);
 					j.put("blackberryNetwork", blackberryNetwork);
+					j.put("fullPlayerCover", fullPlayerCover);
+					j.put("notifications", notifications);
+					j.put("notifySound", notifySound);
+					j.put("pushInterval", pushInterval);
+					j.put("pushBgInterval", pushBgInterval);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);

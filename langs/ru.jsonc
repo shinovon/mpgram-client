@@ -182,6 +182,7 @@
 	"Behaviour": "Поведение",
 	"Images": "Картинки",
 	"Authorization": "Авторизация",
+	"Notifications": "Уведомлления",
 	
 	// UI Settings
 	"Language": "Язык",
@@ -198,6 +199,7 @@
 	"FocusNewMessages": "Авто-прокрутка до новых сообщений",
 	"ChatTextField": "Текстовое поле в чате",
 	"BuiltinImageViewer": "Встроен. просмотр изображений",
+	"LargeMusicCover": "Большая обложка в плеере",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Ждать полной загрузки",
@@ -228,6 +230,14 @@
 	"AvatarsCacheThreshold": "Порог кэширования аватарок",
 	"ProfilesCacheThreshold": "Порог кэширования профилей",
 	"RMSCacheCount": "Записей кэша в хранилище RMS: ",
+	
+	// Notifications settings
+	"EnableNotifications": "Вкл. уведомления",
+	"EnableSound": "Звук",
+	"NotificationMethod": "Способ уведомления",
+	"AlertWindow": "Диалоговое окно",
+	"PushInterval": "Интервал опроса уведомлений",
+	"PushBackgroundInterval": "Интервал опроса в фоне",
 	
 	// About
 	"AboutText": "Клиент Telegram для J2ME, основанный на API MPGram Web.",

@@ -182,6 +182,7 @@
 	"Behaviour": "Caracteristicas",
 	"Images": "Imagenes",
 	"Authorization": "Autorizacion",
+	"Notifications": "Notifications", // Untranslated
 	
 	// UI Settings
 	"Language": "Lenguaje",
@@ -198,6 +199,7 @@
 	"FocusNewMessages": "Enfocar nuevos mensajes",
 	"ChatTextField": "Campo de texto en el chat",
 	"BuiltinImageViewer": "Built-in image viewer", // Untranslated
+	"LargeMusicCover": "Large player cover", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Espere a que se cargue la pagina",
@@ -228,6 +230,14 @@
 	"AvatarsCacheThreshold": "Limite de cache de avatares",
 	"ProfilesCacheThreshold": "Limite de cache de perfiles",
 	"RMSCacheCount": "Stored cache count: ", // Untranslated
+	
+	// Notifications settings
+	"EnableNotifications": "Notifications", // Untranslated
+	"EnableSound": "Sound", // Untranslated
+	"NotificationMethod": "Notification method", // Untranslated
+	"AlertWindow": "Alert window", // Untranslated
+	"PushInterval": "Polling interval", // Untranslated
+	"PushBackgroundInterval": "Background polling interval", // Untranslated
 	
 	// About
 	"AboutText": "Cliente de Telegram asistido por servidor para J2ME, basado en la API web de MPGram.",

@@ -182,6 +182,7 @@
 	"Behaviour": "Behaviour",
 	"Images": "Images",
 	"Authorization": "Authorization",
+	"Notifications": "Notifications",
 	
 	// UI Settings
 	"Language": "Language",
@@ -198,6 +199,7 @@
 	"FocusNewMessages": "Focus new messages",
 	"ChatTextField": "Text field in chat",
 	"BuiltinImageViewer": "Built-in image viewer",
+	"LargeMusicCover": "Large player cover",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Wait for page to load",
@@ -228,6 +230,14 @@
 	"AvatarsCacheThreshold": "Avatars cache threshold",
 	"ProfilesCacheThreshold": "Profiles cache threshold",
 	"RMSCacheCount": "Stored cache count: ",
+	
+	// Notifications settings
+	"EnableNotifications": "Notifications",
+	"EnableSound": "Sound",
+	"NotificationMethod": "Notification method",
+	"AlertWindow": "Alert window",
+	"PushInterval": "Polling interval",
+	"PushBackgroundInterval": "Background polling interval",
 	
 	// About
 	"AboutText": "Server-assisted Telegram client for J2ME, based on MPGram Web API.",

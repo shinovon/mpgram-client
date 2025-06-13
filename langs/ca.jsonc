@@ -182,6 +182,7 @@
 	"Behaviour": "Comportament",
 	"Images": "Imatges",
 	"Authorization": "Autorització",
+	"Notifications": "Notifications", // Untranslated
 	
 	// UI Settings
 	"Language": "Idioma",
@@ -198,6 +199,7 @@
 	"FocusNewMessages": "Centra nous missatges",
 	"ChatTextField": "Camp de text a xat",
 	"BuiltinImageViewer": "Visualitzador d'imatges integrat",
+	"LargeMusicCover": "Large player cover", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Espera que pàgina es carregui",
@@ -228,6 +230,14 @@
 	"AvatarsCacheThreshold": "Llindar de memòria cau d'avatars",
 	"ProfilesCacheThreshold": "Llindar de memòria cau de perfils",
 	"RMSCacheCount": "Recompte de memòria cau emmagatzemada: ",
+	
+	// Notifications settings
+	"EnableNotifications": "Notifications", // Untranslated
+	"EnableSound": "Sound", // Untranslated
+	"NotificationMethod": "Notification method", // Untranslated
+	"AlertWindow": "Alert window", // Untranslated
+	"PushInterval": "Polling interval", // Untranslated
+	"PushBackgroundInterval": "Background polling interval", // Untranslated
 	
 	// About
 	"AboutText": "Client de Telegram assistit per servidor per a J2ME, basat en API web MPGram.",

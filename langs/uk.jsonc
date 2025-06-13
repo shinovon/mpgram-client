@@ -182,6 +182,7 @@
 	"Behaviour": "Поведінка",
 	"Images": "Картинки",
 	"Authorization": "Авторизація",
+	"Notifications": "Notifications", // Untranslated
 	
 	// UI Settings
 	"Language": "Мова",
@@ -198,6 +199,7 @@
 	"FocusNewMessages": "Фокус нових повідомлень",
 	"ChatTextField": "Text field in chat", // Untranslated
 	"BuiltinImageViewer": "Built-in image viewer", // Untranslated
+	"LargeMusicCover": "Large player cover", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Чекати повного завантаження",
@@ -228,6 +230,14 @@
 	"AvatarsCacheThreshold": "Поріг кешування аватарок",
 	"ProfilesCacheThreshold": "Поріг кешування профілів",
 	"RMSCacheCount": "Stored cache count: ", // Untranslated
+	
+	// Notifications settings
+	"EnableNotifications": "Notifications", // Untranslated
+	"EnableSound": "Sound", // Untranslated
+	"NotificationMethod": "Notification method", // Untranslated
+	"AlertWindow": "Alert window", // Untranslated
+	"PushInterval": "Polling interval", // Untranslated
+	"PushBackgroundInterval": "Background polling interval", // Untranslated
 	
 	// About
 	"AboutText": "Клієнт Telegram для J2ME заснований на API MPGram Web.",
