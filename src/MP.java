@@ -393,6 +393,7 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 	// file picker
 	private static Vector rootsList;
+	private static boolean fileMode;
 //#endif
 	
 	// music
@@ -2250,7 +2251,7 @@ public class MP extends MIDlet
 			}
 //#ifndef NO_FILE
 			if (c == chooseFileCmd) {
-				openFilePicker("");
+				openFilePicker("", true);
 				return;
 			}
 //#endif
@@ -2393,14 +2394,18 @@ public class MP extends MIDlet
 			path = path.concat(name);
 			
 			if (dir) {
-				openFilePicker(path.concat("/"));
+				openFilePicker(path.concat("/"), fileMode);
 				return;
 			}
 			
-			// file selected
-			commandAction(cancelCmd, d);
-			sendFile = "file:///".concat(path);
-			fileLabel.setText(L[File_Prefix].concat(path));
+			if (fileMode) {
+				// file selected
+				commandAction(cancelCmd, d);
+				sendFile = "file:///".concat(path);
+				fileLabel.setText(L[File_Prefix].concat(path));
+			} else {
+				// TODO folder selected
+			}
 //#endif
 			return;
 		}
@@ -3166,7 +3171,8 @@ public class MP extends MIDlet
 	}
 	
 //#ifndef NO_FILE
-	static void openFilePicker(String path) {
+	static void openFilePicker(String path, boolean file) {
+		fileMode = file;
 		if (path.length() == 0) path = "/";
 		display(loadingAlert(L[Loading]), current);
 		try {
@@ -3202,6 +3208,10 @@ public class MP extends MIDlet
 					list.append(s, folderImg);
 				}
 			} else {
+				if (!file) {
+					// FIXME unlocalized
+					list.append("Save here", null);
+				}
 				FileConnection fc = (FileConnection) Connector.open("file:///".concat(path));
 				try {
 					Enumeration en = fc.list();
@@ -3209,7 +3219,7 @@ public class MP extends MIDlet
 						String s = (String) en.nextElement();
 						if (s.endsWith("/")) {
 							list.append(s.substring(0, s.length() - 1), folderImg);
-						} else {
+						} else if (file) {
 							list.append(s, fileImg);
 						}
 					}
