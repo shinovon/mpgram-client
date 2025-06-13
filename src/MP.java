@@ -212,6 +212,7 @@ public class MP extends MIDlet
 	static int playerHttpMethod = 1; // 0 - pass url, 1 - pass connection stream
 	static String musicCachePath; // TODO
 	static boolean reopenChat;
+	static boolean fullPlayerCover;
 	
 	// platform
 	static boolean symbianJrt;
@@ -371,6 +372,7 @@ public class MP extends MIDlet
 	private static StringItem playerTitleLabel, playerArtistLabel;
 	private static Gauge playerProgress;
 	private static StringItem playerPlaypauseBtn;
+	private static ImageItem playerCover;
 
 	// cache
 	private static final JSONObject usersCache = new JSONObject();
@@ -580,7 +582,7 @@ public class MP extends MIDlet
 			tzOffset = TimeZone.getDefault().getRawOffset() / 1000;
 		} catch (Throwable ignored) {} // just to be sure
 		
-		reverseChat = f.getHeight() >= 360;
+		fullPlayerCover = reverseChat = f.getHeight() >= 360;
 		
 		// load settings
 		try {
@@ -934,7 +936,15 @@ public class MP extends MIDlet
 								String peer = ((String[]) src)[0];
 								String id = ((String[]) src)[1];
 								String p = ((String[]) src)[3];
-								url = instanceUrl + FILE_URL + "?a&c=" + peer + "&m=" + id + "&p=" + p + "&s=" + photoSize;
+								StringBuffer sb = new StringBuffer(instanceUrl);
+								sb.append(FILE_URL)
+								.append("?a&c=").append(peer)
+								.append("&m=").append(id)
+								.append("&p=").append(p);
+								if (p.indexOf("&s=") == -1) {
+									sb.append("&s=").append(photoSize);
+								}
+								url = sb.toString();
 							} else if (src instanceof JSONObject) { // sticker or document
 								url = instanceUrl + FILE_URL + "?a&sticker=" + ((JSONObject) src).getString("id")
 										+ "&access_hash=" + ((JSONObject) src).getString("access_hash") + "&p=rsprevs&s=32";
@@ -2783,16 +2793,7 @@ public class MP extends MIDlet
 	}
 
 	static void startPlayer(JSONObject msg) {
-		if (currentPlayer != null) {
-			try {
-				currentPlayer.stop();
-			} catch (Throwable ignored) {}
-			try {
-				currentPlayer.close();
-			} catch (Throwable ignored) {}
-			currentPlayer = null;
-			playerState = 0;
-		}
+		closePlayer();
 		try {
 			playerState = 3;
 			
@@ -2807,9 +2808,10 @@ public class MP extends MIDlet
 			.append("&m=").append(msg.getInt("id"))
 			.append("&user=").append(user);
 			
+			JSONObject media = msg.getObject("media");
 			String t;
 			if (playerTitleLabel != null) {
-				if ((t = msg.getObject("media").getObject("audio").getString("title", null)) == null) {
+				if ((t = media.getObject("audio").getString("title", null)) == null) {
 					if ((t = name) == null) {
 						t = L[UnknownTrack];
 					}
@@ -2817,7 +2819,7 @@ public class MP extends MIDlet
 				playerTitleLabel.setText(t);
 			}
 			if (playerArtistLabel != null) {
-				if ((t = msg.getObject("media").getObject("audio").getString("artist", null)) == null) {
+				if ((t = media.getObject("audio").getString("artist", null)) == null) {
 					t = "";
 				}
 				playerArtistLabel.setText(t);
@@ -2829,10 +2831,20 @@ public class MP extends MIDlet
 				} catch (Exception ignored) {}
 			}
 			
+			if (loadThumbs && playerCover != null && media.getBoolean("thumb", false)) {
+				String q = "min";
+				int size;
+				if (fullPlayerCover && (size = Math.min(playerForm.getWidth(), playerForm.getHeight()) - 20) > 20) {
+					q = "prev&s=".concat(Integer.toString(size));
+				}
+				MP.queueImage(new String[] {msg.getString("peer_id"), msg.getString("id"), null, "thumbr".concat(q)}, playerCover);
+				playerForm.insert(0, playerCover);
+			}
+			
 			// TODO
 			Player p;
 			if (playerHttpMethod == 1) {
-				p = Manager.createPlayer(openHttpConnection(url.toString()).openInputStream(), msg.getObject("media").getString("mime", "audio/mpeg"));
+				p = Manager.createPlayer(openHttpConnection(url.toString()).openInputStream(), media.getString("mime", "audio/mpeg"));
 			} else {
 				p = Manager.createPlayer(url.toString());
 			}
@@ -2845,6 +2857,31 @@ public class MP extends MIDlet
 			playerState = 1;
 		} catch (Exception e) {
 			display(errorAlert(e), current);
+		}
+	}
+	
+	static void closePlayer() {
+		if (currentPlayer != null) {
+			try {
+				currentPlayer.stop();
+			} catch (Throwable ignored) {}
+			try {
+				currentPlayer.close();
+			} catch (Throwable ignored) {}
+			currentPlayer = null;
+			playerState = 0;
+		}
+		if (playerTitleLabel != null) {
+			playerTitleLabel.setText("");
+		}
+		if (playerArtistLabel != null) {
+			playerArtistLabel.setText("");
+		}
+		if (playerProgress != null) {
+			playerProgress.setValue(0);
+		}
+		while (playerForm != null && playerForm.get(0) == playerCover) {
+			playerForm.delete(0);
 		}
 	}
 	
@@ -3198,7 +3235,7 @@ public class MP extends MIDlet
 		}
 		openLoad(new ChatInfoForm(id, chatForm, mode));
 	}
-	
+
 	static Form initPlayerForm() {
 		if (playerForm != null) {
 			return playerForm;
@@ -3208,6 +3245,13 @@ public class MP extends MIDlet
 		f.addCommand(backCmd);
 		f.addCommand(playlistCmd);
 		f.setCommandListener(midlet);
+		
+		ImageItem img = playerCover = new ImageItem("", null, 0, "");
+		try {
+			img.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+		} catch (Exception ignored) {}
+		// cover item is added in MP#startPlayer()
+//		f.append(img);
 		
 		StringItem s;
 		
