@@ -2391,15 +2391,15 @@ public class MP extends MIDlet
 			String path = d.getTitle();
 			
 			if ("/".equals(path)) path = "";
-			path = path.concat(name);
 			
 			if (dir) {
-				openFilePicker(path.concat("/"), fileMode);
+				openFilePicker(path.concat(name).concat("/"), fileMode);
 				return;
 			}
 			
 			if (fileMode) {
 				// file selected
+				path = path.concat(name);
 				commandAction(cancelCmd, d);
 				sendFile = "file:///".concat(path);
 				fileLabel.setText(L[File_Prefix].concat(path));
