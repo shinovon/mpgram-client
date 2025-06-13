@@ -325,7 +325,7 @@ public class ChatForm extends MPForm implements Runnable {
 	protected void postLoad(boolean success) {
 		if (!success)
 			return;
-		if (endReached && !hasOffset && query == null && mediaFilter == null && MP.chatUpdates) {
+		if (endReached && !hasOffset && query == null && mediaFilter == null && MP.chatUpdates && !update) {
 			// start updater thread
 			update = true;
 			MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
@@ -335,21 +335,26 @@ public class ChatForm extends MPForm implements Runnable {
 		if (botAnswer != null) {
 			JSONObject j = botAnswer;
 			botAnswer = null;
-			
-			if (j.has("message")) {
-				Alert a = new Alert(title);
-				a.setType(AlertType.CONFIRMATION);
-				a.setString(j.getString("message"));
-				a.setTimeout(1500);
-				MP.display(a, this);
-			}
-			
-			if (j.has("url")) {
-				MP.openUrl(j.getString("url"));
-			}
+			handleBotAnswer(j);
 		}
 	}
 
+	void handleBotAnswer(JSONObject j) {
+		if (j == null) return;
+		
+		if (j.has("message")) {
+			Alert a = new Alert(title);
+			a.setType(AlertType.CONFIRMATION);
+			a.setString(j.getString("message"));
+			a.setTimeout(1500);
+			MP.display(a, this);
+		}
+		
+		if (j.has("url")) {
+			MP.openUrl(j.getString("url"));
+		}
+	}
+	
 	private int message(JSONObject message, int insert, StringBuffer sb, Calendar c, boolean reverse, boolean selfChat, boolean edit, Item[] itemPtr) {
 		StringItem s;
 		String t;

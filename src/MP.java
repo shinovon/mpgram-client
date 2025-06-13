@@ -61,6 +61,7 @@ import javax.microedition.lcdui.Spacer;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextBox;
 import javax.microedition.lcdui.TextField;
+import javax.microedition.lcdui.Ticker;
 import javax.microedition.media.Manager;
 import javax.microedition.media.Player;
 import javax.microedition.media.PlayerListener;
@@ -210,6 +211,7 @@ public class MP extends MIDlet
 	static int blackberryNetwork = -1; // -1: undefined, 0: data, 1: wifi
 	static int playerHttpMethod = 1; // 0 - pass url, 1 - pass connection stream
 	static String musicCachePath; // TODO
+	static boolean reopenChat;
 	
 	// platform
 	static boolean symbianJrt;
@@ -1167,7 +1169,7 @@ public class MP extends MIDlet
 					((ChatForm) current).textField.setString("");
 				}
 				
-				if (!((ChatForm) current).update || !((ChatForm) current).endReached) {
+				if (reopenChat || !((ChatForm) current).update || !((ChatForm) current).endReached) {
 					// load latest messages
 					commandAction(latestCmd, current);
 				} else if (display.getCurrent() != current) {
@@ -1373,19 +1375,43 @@ public class MP extends MIDlet
 			break;
 		}
 		case RUN_BOT_CALLBACK: {
+			ChatForm form = (ChatForm) current;
+			Ticker ticker;
+			form.setTicker(ticker = new Ticker(MP.L[Sending]));
+			
 			try {
 				StringBuffer sb = new StringBuffer("botCallback&timeout=1");
 				sb.append("&peer=").append(((String[]) param)[0]);
 				sb.append("&id=").append(((String[]) param)[1]);
 				sb.append("&data=").append(((String[]) param)[2]);
 				
-				((ChatForm) current).botAnswer = (JSONObject) api(sb.toString());
+				JSONObject j = null;
+				
+				try {
+					j = (JSONObject) api(sb.toString());
+				} catch (APIException e) {
+					// treat api errors as proper answers,
+					// since it will probably be a timeout error
+					if (e.response instanceof JSONObject) {
+						j = (JSONObject) e.response;
+					} else throw e;
+				}
 
-				commandAction(latestCmd, current);
+				if (reopenChat || !form.update || !form.endReached) {
+					// see ChatForm#postLoad() for answer handling
+					form.botAnswer = j;
+					commandAction(latestCmd, current);
+				} else if (display.getCurrent() != current) {
+					display(current);
+					((ChatForm) current).handleBotAnswer(j);
+				}
 			} catch (Exception e) {
 				display(errorAlert(e), current);
 			} finally {
 				sending = false;
+				if (form.getTicker() == ticker) {
+					form.setTicker(null);
+				}
 			}
 			break;
 		}
@@ -1414,7 +1440,12 @@ public class MP extends MIDlet
 				String[] s = (String[]) param;
 				MP.api("pinMessage&peer=".concat(s[0].concat("&id=").concat(s[1])));
 				
-				commandAction(latestCmd, current);
+				if (reopenChat || !((ChatForm) current).update || !((ChatForm) current).endReached) {
+					// load latest messages
+					commandAction(latestCmd, current);
+				} else if (display.getCurrent() != current) {
+					display(current);
+				}
 			} catch (Exception e) {
 				display(errorAlert(e), current);
 			}
@@ -1432,7 +1463,10 @@ public class MP extends MIDlet
 				MP.api(sb.toString());
 				
 				goBackTo(form.chatForm);
-				commandAction(latestCmd, form.chatForm);
+				if (reopenChat || !((ChatForm) current).update || !((ChatForm) current).endReached) {
+					// load latest messages
+					commandAction(latestCmd, form.chatForm);
+				}
 			} catch (Exception e) {
 				display(errorAlert(e), current);
 			}
@@ -2190,9 +2224,9 @@ public class MP extends MIDlet
 				sending = true;
 
 				display(loadingAlert(L[Sending]), d);
-//				if (MP.updatesThread != null) {
-//					MP.cancel(MP.updatesThread, true);
-//				}
+				if (reopenChat && MP.updatesThread != null) {
+					MP.cancel(MP.updatesThread, true);
+				}
 				start(RUN_SEND_MESSAGE, new Object[] { t, writeTo, replyTo, edit, sendFile, sendChoice, fwdPeer, fwdMsg });
 				return;
 			}
@@ -2556,11 +2590,13 @@ public class MP extends MIDlet
 				String[] p = (String[]) ((MPForm) current).urls.get(item);
 				if (sending || p == null) return;
 				sending = true;
-				
-				if (MP.updatesThread != null) {
-					MP.cancel(MP.updatesThread, true);
+
+				if (reopenChat) {
+					display(loadingAlert(L[Sending]), current);
+					if (MP.updatesThread != null) {
+						MP.cancel(MP.updatesThread, true);
+					}
 				}
-				display(loadingAlert(L[Sending]), current);
 				start(RUN_BOT_CALLBACK, p);
 				return;
 			}
@@ -2575,11 +2611,11 @@ public class MP extends MIDlet
 			if (c == pinMsgCmd) {
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
-				
-				if (MP.updatesThread != null) {
+
+				display(loadingAlert(L[Loading]), current);
+				if (reopenChat && MP.updatesThread != null) {
 					MP.cancel(MP.updatesThread, true);
 				}
-				display(loadingAlert(L[Loading]), current);
 				start(RUN_PIN_MESSAGE, s);
 				return;
 			}
@@ -2608,9 +2644,9 @@ public class MP extends MIDlet
 			sending = true;
 
 			display(loadingAlert(L[Sending]), current);
-//			if (MP.updatesThread != null) {
-//				MP.cancel(MP.updatesThread, true);
-//			}
+			if (reopenChat && MP.updatesThread != null) {
+				MP.cancel(MP.updatesThread, true);
+			}
 			start(RUN_SEND_MESSAGE, new Object[] { t, ((ChatForm) current).id, null, null, null, null, null, null });
 			return;
 		}
@@ -2619,7 +2655,7 @@ public class MP extends MIDlet
 			JSONObject s = (JSONObject) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 			
-			if (MP.updatesThread != null) {
+			if (reopenChat && MP.updatesThread != null) {
 				MP.cancel(MP.updatesThread, true);
 			}
 			imagesToLoad.removeAllElements();
