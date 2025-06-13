@@ -576,7 +576,11 @@ public class ChatForm extends MPForm implements Runnable {
 						
 						key[3] = "rsticker";
 						urls.put(img, key);
-						MP.queueImage(key, img);
+						if (MP.loadThumbs) {
+							MP.queueImage(key, img);
+						} else {
+							img.setLabel(MP.L[Sticker]);
+						}
 
 						if (msgItem == null) msgItem = img;
 					} else {
@@ -670,7 +674,11 @@ public class ChatForm extends MPForm implements Runnable {
 					
 					key[3] = "rprev";
 					urls.put(img, key);
-					MP.queueImage(key, img);
+					if (MP.loadThumbs) {
+						MP.queueImage(key, img);
+					} else {
+						img.setLabel(MP.L[Media]);
+					}
 
 					if (msgItem == null) msgItem = img;
 				} else if (type.equals("poll")) {
