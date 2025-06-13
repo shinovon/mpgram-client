@@ -202,7 +202,7 @@ public class MP extends MIDlet
 	static int chatsListFontSize = 0; // 0: default, 1: small, 2: medium
 	static boolean keepAlive = true;
 	static boolean utf = true;
-	static long keepAliveInterval = 10000L;
+	static long pushInterval = 30000L, pushBgInterval = 30000L;
 	static boolean chatField = true;
 	static boolean roundAvatars;
 	static boolean useView = true;
@@ -1371,7 +1371,7 @@ public class MP extends MIDlet
 				int offset = 0;
 				boolean check = true;
 				while (keepAlive || notifications) {
-					Thread.sleep(keepAliveInterval);
+					Thread.sleep(wasShown ? pushInterval : pushBgInterval);
 					if (threadConnections.size() != 0) continue;
 					
 					// update status
@@ -1383,10 +1383,6 @@ public class MP extends MIDlet
 									("updateStatus".concat(!shown ? "&off=1" : "")) : "me");
 							}
 							wasShown = shown;
-							if (!shown) {
-								// double delay time in background
-								Thread.sleep(keepAliveInterval);
-							}
 						} catch (Exception ignored) {}
 					}
 					
