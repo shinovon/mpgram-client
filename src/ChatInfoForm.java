@@ -19,6 +19,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+import javax.microedition.lcdui.ImageItem;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.Spacer;
 import javax.microedition.lcdui.StringItem;
@@ -71,6 +72,15 @@ public class ChatInfoForm extends MPForm {
 			name = getTitle();
 		}
 		boolean isUser = id.charAt(0) != '-';
+		
+		if (MP.loadAvatars) {
+			ImageItem img = new ImageItem("", null, 0, "");
+			try {
+				img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+			} catch (Exception ignored) {}
+			MP.queueAvatar(id, img);
+			append(img);
+		}
 		
 		StringItem s;
 		
