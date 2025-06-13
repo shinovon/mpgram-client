@@ -1304,7 +1304,7 @@ public class MP extends MIDlet
 								form.handleUpdate(ChatForm.UPDATE_NEW_MESSAGE, update);
 							} else if ("updateDeleteChannelMessages".equals(type)) {
 								form.handleUpdate(ChatForm.UPDATE_DELETE_MESSAGES, update);
-							} else if ("updateEditMessages".equals(type)
+							} else if ("updateEditMessage".equals(type)
 									|| "updateEditChannelMessage".equals(type)) {
 								form.handleUpdate(ChatForm.UPDATE_EDIT_MESSAGE, update);
 							}
