@@ -1160,13 +1160,19 @@ public class MP extends MIDlet
 				postMessage(sb.toString(), file, text);
 //#endif
 				
-				// go to latest message after sending
+				// go back to chat screen
 				if (!(current instanceof ChatForm)) {
 					commandAction(backCmd, current);
 				} else if (((ChatForm) current).textField != null) {
 					((ChatForm) current).textField.setString("");
 				}
-				commandAction(latestCmd, current);
+				
+				if (!((ChatForm) current).update || !((ChatForm) current).endReached) {
+					// load latest messages
+					commandAction(latestCmd, current);
+				} else if (display.getCurrent() != current) {
+					display(current);
+				}
 //				display(infoAlert(L[MessageSent_Alert]), current);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -2175,16 +2181,18 @@ public class MP extends MIDlet
 		}
 		{ // write form commands
 			if (c == sendCmd) {
-				if (sending) return;
-				sending = true;
 				String t = messageField.getString();
 				if (t.trim().length() == 0 && sendFile == null && fwdPeer == null) {
 					return;
 				}
-				if (MP.updatesThread != null) {
-					MP.cancel(MP.updatesThread, true);
-				}
+
+				if (sending) return;
+				sending = true;
+
 				display(loadingAlert(L[Sending]), d);
+//				if (MP.updatesThread != null) {
+//					MP.cancel(MP.updatesThread, true);
+//				}
 				start(RUN_SEND_MESSAGE, new Object[] { t, writeTo, replyTo, edit, sendFile, sendChoice, fwdPeer, fwdMsg });
 				return;
 			}
@@ -2592,17 +2600,17 @@ public class MP extends MIDlet
 		}
 		if (c == sendCmd && current instanceof ChatForm) { 
 			// textfield send
-			if (sending)
-				return;
-			sending = true;
-			
 			String t;
 			if ((t = ((TextField) item).getString().trim()).length() == 0)
 				return;
-			if (MP.updatesThread != null) {
-				MP.cancel(MP.updatesThread, true);
-			}
+			
+			if (sending) return;
+			sending = true;
+
 			display(loadingAlert(L[Sending]), current);
+//			if (MP.updatesThread != null) {
+//				MP.cancel(MP.updatesThread, true);
+//			}
 			start(RUN_SEND_MESSAGE, new Object[] { t, ((ChatForm) current).id, null, null, null, null, null, null });
 			return;
 		}
