@@ -202,7 +202,7 @@ public class MP extends MIDlet
 	static int chatsListFontSize = 0; // 0: default, 1: small, 2: medium
 	static boolean keepAlive = true;
 	static boolean utf = true;
-	static long keepAliveInterval = 30000L;
+	static long keepAliveInterval = 10000L;
 	static boolean chatField = true;
 	static boolean roundAvatars;
 	static boolean useView = true;
@@ -213,6 +213,9 @@ public class MP extends MIDlet
 	static String musicCachePath; // TODO
 	static boolean reopenChat;
 	static boolean fullPlayerCover;
+	static boolean notifications = true; // TODO
+	static boolean muteUsers, muteChats, muteBroadcasts;
+	static boolean notifySound = true;
 	
 	// platform
 	static boolean symbianJrt;
@@ -232,6 +235,7 @@ public class MP extends MIDlet
 	static Vector closingConnections = new Vector();
 	private static boolean sending;
 	static boolean updatesRunning;
+	static Object updatesLock = new Object();
 	
 	private static final Object imagesLoadLock = new Object();
 	private static final Vector imagesToLoad = new Vector(); // TODO hashtable?
@@ -1265,7 +1269,7 @@ public class MP extends MIDlet
 				StringBuffer sb = new StringBuffer();
 				ChatForm form = (ChatForm) param;
 				JSONObject j;
-
+				
 				int offset = 0;
 				int fails = 0;
 				boolean check = true;
@@ -1280,7 +1284,9 @@ public class MP extends MIDlet
 								sb.append("&id=").append(form.firstMsgId);
 							}
 							try {
-								j = ((JSONObject) api(sb.toString())).getObject("res");
+								synchronized (updatesLock) {
+									j = ((JSONObject) api(sb.toString())).getObject("res");
+								}
 								int off = j.getInt("update_id");
 								if (!j.getBoolean("exact", false))
 									off -= 1;
@@ -1296,7 +1302,9 @@ public class MP extends MIDlet
 						.append("&offset=").append(offset)
 						.append("&timeout=").append(updatesTimeout);
 						
-						j = (JSONObject) api(sb.toString());
+						synchronized (updatesLock) {
+							j = (JSONObject) api(sb.toString());
+						}
 						
 						JSONArray updates = j.getArray("res");
 						int l = updates.size();
@@ -1354,20 +1362,118 @@ public class MP extends MIDlet
 			} catch (Exception ignored) {}
 			break;
 		}
-		case RUN_KEEP_ALIVE: { // Keep session alive
+		case RUN_KEEP_ALIVE: { // Keep session alive & notifications
 			try {
 				boolean wasShown = true;
-				while (keepAlive) {
+				StringBuffer sb = new StringBuffer();
+				JSONObject j;
+				
+				int offset = 0;
+				boolean check = true;
+				while (keepAlive || notifications) {
 					Thread.sleep(keepAliveInterval);
 					if (threadConnections.size() != 0) continue;
+					
+					// update status
+					if (keepAlive) {
+						try {
+							boolean shown = !paused && current.isShown();
+							if (shown || wasShown != shown) {
+								api(wasShown != shown ?
+									("updateStatus".concat(!shown ? "&off=1" : "")) : "me");
+							}
+							wasShown = shown;
+							if (!shown) {
+								// double delay time in background
+								Thread.sleep(keepAliveInterval);
+							}
+						} catch (Exception ignored) {}
+					}
+					
+					// get notifications
+					if (!notifications) continue;
 					try {
-						boolean shown = !paused && current.isShown();
-						if (shown || wasShown != shown) {
-							api(wasShown != shown ?
-								("updateStatus".concat(!shown ? "&off=1" : "")) : "me");
+						if (check) {
+							try {
+								synchronized (updatesLock) {
+									j = ((JSONObject) api("getLastUpdate")).getObject("res");
+								}
+								int off = j.getInt("update_id");
+								if (!j.getBoolean("exact", false))
+									off -= 1;
+								if (offset <= 0 || off < offset)
+									offset = off;
+							} catch (Exception ignored) {}
+							
+							try {
+								j = ((JSONObject) api("getNotifySettings"));
+								muteUsers = j.getInt("users") != 0;
+								muteChats = j.getInt("chats") != 0;
+								muteBroadcasts = j.getInt("broadcasts") != 0;
+							} catch (Exception ignored) {}
+							check = false;
 						}
-						wasShown = shown;
-					} catch (Exception ignored) {}
+						
+						sb.setLength(0);
+						sb.append("notifications")
+						.append("&offset=").append(offset)
+						.append("&mute_users=").append(muteUsers ? '1' : '0')
+						.append("&mute_chats=").append(muteChats ? '1' : '0')
+						.append("&mute_broadcasts=").append(muteBroadcasts ? '1' : '0')
+//						.append("&include_muted=1") // TODO uncomment to enable chat list updates
+						;
+
+						synchronized (updatesLock) {
+							j = (JSONObject) api(sb.toString());
+						}
+						
+						JSONArray updates = j.getArray("res");
+						int l = updates.size();
+						
+						offset = j.getInt("offset");
+						
+						for (int i = 0; i < l; ++i) {
+							JSONObject update = updates.getObject(i);
+							String type = update.getString("_");
+							if (!"updateNewMessage".equals(type) && !"updateNewChannelMessage".equals(type))
+								continue;
+
+							JSONObject msg = update.getObject("message");
+							
+							String peerId = msg.getString("peer_id");
+							if (peerId.equals(selfId)) {
+								peerId = msg.getString("from_id");
+							}
+							sb.setLength(0);
+							appendDialog(sb, msg, peerId, 0);
+							
+							if (chatsList != null && chatsList.ids.contains(peerId)) {
+								Vector ids = chatsList.ids;
+								int idx = ids.indexOf(peerId);
+								ids.removeElementAt(idx);
+								chatsList.delete(idx);
+								ids.insertElementAt(peerId, 0);
+								chatsList.insert(null, 0, sb.toString(), peerId);
+							}
+							
+							if (msg.getBoolean("out", false)
+									|| update.getBoolean("muted", false)
+									|| msg.getBoolean("silent", false))
+								continue;
+							
+							if (notifySound) {
+								AlertType.ALARM.playSound(display);
+							}
+							display(infoAlert(sb.toString()), null);
+						}
+						
+					} catch (Exception e) {
+						e.printStackTrace();
+						if (e.toString().indexOf("Interrupted") != -1) {
+							break;
+						}
+						check = true;
+					}
 				}
 			} catch (Exception ignored) {}
 			break;
@@ -4273,6 +4379,37 @@ public class MP extends MIDlet
 		if (n < 10) {
 			return "0".concat(Integer.toString(n));
 		} else return Integer.toString(n);
+	}
+
+	// text for dialogs, notifications
+	static StringBuffer appendDialog(StringBuffer sb, JSONObject message, String id, int unread) {
+		JSONObject peer = MP.getPeer(id, false);
+		
+		String name = MP.getName(peer);
+		MP.appendOneLine(sb, name);
+		if (unread != 0) sb.append(" +").append(unread);
+		
+		if (message != null) {
+			sb.append('\n')
+			.append(MP.localizeDate(message.getLong("date"), 2)).append(' ');
+			if (!peer.getBoolean("c", false)) {
+				if (message.getBoolean("out", false) && !id.equals(selfId)) {
+					sb.append(MP.L[You_Prefix]);
+				} else if (id.charAt(0) == '-' && message.has("from_id")) {
+					MP.appendOneLine(sb, MP.getName(message.getString("from_id"), true)).append(": ");
+				}
+			}
+			if (message.has("media")) {
+				sb.append(MP.L[Media]);
+			} else if (message.has("fwd")) {
+				sb.append(MP.L[ForwardedMessage]);
+			} else  if (message.has("act")) {
+				sb.append(MP.L[Action]);
+			} else {
+				MP.appendOneLine(sb, message.getString("text"));
+			}
+		}
+		return sb;
 	}
 	
 	// endregion

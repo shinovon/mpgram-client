@@ -166,49 +166,29 @@ public class ChatsList extends MPList {
 			JSONObject dialog = dialogs.getObject(i);
 			String id = dialog.getString("id");
 			ids.addElement(id);
-			JSONObject peer = MP.getPeer(id, false);
-			
+
 			sb.setLength(0);
-			String name = MP.getName(peer);
-			MP.appendOneLine(sb, name);
-			if (msgId == null) {
-				if (dialog.has("unread")) {
-					sb.append(" +").append(dialog.getInt("unread"));
-				}
-				
-				JSONObject message = dialog.getObject("msg", null)/*messages.getObject(id)*/;
-				if (message != null) {
-					sb.append('\n')
-					.append(MP.localizeDate(message.getLong("date"), 2)).append(' ');
-					if (!peer.getBoolean("c", false)) {
-						if (message.getBoolean("out", false)) {
-							sb.append(MP.L[You_Prefix]);
-						} else if (id.charAt(0) == '-' && message.has("from_id")) {
-							MP.appendOneLine(sb, MP.getName(message.getString("from_id"), true)).append(": ");
-						}
-					}
-					if (message.has("media")) {
-						sb.append(MP.L[Media]);
-					} else if (message.has("fwd")) {
-						sb.append(MP.L[ForwardedMessage]);
-					} else  if (message.has("act")) {
-						sb.append(MP.L[Action]);
-					} else {
-						MP.appendOneLine(sb, message.getString("text"));
-					}
-				}
+			if (msgId != null) {
+				String name = MP.getName(id, false);
+				MP.appendOneLine(sb, name);
+			} else {
+				MP.appendDialog(sb, dialog.getObject("msg", null), id, dialog.getInt("unread", 0));
 			}
 			
-			int itemIdx = safeAppend(thread, sb.toString(), null);
-			if (MP.chatsListFontSize != 0) {
-				try {
-					setFont(itemIdx, MP.chatsListFontSize == 1 ? MP.smallPlainFont : MP.medPlainFont);
-				} catch (Exception ignored) {}
-			}
-			
-			if (noAvas || !MP.loadAvatars) continue;
-			MP.queueAvatar(id, new Object[] { this, new Integer(itemIdx) });
+			insert(thread, size(), sb.toString(), id);
 		}
+	}
+	
+	void insert(Thread thread, int idx, String s, String id) {
+		safeInsert(thread, idx, s, null);
+		if (MP.chatsListFontSize != 0) {
+			try {
+				setFont(idx, MP.chatsListFontSize == 1 ? MP.smallPlainFont : MP.medPlainFont);
+			} catch (Exception ignored) {}
+		}
+		
+		if (noAvas || !MP.loadAvatars) return;
+		MP.queueAvatar(id, new Object[] { this, new Integer(idx) });
 	}
 	
 	void select(int i) {
