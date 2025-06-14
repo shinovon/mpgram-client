@@ -102,6 +102,7 @@
 	"GoTo": "Перейти",
 	"Pin": "Закрепить",
 	"BanMember": "Забанить участника",
+	"Comments": "Обсуждение",
 	
 	// Item commands
 	"Link_Cmd": "Открыть",
@@ -282,6 +283,9 @@
 	"ForwardedMessage": "Пересланное сообщ.",
 	"Action": "Действие",
 	"Edited": "изм.",
+	"_comment": " комментарий",
+	"_comments": " комментария",
+	"_comments2": " комментариев",
 	
 	// Message media
 	"Media": "Медиа",
@@ -319,7 +323,7 @@
 	"Pause_Player": "Pause",
 	"Prev_Player": "Пред.",
 	"Next_Player": "След.",
-	"UnknownTrack": "Unknown Track",
+	"UnknownTrack": "Без названия",
 	"Playlist_Title": "Плейлист",
 	
 	// Profile/chat info

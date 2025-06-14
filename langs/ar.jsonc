@@ -102,6 +102,7 @@
 	"GoTo": "الذهاب الى",
 	"Pin": "Pin", // Untranslated
 	"BanMember": "Ban member", // Untranslated
+	"Comments": "Discussion", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "الرابط",
@@ -282,6 +283,9 @@
 	"You_Prefix": "انت: ",
 	"ForwardedMessage": "رسالة محولة",
 	"Edited": "edited", // Untranslated
+	"_comment": " comment", // Untranslated
+	"_comments": " comments", // Untranslated
+	"_comments2": "",
 	
 	// Message media
 	"Media": "وسائط",

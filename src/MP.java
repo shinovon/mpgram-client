@@ -729,7 +729,7 @@ public class MP extends MIDlet
 		botCallbackCmd = new Command("", Command.ITEM, 1); // TODO unlocalized
 		banMemberCmd = new Command(L[BanMember], Command.ITEM, 11);
 		pinMsgCmd = new Command(L[Pin], Command.ITEM, 10);
-		postCommentsCmd = new Command("Comments", Command.ITEM, 1); // TODO unlocalized
+		postCommentsCmd = new Command(L[Comments], Command.ITEM, 1); 
 		
 		richTextLinkCmd = new Command(L[Link_Cmd], Command.ITEM, 1);
 		openImageCmd = new Command(L[ViewImage], Command.ITEM, 1);

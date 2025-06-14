@@ -102,6 +102,7 @@
 	"GoTo": "Go to",
 	"Pin": "Pin",
 	"BanMember": "Ban member",
+	"Comments": "Discussion",
 	
 	// Item commands
 	"Link_Cmd": "Link",
@@ -282,6 +283,9 @@
 	"ForwardedMessage": "Forwarded message",
 	"Action": "Action",
 	"Edited": "edited",
+	"_comment": " comment",
+	"_comments": " comments",
+	"_comments2": "",
 	
 	// Message media
 	"Media": "Media",
