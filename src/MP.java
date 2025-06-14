@@ -467,8 +467,9 @@ public class MP extends MIDlet
 		} catch (Exception ignored) {}
 //#endif	
 		// get device name
-		String p, v;
+		String p, v, d;
 		if ((p = System.getProperty("microedition.platform")) != null) {
+			d = p;
 			if ((symbianJrt = p.indexOf("platform=S60") != -1)) {
 				int i;
 				v = p.substring(i = p.indexOf("platform_version=") + 17, i = p.indexOf(';', i));
@@ -498,18 +499,18 @@ public class MP extends MIDlet
 			blackberry = p.toLowerCase().startsWith("blackberry");
 			try {
 				Class.forName("emulator.custom.CustomMethod");
-				p = "KEmulator";
+				d = "KEmulator";
 				if ((v = System.getProperty("kemulator.mod.version")) != null) {
-					p = p.concat(" ".concat(v));
+					d = d.concat(" ".concat(v));
 				}
 			} catch (Exception e) {
 				int i;
 				
 				if ((i = p.indexOf('/')) != -1 || (i = p.indexOf(' ')) != -1) {
-					p = p.substring(0, i);
+					d = p.substring(0, i);
 				}
 			}
-			deviceName = p;
+			deviceName = d;
 		}
 		
 		symbian = symbianJrt
