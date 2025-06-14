@@ -1506,7 +1506,7 @@ public class MP extends MIDlet
 								ids.removeElementAt(idx);
 								chatsList.delete(idx);
 								ids.insertElementAt(peerId, 0);
-								chatsList.insert(null, 0, sb.insert(0, getName(peer, false)).toString(), peerId);
+								chatsList.insert(null, 0, sb.insert(0, '\n').insert(0, getName(peer, false)).toString(), peerId);
 							}
 							
 							if (msg.getBoolean("out", false)

@@ -879,7 +879,7 @@ public class ChatForm extends MPForm implements Runnable {
 		
 		if (message.has("comments")) {
 			JSONObject comments = message.getObject("comments");
-			s = new StringItem(null, MP.localizePlural(_comment, comments.getInt("count")));
+			s = new StringItem(null, MP.localizePlural(comments.getInt("count"), _comment));
 			s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			s.setDefaultCommand(MP.postCommentsCmd);
 			s.setItemCommandListener(MP.midlet);
