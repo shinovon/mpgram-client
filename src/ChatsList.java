@@ -116,7 +116,7 @@ public class ChatsList extends MPList {
 				ids.addElement(id);
 
 				sb.setLength(0);
-				MP.appendOneLine(sb, MP.getName(user));
+				MP.appendOneLine(sb, MP.getName(user, false));
 				
 				if (user.getBoolean("b", false)) { // bot
 					sb.append('\n').append(MP.L[Bot]);
@@ -168,11 +168,14 @@ public class ChatsList extends MPList {
 			ids.addElement(id);
 
 			sb.setLength(0);
-			if (msgId != null) {
-				String name = MP.getName(id, false);
-				MP.appendOneLine(sb, name);
-			} else {
-				MP.appendDialog(sb, dialog.getObject("msg", null), id, dialog.getInt("unread", 0));
+			JSONObject peer = MP.getPeer(id, false);
+			String name = MP.getName(peer, false);
+			MP.appendOneLine(sb, name);
+			
+			if (msgId == null) {
+				int unread = dialog.getInt("unread", 0);
+				if (unread != 0) sb.append(" +").append(unread);
+				MP.appendDialog(sb.append('\n'), peer, id, dialog.getObject("msg", null));
 			}
 			
 			insert(thread, size(), sb.toString(), id);

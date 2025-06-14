@@ -224,7 +224,7 @@
 	
 	// Cache settings
 	"AvatarsCaching": "Кэшироние аватарок",
-	"Disabled": "Выкл",
+	"Disabled": "Выкл.",
 	"HoldInRAM": "Хранить в ОЗУ",
 	"Store": "Хранить в RMS",
 	"HoldInRAMandStore": "Хранить в ОЗУ и в RMS",
@@ -236,6 +236,7 @@
 	"EnableNotifications": "Вкл. уведомления",
 	"EnableSound": "Звук",
 	"NotificationMethod": "Способ уведомления",
+	"Off": "Выкл",
 	"AlertWindow": "Диалоговое окно",
 	"PushInterval": "Интервал опроса уведомлений",
 	"PushBackgroundInterval": "Интервал опроса в фоне",

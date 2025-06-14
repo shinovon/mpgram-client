@@ -220,9 +220,10 @@ public class MP extends MIDlet
 //#ifndef NO_NOTIFY
 	static boolean muteUsers, muteChats, muteBroadcasts;
 	static boolean notifySound = true;
-	static int notifyMethod = 0; // 0: alert, 1: nokiaui, 2: pigler api
+	static int notifyMethod = 1; // 0: off, 1: alert, 2: nokiaui, 3: pigler api
 //#endif
 	static boolean updateChatsList;
+	static boolean notifyAvas;
 	
 	// platform
 	static boolean symbianJrt;
@@ -433,7 +434,9 @@ public class MP extends MIDlet
 	
 	protected void destroyApp(boolean u) {
 //#ifndef NO_NOTIFY
-		Notifier.close();
+		try {
+			Notifier.close();
+		} catch (Throwable ignored) {}
 //#endif
 	}
 
@@ -611,9 +614,9 @@ public class MP extends MIDlet
 		fullPlayerCover = reverseChat = f.getHeight() >= 360;
 		
 //#ifndef NO_NOTIFY
-		notifyMethod = checkClass("org.pigler.api.PiglerAPI") ? 2 :
+		notifyMethod = checkClass("org.pigler.api.PiglerAPI") ? 3 :
 			// softnotification is stubbed in s40
-			checkClass("com.nokia.mid.ui.SoftNotification") && !checkClass("com.nokia.mid.impl.isa.jam.Jam") ? 1 : 0;
+			checkClass("com.nokia.mid.ui.SoftNotification") && !checkClass("com.nokia.mid.impl.isa.jam.Jam") ? 2 : 1;
 //#endif
 		
 		// load settings
@@ -1493,7 +1496,9 @@ public class MP extends MIDlet
 								peerId = msg.getString("from_id");
 							}
 							sb.setLength(0);
-							appendDialog(sb, msg, peerId, 0);
+
+							JSONObject peer = getPeer(peerId, false);
+							String text = appendDialog(sb, peer, peerId, msg).toString();
 							
 							if (chatsList != null && chatsList.ids.contains(peerId)) {
 								Vector ids = chatsList.ids;
@@ -1501,7 +1506,7 @@ public class MP extends MIDlet
 								ids.removeElementAt(idx);
 								chatsList.delete(idx);
 								ids.insertElementAt(peerId, 0);
-								chatsList.insert(null, 0, sb.toString(), peerId);
+								chatsList.insert(null, 0, sb.insert(0, getName(peer, false)).toString(), peerId);
 							}
 							
 							if (msg.getBoolean("out", false)
@@ -1510,7 +1515,7 @@ public class MP extends MIDlet
 								continue;
 
 							msg.put("peer_id", peerId);
-							msg.put("text", sb.toString());
+							msg.put("text", text);
 							int count = 0;
 							if (notificationMessages.containsKey(peerId)) {
 								count = ((JSONObject) notificationMessages.get(peerId)).getInt("count", 0);
@@ -1539,6 +1544,14 @@ public class MP extends MIDlet
 								String text = msg.getString("text");
 								String peerId = msg.getString("peer_id");
 								
+								sb.setLength(0);
+								sb.append(getName(peerId, false));
+								int count = msg.getInt("count", 0);
+								if (count != 0) {
+									sb.append(" +").append(count);
+								}
+								String title = sb.toString();
+								
 								if (!paused && current instanceof ChatForm && current.isShown() && peerId.equals(((ChatForm) current).id)) {
 									try {
 										Notifier.remove(peerId);
@@ -1549,15 +1562,16 @@ public class MP extends MIDlet
 								
 								// TODO chat avatars
 								if (notifyMethod != 0) {
-									try {
-										int k = text.indexOf('\n');
-										Notifier.post(peerId, MP.getName(peerId, false), k == -1 ? "" : text.substring(k + 1), notifyMethod);
-									} catch (Throwable ignored) {}
-								} else {
-									Alert alert = new Alert("");
-									alert.setString(text);
-									alert.setTimeout(1500);
-									display(alert, null);
+									if (notifyMethod != 1) {
+										try {
+											Notifier.post(peerId, title, text, notifyMethod, null);
+										} catch (Throwable ignored) {}
+									} else {
+										Alert alert = new Alert(title);
+										alert.setString(text);
+										alert.setTimeout(1500);
+										display(alert, null);
+									}
 								}
 								notified = true;
 							}
@@ -2230,6 +2244,7 @@ public class MP extends MIDlet
 					f.append(notifyChoice);
 					
 					notifyMethodChoice = new ChoiceGroup(L[NotificationMethod], ChoiceGroup.POPUP, new String[] {
+							L[Off],
 							L[AlertWindow],
 							"Nokia UI",
 							"Pigler API"
@@ -3304,7 +3319,7 @@ public class MP extends MIDlet
 				o = getPeer(id, loadIfNeeded);
 			}
 			if (o == null) return null;
-			res = variant ? getShortName(o) : getName(o);
+			res = getName(o, variant);
 		}
 		return res;
 	}
@@ -3313,7 +3328,7 @@ public class MP extends MIDlet
 		return getName(id, variant, true);
 	}
 	
-	static String getName(JSONObject p) {
+	static String getName(JSONObject p, boolean variant) {
 		if (p == null) return null;
 		if (p.has("t")) {
 			return p.getString("t");
@@ -3322,7 +3337,7 @@ public class MP extends MIDlet
 		String fn = p.getString("fn");
 		String ln = p.getString("ln");
 		
-		if (fn != null && ln != null) {
+		if (!variant && fn != null && ln != null) {
 			return fn.concat(" ".concat(ln));
 		}
 		
@@ -3349,25 +3364,6 @@ public class MP extends MIDlet
 		if (fn != null && ln != null) {
 			return fn.concat(" ".concat(ln));
 		}
-		
-		if (fn != null && fn.length() != 0) {
-			return fn;
-		}
-		
-		if (ln != null) {
-			return ln;
-		}
-		
-		return "Deleted";
-	}
-	
-	private static String getShortName(JSONObject p) {
-		if (p.has("t")) {
-			return p.getString("t");
-		}
-		
-		String fn = p.getString("fn");
-		String ln = p.getString("ln");
 		
 		if (fn != null && fn.length() != 0) {
 			return fn;
@@ -4558,16 +4554,9 @@ public class MP extends MIDlet
 	}
 
 	// text for dialogs, notifications
-	static StringBuffer appendDialog(StringBuffer sb, JSONObject message, String id, int unread) {
-		JSONObject peer = MP.getPeer(id, false);
-		
-		String name = MP.getName(peer);
-		MP.appendOneLine(sb, name);
-		if (unread != 0) sb.append(" +").append(unread);
-		
+	static StringBuffer appendDialog(StringBuffer sb, JSONObject peer, String id, JSONObject message) {
 		if (message != null) {
-			sb.append('\n')
-			.append(MP.localizeDate(message.getLong("date"), 2)).append(' ');
+			sb.append(MP.localizeDate(message.getLong("date"), 2)).append(' ');
 			if (!peer.getBoolean("c", false)) {
 				if (message.getBoolean("out", false) && !id.equals(selfId)) {
 					sb.append(MP.L[You_Prefix]);

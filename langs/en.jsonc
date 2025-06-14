@@ -236,6 +236,7 @@
 	"EnableNotifications": "Notifications",
 	"EnableSound": "Sound",
 	"NotificationMethod": "Notification method",
+	"Off": "Off",
 	"AlertWindow": "Alert window",
 	"PushInterval": "Polling interval",
 	"PushBackgroundInterval": "Background polling interval",

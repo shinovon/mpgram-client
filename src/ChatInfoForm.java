@@ -59,7 +59,7 @@ public class ChatInfoForm extends MPForm {
 			JSONObject peer = MP.getPeer(id, true);
 			id = peer.getString("id");
 			broadcast = peer.getBoolean("c", false);
-			name = MP.getName(peer);
+			name = MP.getName(peer, false);
 		} else if (mode == 1) {
 			sb.append("resolvePhone&phone=").append(id);
 			JSONObject r = ((JSONObject) MP.api(sb.toString())).getObject("res");

@@ -236,6 +236,7 @@
 	"EnableNotifications": "Notifications", // Untranslated
 	"EnableSound": "Sound", // Untranslated
 	"NotificationMethod": "Notification method", // Untranslated
+	"Off": "Off", // Untranslated
 	"AlertWindow": "Alert window", // Untranslated
 	"PushInterval": "Polling interval", // Untranslated
 	"PushBackgroundInterval": "Background polling interval", // Untranslated

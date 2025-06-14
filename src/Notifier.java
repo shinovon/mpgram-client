@@ -64,7 +64,9 @@ public class Notifier implements SoftNotificationListener {
 		}
 	}
 	
-	public static boolean post(String peerId, String peer, String text, int mode) {
+	public static boolean post(String peerId, String peer, String text, int mode, Image image) {
+		if (image == null) image = icon;
+		
 		int id = 0;
 		try {
 			if (piglerApi != null) {
@@ -74,7 +76,7 @@ public class Notifier implements SoftNotificationListener {
 				} catch (Throwable ignored) {}
 			}
 			
-			if (mode == 2) {
+			if (mode == 3) {
 				Class.forName("org.pigler.api.PiglerAPI");
 				if (piglerApi == null) return false;
 				
@@ -96,7 +98,7 @@ public class Notifier implements SoftNotificationListener {
 				
 				if (id == 0) {
 					try {
-						id = ((PiglerAPI) piglerApi).createNotification(peer, text, icon, true);
+						id = ((PiglerAPI) piglerApi).createNotification(peer, text, image, true);
 						piglerIds.put(new Integer(id), peerId);
 						return true;
 					} catch (Exception e) {
@@ -106,10 +108,10 @@ public class Notifier implements SoftNotificationListener {
 						id = ((Integer) piglerIds.keys().nextElement()).intValue();
 					}
 				}
-				((PiglerAPI) piglerApi).updateNotification(id, peer, text);
+				((PiglerAPI) piglerApi).updateNotification(id, peer, text, image);
 				piglerIds.put(new Integer(id), peerId);
 				return true;
-			} else if (mode == 1) {
+			} else if (mode == 2) {
 				Class.forName("com.nokia.mid.ui.SoftNotification");
 				if (nokiaIds.contains(peerId)) {
 					for (Enumeration keys = nokiaIds.keys(); keys.hasMoreElements(); ) {
@@ -152,7 +154,7 @@ public class Notifier implements SoftNotificationListener {
 		if (nokiaIds.contains(peerId)) {
 			for (Enumeration keys = nokiaIds.keys(); keys.hasMoreElements(); ) {
 				Object key = keys.nextElement();
-				if (!nokiaIds.get(key).equals(peerId)) continue;
+				if (!nokiaIds.equals(piglerIds.get(key))) continue;
 				
 				int id = ((Integer) key).intValue();
 				try {
@@ -168,7 +170,7 @@ public class Notifier implements SoftNotificationListener {
 		if (piglerIds.contains(peerId)) {
 			for (Enumeration keys = piglerIds.keys(); keys.hasMoreElements(); ) {
 				Object key = keys.nextElement();
-				if (!piglerIds.get(key).equals(peerId)) continue;
+				if (!peerId.equals(piglerIds.get(key))) continue;
 				
 				int id = ((Integer) piglerIds.get(peerId)).intValue();
 				try {
@@ -181,23 +183,27 @@ public class Notifier implements SoftNotificationListener {
 	}
 	
 	public static void close() {
-		for (Enumeration keys = nokiaIds.keys(); keys.hasMoreElements(); ) {
-			int id = ((Integer) keys.nextElement()).intValue();
-			
-			try {
-				SoftNotification.newInstance(id).remove();
-			} catch (Throwable ignored) {}
-		}
+		try {
+			for (Enumeration keys = nokiaIds.keys(); keys.hasMoreElements(); ) {
+				int id = ((Integer) keys.nextElement()).intValue();
+				
+				try {
+					SoftNotification.newInstance(id).remove();
+				} catch (Throwable ignored) {}
+			}
+		} catch (Throwable ignored) {}
 		
 		if (piglerApi == null) return;
 
-		for (Enumeration keys = piglerIds.keys(); keys.hasMoreElements(); ) {
-			int id = ((Integer) keys.nextElement()).intValue();
-			
-			try {
-				((PiglerAPI) piglerApi).removeNotification(id);
-			} catch (Throwable ignored) {}
-		}
+		try {
+			for (Enumeration keys = piglerIds.keys(); keys.hasMoreElements(); ) {
+				int id = ((Integer) keys.nextElement()).intValue();
+				
+				try {
+					((PiglerAPI) piglerApi).removeNotification(id);
+				} catch (Throwable ignored) {}
+			}
+		} catch (Throwable ignored) {}
 		
 		try {
 			((PiglerAPI) piglerApi).removeAllNotifications();
