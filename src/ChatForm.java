@@ -337,6 +337,11 @@ public class ChatForm extends MPForm implements Runnable {
 			botAnswer = null;
 			handleBotAnswer(j);
 		}
+		
+		try {
+			Notifier.remove(id);
+		} catch (Throwable ignored) {}
+		MP.notificationMessages.remove(id);
 	}
 
 	void handleBotAnswer(JSONObject j) {

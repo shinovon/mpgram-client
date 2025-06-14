@@ -74,6 +74,12 @@ public class Notifier implements SoftNotificationListener {
 					((PiglerAPI) piglerApi).showGlobalPopup(peer, text, 0);
 				} catch (Throwable ignored) {}
 				
+				try {
+					if (((PiglerAPI) piglerApi).isSingleLine()) {
+						text = null;
+					}
+				} catch (Throwable ignored) {}
+				
 				if (piglerIds.contains(peerId)) {
 					for (Enumeration keys = piglerIds.keys(); keys.hasMoreElements(); ) {
 						Object key = keys.nextElement();
@@ -97,6 +103,7 @@ public class Notifier implements SoftNotificationListener {
 					}
 				}
 				((PiglerAPI) piglerApi).updateNotification(id, peer, text);
+				piglerIds.put(new Integer(id), peerId);
 				return true;
 			} else if (mode == 1) {
 				Class.forName("com.nokia.mid.ui.SoftNotification");
@@ -128,12 +135,45 @@ public class Notifier implements SoftNotificationListener {
 				s.setListener(inst);
 				s.setText(peer.concat("\n").concat(text), peer);
 				s.post();
+				nokiaIds.put(new Integer(id), peerId);
 				return true;
 			}
 		} catch (Throwable ignored) {
 			ignored.printStackTrace();
 		}
 		return false;
+	}
+
+	public static void remove(String peerId) {
+		if (nokiaIds.contains(peerId)) {
+			for (Enumeration keys = nokiaIds.keys(); keys.hasMoreElements(); ) {
+				Object key = keys.nextElement();
+				if (!nokiaIds.get(key).equals(peerId)) continue;
+				
+				int id = ((Integer) key).intValue();
+				try {
+					SoftNotification.newInstance(id).remove();
+				} catch (Throwable ignored) {}
+				nokiaIds.remove(peerId);
+				break;
+			}
+		}
+		
+		if (piglerApi == null) return;
+		
+		if (piglerIds.contains(peerId)) {
+			for (Enumeration keys = piglerIds.keys(); keys.hasMoreElements(); ) {
+				Object key = keys.nextElement();
+				if (!piglerIds.get(key).equals(peerId)) continue;
+				
+				int id = ((Integer) piglerIds.get(peerId)).intValue();
+				try {
+					((PiglerAPI) piglerApi).removeNotification(id);
+				} catch (Throwable ignored) {}
+				piglerIds.remove(peerId);
+				break;
+			}
+		}
 	}
 	
 	public static void close() {

@@ -28,7 +28,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+//#ifndef NO_FILE
 import java.util.Random;
+//#endif
 import java.util.TimeZone;
 import java.util.Vector;
 
@@ -109,7 +111,7 @@ public class MP extends MIDlet
 	private static final String AVATAR_RECORD_PREFIX = "mcA";
 	
 	private static final String DEFAULT_INSTANCE_URL = "http://mp.nnchan.ru/";
-	static final String API_URL = "api2.php";
+	static final String API_URL = "api.php";
 	static final String AVA_URL = "ava.php";
 	static final String FILE_URL = "file.php";
 	static final String OTA_URL = "http://nnproject.cc/mp/upd.php";
@@ -214,12 +216,13 @@ public class MP extends MIDlet
 	static String musicCachePath; // TODO
 	static boolean reopenChat;
 	static boolean fullPlayerCover;
-	static boolean notifications = true; // TODO
+	static boolean notifications;
+//#ifndef NO_NOTIFY
 	static boolean muteUsers, muteChats, muteBroadcasts;
 	static boolean notifySound = true;
-//#ifndef NO_NOTIFY
 	static int notifyMethod = 0; // 0: alert, 1: nokiaui, 2: pigler api
 //#endif
+	static boolean updateChatsList;
 	
 	// platform
 	static boolean symbianJrt;
@@ -363,22 +366,26 @@ public class MP extends MIDlet
 	private static ChoiceGroup langChoice;
 	private static ChoiceGroup chatsFontSizeCoice;
 	private static ChoiceGroup networkChoice;
-	private static ChoiceGroup notifyChoice;
-	private static ChoiceGroup notifyMethodChoice;
 	private static Gauge avaCacheGauge;
 	private static Gauge photoSizeGauge;
 	private static Gauge profileCacheGauge;
 	private static Gauge chatsGauge;
 	private static Gauge msgsGauge;
 	private static Gauge updateTimeoutGauge;
+//#ifndef NO_NOTIFY
+	private static ChoiceGroup notifyChoice;
+	private static ChoiceGroup notifyMethodChoice;
 	private static Gauge pushIntervalGauge;
 	private static Gauge pushBgIntervalGauge;
+//#endif
 	
 	// write items
 	private static TextField messageField;
 //	private static TextField fileField;
 	private static ChoiceGroup sendChoice;
+//#ifndef NO_FILE
 	private static StringItem fileLabel;
+//#endif
 	
 	// player items
 	private static StringItem playerTitleLabel, playerArtistLabel;
@@ -418,6 +425,8 @@ public class MP extends MIDlet
 	private static JSONObject currentMusic;
 	private static int playerState; // 1 - playing, 2 - paused, 3 - loading
 	private static Player currentPlayer;
+	
+	static Hashtable notificationMessages = new Hashtable();
 	
 	// region MIDlet
 	
@@ -644,11 +653,13 @@ public class MP extends MIDlet
 			useView = j.getBoolean("useView", useView);
 			blackberryNetwork = j.getInt("blackberryNetwork", blackberryNetwork);
 			fullPlayerCover = j.getBoolean("fullPlayerCover", fullPlayerCover);
+//#ifndef NO_NOTIFY
 			notifications = j.getBoolean("notifications", notifications);
 			notifySound = j.getBoolean("notifySound", notifySound);
 			pushInterval = j.getLong("pushInterval", pushInterval);
 			pushBgInterval = j.getLong("pushBgInterval", pushBgInterval);
 			notifyMethod = j.getInt("notifyMethod", notifyMethod);
+//#endif
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -1395,11 +1406,13 @@ public class MP extends MIDlet
 		case RUN_KEEP_ALIVE: { // Keep session alive & notifications
 			try {
 				boolean wasShown = true;
+//#ifndef NO_NOTIFY
 				StringBuffer sb = new StringBuffer();
 				JSONObject j;
 				
 				int offset = 0;
 				boolean check = true;
+//#endif
 				while (keepAlive || notifications) {
 					Thread.sleep(wasShown ? pushInterval : pushBgInterval);
 					if (threadConnections.size() != 0) continue;
@@ -1447,8 +1460,11 @@ public class MP extends MIDlet
 						.append("&mute_users=").append(muteUsers ? '1' : '0')
 						.append("&mute_chats=").append(muteChats ? '1' : '0')
 						.append("&mute_broadcasts=").append(muteBroadcasts ? '1' : '0')
-//						.append("&include_muted=1") // TODO uncomment to enable chat list updates
 						;
+						
+						if (updateChatsList) {
+							sb.append("&include_muted=1");
+						}
 
 						synchronized (updatesLock) {
 							j = (JSONObject) api(sb.toString());
@@ -1458,6 +1474,8 @@ public class MP extends MIDlet
 						int l = updates.size();
 						
 						offset = j.getInt("offset");
+						
+						JSONArray newMsgs = new JSONArray();
 						
 						for (int i = 0; i < l; ++i) {
 							JSONObject update = updates.getObject(i);
@@ -1487,21 +1505,62 @@ public class MP extends MIDlet
 									|| update.getBoolean("muted", false)
 									|| msg.getBoolean("silent", false))
 								continue;
-							
-							if (notifySound) {
-								AlertType.ALARM.playSound(display);
+
+							msg.put("peer_id", peerId);
+							msg.put("text", sb.toString());
+							int count = 0;
+							if (notificationMessages.containsKey(peerId)) {
+								count = ((JSONObject) notificationMessages.get(peerId)).getInt("count", 0);
 							}
-							if (notifyMethod != 0) {
-								try {
-									String s = sb.toString();
-									int k = s.indexOf('\n');
-									Notifier.post(peerId, MP.getName(peerId, false), k == -1 ? "" : s.substring(k + 1), notifyMethod);
-								} catch (Throwable ignored) {}
-							} else {
-								Alert alert = new Alert("");
-								alert.setString(sb.toString());
-								alert.setTimeout(1500);
-								display(alert, null);
+
+							// filter latest messages
+							int n = newMsgs.size();
+							for (int m = 0; m < n; ++m) {
+								JSONObject t = newMsgs.getObject(m);
+								if (peerId.equals(t.getString("peer_id"))) {
+									newMsgs.remove(m);
+									count++;
+								}
+							}
+							msg.put("count", ++count);
+							newMsgs.add(msg);
+							notificationMessages.put(peerId, msg);
+						}
+						
+						if (newMsgs.size() != 0) {
+							boolean notified = false;
+							
+							l = newMsgs.size();
+							for (int i = 0; i < l; ++i) {
+								JSONObject msg = newMsgs.getObject(i);
+								String text = msg.getString("text");
+								String peerId = msg.getString("peer_id");
+								
+								if (!paused && current instanceof ChatForm && current.isShown() && peerId.equals(((ChatForm) current).id)) {
+									try {
+										Notifier.remove(peerId);
+									} catch (Throwable ignored) {}
+									notificationMessages.remove(peerId);
+									continue;
+								}
+								
+								// TODO chat avatars
+								if (notifyMethod != 0) {
+									try {
+										int k = text.indexOf('\n');
+										Notifier.post(peerId, MP.getName(peerId, false), k == -1 ? "" : text.substring(k + 1), notifyMethod);
+									} catch (Throwable ignored) {}
+								} else {
+									Alert alert = new Alert("");
+									alert.setString(text);
+									alert.setTimeout(1500);
+									display(alert, null);
+								}
+								notified = true;
+							}
+							
+							if (notified && notifySound) {
+								AlertType.ALARM.playSound(display);	
 							}
 						}
 						
@@ -2390,11 +2449,13 @@ public class MP extends MIDlet
 					j.put("useView", useView);
 					j.put("blackberryNetwork", blackberryNetwork);
 					j.put("fullPlayerCover", fullPlayerCover);
+//#ifndef NO_NOTIFY
 					j.put("notifications", notifications);
 					j.put("notifySound", notifySound);
 					j.put("pushInterval", pushInterval);
 					j.put("pushBgInterval", pushBgInterval);
 					j.put("notifyMethod", notifyMethod);
+//#endif
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
@@ -4236,9 +4297,8 @@ public class MP extends MIDlet
 		if (blackberry && blackberryNetwork == 1) {
 			url = url.concat(";deviceside=true;interface=wifi");
 		}
-		boolean u;
-		HttpConnection hc = (HttpConnection) Connector.open(url, Connector.READ_WRITE,
-				u = (url.indexOf("method=updates") != -1 || url.indexOf(OTA_URL) != -1));
+		boolean u = (url.indexOf("method=updates") != -1 || url.indexOf(OTA_URL) != -1);
+		HttpConnection hc = (HttpConnection) Connector.open(url, Connector.READ_WRITE, u);
 		hc.setRequestProperty("User-Agent", "mpgram4/".concat(version).concat(" (https://github.com/shinovon/mpgram-client)"));
 //#ifndef NO_ZIP
 		if (!u && compress) {
