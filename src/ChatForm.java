@@ -86,6 +86,9 @@ public class ChatForm extends MPForm implements Runnable {
 
 	JSONObject botAnswer;
 	
+	// discussion
+	String postPeer, postId;
+	
 	public ChatForm(String id, String query, int message, int topMsg) {
 		super(id);
 		addCommand(MP.latestCmd);
@@ -113,6 +116,18 @@ public class ChatForm extends MPForm implements Runnable {
 		this.mediaFilter = mediaFilter;
 		addCommand(MP.latestCmd);
 	}
+	
+	// post discussion
+	public ChatForm(String id, String postPeer, String postId, int readMaxId) {
+		super(id);
+		this.id = id;
+		this.postPeer = postPeer;
+		this.postId = postId;
+		offsetId = messageId = readMaxId;
+		addOffset = -limit;
+		dir = 1;
+		addCommand(MP.latestCmd);
+	}
 
 	void loadInternal(Thread thread) throws Exception {
 		// TODO forum
@@ -134,6 +149,15 @@ public class ChatForm extends MPForm implements Runnable {
 		
 		StringBuffer sb = new StringBuffer();
 		if (!infoLoaded) {
+			if (postPeer != null) {
+				sb.append("getDiscussionMessage&peer=").append(postPeer)
+				.append("&id=").append(postId);
+				JSONObject j = (JSONObject) MP.api(sb.toString());
+				id = j.getString("peer_id");
+				topMsgId = j.getInt("id");
+				sb.setLength(0);
+			}
+			
 			JSONObject peer = MP.getPeer(id, true);
 			
 			left = peer.getBoolean("l", false);
@@ -146,9 +170,9 @@ public class ChatForm extends MPForm implements Runnable {
 
 			if (mediaFilter == null) {
 				canWrite = !broadcast;
-				JSONObject fullInfo = (JSONObject) MP.api("getFullInfo&id=".concat(id));
+				JSONObject info = (JSONObject) MP.api((messageId == -1 ? "getFullInfo&id=" : "getInfo&id=").concat(id));
 				if (id.charAt(0) == '-') {
-					JSONObject chat = fullInfo.getObject("Chat");
+					JSONObject chat = info.getObject("Chat");
 					if (chat.has("admin_rights")) {
 						JSONObject adminRights = chat.getObject("admin_rights");
 						canWrite = !broadcast || adminRights.getBoolean("post_messages", false);
@@ -158,12 +182,12 @@ public class ChatForm extends MPForm implements Runnable {
 					}
 				} else {
 					canPin = true;
-					if (MP.chatStatus && fullInfo.getObject("User").has("status")) {
-						setStatus(fullInfo.getObject("User").getObject("status"));
+					if (MP.chatStatus && info.getObject("User").has("status")) {
+						setStatus(info.getObject("User").getObject("status"));
 					}
 				}
-				JSONObject full = fullInfo.getObject("full");
-				if (messageId == -1 && full.has("read_inbox_max_id")) {
+				JSONObject full;
+				if (messageId == -1 && (full = info.getObject("full")).has("read_inbox_max_id")) {
 					messageId = 0;
 					int maxId = full.getInt("read_inbox_max_id");
 					if (maxId != 0 && full.getInt("unread_count", 0) > limit) {
@@ -325,7 +349,12 @@ public class ChatForm extends MPForm implements Runnable {
 	protected void postLoad(boolean success) {
 		if (!success)
 			return;
-		if (endReached && !hasOffset && query == null && mediaFilter == null && MP.chatUpdates && !update) {
+		if (endReached && !hasOffset
+				&& query == null && mediaFilter == null
+				&& MP.chatUpdates && !update
+				// TODO remove this when support for top_msg_id will be added
+				&& postId == null)
+		{
 			// start updater thread
 			update = true;
 			MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
@@ -371,7 +400,7 @@ public class ChatForm extends MPForm implements Runnable {
 		String fromId = message.has("from_id") ? message.getString("from_id") : this.id;
 		boolean out = message.getBoolean("out", false);
 		String text = message.getString("text", null);
-		// 0: peer id, 1: message id, 2: from id, 3: image quality, 4: file name
+		// 0: peer id, 1: message id, 2: from id/discussion peer, 3: image quality, 4: file name
 		String[] key = new String[] { this.id, idString, fromId, null, null };
 		
 		loadedMsgs.addElement(idString);
@@ -420,15 +449,17 @@ public class ChatForm extends MPForm implements Runnable {
 				if (canPin) {
 					s.addCommand(MP.pinMsgCmd);
 				}
-				if (canBan && !out) {
+				if (!broadcast && canBan && !out) {
 					s.addCommand(MP.banMemberCmd);
 				}
 				if (out || selfChat) {
 					s.addCommand(MP.deleteMsgCmd);
 					s.addCommand(MP.editMsgCmd);
 				} else {
-					s.setDefaultCommand(MP.itemChatCmd);
-					s.addCommand(MP.itemChatInfoCmd);
+					if (!broadcast) {
+						s.setDefaultCommand(MP.itemChatCmd);
+						s.addCommand(MP.itemChatInfoCmd);
+					}
 					if (canDelete) {
 						s.addCommand(MP.deleteMsgCmd);
 					}
@@ -837,6 +868,17 @@ public class ChatForm extends MPForm implements Runnable {
 					if (msgItem == null) msgItem = s;
 				}
 			}
+		}
+		
+		if (message.has("comments")) {
+			JSONObject comments = message.getObject("comments");
+			// TODO localize, count
+			s = new StringItem(null, "Show comments");
+			s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+			s.setDefaultCommand(MP.postCommentsCmd);
+			s.setItemCommandListener(MP.midlet);
+			safeInsert(thread, insert++, lastItem = s);
+			urls.put(s, new String[] {comments.getString("peer"), this.id, idString, comments.getString("read", "0")});
 		}
 		
 		if (!reverse || (group == 0 && space)) {

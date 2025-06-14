@@ -291,6 +291,7 @@ public class MP extends MIDlet
 	static Command botCallbackCmd;
 	static Command banMemberCmd;
 	static Command pinMsgCmd;
+	static Command postCommentsCmd;
 	
 	static Command richTextLinkCmd;
 	static Command openImageCmd;
@@ -728,6 +729,7 @@ public class MP extends MIDlet
 		botCallbackCmd = new Command("", Command.ITEM, 1); // TODO unlocalized
 		banMemberCmd = new Command(L[BanMember], Command.ITEM, 11);
 		pinMsgCmd = new Command(L[Pin], Command.ITEM, 10);
+		postCommentsCmd = new Command("Comments", Command.ITEM, 1); // TODO unlocalized
 		
 		richTextLinkCmd = new Command(L[Link_Cmd], Command.ITEM, 1);
 		openImageCmd = new Command(L[ViewImage], Command.ITEM, 1);
@@ -1338,6 +1340,7 @@ public class MP extends MIDlet
 						}
 						if (!form.update || updatesThread != thread) break;
 						
+						// TODO top_msg_id
 						sb.setLength(0);
 						sb.append("updates&media=1&read=1&peer=").append(form.id)
 						.append("&offset=").append(offset)
@@ -1909,7 +1912,7 @@ public class MP extends MIDlet
 				return;
 			}
 			if (c == writeCmd) {
-				display(writeForm(((ChatForm) d).id, null, "", null, null, null));
+				display(writeForm(((ChatForm) d).id, Integer.toString(((ChatForm) d).topMsgId), "", null, null, null));
 				return;
 			}
 			if (c == searchMsgCmd) {
@@ -2954,6 +2957,13 @@ public class MP extends MIDlet
 			start(RUN_LOAD_PLAYLIST, new String[] {s[0], "3", s[1]});
 			return;
 		}
+		if (c == postCommentsCmd) {
+			String[] s = (String[]) ((MPForm) current).urls.get(item);
+			if (s == null) return;
+			
+			openLoad(new ChatForm(s[0], s[1], s[2], Integer.parseInt(s[3])));
+			return;
+		}
 		commandAction(c, display.getCurrent());
 	}
 
@@ -3388,7 +3398,7 @@ public class MP extends MIDlet
 	
 	static Form writeForm(String id, String reply, String text, String editId, String fwdPeerId, String fwdMsgId) {
 		writeTo = id;
-		replyTo = reply;
+		replyTo = "0".equals(reply) ? null : reply;
 		edit = editId;
 		sendFile = null;
 		fwdPeer = fwdPeerId;

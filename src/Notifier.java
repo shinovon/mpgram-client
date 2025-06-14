@@ -198,6 +198,9 @@ public class Notifier implements SoftNotificationListener {
 		try {
 			((PiglerAPI) piglerApi).removeAllNotifications();
 		} catch (Throwable ignored) {}
+		try {
+			((PiglerAPI) piglerApi).close();
+		} catch (Throwable ignored) {}
 	}
 
 	public void notificationDismissed(SoftNotification notification) {
