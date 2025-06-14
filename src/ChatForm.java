@@ -123,9 +123,7 @@ public class ChatForm extends MPForm implements Runnable {
 		this.id = id;
 		this.postPeer = postPeer;
 		this.postId = postId;
-		offsetId = messageId = readMaxId;
-		addOffset = -limit;
-		dir = 1;
+		this.messageId = readMaxId;
 		addCommand(MP.latestCmd);
 	}
 
@@ -155,6 +153,15 @@ public class ChatForm extends MPForm implements Runnable {
 				JSONObject j = (JSONObject) MP.api(sb.toString());
 				id = j.getString("peer_id");
 				topMsgId = j.getInt("id");
+				if (messageId == 0) {
+					messageId = j.getInt("read");
+				} else if (messageId != 0 && j.getInt("unread", 0) > limit) {
+					offsetId = messageId = j.getInt("read");
+					addOffset = -limit;
+					dir = 1;
+				} else {
+					messageId = 0;
+				}
 				sb.setLength(0);
 			}
 			
@@ -224,7 +231,7 @@ public class ChatForm extends MPForm implements Runnable {
 		}
 
 		if (messageId == -1) messageId = 0;
-		if (messageId != 0) {
+		if (messageId != 0 && offsetId == 0) {
 			// message to focus
 			offsetId = messageId;
 			addOffset = -1;

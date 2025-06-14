@@ -3513,7 +3513,10 @@ public class MP extends MIDlet
 //#endif
 	
 	static void openChat(String id, int msg) {
-		if (current instanceof ChatForm && id.equals(((ChatForm) current).id)) {
+		Displayable d = MP.current;
+		if (d instanceof ChatForm && id.equals(((ChatForm) d).id)
+				&& ((ChatForm) d).postId == null && ((ChatForm) d).query == null
+				&& ((ChatForm) d).mediaFilter == null) {
 			return;
 		}
 		openLoad(new ChatForm(id, null, msg, 0));
