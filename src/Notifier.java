@@ -67,12 +67,16 @@ public class Notifier implements SoftNotificationListener {
 	public static boolean post(String peerId, String peer, String text, int mode) {
 		int id = 0;
 		try {
+			if (piglerApi != null) {
+				try {
+					Class.forName("org.pigler.api.PiglerAPI");
+					((PiglerAPI) piglerApi).showGlobalPopup(peer, text, 0);
+				} catch (Throwable ignored) {}
+			}
+			
 			if (mode == 2) {
 				Class.forName("org.pigler.api.PiglerAPI");
 				if (piglerApi == null) return false;
-				try {
-					((PiglerAPI) piglerApi).showGlobalPopup(peer, text, 0);
-				} catch (Throwable ignored) {}
 				
 				try {
 					if (((PiglerAPI) piglerApi).isSingleLine()) {
@@ -108,7 +112,7 @@ public class Notifier implements SoftNotificationListener {
 			} else if (mode == 1) {
 				Class.forName("com.nokia.mid.ui.SoftNotification");
 				if (nokiaIds.contains(peerId)) {
-					for (Enumeration keys = piglerIds.keys(); keys.hasMoreElements(); ) {
+					for (Enumeration keys = nokiaIds.keys(); keys.hasMoreElements(); ) {
 						Object key = keys.nextElement();
 						if (nokiaIds.get(key).equals(peerId)) {
 							id = ((Integer) key).intValue();
@@ -210,6 +214,7 @@ public class Notifier implements SoftNotificationListener {
 		String peerId = (String) nokiaIds.get(new Integer(notification.getId()));
 		if (peerId == null) return;
 		
+		remove(peerId);
 		MP.openChat(peerId, 0);
 	}
 	

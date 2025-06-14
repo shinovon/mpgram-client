@@ -678,7 +678,7 @@ public class MP extends MIDlet
 	
 		
 		// load locale
-		(L = new String[300])[0] = "MPGram";
+		(L = new String[350])[0] = "MPGram";
 		try {
 			loadLocale(lang);
 		} catch (Exception e) {
