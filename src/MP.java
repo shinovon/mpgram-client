@@ -221,9 +221,9 @@ public class MP extends MIDlet
 	static boolean muteUsers, muteChats, muteBroadcasts;
 	static boolean notifySound = true;
 	static int notifyMethod = 1; // 0: off, 1: alert, 2: nokiaui, 3: pigler api
+//	static boolean updateChatsList;
+	static boolean notifyAvas = true;
 //#endif
-	static boolean updateChatsList;
-	static boolean notifyAvas;
 	
 	// platform
 	static boolean symbianJrt;
@@ -977,8 +977,7 @@ public class MP extends MIDlet
 										try {
 											byte[] b = r.getRecord(1);
 											img = Image.createImage(b, 0, b.length);
-											if (recordName != null && roundAvatars)
-												img = roundImage(img);
+											if (roundAvatars) img = roundImage(img);
 										} finally {
 											r.closeRecordStore();
 										}
@@ -1469,9 +1468,9 @@ public class MP extends MIDlet
 						.append("&mute_broadcasts=").append(muteBroadcasts ? '1' : '0')
 						;
 						
-						if (updateChatsList) {
-							sb.append("&include_muted=1");
-						}
+//						if (updateChatsList) {
+//							sb.append("&include_muted=1");
+//						}
 
 						synchronized (updatesLock) {
 							j = (JSONObject) api(sb.toString());
@@ -1498,17 +1497,18 @@ public class MP extends MIDlet
 							}
 							sb.setLength(0);
 
-							JSONObject peer = getPeer(peerId, false);
+							JSONObject peer = getPeer(peerId, true);
 							String text = appendDialog(sb, peer, peerId, msg).toString();
 							
-							if (chatsList != null && chatsList.ids.contains(peerId)) {
-								Vector ids = chatsList.ids;
-								int idx = ids.indexOf(peerId);
-								ids.removeElementAt(idx);
-								chatsList.delete(idx);
-								ids.insertElementAt(peerId, 0);
-								chatsList.insert(null, 0, sb.insert(0, '\n').insert(0, getName(peer, false)).toString(), peerId);
-							}
+							// TODO fix pinned messages sorting
+//							if (chatsList != null && chatsList.ids.contains(peerId)) {
+//								Vector ids = chatsList.ids;
+//								int idx = ids.indexOf(peerId);
+//								ids.removeElementAt(idx);
+//								chatsList.delete(idx);
+//								ids.insertElementAt(peerId, 0);
+//								chatsList.insert(null, 0, sb.insert(0, '\n').insert(0, getName(peer, false)).toString(), peerId);
+//							}
 							
 							if (msg.getBoolean("out", false)
 									|| update.getBoolean("muted", false)
@@ -1561,11 +1561,17 @@ public class MP extends MIDlet
 									continue;
 								}
 								
-								// TODO chat avatars
 								if (notifyMethod != 0) {
 									if (notifyMethod != 1) {
+										Image img = null;
+										if (imagesCache.containsKey(peerId)) {
+											img = (Image) imagesCache.get(peerId);
+										}
 										try {
-											Notifier.post(peerId, title, text, notifyMethod, null);
+											Notifier.post(peerId, title, text, notifyMethod, img);
+											if (img == null && notifyAvas) {
+												MP.queueAvatar(peerId, peerId);
+											}
 										} catch (Throwable ignored) {}
 									} else {
 										Alert alert = new Alert(title);
@@ -3212,12 +3218,23 @@ public class MP extends MIDlet
 			return;
 		}
 		if (target instanceof Object[]) {
+			// list item
 			if (((Object[]) target)[0] instanceof List) {
 				List list = ((List) ((Object[]) target)[0]);
 				int idx = (((Integer) ((Object[]) target)[1])).intValue();
 				list.set(idx, list.getString(idx), img);
+				return;
 			}
 		}
+//#ifndef NO_NOTIFY
+		if (target instanceof String) {
+			// notification
+			try {
+				Notifier.updateImage((String) target, img);
+			} catch (Throwable ignored) {}
+			return;
+		}
+//#endif
 	}
 	
 	static void queueImage(Object src, Object target) {

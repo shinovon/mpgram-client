@@ -30,6 +30,8 @@ import org.pigler.api.PiglerAPI;
 import com.nokia.mid.ui.SoftNotification;
 import com.nokia.mid.ui.SoftNotificationListener;
 
+// TODO: rewrite this mess
+
 public class Notifier implements SoftNotificationListener {
 
 	private static Image icon;
@@ -59,7 +61,6 @@ public class Notifier implements SoftNotificationListener {
 			} catch (Throwable ignored) {}
 			return true;
 		} catch (Throwable e) {
-			e.printStackTrace();
 			return false;
 		}
 	}
@@ -104,7 +105,7 @@ public class Notifier implements SoftNotificationListener {
 					} catch (Exception e) {
 						if (piglerIds.size() == 0) throw e;
 					
-						// most likely an overflow, try resetting old ids
+						// most likely an overflow, try reusing old ids
 						id = ((Integer) piglerIds.keys().nextElement()).intValue();
 					}
 				}
@@ -144,9 +145,7 @@ public class Notifier implements SoftNotificationListener {
 				nokiaIds.put(new Integer(id), peerId);
 				return true;
 			}
-		} catch (Throwable ignored) {
-			ignored.printStackTrace();
-		}
+		} catch (Throwable ignored) {}
 		return false;
 	}
 
@@ -165,20 +164,34 @@ public class Notifier implements SoftNotificationListener {
 			}
 		}
 		
-		if (piglerApi == null) return;
+		if (piglerApi == null || !piglerIds.contains(peerId))
+			return;
 		
-		if (piglerIds.contains(peerId)) {
-			for (Enumeration keys = piglerIds.keys(); keys.hasMoreElements(); ) {
-				Object key = keys.nextElement();
-				if (!peerId.equals(piglerIds.get(key))) continue;
-				
-				int id = ((Integer) key).intValue();
-				try {
-					((PiglerAPI) piglerApi).removeNotification(id);
-				} catch (Throwable ignored) {}
-				piglerIds.remove(key);
-				break;
-			}
+		for (Enumeration keys = piglerIds.keys(); keys.hasMoreElements(); ) {
+			Object key = keys.nextElement();
+			if (!peerId.equals(piglerIds.get(key))) continue;
+			
+			int id = ((Integer) key).intValue();
+			try {
+				((PiglerAPI) piglerApi).removeNotification(id);
+			} catch (Throwable ignored) {}
+			piglerIds.remove(key);
+			break;
+		}
+	}
+	
+	public static void updateImage(String peerId, Image image) {
+		if (piglerApi == null || !piglerIds.contains(peerId))
+			return;
+		
+		for (Enumeration keys = piglerIds.keys(); keys.hasMoreElements(); ) {
+			Object key = keys.nextElement();
+			if (!peerId.equals(piglerIds.get(key))) continue;
+			
+			try {
+				((PiglerAPI) piglerApi).updateNotification(((Integer) key).intValue(), image);
+			} catch (Exception ignored) {}
+			break;
 		}
 	}
 	
