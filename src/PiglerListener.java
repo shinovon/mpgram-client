@@ -29,6 +29,7 @@ public class PiglerListener implements IPiglerTapHandler {
 		if (peerId == null) return;
 		
 		Notifier.remove(peerId);
+		MP.notificationMessages.remove(peerId);
 		MP.openChat(peerId, 0);
 	}
 

@@ -66,8 +66,6 @@ public class Notifier implements SoftNotificationListener {
 	}
 	
 	public static boolean post(String peerId, String peer, String text, int mode, Image image) {
-		if (image == null) image = icon;
-		
 		int id = 0;
 		try {
 			if (piglerApi != null) {
@@ -99,7 +97,7 @@ public class Notifier implements SoftNotificationListener {
 				
 				if (id == 0) {
 					try {
-						id = ((PiglerAPI) piglerApi).createNotification(peer, text, image, true);
+						id = ((PiglerAPI) piglerApi).createNotification(peer, text, image == null && !MP.notifyAvas ? icon : image, true);
 						piglerIds.put(new Integer(id), peerId);
 						return true;
 					} catch (Exception e) {
@@ -107,9 +105,14 @@ public class Notifier implements SoftNotificationListener {
 					
 						// most likely an overflow, try reusing old ids
 						id = ((Integer) piglerIds.keys().nextElement()).intValue();
+						if (image == null) image = icon;
 					}
 				}
-				((PiglerAPI) piglerApi).updateNotification(id, peer, text, image);
+				if (image == null) {
+					((PiglerAPI) piglerApi).updateNotification(id, peer, text);
+				} else {
+					((PiglerAPI) piglerApi).updateNotification(id, peer, text, image);
+				}
 				piglerIds.put(new Integer(id), peerId);
 				return true;
 			} else if (mode == 2) {

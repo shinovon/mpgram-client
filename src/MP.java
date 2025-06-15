@@ -1564,12 +1564,12 @@ public class MP extends MIDlet
 								if (notifyMethod != 0) {
 									if (notifyMethod != 1) {
 										Image img = null;
-										if (imagesCache.containsKey(peerId)) {
+										if (count == 0 && imagesCache.containsKey(peerId)) {
 											img = (Image) imagesCache.get(peerId);
 										}
 										try {
 											Notifier.post(peerId, title, text, notifyMethod, img);
-											if (img == null && notifyAvas) {
+											if (img == null && count == 0 && notifyAvas) {
 												MP.queueAvatar(peerId, peerId);
 											}
 										} catch (Throwable ignored) {}
