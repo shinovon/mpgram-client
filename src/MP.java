@@ -1548,7 +1548,7 @@ public class MP extends MIDlet
 								sb.setLength(0);
 								sb.append(getName(peerId, false));
 								int count = msg.getInt("count", 0);
-								if (count != 0) {
+								if (count > 1) {
 									sb.append(" +").append(count);
 								}
 								String title = sb.toString();
@@ -1564,12 +1564,12 @@ public class MP extends MIDlet
 								if (notifyMethod != 0) {
 									if (notifyMethod != 1) {
 										Image img = null;
-										if (count == 0 && imagesCache.containsKey(peerId)) {
+										if (count <= 1 && imagesCache.containsKey(peerId)) {
 											img = (Image) imagesCache.get(peerId);
 										}
 										try {
 											Notifier.post(peerId, title, text, notifyMethod, img);
-											if (img == null && count == 0 && notifyAvas) {
+											if (img == null && count <= 1 && notifyAvas) {
 												MP.queueAvatar(peerId, peerId);
 											}
 										} catch (Throwable ignored) {}
