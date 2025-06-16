@@ -5124,6 +5124,8 @@ public class MP extends MIDlet
 
 	public static Object parseJSON(String str) {
 		char first = str.charAt(0);
+		if (first <= ' ')
+			first = (str = str.trim()).charAt(0);
 		int length;
 		char last = str.charAt(length = str.length() - 1);
 		if (last <= ' ')
