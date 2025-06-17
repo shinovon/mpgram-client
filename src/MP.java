@@ -522,10 +522,13 @@ public class MP extends MIDlet
 			systemName = "Symbian";
 		}
 		
+		boolean s40 = false;
+		
 		// check media capabilities
 		try {
 			// s40 check
 			Class.forName("com.nokia.mid.impl.isa.jam.Jam");
+			s40 = true;
 			systemName = "Series 40";
 			try {
 				Class.forName("com.sun.mmedia.protocol.CommonDS");
@@ -617,8 +620,10 @@ public class MP extends MIDlet
 //#ifndef NO_NOTIFY
 		notifyMethod = checkClass("org.pigler.api.PiglerAPI") ? 3 :
 			// softnotification is stubbed in s40
-			checkClass("com.nokia.mid.ui.SoftNotification") && !checkClass("com.nokia.mid.impl.isa.jam.Jam") ? 2 : 1;
+			checkClass("com.nokia.mid.ui.SoftNotification") && !s40 ? 2 : 1;
 //#endif
+		
+		reopenChat = s40;
 		
 		// load settings
 		try {
@@ -1323,6 +1328,7 @@ public class MP extends MIDlet
 					try {
 						Thread.sleep(updatesDelay);
 						if (!form.update || updatesThread != thread) break;
+						if (!form.isShown()) continue;
 						if (check) {
 							sb.setLength(0);
 							sb.append("getLastUpdate&peer=").append(form.id);
@@ -1421,7 +1427,7 @@ public class MP extends MIDlet
 //#endif
 				while (keepAlive || notifications) {
 					Thread.sleep(wasShown ? pushInterval : pushBgInterval);
-					if (threadConnections.size() != 0) continue;
+					if (threadConnections.size() != 0 || (playerState == 1 && reopenChat)) continue;
 					
 					// update status
 					if (keepAlive) {
@@ -3751,7 +3757,12 @@ public class MP extends MIDlet
 		
 		if (d != playerForm) {
 			if (playerState != 0) {
-				d.addCommand(playerCmd);
+				if (playerState == 1 && reopenChat) {
+					closePlayer();
+					d.removeCommand(playerCmd);
+				} else {
+					d.addCommand(playerCmd);
+				}
 			} else {
 				d.removeCommand(playerCmd);
 			}
