@@ -1410,8 +1410,13 @@ public class MP extends MIDlet
 		}
 		case RUN_SET_TYPING: {
 			try {
+				String peer = writeTo;
+				if (current instanceof ChatForm) {
+					peer = ((ChatForm) current).id;
+				}
+				if (peer == null) return;
 				api("setTyping&action=" + (param == null ? "Typing" : (String) param)
-						+ "&peer=" + writeTo);
+						+ "&peer=" + peer);
 			} catch (Exception ignored) {}
 			break;
 		}
