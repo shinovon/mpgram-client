@@ -2692,6 +2692,7 @@ public class MP extends MIDlet
 				if (form == null || i == -1) return;
 				JSONObject topic = form.topics.getObject(i);
 				form.reset();
+				// TODO unread offset
 				form.topMsgId = topic.getInt("id");
 				openLoad(form);
 				
