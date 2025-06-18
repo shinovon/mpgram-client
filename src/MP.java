@@ -2694,6 +2694,7 @@ public class MP extends MIDlet
 				form.reset();
 				// TODO unread offset
 				form.topMsgId = topic.getInt("id");
+				form.canWrite = !topic.getBoolean("closed", false);
 				openLoad(form);
 				
 				return;
