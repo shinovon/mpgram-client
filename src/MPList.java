@@ -52,6 +52,7 @@ public abstract class MPList extends List implements LangConstants {
 			
 			loadInternal(thread);
 			finished = true;
+			if (this.thread != thread) return;
 			if (MP.useLoadingForm && MP.current == this) {
 				MP.display(this);
 			}

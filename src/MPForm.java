@@ -55,6 +55,7 @@ public abstract class MPForm extends Form implements LangConstants {
 			
 			loadInternal(thread);
 			finished = true;
+			if (this.thread != thread) return;
 			if (MP.useLoadingForm && MP.current == this) {
 				MP.display(this);
 			}
@@ -62,9 +63,7 @@ public abstract class MPForm extends Form implements LangConstants {
 				MP.display.setCurrentItem(focusOnFinish);
 				focusOnFinish = null;
 			}
-			if (this.thread == thread) {
-				postLoad(true);
-			}
+			postLoad(true);
 			return;
 		} catch (InterruptedException e) {
 		} catch (InterruptedIOException e) {

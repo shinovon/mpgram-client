@@ -131,7 +131,8 @@ public class ChatForm extends MPForm implements Runnable {
 		// TODO forum
 		deleteAll();
 		
-		if (query == null && mediaFilter == null && MP.chatUpdates
+		if ((MP.reopenChat || (query == null && mediaFilter == null))
+				&& MP.chatUpdates
 				&& (MP.updatesThread != null || MP.updatesRunning)) {
 			MP.display(MP.loadingAlert(MP.L[WaitingForPrevChat]), this);
 			
@@ -360,7 +361,7 @@ public class ChatForm extends MPForm implements Runnable {
 				&& query == null && mediaFilter == null
 				&& MP.chatUpdates && !update
 				// TODO remove this when support for top_msg_id will be added
-				&& postId == null)
+				&& topMsgId == 0)
 		{
 			// start updater thread
 			update = true;
