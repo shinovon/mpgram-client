@@ -93,21 +93,13 @@ public class ChatForm extends MPForm implements Runnable {
 	
 	public ChatForm(String id, String query, int message, int topMsg) {
 		super(id);
-		addCommand(MP.latestCmd);
 		addCommand(MP.chatInfoCmd);
 //		addCommand(MP.searchCmd);
 		this.id = id;
 		this.query = query;
 		this.messageId = message;
 		this.topMsgId = topMsg;
-		
-		if (MP.chatField && query == null) {
-			setItemStateListener(MP.midlet);
-			textField = new TextField("", "", 500, TextField.ANY);
-			textField.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-			textField.addCommand(MP.sendCmd);
-			textField.setItemCommandListener(MP.midlet);
-		}
+		init(query == null);
 	}
 	
 	// create in media mode
@@ -116,7 +108,7 @@ public class ChatForm extends MPForm implements Runnable {
 		this.id = id;
 		if (mediaFilter == null) mediaFilter = "Photos";
 		this.mediaFilter = mediaFilter;
-		addCommand(MP.latestCmd);
+		init(false);
 	}
 	
 	// post discussion
@@ -126,7 +118,19 @@ public class ChatForm extends MPForm implements Runnable {
 		this.postPeer = postPeer;
 		this.postId = postId;
 		this.messageId = readMaxId;
+		init(true);
+	}
+	
+	private void init(boolean field) {
 		addCommand(MP.latestCmd);
+		
+		if (MP.chatField && field) {
+			setItemStateListener(MP.midlet);
+			textField = new TextField("", "", 500, TextField.ANY);
+			textField.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+			textField.addCommand(MP.sendCmd);
+			textField.setItemCommandListener(MP.midlet);
+		}
 	}
 
 	void loadInternal(Thread thread) throws Exception {
