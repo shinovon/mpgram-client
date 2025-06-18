@@ -2686,6 +2686,17 @@ public class MP extends MIDlet
 				startPlayer(playlist.getObject(playlistIndex = ((List) d).getSelectedIndex()));
 				return;
 			}
+			if (d instanceof ChatTopicsList) {
+				ChatForm form = ((ChatTopicsList) d).chatForm;
+				int i = ((List) d).getSelectedIndex();
+				if (form == null || i == -1) return;
+				JSONObject topic = form.topics.getObject(i);
+				form.reset();
+				form.topMsgId = topic.getInt("id");
+				openLoad(form);
+				
+				return;
+			}
 //#ifndef NO_FILE
 			// file picker
 			int i = ((List) d).getSelectedIndex();

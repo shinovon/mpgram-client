@@ -29,7 +29,6 @@ import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.ImageItem;
 import javax.microedition.lcdui.Item;
-import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.Spacer;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
@@ -89,7 +88,8 @@ public class ChatForm extends MPForm implements Runnable {
 	
 	// discussion
 	String postPeer, postId;
-	List topicsList;
+	ChatTopicsList topicsList;
+	JSONArray topics;
 	
 	public ChatForm(String id, String query, int message, int topMsg) {
 		super(id);
@@ -130,7 +130,6 @@ public class ChatForm extends MPForm implements Runnable {
 	}
 
 	void loadInternal(Thread thread) throws Exception {
-		// TODO forum
 		deleteAll();
 		
 		if ((MP.reopenChat || (query == null && mediaFilter == null))
@@ -180,7 +179,7 @@ public class ChatForm extends MPForm implements Runnable {
 
 			if (mediaFilter == null) {
 				canWrite = !broadcast;
-				JSONObject info = (JSONObject) MP.api((messageId == -1 ? "getFullInfo&id=" : "getInfo&id=").concat(id));
+				JSONObject info = (JSONObject) MP.api((messageId == -1 && !forum ? "getFullInfo&id=" : "getInfo&id=").concat(id));
 				if (id.charAt(0) == '-') {
 					JSONObject chat = info.getObject("Chat");
 					if (chat.has("admin_rights")) {
@@ -191,7 +190,26 @@ public class ChatForm extends MPForm implements Runnable {
 						canPin = adminRights.getBoolean("pin_messages", false);
 					}
 					
-					// TODO: check for forum here
+					if (forum && topMsgId == 0) {
+						ChatTopicsList list = new ChatTopicsList(this, title);
+						
+						JSONArray topics = ((JSONObject) MP.api("getForumTopics&peer=".concat(id))).getArray("res");
+						int l = topics.size();
+						for (int i = 0; i < l; i++) {
+							JSONObject topic = topics.getObject(i);
+							// TODO
+							list.append(topic.getString("title", "General"), null);
+						}
+						
+						if (thread != this.thread) throw MP.cancelException;
+						MP.deleteFromHistory(this);
+						MP.display(list);
+						
+						this.topics = topics;
+						this.topicsList = list;
+						infoLoaded = true;
+						return;
+					}
 				} else {
 					canPin = true;
 					if (MP.chatStatus && info.getObject("User").has("status")) {
@@ -208,16 +226,17 @@ public class ChatForm extends MPForm implements Runnable {
 						dir = 1;
 					}
 				}
-			
-				if (left) {
-					addCommand(MP.joinChatCmd);
-				} else if (canWrite) {
-					addCommand(MP.writeCmd);
-					addCommand(MP.sendStickerCmd);
-				}
 			}
 			infoLoaded = true;
 		}
+		
+		if (left) {
+			addCommand(MP.joinChatCmd);
+		} else if (canWrite) {
+			addCommand(MP.writeCmd);
+			addCommand(MP.sendStickerCmd);
+		}
+		
 		setTitle(title);
 		
 		boolean selfChat = MP.selfId.equals(id);
