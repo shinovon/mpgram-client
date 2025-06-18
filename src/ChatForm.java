@@ -29,6 +29,7 @@ import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.ImageItem;
 import javax.microedition.lcdui.Item;
+import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.Spacer;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
@@ -88,6 +89,7 @@ public class ChatForm extends MPForm implements Runnable {
 	
 	// discussion
 	String postPeer, postId;
+	List topicsList;
 	
 	public ChatForm(String id, String query, int message, int topMsg) {
 		super(id);
@@ -188,6 +190,8 @@ public class ChatForm extends MPForm implements Runnable {
 						canBan = !broadcast && adminRights.getBoolean("ban_users", false);
 						canPin = adminRights.getBoolean("pin_messages", false);
 					}
+					
+					// TODO: check for forum here
 				} else {
 					canPin = true;
 					if (MP.chatStatus && info.getObject("User").has("status")) {
@@ -359,9 +363,7 @@ public class ChatForm extends MPForm implements Runnable {
 			return;
 		if (endReached && !hasOffset
 				&& query == null && mediaFilter == null
-				&& MP.chatUpdates && !update
-				// TODO remove this when support for top_msg_id will be added
-				&& topMsgId == 0)
+				&& MP.chatUpdates && !update)
 		{
 			// start updater thread
 			update = true;
@@ -1033,8 +1035,6 @@ public class ChatForm extends MPForm implements Runnable {
 			
 			typing = 0;
 			typingThread.interrupt();
-			
-			if (topMsgId != 0) break;
 			
 			// delete old messages
 			while (loadedMsgs.size() >= limit) {

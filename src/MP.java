@@ -1349,11 +1349,13 @@ public class MP extends MIDlet
 						}
 						if (!form.update || updatesThread != thread) break;
 						
-						// TODO top_msg_id
 						sb.setLength(0);
 						sb.append("updates&media=1&read=1&peer=").append(form.id)
 						.append("&offset=").append(offset)
 						.append("&timeout=").append(updatesTimeout);
+						if (form.topMsgId != 0) {
+							sb.append("&top_msg=").append(form.topMsgId);
+						}
 						
 						synchronized (updatesLock) {
 							j = (JSONObject) api(sb.toString());
