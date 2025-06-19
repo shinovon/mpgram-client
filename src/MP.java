@@ -1879,7 +1879,7 @@ public class MP extends MIDlet
 	public void commandAction(Command c, Displayable d) {
 		if (d instanceof ChatsList) { // chats list commands
 			if (c == archiveCmd) {
-				chatsList.changeFolder(1, L[Archive]);
+				((ChatsList) d).changeFolder(1, L[Archive]);
 				return;
 			}
 			if (c == foldersCmd) {
@@ -1897,11 +1897,11 @@ public class MP extends MIDlet
 				return;
 			}
 			if (c == nextPageCmd) {
-				chatsList.paginate(1);
+				((ChatsList) d).paginate(1);
 				return;
 			}
 			if (c == prevPageCmd) {
-				chatsList.paginate(-1);
+				((ChatsList) d).paginate(-1);
 				return;
 			}
 			if (c == openLinkCmd) {
