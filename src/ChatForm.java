@@ -103,11 +103,12 @@ public class ChatForm extends MPForm implements Runnable {
 	}
 	
 	// create in media mode
-	public ChatForm(String id, String mediaFilter) {
+	public ChatForm(String id, String mediaFilter, int topMsg) {
 		super(id);
 		this.id = id;
 		if (mediaFilter == null) mediaFilter = "Photos";
 		this.mediaFilter = mediaFilter;
+		this.topMsgId = topMsg;
 		init(false);
 	}
 	

@@ -1982,7 +1982,7 @@ public class MP extends MIDlet
 				return;
 			}
 			
-			ChatForm form = new ChatForm(((ChatInfoForm) current).id, ((TextBox) d).getString(), 0, 0);
+			ChatForm form = new ChatForm(((ChatInfoForm) current).id, ((TextBox) d).getString(), 0, ((ChatInfoForm) current).chatForm.topMsgId);
 			form.parent = ((ChatInfoForm) current).chatForm;
 			openLoad(form);
 			return;
@@ -2025,19 +2025,19 @@ public class MP extends MIDlet
 				return;
 			}
 			if (c == chatPhotosCmd) {
-				openLoad(new ChatForm(((ChatInfoForm) current).id, "Photos"));
+				openLoad(new ChatForm(((ChatInfoForm) current).id, "Photos", ((ChatInfoForm) current).chatForm.topMsgId));
 				return;
 			}
 			if (c == chatVideosCmd) {
-				openLoad(new ChatForm(((ChatInfoForm) current).id, "Video"));
+				openLoad(new ChatForm(((ChatInfoForm) current).id, "Video", ((ChatInfoForm) current).chatForm.topMsgId));
 				return;
 			}
 			if (c == chatFilesCmd) {
-				openLoad(new ChatForm(((ChatInfoForm) current).id, "Document"));
+				openLoad(new ChatForm(((ChatInfoForm) current).id, "Document", ((ChatInfoForm) current).chatForm.topMsgId));
 				return;
 			}
 			if (c == chatMusicCmd) {
-				openLoad(new ChatForm(((ChatInfoForm) current).id, "Music"));
+				openLoad(new ChatForm(((ChatInfoForm) current).id, "Music", ((ChatInfoForm) current).chatForm.topMsgId));
 				return;
 			}
 			if (c == gotoPinnedMsgCmd) {
@@ -2055,6 +2055,13 @@ public class MP extends MIDlet
 						"getParticipants&peer=" + ((ChatInfoForm) current).id + "&fields=status",
 						null,
 						((ChatInfoForm) d).id, ((ChatInfoForm) d).canBan));
+				return;
+			}
+		}
+		if (d instanceof ChatTopicsList) {
+			if (c == chatInfoCmd) {
+				ChatForm f = ((ChatTopicsList) d).chatForm;
+				openProfile(f.id, /* f */ null, 0);
 				return;
 			}
 		}
@@ -2698,6 +2705,7 @@ public class MP extends MIDlet
 				// TODO unread offset
 				form.topMsgId = topic.getInt("id");
 				form.canWrite = !topic.getBoolean("closed", false);
+				form.setTitle(form.title = topic.getString("title", ""));
 				openLoad(form);
 				
 				return;

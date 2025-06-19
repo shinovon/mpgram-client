@@ -71,24 +71,32 @@ public class ChatInfoForm extends MPForm {
 		} else {
 			name = getTitle();
 		}
+		
 		boolean isUser = id.charAt(0) != '-';
-		
-		if (MP.loadAvatars) {
-			ImageItem img = new ImageItem("", null, 0, "");
-			try {
-				img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-			} catch (Exception ignored) {}
-			MP.queueAvatar(id, img);
-			append(img);
-		}
-		
+		boolean topic = mode == 0 && chatForm != null && chatForm.forum;
 		StringItem s;
 		
-		if (name != null) {
-			s = new StringItem(null, name);
+		if (topic) {
+			s = new StringItem(null, chatForm.getTitle());
 			s.setFont(MP.medPlainFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			append(s);
+		} else {
+			if (MP.loadAvatars) {
+				ImageItem img = new ImageItem("", null, 0, "");
+				try {
+					img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+				} catch (Exception ignored) {}
+				MP.queueAvatar(id, img);
+				append(img);
+			}
+			
+			if (name != null) {
+				s = new StringItem(null, name);
+				s.setFont(MP.medPlainFont);
+				s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+				append(s);
+			}
 		}
 		
 		JSONObject full = null;
@@ -97,7 +105,7 @@ public class ChatInfoForm extends MPForm {
 			full = fullInfo.getObject("full");
 			rawPeer = fullInfo.getObject(isUser ? "User" : "Chat");
 			
-			setTitle(MP.L[isUser ? UserInfo : broadcast ? ChannelInfo : GroupInfo]);
+			setTitle(MP.L[isUser ? UserInfo : broadcast ? ChannelInfo : topic ? TopicInfo : GroupInfo]);
 		}
 		
 		if (isUser) {
@@ -166,16 +174,21 @@ public class ChatInfoForm extends MPForm {
 					append(s);
 				}
 				
-				if (full.has("about")) {
-					s = new StringItem(MP.L[About_Chat], full.getString("about"));
-					s.setFont(MP.medPlainFont);
-					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					s.setItemCommandListener(MP.midlet);
-					append(s);
+				if (topic) {
+					// TODO
+				} else {
+					if (full.has("about")) {
+						s = new StringItem(MP.L[About_Chat], full.getString("about"));
+						s.setFont(MP.medPlainFont);
+						s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						s.setItemCommandListener(MP.midlet);
+						append(s);
+					}
 				}
 				
 				if (rawPeer.has("username")) {
-					s = new StringItem(MP.L[Link], "t.me/".concat(rawPeer.getString("username")));
+					String t = "t.me/".concat(rawPeer.getString("username"));
+					s = new StringItem(MP.L[Link], topic ? t.concat("/").concat(Integer.toString(chatForm.topMsgId)) : t);
 					s.setFont(MP.medPlainFont);
 					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					s.setItemCommandListener(MP.midlet);
@@ -193,7 +206,7 @@ public class ChatInfoForm extends MPForm {
 			}
 		}
 		
-		if (full.has("pinned_msg_id")) {
+		if (!topic && full.has("pinned_msg_id")) {
 			this.pinnedMessageId = full.getInt("pinned_msg_id");
 			
 			s = new StringItem(null, MP.L[GoToPinnedMessage]);
@@ -237,7 +250,7 @@ public class ChatInfoForm extends MPForm {
 			append(s);
 		}
 		
-		if (!isUser) {
+		if (!isUser && !topic) {
 			boolean left = rawPeer.getBoolean("left", false);
 			s = new StringItem(null, left ? MP.L[JoinGroup] : MP.L[LeaveGroup], Item.BUTTON);
 			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);

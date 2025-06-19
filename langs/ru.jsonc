@@ -345,6 +345,7 @@
 	"UserInfo": "Пользователь",
 	"GroupInfo": "Группа",
 	"ChannelInfo": "Канал",
+	"TopicInfo": "Topic Info", // Untranslated
 	
 	"_member": " участник",
 	"_members": " участника",

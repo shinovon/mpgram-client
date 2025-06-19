@@ -342,9 +342,10 @@
 	"Owner": "owner",
 	"Admin": "admin",
 	"Bot": "bot",
-	"UserInfo": "User info",
-	"GroupInfo": "Group info",
-	"ChannelInfo": "Channel info",
+	"UserInfo": "User Info",
+	"GroupInfo": "Group Info",
+	"ChannelInfo": "Channel Info",
+	"TopicInfo": "Topic Info",
 	
 	"_member": " member",
 	"_members": " members",
