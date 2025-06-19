@@ -37,6 +37,7 @@ public class ChatsList extends MPList {
 	boolean noAvas;
 	boolean canBan;
 	String peerId, msgId;
+	int pinnedCount;
 
 	// main mode
 	public ChatsList(String title, int folder) {
@@ -79,6 +80,7 @@ public class ChatsList extends MPList {
 	void loadInternal(Thread thread) throws Exception {
 		deleteAll();
 		ids = new Vector();
+		pinnedCount = 0;
 		
 		StringBuffer sb = new StringBuffer(url != null ? url : "getDialogs");
 		if (limit != 0) {
@@ -166,6 +168,9 @@ public class ChatsList extends MPList {
 			JSONObject dialog = dialogs.getObject(i);
 			String id = dialog.getString("id");
 			ids.addElement(id);
+			
+			if (dialog.getBoolean("pin", false))
+				++pinnedCount;
 
 			sb.setLength(0);
 			JSONObject peer = MP.getPeer(id, false);

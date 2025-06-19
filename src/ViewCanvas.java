@@ -137,7 +137,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 				if (error) {
 					g.setGrayScale(0);
 					g.fillRect(0, 0, w, h);
-					info = MP.L[FailedToLoadImage]; // TODO unlocalized
+					info = MP.L[FailedToLoadImage];
 				} else {
 					info = MP.L[Loading];
 				}

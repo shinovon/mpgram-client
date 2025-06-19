@@ -221,7 +221,7 @@ public class MP extends MIDlet
 	static boolean muteUsers, muteChats, muteBroadcasts;
 	static boolean notifySound = true;
 	static int notifyMethod = 1; // 0: off, 1: alert, 2: nokiaui, 3: pigler api
-//	static boolean updateChatsList;
+	static boolean updateChatsList;
 	static boolean notifyAvas = true;
 //#endif
 	
@@ -1432,9 +1432,10 @@ public class MP extends MIDlet
 				int offset = 0;
 				boolean check = true;
 //#endif
-				while (keepAlive || notifications) {
+				while (keepAlive || notifications || updateChatsList) {
 					Thread.sleep(wasShown ? pushInterval : pushBgInterval);
-					if (threadConnections.size() != 0 || (playerState == 1 && reopenChat)) continue;
+					if (threadConnections.size() != 0 || (playerState == 1 && reopenChat))
+						continue;
 					
 					// update status
 					if (keepAlive) {
@@ -1450,7 +1451,8 @@ public class MP extends MIDlet
 
 //#ifndef NO_NOTIFY
 					// get notifications
-					if (!notifications) continue;
+					if (!notifications && (!updateChatsList || !chatsList.isShown()))
+						continue;
 					try {
 						if (check) {
 							try {
@@ -1481,9 +1483,9 @@ public class MP extends MIDlet
 						.append("&mute_broadcasts=").append(muteBroadcasts ? '1' : '0')
 						;
 						
-//						if (updateChatsList) {
-//							sb.append("&include_muted=1");
-//						}
+						if (updateChatsList) {
+							sb.append("&include_muted=1");
+						}
 
 						synchronized (updatesLock) {
 							j = (JSONObject) api(sb.toString());
@@ -1513,15 +1515,16 @@ public class MP extends MIDlet
 							JSONObject peer = getPeer(peerId, true);
 							String text = appendDialog(sb, peer, peerId, msg).toString();
 							
-							// TODO fix pinned messages sorting
-//							if (chatsList != null && chatsList.ids.contains(peerId)) {
-//								Vector ids = chatsList.ids;
-//								int idx = ids.indexOf(peerId);
-//								ids.removeElementAt(idx);
-//								chatsList.delete(idx);
-//								ids.insertElementAt(peerId, 0);
-//								chatsList.insert(null, 0, sb.insert(0, '\n').insert(0, getName(peer, false)).toString(), peerId);
-//							}
+							if (chatsList != null && chatsList.ids.contains(peerId)) {
+								Vector ids = chatsList.ids;
+								int idx = ids.indexOf(peerId);
+								ids.removeElementAt(idx);
+								chatsList.delete(idx);
+								ids.insertElementAt(peerId, 0);
+								
+								chatsList.insert(null, Math.min(chatsList.size(), idx < chatsList.pinnedCount ? 0 : chatsList.pinnedCount),
+										sb.insert(0, '\n').insert(0, getName(peer, false)).toString(), peerId);
+							}
 							
 							if (msg.getBoolean("out", false)
 									|| update.getBoolean("muted", false)
