@@ -916,7 +916,8 @@ public class MP extends MIDlet
 					writeAuth();
 				}
 				
-				start(RUN_KEEP_ALIVE, null);
+				if (keepAlive || notifications || updateChatsList)
+					start(RUN_KEEP_ALIVE, null);
 				break;
 			} catch (APIException e) {
 				if (e.code == 401) {
