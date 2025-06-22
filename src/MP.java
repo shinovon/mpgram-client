@@ -221,9 +221,9 @@ public class MP extends MIDlet
 	static boolean muteUsers, muteChats, muteBroadcasts;
 	static boolean notifySound = true;
 	static int notifyMethod = 1; // 0: off, 1: alert, 2: nokiaui, 3: pigler api
-	static boolean updateChatsList;
 	static boolean notifyAvas = true;
 //#endif
+	static boolean updateChatsList;
 	
 	// platform
 	static boolean symbianJrt;
@@ -1431,8 +1431,10 @@ public class MP extends MIDlet
 				
 				int offset = 0;
 				boolean check = true;
-//#endif
 				while (keepAlive || notifications || updateChatsList) {
+//#else
+//#				while (keepAlive) {
+//#endif
 					Thread.sleep(wasShown ? pushInterval : pushBgInterval);
 					if (threadConnections.size() != 0 || (playerState == 1 && reopenChat))
 						continue;
