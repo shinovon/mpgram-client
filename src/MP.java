@@ -1337,9 +1337,7 @@ public class MP extends MIDlet
 								sb.append("&id=").append(form.firstMsgId);
 							}
 							try {
-								synchronized (updatesLock) {
-									j = ((JSONObject) api(sb.toString())).getObject("res");
-								}
+								j = ((JSONObject) api(sb.toString())).getObject("res");
 								int off = j.getInt("update_id");
 								if (!j.getBoolean("exact", false))
 									off -= 1;
@@ -1358,9 +1356,7 @@ public class MP extends MIDlet
 							sb.append("&top_msg=").append(form.topMsgId);
 						}
 						
-						synchronized (updatesLock) {
-							j = (JSONObject) api(sb.toString());
-						}
+						j = (JSONObject) api(sb.toString());
 						
 						JSONArray updates = j.getArray("res");
 						int l = updates.size();
@@ -1456,12 +1452,14 @@ public class MP extends MIDlet
 					// get notifications
 					if (!notifications && (!updateChatsList || !chatsList.isShown()))
 						continue;
+					if (updatesThread != null) {
+						check = true;
+						continue;
+					}
 					try {
 						if (check) {
 							try {
-								synchronized (updatesLock) {
-									j = ((JSONObject) api("getLastUpdate")).getObject("res");
-								}
+								j = ((JSONObject) api("getLastUpdate")).getObject("res");
 								int off = j.getInt("update_id");
 								if (!j.getBoolean("exact", false))
 									off -= 1;
@@ -1490,9 +1488,7 @@ public class MP extends MIDlet
 							sb.append("&include_muted=1");
 						}
 
-						synchronized (updatesLock) {
-							j = (JSONObject) api(sb.toString());
-						}
+						j = (JSONObject) api(sb.toString());
 						
 						JSONArray updates = j.getArray("res");
 						int l = updates.size();
