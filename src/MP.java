@@ -1284,7 +1284,7 @@ public class MP extends MIDlet
 		case RUN_JOIN_CHANNEL: 
 		case RUN_LEAVE_CHANNEL: {
 			try {
-				MP.api((run == RUN_JOIN_CHANNEL ? "join" : "leave").concat("channel&id=").concat((String) param));
+				MP.api((run == RUN_JOIN_CHANNEL ? "join" : "leave").concat("Channel&id=").concat((String) param));
 				
 				if (run == RUN_JOIN_CHANNEL) {
 					commandAction(backCmd, current);
