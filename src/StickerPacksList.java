@@ -22,9 +22,9 @@ SOFTWARE.
 public class StickerPacksList extends MPList {
 	
 	JSONArray sets;
-	ChatForm chatForm;
+	ChatInterface chatForm;
 
-	public StickerPacksList(ChatForm form) {
+	public StickerPacksList(ChatInterface form) {
 		super(MP.L[Stickers_Title]);
 		this.chatForm = form;
 		addCommand(MP.backCmd);

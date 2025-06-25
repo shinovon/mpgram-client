@@ -1230,13 +1230,13 @@ public class MP extends MIDlet
 //#endif
 				
 				// go back to chat screen
-				if (!(current instanceof ChatForm)) {
+				if (!(current instanceof ChatInterface)) {
 					commandAction(backCmd, current);
-				} else if (((ChatForm) current).textField != null) {
-					((ChatForm) current).textField.setString("");
+				} else {
+					((ChatInterface) current).sent();
 				}
 				
-				if (reopenChat || !((ChatForm) current).update || !((ChatForm) current).endReached) {
+				if (reopenChat || !((ChatInterface) current).update() || !((ChatInterface) current).endReached()) {
 					// load latest messages
 					commandAction(latestCmd, current);
 				} else if (display.getCurrent() != current) {
@@ -1319,22 +1319,22 @@ public class MP extends MIDlet
 			updatesRunning = true;
 			try {
 				StringBuffer sb = new StringBuffer();
-				ChatForm form = (ChatForm) param;
+				ChatInterface form = (ChatInterface) param;
 				JSONObject j;
 				
 				int offset = 0;
 				int fails = 0;
 				boolean check = true;
-				while (form.update && updatesThread == thread) {
+				while (form.update() && updatesThread == thread) {
 					try {
 						Thread.sleep(updatesDelay);
-						if (!form.update || updatesThread != thread) break;
+						if (!form.update() || updatesThread != thread) break;
 						if (!form.isShown()) continue;
 						if (check) {
 							sb.setLength(0);
-							sb.append("getLastUpdate&peer=").append(form.id);
+							sb.append("getLastUpdate&peer=").append(form.id());
 							if (offset <= 0) {
-								sb.append("&id=").append(form.firstMsgId);
+								sb.append("&id=").append(form.firstMsgId());
 							}
 							try {
 								j = ((JSONObject) api(sb.toString())).getObject("res");
@@ -1346,14 +1346,14 @@ public class MP extends MIDlet
 							} catch (Exception ignored) {}
 							check = false;
 						}
-						if (!form.update || updatesThread != thread) break;
+						if (!form.update() || updatesThread != thread) break;
 						
 						sb.setLength(0);
-						sb.append("updates&media=1&read=1&peer=").append(form.id)
+						sb.append("updates&media=1&read=1&peer=").append(form.id())
 						.append("&offset=").append(offset)
 						.append("&timeout=").append(updatesTimeout);
-						if (form.topMsgId != 0) {
-							sb.append("&top_msg=").append(form.topMsgId);
+						if (form.topMsgId() != 0) {
+							sb.append("&top_msg=").append(form.topMsgId());
 						}
 						
 						j = (JSONObject) api(sb.toString());
@@ -1367,32 +1367,32 @@ public class MP extends MIDlet
 							update = update.getObject("update");
 							String type = update.getString("_");
 							if ("updateUserStatus".equals(type)) {
-								form.handleUpdate(ChatForm.UPDATE_USER_STATUS, update);
+								form.handleUpdate(ChatInterface.UPDATE_USER_STATUS, update);
 							} else if ("updateUserTyping".equals(type)
 									|| "updateChatUserTyping".equals(type)
 									|| "updateChannelUserTyping".equals(type)) {
-								form.handleUpdate(ChatForm.UPDATE_USER_TYPING, update);
+								form.handleUpdate(ChatInterface.UPDATE_USER_TYPING, update);
 							} else if ("updateNewMessage".equals(type)
 									|| "updateNewChannelMessage".equals(type)) {
-								form.handleUpdate(ChatForm.UPDATE_NEW_MESSAGE, update);
+								form.handleUpdate(ChatInterface.UPDATE_NEW_MESSAGE, update);
 							} else if ("updateDeleteChannelMessages".equals(type)) {
-								form.handleUpdate(ChatForm.UPDATE_DELETE_MESSAGES, update);
+								form.handleUpdate(ChatInterface.UPDATE_DELETE_MESSAGES, update);
 							} else if ("updateEditMessage".equals(type)
 									|| "updateEditChannelMessage".equals(type)) {
-								form.handleUpdate(ChatForm.UPDATE_EDIT_MESSAGE, update);
+								form.handleUpdate(ChatInterface.UPDATE_EDIT_MESSAGE, update);
 							}
 						}
 						
 					} catch (Exception e) {
 						if (e.toString().indexOf("Interrupted") != -1) {
-							form.update = false;
+							form.setUpdate(false);
 							break;
 						}
 						e.printStackTrace();
 						fails++;
 						check = true;
-						if (fails >= 5 && form.update) {
-							form.update = false;
+						if (fails >= 5 && form.update()) {
+							form.setUpdate(false);
 							display(errorAlert("Updates thread died!\n".concat(e.toString())), null);
 							break;
 						}
@@ -1410,8 +1410,8 @@ public class MP extends MIDlet
 		case RUN_SET_TYPING: {
 			try {
 				String peer = writeTo;
-				if (current instanceof ChatForm) {
-					peer = ((ChatForm) current).id;
+				if (current instanceof ChatInterface) {
+					peer = ((ChatInterface) current).id();
 				}
 				if (peer == null) return;
 				api("setTyping&action=" + (param == null ? "Typing" : (String) param)
@@ -1568,7 +1568,7 @@ public class MP extends MIDlet
 								}
 								String title = sb.toString();
 								
-								if (!paused && current instanceof ChatForm && current.isShown() && peerId.equals(((ChatForm) current).id)) {
+								if (!paused && current instanceof ChatInterface && current.isShown() && peerId.equals(((ChatInterface) current).id())) {
 									try {
 										Notifier.remove(peerId);
 									} catch (Throwable ignored) {}
@@ -1629,7 +1629,7 @@ public class MP extends MIDlet
 			break;
 		}
 		case RUN_BOT_CALLBACK: {
-			ChatForm form = (ChatForm) current;
+			ChatInterface form = (ChatInterface) current;
 			Ticker ticker;
 			form.setTicker(ticker = new Ticker(MP.L[Sending]));
 			
@@ -1651,13 +1651,13 @@ public class MP extends MIDlet
 					} else throw e;
 				}
 
-				if (reopenChat || !form.update || !form.endReached) {
+				if (reopenChat || !form.update() || !form.endReached()) {
 					// see ChatForm#postLoad() for answer handling
-					form.botAnswer = j;
+					form.setBotAnswer(j);
 					commandAction(latestCmd, current);
 				} else if (display.getCurrent() != current) {
 					display(current);
-					((ChatForm) current).handleBotAnswer(j);
+					((ChatInterface) current).handleBotAnswer(j);
 				}
 			} catch (Exception e) {
 				display(errorAlert(e), current);
@@ -1694,7 +1694,7 @@ public class MP extends MIDlet
 				String[] s = (String[]) param;
 				MP.api("pinMessage&peer=".concat(s[0].concat("&id=").concat(s[1])));
 				
-				if (reopenChat || !((ChatForm) current).update || !((ChatForm) current).endReached) {
+				if (reopenChat || !((ChatInterface) current).update() || !((ChatInterface) current).endReached()) {
 					// load latest messages
 					commandAction(latestCmd, current);
 				} else if (display.getCurrent() != current) {
@@ -1710,16 +1710,16 @@ public class MP extends MIDlet
 				JSONObject s = (JSONObject) param;
 				StickerPackForm form = (StickerPackForm) current;
 				
-				StringBuffer sb = new StringBuffer("sendMedia&peer=").append(form.chatForm.id);
+				StringBuffer sb = new StringBuffer("sendMedia&peer=").append(form.chatForm.id());
 				sb.append("&doc_id=").append(s.getString("id"))
 				.append("&doc_access_hash=").append(s.getString("access_hash"));
 				
 				MP.api(sb.toString());
 				
-				goBackTo(form.chatForm);
-				if (reopenChat || !((ChatForm) current).update || !((ChatForm) current).endReached) {
+				goBackTo((Displayable) form.chatForm);
+				if (reopenChat || !((ChatInterface) current).update() || !((ChatInterface) current).endReached()) {
 					// load latest messages
-					commandAction(latestCmd, form.chatForm);
+					commandAction(latestCmd, (Displayable) form.chatForm);
 				}
 			} catch (Exception e) {
 				display(errorAlert(e), current);
@@ -1933,22 +1933,22 @@ public class MP extends MIDlet
 				return;
 			}
 		}
-		if (d instanceof ChatForm) { // chat form commands
+		if (d instanceof ChatInterface) { // chat form commands
 			if (c == latestCmd) {
-				((ChatForm) d).reset();
+				((ChatInterface) d).reset();
 				start(RUN_LOAD_FORM, d);
 				return;
 			}
 			if (c == olderMessagesCmd || c == newerMessagesCmd) {
-				((ChatForm) d).paginate(c == olderMessagesCmd ? -1 : 1);
+				((ChatInterface) d).paginate(c == olderMessagesCmd ? -1 : 1);
 				return;
 			}
 			if (c == chatInfoCmd) {
-				openProfile(((ChatForm) d).id, (ChatForm) d, 0);
+				openProfile(((ChatInterface) d).id(), (ChatInterface) d, 0);
 				return;
 			}
 			if (c == writeCmd) {
-				display(writeForm(((ChatForm) d).id, Integer.toString(((ChatForm) d).topMsgId), "", null, null, null));
+				display(writeForm(((ChatInterface) d).id(), Integer.toString(((ChatInterface) d).topMsgId()), "", null, null, null));
 				return;
 			}
 			if (c == searchMsgCmd) {
@@ -1961,29 +1961,28 @@ public class MP extends MIDlet
 				return;
 			}
 			if (c == sendStickerCmd) {
-				openLoad(new StickerPacksList((ChatForm) d));
+				openLoad(new StickerPacksList((ChatInterface) d));
 				return;
 			}
-			if (c == backCmd && ((ChatForm) d).query != null && ((ChatForm) d).switched) {
+			if (c == backCmd && ((ChatInterface) d).query() != null && ((ChatInterface) d).switched()) {
 				// close search
-				((ChatForm) current).reset();
+				((ChatInterface) current).reset();
 				start(RUN_LOAD_FORM, current);
 				return;
 			}
 		}
 		if (d instanceof TextBox && c == searchMsgCmd) {
 			commandAction(backCmd, d);
-			if (current instanceof ChatForm) {
-				((ChatForm) current).reset();
-				((ChatForm) current).query = ((TextBox) d).getString();
-				((ChatForm) current).switched = true;
+			if (current instanceof ChatInterface) {
+				((ChatInterface) current).reset();
+				((ChatInterface) current).setQuery(((TextBox) d).getString());
 				start(RUN_LOAD_FORM, current);
 				return;
 			}
 			
-			ChatForm form = new ChatForm(((ChatInfoForm) current).id, ((TextBox) d).getString(), 0, ((ChatInfoForm) current).chatForm.topMsgId);
-			form.parent = ((ChatInfoForm) current).chatForm;
-			openLoad(form);
+			ChatInterface form = new ChatForm(((ChatInfoForm) current).id, ((TextBox) d).getString(), 0, ((ChatInfoForm) current).chatForm.topMsgId());
+			form.setParent(((ChatInfoForm) current).chatForm);
+			openLoad((Displayable) form);
 			return;
 		}
 		if (d instanceof TextBox && c == searchChatsCmd) {
@@ -2024,19 +2023,19 @@ public class MP extends MIDlet
 				return;
 			}
 			if (c == chatPhotosCmd) {
-				openLoad(new ChatForm(((ChatInfoForm) current).id, "Photos", ((ChatInfoForm) current).chatForm.topMsgId));
+				openLoad(new ChatForm(((ChatInfoForm) current).id, "Photos", ((ChatInfoForm) current).chatForm.topMsgId()));
 				return;
 			}
 			if (c == chatVideosCmd) {
-				openLoad(new ChatForm(((ChatInfoForm) current).id, "Video", ((ChatInfoForm) current).chatForm.topMsgId));
+				openLoad(new ChatForm(((ChatInfoForm) current).id, "Video", ((ChatInfoForm) current).chatForm.topMsgId()));
 				return;
 			}
 			if (c == chatFilesCmd) {
-				openLoad(new ChatForm(((ChatInfoForm) current).id, "Document", ((ChatInfoForm) current).chatForm.topMsgId));
+				openLoad(new ChatForm(((ChatInfoForm) current).id, "Document", ((ChatInfoForm) current).chatForm.topMsgId()));
 				return;
 			}
 			if (c == chatMusicCmd) {
-				openLoad(new ChatForm(((ChatInfoForm) current).id, "Music", ((ChatInfoForm) current).chatForm.topMsgId));
+				openLoad(new ChatForm(((ChatInfoForm) current).id, "Music", ((ChatInfoForm) current).chatForm.topMsgId()));
 				return;
 			}
 			if (c == gotoPinnedMsgCmd) {
@@ -2059,8 +2058,8 @@ public class MP extends MIDlet
 		}
 		if (d instanceof ChatTopicsList) {
 			if (c == chatInfoCmd) {
-				ChatForm f = ((ChatTopicsList) d).chatForm;
-				openProfile(f.id, /* f */ null, 0);
+				ChatInterface f = ((ChatTopicsList) d).chatForm;
+				openProfile(f.id(), /* f */ null, 0);
 				return;
 			}
 		}
@@ -2696,16 +2695,16 @@ public class MP extends MIDlet
 				return;
 			}
 			if (d instanceof ChatTopicsList) {
-				ChatForm form = ((ChatTopicsList) d).chatForm;
+				ChatInterface form = ((ChatTopicsList) d).chatForm;
 				int i = ((List) d).getSelectedIndex();
 				if (form == null || i == -1) return;
-				JSONObject topic = form.topics.getObject(i);
+				JSONObject topic = form.topics().getObject(i);
 				form.reset();
 				// TODO unread offset
-				form.topMsgId = topic.getInt("id");
-				form.canWrite = !topic.getBoolean("closed", false);
-				form.setTitle(form.title = topic.getString("title", ""));
-				openLoad(form);
+				form.openTopic(topic.getInt("id"),
+						!topic.getBoolean("closed", false),
+						topic.getString("title", ""));
+				openLoad((Displayable) form);
 				
 				return;
 			}
@@ -2846,7 +2845,7 @@ public class MP extends MIDlet
 			if (c == replyMsgCmd) {
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
-				display(writeForm(((ChatForm) current).id, s[1], "", null, null, null));
+				display(writeForm(((ChatInterface) current).id(), s[1], "", null, null, null));
 				return;
 			}
 			if (c == forwardMsgCmd) {
@@ -2867,7 +2866,7 @@ public class MP extends MIDlet
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
 				StringBuffer sb = new StringBuffer("https://t.me/"); 
-				String username = ((ChatForm) current).username;
+				String username = ((ChatInterface) current).username();
 				if (s[0].charAt(0) == '-' && username == null) {
 					sb.append("c/");
 				}
@@ -2912,16 +2911,16 @@ public class MP extends MIDlet
 			if (c == gotoMsgCmd) {
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
-				if (((ChatForm) current).parent != null) {
+				if (((ChatInterface) current).parent() != null) {
 					// from search
-					goBackTo(((ChatForm) current).parent);
-					((ChatForm) current).openMessage(s[1], -1);
+					goBackTo((Displayable) ((ChatInterface) current).parent());
+					((ChatInterface) current).openMessage(s[1], -1);
 					return;
 				}
-				if ((s[0] == null || s[0].equals(((ChatForm) current).id))
-						&& ((ChatForm) current).query == null) {
+				if ((s[0] == null || s[0].equals(((ChatInterface) current).id()))
+						&& ((ChatInterface) current).query() == null) {
 					// from current chat
-					((ChatForm) current).openMessage(s[1], -1);
+					((ChatInterface) current).openMessage(s[1], -1);
 					return;
 				}
 				
@@ -2977,7 +2976,7 @@ public class MP extends MIDlet
 			browse("tel:".concat(((StringItem) item).getText()));
 			return;
 		}
-		if (c == sendCmd && current instanceof ChatForm) { 
+		if (c == sendCmd && current instanceof ChatInterface) { 
 			// textfield send
 			String t;
 			if ((t = ((TextField) item).getString().trim()).length() == 0)
@@ -2990,7 +2989,7 @@ public class MP extends MIDlet
 			if (reopenChat && MP.updatesThread != null) {
 				MP.cancel(MP.updatesThread, true);
 			}
-			start(RUN_SEND_MESSAGE, new Object[] { t, ((ChatForm) current).id, null, null, null, null, null, null });
+			start(RUN_SEND_MESSAGE, new Object[] { t, ((ChatInterface) current).id(), null, null, null, null, null, null });
 			return;
 		}
 		if (c == stickerItemCmd) {
@@ -3564,17 +3563,17 @@ public class MP extends MIDlet
 	
 	static void openChat(String id, int msg) {
 		Displayable d = MP.current;
-		if (d instanceof ChatForm && id.equals(((ChatForm) d).id)
-				&& ((ChatForm) d).postId == null && ((ChatForm) d).query == null
-				&& ((ChatForm) d).mediaFilter == null) {
+		if (d instanceof ChatInterface && id.equals(((ChatInterface) d).id())
+				&& ((ChatInterface) d).postId() == null && ((ChatInterface) d).query() == null
+				&& ((ChatInterface) d).mediaFilter() == null) {
 			return;
 		}
 		openLoad(new ChatForm(id, null, msg, 0));
 	}
 	
-	static void openProfile(String id, ChatForm chatForm, int mode) {
-		if (chatForm == null && current instanceof ChatForm && id.equals(((ChatForm) current).id)) {
-			chatForm = (ChatForm) current;
+	static void openProfile(String id, ChatInterface chatForm, int mode) {
+		if (chatForm == null && current instanceof ChatInterface && id.equals(((ChatInterface) current).id())) {
+			chatForm = (ChatInterface) current;
 		}
 		openLoad(new ChatInfoForm(id, chatForm, mode));
 	}
@@ -4029,10 +4028,10 @@ public class MP extends MIDlet
 								topMsg = Integer.parseInt(thread);
 							} catch (Exception ignored) {}
 						}
-						if (current instanceof ChatForm &&
-								(domain.equals(((ChatForm) current).id)
-								|| domain.equals(((ChatForm) current).username))) {
-							((ChatForm) current).openMessage(messageId, topMsg);
+						if (current instanceof ChatInterface &&
+								(domain.equals(((ChatInterface) current).id())
+								|| domain.equals(((ChatInterface) current).username()))) {
+							((ChatInterface) current).openMessage(messageId, topMsg);
 						} else {
 							ChatForm f = new ChatForm(domain, null, msg, topMsg);
 							if (start != null) {
