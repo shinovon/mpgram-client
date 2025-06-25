@@ -4,6 +4,7 @@ Nokia-UI-Enhancement: IgnoreProfilesBasedSoundMuting
 MicroEdition-Configuration: CLDC-1.0
 MIDlet-Name: MPGram
 Nokia-Scalable-Icon: /m.svg
+Nokia-MIDlet-On-Screen-Keypad: no
 MIDlet-Vendor: nnproject
 progressive_download: enabled
 MIDlet-Icon: /m.png
