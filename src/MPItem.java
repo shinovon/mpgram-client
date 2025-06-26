@@ -2,7 +2,9 @@ import javax.microedition.lcdui.Graphics;
 
 public class MPItem {
 	
+	int contentWidth;
 	int contentHeight;
+	int layout;
 	
 	void paint(Graphics g, int x, int y, int w, int h) {
 		
