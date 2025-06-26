@@ -1,7 +1,7 @@
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
 
-public class ChatCanvas extends Canvas implements ChatInterface {
+public class ChatCanvas extends Canvas implements MPChat {
 
 	Thread thread;
 	
@@ -113,14 +113,14 @@ public class ChatCanvas extends Canvas implements ChatInterface {
 		return null;
 	}
 
-	public ChatInterface parent() {
+	public MPChat parent() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
 	// interface setters
 
-	public void setParent(ChatInterface parent) {
+	public void setParent(MPChat parent) {
 		// TODO Auto-generated method stub
 		
 	}

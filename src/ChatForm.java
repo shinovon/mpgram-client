@@ -34,7 +34,7 @@ import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 import javax.microedition.lcdui.Ticker;
 
-public class ChatForm extends MPForm implements ChatInterface, Runnable {
+public class ChatForm extends MPForm implements MPChat, Runnable {
 	
 	private static final int SPACER_HEIGHT = 8;
 
@@ -76,7 +76,7 @@ public class ChatForm extends MPForm implements ChatInterface, Runnable {
 	long wasOnline;
 	
 	TextField textField;
-	ChatInterface parent;
+	MPChat parent;
 
 	JSONObject botAnswer;
 	
@@ -1235,13 +1235,13 @@ public class ChatForm extends MPForm implements ChatInterface, Runnable {
 		return topics;
 	}
 
-	public ChatInterface parent() {
+	public MPChat parent() {
 		return parent;
 	}
 	
 	// interface setters
 	
-	public void setParent(ChatInterface parent) {
+	public void setParent(MPChat parent) {
 		this.parent = parent;
 	}
 	

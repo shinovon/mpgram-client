@@ -29,12 +29,12 @@ public class ChatInfoForm extends MPForm {
 	String id;
 	String phone;
 	String invite;
-	ChatInterface chatForm;
+	MPChat chatForm;
 	int mode; // 0 - chat info or profile by id, 1 - phone, 2 - invite peek, 3 - invite
 	int pinnedMessageId;
 	boolean canBan;
 	
-	public ChatInfoForm(String id, ChatInterface chatForm, int mode) {
+	public ChatInfoForm(String id, MPChat chatForm, int mode) {
 		super(id);
 		this.id = id;
 		this.chatForm = chatForm;

@@ -29,9 +29,9 @@ public class StickerPackForm extends MPForm {
 	String id;
 	String accessHash;
 	String slug;
-	ChatInterface chatForm;
+	MPChat chatForm;
 	
-	public StickerPackForm(ChatInterface chatForm, JSONObject json) {
+	public StickerPackForm(MPChat chatForm, JSONObject json) {
 		super(json.getString("title", json.getString("short_name", MP.L[Stickers_Title])));
 		this.id = json.getString("id");
 		this.accessHash = json.getString("access_hash");
