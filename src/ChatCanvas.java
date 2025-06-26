@@ -2,9 +2,30 @@ import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
 
 public class ChatCanvas extends Canvas implements ChatInterface {
+
+	Thread thread;
+	
+	String id;
+	String username;
+	String query;
+	String startBot;
+	String title;
+	String mediaFilter;
+	
+	int limit = MP.messagesLimit;
+	int addOffset, offsetId;
+	int messageId, topMsgId;
 	
 	void load() {
 		// TODO
+	}
+	
+	void closed(boolean destroy) {
+		if (destroy) cancel();
+	}
+	
+	void cancel() {
+		
 	}
 	
 	// Canvas
@@ -37,8 +58,7 @@ public class ChatCanvas extends Canvas implements ChatInterface {
 	// interface getters
 
 	public String id() {
-		// TODO Auto-generated method stub
-		return null;
+		return id;
 	}
 
 	public String postId() {
@@ -47,18 +67,15 @@ public class ChatCanvas extends Canvas implements ChatInterface {
 	}
 
 	public String query() {
-		// TODO Auto-generated method stub
-		return null;
+		return query;
 	}
 
 	public String mediaFilter() {
-		// TODO Auto-generated method stub
-		return null;
+		return mediaFilter;
 	}
 
 	public String username() {
-		// TODO Auto-generated method stub
-		return null;
+		return username;
 	}
 
 	public boolean update() {
@@ -126,7 +143,7 @@ public class ChatCanvas extends Canvas implements ChatInterface {
 	//
 
 	public void reset() {
-		// TODO Auto-generated method stub
+		cancel();
 		
 	}
 

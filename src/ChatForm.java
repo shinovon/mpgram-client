@@ -37,12 +37,6 @@ import javax.microedition.lcdui.Ticker;
 public class ChatForm extends MPForm implements ChatInterface, Runnable {
 	
 	private static final int SPACER_HEIGHT = 8;
-	
-	static final int UPDATE_USER_STATUS = 1;
-	static final int UPDATE_USER_TYPING = 2;
-	static final int UPDATE_NEW_MESSAGE = 3;
-	static final int UPDATE_DELETE_MESSAGES = 4;
-	static final int UPDATE_EDIT_MESSAGE = 5;
 
 	String id;
 	String username;
