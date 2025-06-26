@@ -12,8 +12,9 @@ public class MPItem {
 		
 	}
 	
-	boolean traverse(int dir) {
-		return false;
+	// 0: not grabbed, 1: grabbed in visible area, 2: scroll needed
+	int traverse(int dir) {
+		return 0;
 	}
 	
 	void interact() {
