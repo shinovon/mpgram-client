@@ -1519,9 +1519,10 @@ public class MP extends MIDlet
 								int idx = ids.indexOf(peerId);
 								ids.removeElementAt(idx);
 								chatsList.delete(idx);
-								ids.insertElementAt(peerId, 0);
 								
-								chatsList.insert(null, Math.min(chatsList.size(), idx < chatsList.pinnedCount ? 0 : chatsList.pinnedCount),
+								int newIdx = Math.min(chatsList.size(), idx < chatsList.pinnedCount ? 0 : chatsList.pinnedCount);
+								ids.insertElementAt(peerId, newIdx);
+								chatsList.insert(null, newIdx,
 										sb.insert(0, '\n').insert(0, getName(peer, false)).toString(), peerId);
 							}
 							
