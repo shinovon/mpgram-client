@@ -37,6 +37,7 @@ if not err:
         for s in en_json.keys():
             f.write("\tstatic final int " + s + " = " + str(i) + ";\n")
             i += 1
+        f.write("\tstatic final int LocaleStrings = " + str(len(en_json)) + ";\n")
         f.write("\tstatic final int mpgram = 0;\n")
         f.write("}\n")
 
