@@ -1518,6 +1518,7 @@ public class MP extends MIDlet
 							JSONObject peer = getPeer(peerId, true);
 							String text = appendDialog(sb, peer, peerId, msg).toString();
 							
+							// update chats list
 							if (chatsList != null && chatsList.ids.contains(peerId)) {
 								Vector ids = chatsList.ids;
 								int idx = ids.indexOf(peerId);
@@ -2028,6 +2029,7 @@ public class MP extends MIDlet
 				display(t);
 				return;
 			}
+			// Chat media categories
 			if (c == chatPhotosCmd) {
 				openLoad(new ChatForm(((ChatInfoForm) current).id, "Photos", ((ChatInfoForm) current).chatForm.topMsgId));
 				return;
@@ -3013,6 +3015,7 @@ public class MP extends MIDlet
 			return;
 		}
 		if (c == playItemCmd) {
+			// play message media
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 			
@@ -3021,6 +3024,7 @@ public class MP extends MIDlet
 			return;
 		}
 		if (c == postCommentsCmd) {
+			// open post discussion
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 			
@@ -3125,6 +3129,7 @@ public class MP extends MIDlet
 				}
 				JSONObject msg = (JSONObject) playlist.get(idx);
 				String t;
+				// filter playable media
 				if (!"audio/mpeg".equals(t = msg.getObject("media").getString("mime"))
 						&& !"audio/aac".equals(t)
 						&& !"audio/m4a".equals(t))
