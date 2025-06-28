@@ -248,18 +248,18 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 			toDraw = null;
 			return;
 		}
-		if (k == KEY_NUM9) {
-			rotate = !rotate;
-			MP.midlet.start(MP.RUN_ZOOM_VIEW, this);
-			repaint();
-			return;
-		}
 //		if (!canDraw()) {
 //			repaint();
 //			return;
 //		}
 
 		if (!resizing) {
+			if (k == KEY_NUM9) {
+				rotate = !rotate;
+				MP.midlet.start(MP.RUN_ZOOM_VIEW, this);
+				repaint();
+				return;
+			}
 			// zooming via *0#
 			if (k == KEY_STAR) {
 				zoom = 1;

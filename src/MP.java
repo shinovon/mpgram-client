@@ -2236,7 +2236,7 @@ public class MP extends MIDlet
 					uiChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(uiChoice);
 					
-					photoSizeGauge = new Gauge(L[ThumbnailsSize], true, 64, photoSize / 8);
+					photoSizeGauge = new Gauge(L[ThumbnailsSize], true, 64, Math.min(64, photoSize / 8));
 					photoSizeGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(photoSizeGauge);
 					
