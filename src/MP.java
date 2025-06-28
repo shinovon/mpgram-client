@@ -452,6 +452,10 @@ public class MP extends MIDlet
 		version = getAppProperty("MIDlet-Version");
 		display = Display.getDisplay(this);
 		
+		// sanity check
+		if (!"nnproject".equals(getAppProperty("MIDlet-Vendor")))
+			throw new RuntimeException();
+		
 		Form f = new Form("MPGram");
 		f.append("Loading");
 		display.setCurrent(mainDisplayable = f);
