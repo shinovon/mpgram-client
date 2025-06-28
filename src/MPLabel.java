@@ -82,19 +82,19 @@ public class MPLabel extends MPItem {
 			}
 			
 			if (text.indexOf('\n', ch) == -1) {
-				int[] out = split(text, font, url, width, x, y, idx, ch, sl, fh, res);
+				int[] out = split(text, font, width, x, y, idx, ch, sl, fh, res);
 				x = out[0]; y = out[1]; idx = out[2];
 			} else {
 				int j = ch;
 				for (int i = ch; i < sl; ++i) {
 					if ((c = text.charAt(i)) == '\n') {
-						int[] out = split(text, font, url, width, x, y, idx, j, i, fh, res);
+						int[] out = split(text, font, width, x, y, idx, j, i, fh, res);
 						x = 0; y = out[1] + fh; idx = out[2];
 						j = i + 1;
 					}
 				}
 				if (j != sl) {
-					int[] out = split(text, font, url, width, x, y, idx, j, sl, fh, res);
+					int[] out = split(text, font, width, x, y, idx, j, sl, fh, res);
 					x = out[0]; y = out[1]; idx = out[2];
 				}
 			}
@@ -112,7 +112,7 @@ public class MPLabel extends MPItem {
 		contentHeight = y + fh;
 	}
 	
-	private int[] split(String text, Font font, String url, int width, int x, int y, int idx, int ch, int sl, int fh, Vector res) {
+	private static int[] split(String text, Font font, int width, int x, int y, int idx, int ch, int sl, int fh, Vector res) {
 		if (ch != sl) {
 			int ew = font.substringWidth(text, ch, sl - ch);
 			if (x + ew < width) {
@@ -120,7 +120,7 @@ public class MPLabel extends MPItem {
 				x += ew; idx ++;
 			} else {
 				for (int i = ch; i < sl; i++) {
-					if (font.stringWidth(text.substring(ch, i+1)) >= width) {
+					if (x + font.stringWidth(text.substring(ch, i+1)) >= width) {
 						w: {
 							for (int j = i; j > ch; j--) {
 								char c = text.charAt(j);
