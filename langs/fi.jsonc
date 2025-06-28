@@ -37,9 +37,9 @@
 	"Today": "tänään",
 	"Yesterday": "eilen",
 	"LastWeek": "viime viikolla",
-	"LastMonth": "last month", // Untranslated
-	"ALongTimeAgo": "a long time ago", // Untranslated
-	"Recently": "recently", // Untranslated
+	"LastMonth": "viime kuussa",
+	"ALongTimeAgo": "kauan sitten",
+	"Recently": "hiljattain",
 	// Date suffixes
 	"on_Date": "",
 	"at_Time": " klo ",
@@ -88,7 +88,7 @@
 	"ArchivedChats": "Arkistoidut keskustelut",
 	"Contacts": "Yhteystiedot",
 	"Search": "Haku",
-	"OpenByLink": "Open by link", // Untranslated
+	"OpenByLink": "Avaa linkillä",
 	
 	// Message commands
 	"OpenChat": "Avaa keskustelu",
@@ -100,16 +100,16 @@
 	"Delete": "Poista",
 	"Edit": "Muokkaa",
 	"GoTo": "Siirry",
-	"Pin": "Pin", // Untranslated
-	"BanMember": "Ban member", // Untranslated
-	"Comments": "Discussion", // Untranslated
+	"Pin": "Kiinnitä",
+	"BanMember": "Estä käyttäjä",
+	"Comments": "Keskustelu",
 	
 	// Item commands
 	"Link_Cmd": "Linkki",
 	"ViewImage": "Näytä kuva",
 	"Call": "Soita",
 	"Download": "Lataa",
-	"Play_Item": "Play", // Untranslated
+	"Play_Item": "Soita",
 	
 	// Chat form commands
 	"WriteMessage": "Kirjoita viesti",
@@ -117,12 +117,12 @@
 	"ChatInfo": "Keskustelun tiedot",
 	"Older": "Vanhemmat",
 	"Newer": "Uudemmat",
-	"SendSticker": "Send sticker", // Untranslated
+	"SendSticker": "Lähetä tarra",
 	
 	// Message writing form commands
 	"Send": "Lähetä",
 	"OpenTextBox": "Avaa tekstiruutu",
-	"ChooseFile": "Choose file", // Untranslated
+	"ChooseFile": "Valitse tiedosto",
 	
 	// Profile/chat info commands
 	"Join": "Liity",
@@ -130,11 +130,11 @@
 	"LeaveGroup": "Poistu ryhmästä",
 	"ChatMedia": "Keskustelun media",
 	"Members": "Jäsenet",
-	"AddToContacts": "Add to contacts", // Untranslated
-	"Photos": "Photos", // Untranslated
-	"Videos": "Videos", // Untranslated
-	"Files": "Files", // Untranslated
-	"AudioFiles": "Music", // Untranslated
+	"AddToContacts": "Lisää yhteystietoihin",
+	"Photos": "Kuvat",
+	"Videos": "Videot",
+	"Files": "Tiedostot",
+	"AudioFiles": "Musiikki",
 	
 	// Dialog commands
 	"Ok": "OK",
@@ -149,7 +149,7 @@
 	"Authorizing": "Kirjaudutaan sisään",
 	"WaitingForServerResponse": "Odotetaan palvelimen vastausta...",
 	"Sending": "Lähetetään",
-	"WaitingForPrevChat": "Waiting for previous chat to disconnect...", // Untranslated
+	"WaitingForPrevChat": "Odotetaan yhteyden sulkeutumista...",
 	
 	// Authorization process
 	"Auth_Title": "Kirjaudu",
@@ -162,45 +162,45 @@
 	"CloudPassword": "Pilvisalasana",
 	"Captcha": "Captcha",
 	"Auth_Btn": "Kirjaudu",
-	"InvalidCode_Alert": "Invalid code!", // Untranslated
-	"CodeExpired_Alert": "Code expired!", // Untranslated
-	"Auth_Hint1": "(leave empty if using mp.nnchan.ru or your instance doesn't have a password)", // Untranslated
-	"InvalidInstance_Alert": "Invalid instance URL!", // Untranslated
-	"InvalidPhoneNumber_Alert": "Invalid phone number!", // Untranslated
-	"InvalidCaptcha_Alert": "Invalid captcha!", // Untranslated
-	"CloudPasswordEmpty_Alert": "Cloud password can't be empty!", // Untranslated
-	"CreateNewSession_Btn": "Create new session", // Untranslated
-	"ImportSession_Btn": "Import existing session", // Untranslated
-	"InvalidPassword_Alert": "Invalid password!", // Untranslated
-	"LoginDisabled_Alert": "This instance does not support session creation with API!", // Untranslated
-	"APIDisabled_Alert": "This instance does not support API!", // Untranslated
-	"ClientOutdated_Alert": "Client outdated!", // Untranslated
-	"InvalidInstancePassword_Alert": "Invalid instance password!", // Untranslated
-	"Retry": "Retry", // Untranslated
+	"InvalidCode_Alert": "Väärä koodi!",
+	"CodeExpired_Alert": "Koodi vanhentui!",
+	"Auth_Hint1": "(jätä tyhjäksi jos käytät palvelinta mp.nnchan.ru tai jos palvelimesi ei vaadi salasanaa)",
+	"InvalidInstance_Alert": "Palvelimen osoite ei kelpaa!",
+	"InvalidPhoneNumber_Alert": "Puhelinnumero ei kelpaa!",
+	"InvalidCaptcha_Alert": "Captcha-vastaus ei kelpaa!",
+	"CloudPasswordEmpty_Alert": "Pilvisalasana vaaditaan!",
+	"CreateNewSession_Btn": "Uusi istunto",
+	"ImportSession_Btn": "Tuo istunto",
+	"InvalidPassword_Alert": "Väärä salasana!",
+	"LoginDisabled_Alert": "Palvelin ei tue istunnon luomista rajapinnan kautta!",
+	"APIDisabled_Alert": "Palvelin ei tue rajapintaa!",
+	"ClientOutdated_Alert": "Vanhentunut sovellus!",
+	"InvalidInstancePassword_Alert": "Väärä palvelimen salasana!",
+	"Retry": "Uudell.",
 	
 	// Settings sections
 	"UI": "Käyttöliittymä",
 	"Behaviour": "Yleiset",
 	"Images": "Kuvat",
 	"Authorization": "Kirjautuminen",
-	"Notifications": "Notifications", // Untranslated
+	"Notifications": "Ilmoitukset",
 	
 	// UI Settings
 	"Language": "Kieli",
 	"ReversedChat": "Vaihda viestien järjestystä",
 	"ShowMedia": "Näytä media",
-	"ShowChatStatus": "Show chat status",
+	"ShowChatStatus": "Näytä keskustelun tila",
 	"ThumbnailsSize": "Esikatselun koko",
 	"ChatsCount": "Keskustelujen määrä",
 	"MessagesCount": "Viestien määrä",
-	"ChatsListFontSize": "Chats list font size", // Untranslated
-	"Default": "Default", // Untranslated
-	"Small": "Small", // Untranslated
-	"Medium": "Medium", // Untranslated
-	"FocusNewMessages": "Focus new messages", // Untranslated
-	"ChatTextField": "Text field in chat", // Untranslated
-	"BuiltinImageViewer": "Built-in image viewer", // Untranslated
-	"LargeMusicCover": "Large player cover", // Untranslated
+	"ChatsListFontSize": "Luettelon fonttikoko",
+	"Default": "Oletus",
+	"Small": "Pieni",
+	"Medium": "Keskikokoinen",
+	"FocusNewMessages": "Siirry uusiin viesteihin",
+	"ChatTextField": "Näytä tekstikenttä",
+	"BuiltinImageViewer": "Näytä kuvat sovelluksessa",
+	"LargeMusicCover": "Suuri soittimen kansikuva",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Odota sivun latausta",
@@ -209,18 +209,18 @@
 	"ParseLinks": "Jäsennä linkit",
 	"ChatAutoUpdate": "Autom. päivitys",
 	"UpdatesTimeout": "Päivitysten aikaväli",
-	"KeepSessionAlive": "Keep session alive", // Untranslated
-	"UseUnicode": "Use Unicode", // Untranslated
-	"UseCompression": "Use compression", // Untranslated
-	"NetworkAccess": "Network access", // Untranslated
-	"MobileData": "Data", // Untranslated
-	"WiFi": "Wi-Fi", // Untranslated
+	"KeepSessionAlive": "Säilytä istunto",
+	"UseUnicode": "Käytä Unicodea",
+	"UseCompression": "Tiedon pakkaus",
+	"NetworkAccess": "Yhteystapa",
+	"MobileData": "Mobiilidata",
+	"WiFi": "Wi-Fi",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Kuvien esikatselu",
 	"LoadAvatars": "Profiilikuvat",
 	"MultiThreadedLoading": "Monisäikeinen lataus",
-	"RoundAvatars": "Rounded avatars", // Untranslated
+	"RoundAvatars": "Pyöreät prof.kuvat",
 	
 	// Cache settings
 	"AvatarsCaching": "Prof.kuvien välimuisti",
@@ -230,16 +230,16 @@
 	"HoldInRAMandStore": "Tallenna ja pidä muistissa",
 	"AvatarsCacheThreshold": "Prof.kuvien välimuistin koko",
 	"ProfilesCacheThreshold": "Profiilien välimuistin koko",
-	"RMSCacheCount": "Stored cache count: ", // Untranslated
+	"RMSCacheCount": "Tiedostoja välimuistissa: ",
 	
 	// Notifications settings
-	"EnableNotifications": "Notifications", // Untranslated
-	"EnableSound": "Sound", // Untranslated
-	"NotificationMethod": "Notification method", // Untranslated
-	"Off": "Off", // Untranslated
-	"AlertWindow": "Alert window", // Untranslated
-	"PushInterval": "Polling interval", // Untranslated
-	"PushBackgroundInterval": "Background polling interval", // Untranslated
+	"EnableNotifications": "Ilmoitukset",
+	"EnableSound": "Ääni",
+	"NotificationMethod": "Ilmoitustapa",
+	"Off": "Pois",
+	"AlertWindow": "Ponnahdusikkuna",
+	"PushInterval": "Päivitysnopeus",
+	"PushBackgroundInterval": "Taustapäivitysnopeus",
 	
 	// About
 	"AboutText": "MPGram Web -rajapintaan perustuva Telegram-asiakasohjelma J2ME-alustalle.",
@@ -251,25 +251,25 @@
 	// Write form
 	"Reply_Title": "Vastaa",
 	"Write_Title": "Kirjoita",
-	"Edit_Title": "Edit", // Untranslated
-	"Forward_Title": "Forward", // Untranslated
+	"Edit_Title": "Muokkaa",
+	"Forward_Title": "Välitä",
 	"Message": "Viesti",
-	"File": "File", // Untranslated
-	"File_Prefix": "File: ", // Untranslated
-	"NotSelected": "Not selected", // Untranslated
-	"SendUncompressed": "Send uncompressed", // Untranslated
-	"SendAsVoice": "Send as voice message", // Untranslated
-	"HideWithSpoiler": "Hide with spoiler", // Untranslated
-	"EnableHTMLFormatting": "Enable HTML-formatting", // Untranslated
+	"File": "Tiedosto",
+	"File_Prefix": "Tiedosto: ",
+	"NotSelected": "Ei valittu",
+	"SendUncompressed": "Lähetä ilman pakkausta",
+	"SendAsVoice": "Lähetä ääniviestinä",
+	"HideWithSpoiler": "Piilota",
+	"EnableHTMLFormatting": "HTML-muotoilu",
 	
 	// Alert messages
 	"MessageSent_Alert": "Viesti lähetetty",
 	"MessageDeleted_Alert": "Viesti poistettu",
 	"UpdateAvailable_Alert": "Päivitys saatavilla",
-	"MemberBanned_Alert": "Member banned", // Untranslated
-	"StickersAdded_Alert": "Stickers added", // Untranslated
-	"ChooseNetwork_Alert": "Choose network access point", // Untranslated
-	"FailedToLoadImage": "Failed to load image", // unwrapped, should be short // Untranslated
+	"MemberBanned_Alert": "Käyttäjä estetty",
+	"StickersAdded_Alert": "Tarrat lisätty",
+	"ChooseNetwork_Alert": "Valitse yhteystapa",
+	"FailedToLoadImage": "Kuvan lataus epäonnistui", // unwrapped, should be short
 	
 	// Chat form
 	"ChatMedia_Title": "Media",
@@ -283,9 +283,9 @@
 	"You_Prefix": "Sinä: ",
 	"ForwardedMessage": "Välitetty viesti",
 	"Action": "Toiminto",
-	"Edited": "edited", // Untranslated
-	"_comment": " comment", // Untranslated
-	"_comments": " comments", // Untranslated
+	"Edited": "muokattu",
+	"_comment": " kommentti",
+	"_comments": " kommenttia",
 	"_comments2": "",
 	
 	// Message media
@@ -294,38 +294,38 @@
 	"Geo": "Sijainti: ",
 	
 	// Chat actions
-	"PinnedMessage_Action": " pinned message", // Untranslated
-	"Joined_Action": " joined the group", // Untranslated
-	"Added_Action": " added", // Untranslated
-	"Left_Action": " left the group", // Untranslated
-	"Removed_Action": " removed", // Untranslated
-	"JoinedByLink_Action": " joined the group via invite link", // Untranslated
-	"JoinedByRequest_Action": " was accepted to the group", // Untranslated
-	"ChatHistoryCleared_Action": "Chat history was cleared", // Untranslated
-	"GroupCreated_Action": "Group created", // Untranslated
-	"ChannelCreated_Action": "Channel created", // Untranslated
-	"PhotoUpdated_Action": "Photo updated", // Untranslated
-	"NameChanged_Action": "Name was changed to ", // Untranslated
+	"PinnedMessage_Action": " kiinnitti viestin",
+	"Joined_Action": " liittyi ryhmään",
+	"Added_Action": " lisäsi",
+	"Left_Action": " poistui ryhmästä",
+	"Removed_Action": " poisti",
+	"JoinedByLink_Action": " liittyi ryhmään kutsulinkillä",
+	"JoinedByRequest_Action": " päästettiin ryhmään",
+	"ChatHistoryCleared_Action": "Keskusteluhistoria tyhjennetty",
+	"GroupCreated_Action": "Ryhmä luotu",
+	"ChannelCreated_Action": "Kanava luotu",
+	"PhotoUpdated_Action": "Kuva vaihdettu",
+	"NameChanged_Action": "Nimi vaihdettu: ",
 	
 	// Folders
 	"AllChats": "Kaikki keskustelut",
 	"Archive": "Arkisto",
 	
 	// Stickers
-	"Stickers_Title": "Stickers", // Untranslated
-	"Sticker": "Sticker", // Untranslated
-	"AddStickers": "Add stickers", // Untranslated
+	"Stickers_Title": "Tarrat",
+	"Sticker": "Tarra",
+	"AddStickers": "Lisää tarrat",
 	
 	// Music player
-	"Player_Title": "Music player", // Untranslated
-	"OpenPlayer": "Player", // Untranslated
-	"OpenPlaylist": "Playlist", // Untranslated
-	"Play_Player": "Play", // Untranslated
-	"Pause_Player": "Pause", // Untranslated
-	"Prev_Player": "Prev", // Untranslated
-	"Next_Player": "Next", // Untranslated
-	"UnknownTrack": "Unknown Track", // Untranslated
-	"Playlist_Title": "Playlist", // Untranslated
+	"Player_Title": "Musiikkisoitin",
+	"OpenPlayer": "Soitin",
+	"OpenPlaylist": "Soittolista",
+	"Play_Player": "Soita",
+	"Pause_Player": "Keskeytä",
+	"Prev_Player": "Edell.",
+	"Next_Player": "Seur.",
+	"UnknownTrack": "Tuntematon kappale",
+	"Playlist_Title": "Soittolista",
 	
 	// Profile/chat info
 	"Online": "paikalla",
@@ -333,19 +333,19 @@
 	"LastSeen": "nähty ",
 	"About_User": "Kuvaus",
 	"About_Chat": "Tietoja",
-	"Mobile": "Mobile", // Untranslated
+	"Mobile": "Puhelinnumero",
 	"Username": "Käyttäjätunnus",
 	"Link": "Linkki",
 	"SearchMessages": "Hae viesteistä",
 	"ViewGroup": "Näytä ryhmä",
 	"GoToPinnedMessage": "Näytä kiinnitetty viesti",
-	"Owner": "owner", // Untranslated
-	"Admin": "admin", // Untranslated
-	"Bot": "bot", // Untranslated
-	"UserInfo": "User info", // Untranslated
-	"GroupInfo": "Group info", // Untranslated
-	"ChannelInfo": "Channel info", // Untranslated
-	"TopicInfo": "Topic Info", // Untranslated
+	"Owner": "omistaja",
+	"Admin": "valvoja",
+	"Bot": "botti",
+	"UserInfo": "Käyttäjän tiedot",
+	"GroupInfo": "Ryhmän tiedot",
+	"ChannelInfo": "Kanavan tiedot",
+	"TopicInfo": "Ketjun tiedot",
 	
 	"_member": " jäsen",
 	"_members": " jäsentä",
@@ -355,23 +355,23 @@
 	"_subscribers": " tilaajaa",
 	"_subscribers2": "",
 	
-	"_photo": " photo", // Untranslated
-	"_photos": " photos", // Untranslated
+	"_photo": " kuva",
+	"_photos": " kuvaa",
 	"_photos2": "",
 	
-	"_video": " video", // Untranslated
-	"_videos": " videos", // Untranslated
+	"_video": " video",
+	"_videos": " videota",
 	"_videos2": "",
 	
-	"_file": " file", // Untranslated
-	"_files": " files", // Untranslated
+	"_file": " tiedosto",
+	"_files": " tiedostoa",
 	"_files2": "",
 	
-	"_audioFile": " audio file", // Untranslated
-	"_audioFiles": " audio files", // Untranslated
+	"_audioFile": " äänitiedosto",
+	"_audioFiles": " äänitiedostoa",
 	"_audioFiles2": "",
 	
-	"_voiceMessage": " voice message", // Untranslated
-	"_voiceMessages": " voice messages", // Untranslated
+	"_voiceMessage": " ääniviesti",
+	"_voiceMessages": " ääniviestiä",
 	"_voiceMessages2": ""
 }
