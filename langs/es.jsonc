@@ -102,14 +102,14 @@
 	"GoTo": "Ir a",
 	"Pin": "Fijado",
 	"BanMember": "Prohibir miembro",
-	"Comments": "Discussion", // Untranslated
+	"Comments": "Discusión",
 	
 	// Item commands
 	"Link_Cmd": "Enlace",
 	"ViewImage": "Ver imagen",
 	"Call": "Llamar",
 	"Download": "Descargar",
-	"Play_Item": "Play", // Untranslated
+	"Play_Item": "Reproducir",
 	
 	// Chat form commands
 	"WriteMessage": "Escribir mensaje",
@@ -131,10 +131,10 @@
 	"ChatMedia": "Documentos del chat",
 	"Members": "Miembros",
 	"AddToContacts": "Añadir a contactos",
-	"Photos": "Photos", // Untranslated
-	"Videos": "Videos", // Untranslated
-	"Files": "Files", // Untranslated
-	"AudioFiles": "Music", // Untranslated
+	"Photos": "Fotos",
+	"Videos": "Videos",
+	"Files": "Archivos",
+	"AudioFiles": "Musica",
 	
 	// Dialog commands
 	"Ok": "Aceptar",
@@ -164,26 +164,26 @@
 	"Auth_Btn": "Autorizar",
 	"InvalidCode_Alert": "Codigo invalido",
 	"CodeExpired_Alert": "Codigo caducado!",
-	"Auth_Hint1": "(leave empty if using mp.nnchan.ru or your instance doesn't have a password)", // Untranslated
-	"InvalidInstance_Alert": "Invalid instance URL!", // Untranslated
-	"InvalidPhoneNumber_Alert": "Invalid phone number!", // Untranslated
-	"InvalidCaptcha_Alert": "Invalid captcha!", // Untranslated
-	"CloudPasswordEmpty_Alert": "Cloud password can't be empty!", // Untranslated
-	"CreateNewSession_Btn": "Create new session", // Untranslated
-	"ImportSession_Btn": "Import existing session", // Untranslated
-	"InvalidPassword_Alert": "Invalid password!", // Untranslated
-	"LoginDisabled_Alert": "This instance does not support session creation with API!", // Untranslated
-	"APIDisabled_Alert": "This instance does not support API!", // Untranslated
-	"ClientOutdated_Alert": "Client outdated!", // Untranslated
-	"InvalidInstancePassword_Alert": "Invalid instance password!", // Untranslated
-	"Retry": "Retry", // Untranslated
+	"Auth_Hint1": "(deje vacío si usa mp.nnchan.ru o su instancia no tiene contraseña)",
+	"InvalidInstance_Alert": "URL de instancia no válida!",
+	"InvalidPhoneNumber_Alert": "¡Número de teléfono inválido!",
+	"InvalidCaptcha_Alert": "Captcha no válido!",
+	"CloudPasswordEmpty_Alert": "¡La contraseña de la nube no puede estar vacía!",
+	"CreateNewSession_Btn": "Crear nueva sesión",
+	"ImportSession_Btn": "Importar sesión existente",
+	"InvalidPassword_Alert": "¡Contraseña inválida!",
+	"LoginDisabled_Alert": "¡Esta instancia no admite la creación de sesiones con API!",
+	"APIDisabled_Alert": "¡Esta instancia no admite API!",
+	"ClientOutdated_Alert": "¡Cliente desactualizado!",
+	"InvalidInstancePassword_Alert": "Contraseña de instancia no válida!",
+	"Retry": "Reintentar",
 	
 	// Settings sections
 	"UI": "Interfaz de usuario",
 	"Behaviour": "Caracteristicas",
 	"Images": "Imagenes",
 	"Authorization": "Autorizacion",
-	"Notifications": "Notifications", // Untranslated
+	"Notifications": "Notificationes",
 	
 	// UI Settings
 	"Language": "Lenguaje",
@@ -199,8 +199,8 @@
 	"Medium": "Mediano",
 	"FocusNewMessages": "Enfocar nuevos mensajes",
 	"ChatTextField": "Campo de texto en el chat",
-	"BuiltinImageViewer": "Built-in image viewer", // Untranslated
-	"LargeMusicCover": "Large player cover", // Untranslated
+	"BuiltinImageViewer": "Visor de imágenes incorporado",
+	"LargeMusicCover": "Cubierta de reproductor grande",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Espere a que se cargue la pagina",
@@ -210,11 +210,11 @@
 	"ChatAutoUpdate": "Actualización automatica del chat",
 	"UpdatesTimeout": "Tiempo de espera de actualizaciones",
 	"KeepSessionAlive": "Mantener la sesión activa",
-	"UseUnicode": "Use Unicode", // Untranslated
-	"UseCompression": "Use compression", // Untranslated
-	"NetworkAccess": "Network access", // Untranslated
-	"MobileData": "Data", // Untranslated
-	"WiFi": "Wi-Fi", // Untranslated
+	"UseUnicode": "Usar Unicode",
+	"UseCompression": "Usar compresión",
+	"NetworkAccess": "Acceso a la red",
+	"MobileData": "Datos",
+	"WiFi": "Wi-Fi",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Cargar miniaturas de medios",
@@ -230,16 +230,16 @@
 	"HoldInRAMandStore": "Mantener en RAM y almacenar",
 	"AvatarsCacheThreshold": "Limite de cache de avatares",
 	"ProfilesCacheThreshold": "Limite de cache de perfiles",
-	"RMSCacheCount": "Stored cache count: ", // Untranslated
+	"RMSCacheCount": "Recuento de caché almacenado: ",
 	
 	// Notifications settings
-	"EnableNotifications": "Notifications", // Untranslated
-	"EnableSound": "Sound", // Untranslated
-	"NotificationMethod": "Notification method", // Untranslated
-	"Off": "Off", // Untranslated
-	"AlertWindow": "Alert window", // Untranslated
-	"PushInterval": "Polling interval", // Untranslated
-	"PushBackgroundInterval": "Background polling interval", // Untranslated
+	"EnableNotifications": "Notificationes",
+	"EnableSound": "Sonido",
+	"NotificationMethod": "Método de notificación",
+	"Off": "Apagado",
+	"AlertWindow": "Ventana de alerta",
+	"PushInterval": "Tiempo de Notificaciones",
+	"PushBackgroundInterval": "Intervalo de Notificaciones de fondo",
 	
 	// About
 	"AboutText": "Cliente de Telegram asistido por servidor para J2ME, basado en la API web de MPGram.",
@@ -257,7 +257,7 @@
 	"File": "Archivo",
 	"File_Prefix": "Archivo: ",
 	"NotSelected": "No seleccionado",
-	"SendUncompressed": "Enviar uncompressed",
+	"SendUncompressed": "Enviar sin comprimir",
 	"SendAsVoice": "Enviar como mensaje de voz",
 	"HideWithSpoiler": "Ocultar con spoiler",
 	"EnableHTMLFormatting": "HTML formato",
@@ -267,9 +267,9 @@
 	"MessageDeleted_Alert": "Mensaje eliminado",
 	"UpdateAvailable_Alert": "Nueva actualizacion disponible",
 	"MemberBanned_Alert": "Miembro prohibido",
-	"StickersAdded_Alert": "Stickers added", // Untranslated
-	"ChooseNetwork_Alert": "Choose network access point", // Untranslated
-	"FailedToLoadImage": "Failed to load image", // unwrapped, should be short // Untranslated
+	"StickersAdded_Alert": "Pegatinas agregadas",
+	"ChooseNetwork_Alert": "Elija el punto de acceso a la red",
+	"FailedToLoadImage": "Error al cargar la imagen",
 	
 	// Chat form
 	"ChatMedia_Title": "Archivos",
@@ -284,8 +284,8 @@
 	"ForwardedMessage": "Mensaje reenviado",
 	"Action": "Accion",
 	"Edited": "editado",
-	"_comment": " comment", // Untranslated
-	"_comments": " comments", // Untranslated
+	"_comment": " comentario",
+	"_comments": " comentarios",
 	"_comments2": "",
 	
 	// Message media
@@ -312,20 +312,20 @@
 	"Archive": "Archivo",
 	
 	// Stickers
-	"Stickers_Title": "Stickers", // Untranslated
-	"Sticker": "Sticker", // Untranslated
-	"AddStickers": "Add stickers", // Untranslated
+	"Stickers_Title": "Pegatinas",
+	"Sticker": "Pegatina",
+	"AddStickers": "Añadir pegatinas",
 	
 	// Music player
-	"Player_Title": "Music player", // Untranslated
-	"OpenPlayer": "Player", // Untranslated
-	"OpenPlaylist": "Playlist", // Untranslated
-	"Play_Player": "Play", // Untranslated
-	"Pause_Player": "Pause", // Untranslated
-	"Prev_Player": "Prev", // Untranslated
-	"Next_Player": "Next", // Untranslated
-	"UnknownTrack": "Unknown Track", // Untranslated
-	"Playlist_Title": "Playlist", // Untranslated
+	"Player_Title": "Reproductor de música",
+	"OpenPlayer": "Reproductor",
+	"OpenPlaylist": "Lista de reproducción",
+	"Play_Player": "Reproducir",
+	"Pause_Player": "Pausa",
+	"Prev_Player": "Anterior",
+	"Next_Player": "Siguiente",
+	"UnknownTrack": "Pista Desconocida",
+	"Playlist_Title": "Lista de reproducción",
 	
 	// Profile/chat info
 	"Online": "en linea",
@@ -345,7 +345,7 @@
 	"UserInfo": "User info",
 	"GroupInfo": "Info del grupo",
 	"ChannelInfo": "Info del canal",
-	"TopicInfo": "Topic Info", // Untranslated
+	"TopicInfo": "Información del tema",
 	
 	"_member": " miembro",
 	"_members": " miembros",
