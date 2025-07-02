@@ -106,10 +106,12 @@ public class MP extends MIDlet
 	static final int RUN_LOAD_PLAYLIST = 23;
 	static final int RUN_PLAYER_LOOP = 24;
 	
+	// RMS
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
 	private static final String AVATAR_RECORD_PREFIX = "mcA";
 	
+	// URLs
 	private static final String DEFAULT_INSTANCE_URL = "http://mp.nnchan.ru/";
 	static final String API_URL = "api.php";
 	static final String AVA_URL = "ava.php";
@@ -150,6 +152,7 @@ public class MP extends MIDlet
 //#endif
 	// endregion
 	
+	// Fonts
 	static final Font largePlainFont = Font.getFont(0, 0, Font.SIZE_LARGE);
 	static final Font medPlainFont = Font.getFont(0, 0, Font.SIZE_MEDIUM);
 	static final Font medBoldFont = Font.getFont(0, Font.STYLE_BOLD, Font.SIZE_MEDIUM);
@@ -158,6 +161,10 @@ public class MP extends MIDlet
 	static final Font smallPlainFont = Font.getFont(0, 0, Font.SIZE_SMALL);
 	static final Font smallBoldFont = Font.getFont(0, Font.STYLE_BOLD, Font.SIZE_SMALL);
 	static final Font smallItalicFont = Font.getFont(0, Font.STYLE_ITALIC, Font.SIZE_SMALL);
+	
+	static final int smallPlainFontHeight = smallPlainFont.getHeight();
+	static final int smallPlainFontSpaceWidth = smallPlainFont.charWidth(' ');
+	static final int smallBoldFontHeight = smallBoldFont.getHeight();
 
 	static final IllegalStateException cancelException = new IllegalStateException("cancel");
 	
@@ -859,6 +866,9 @@ public class MP extends MIDlet
 		
 		authForm = f;
 		
+		openLoad(new ChatCanvas());
+		
+		/*
 		// load main form
 		if (user == null || userState < 3) {
 			display(mainDisplayable = authForm);
@@ -885,6 +895,7 @@ public class MP extends MIDlet
 		}
 		
 		start(RUN_CHECK_OTA, null);
+		*/
 	}
 	
 	// endregion
@@ -1064,6 +1075,14 @@ public class MP extends MIDlet
 			return;
 		}
 		case RUN_LOAD_FORM: {
+			if (param instanceof MPList) {
+				((MPList) param).load();
+				break;
+			}
+			if (param instanceof MPChat) {
+				((MPChat) param).load();
+				break;
+			}
 			((MPForm) param).load();
 			break;
 		}
@@ -4733,6 +4752,10 @@ public class MP extends MIDlet
 		}
 	}
 	
+	static float lerp(float start, float target, float mul, float div) {
+		return start + ((target - start) * mul / div);
+	}
+	
 	// endregion
 	
 	// region Rich text
@@ -4881,11 +4904,11 @@ public class MP extends MIDlet
 						}
 						if (!valid) break b;
 						
-						if (form instanceof MPLabel) {
+						if (form instanceof UILabel) {
 							if (i != 0) {
-								((MPLabel) form).appendWord(text.substring(0, j), f, null);
+								((UILabel) form).appendWord(text.substring(0, j), f, null);
 							}
-							((MPLabel) form).appendWord(text.substring(j, k), f, null);
+							((UILabel) form).appendWord(text.substring(j, k), f, null);
 						} else {
 							if (i != 0) {
 								s = new StringItem(null, text.substring(0, j));
@@ -4918,11 +4941,11 @@ public class MP extends MIDlet
 							if (!b && (c < '0' || c > '9')) break b;
 						}
 						if (k == i + 10 || k == i + 1) break b;
-						if (form instanceof MPLabel) {
+						if (form instanceof UILabel) {
 							if (i != 0) {
-								((MPLabel) form).appendWord(text.substring(0, i), f, null);
+								((UILabel) form).appendWord(text.substring(0, i), f, null);
 							}
-							((MPLabel) form).appendWord(text.substring(i, k), f, null);
+							((UILabel) form).appendWord(text.substring(i, k), f, null);
 						} else {
 							if (i != 0) {
 								s = new StringItem(null, text.substring(0, i));
@@ -4945,8 +4968,8 @@ public class MP extends MIDlet
 			}
 		}
 
-		if (form instanceof MPLabel) {
-			((MPLabel) form).appendWord(text, f, state != null && state[RT_URL] != 0 ? richTextUrl : null);
+		if (form instanceof UILabel) {
+			((UILabel) form).appendWord(text, f, state != null && state[RT_URL] != 0 ? richTextUrl : null);
 		} else {
 			s = new StringItem(null, text);
 			s.setFont(f);

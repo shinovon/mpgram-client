@@ -1,9 +1,30 @@
+/*
+Copyright (c) 2025 Arman Jussupgaliyev
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 import java.util.Vector;
 
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
-public class MPLabel extends MPItem {
+public class UILabel extends UIItem {
 	
 	static final int WIDTH_MARGIN = 2;
 	
@@ -12,25 +33,31 @@ public class MPLabel extends MPItem {
 	Vector urls;
 
 	int color;
-	boolean center;
+	boolean center, wrap, background;
 	
-	public MPLabel(String text, Font font, String url) {
+	public UILabel(String text, Font font, String url) {
 		(this.parsed = new Vector())
 		.addElement(new Object[] { text, font, url });
 	}
 	
-	public MPLabel(String text, JSONArray entities) {
+	public UILabel(String text, JSONArray entities, boolean wrap) {
 		parsed = new Vector();
+		this.wrap = wrap;
 		MP.wrapRichText(this, null, text, entities, 0);
 	}
 
 	void appendWord(String text, Font font, String url) {
 		parsed.addElement(new Object[] { text, font, url });
+		requestLayout();
 	}
-	
-	void paint(Graphics g, int x, int y, int w, int h) {
+
+	void paint(Graphics g, int x, int y, int w) {
 		if (render == null) return;
 		int l = render.size();
+		if (background) {
+			g.setColor(color);
+			
+		}
 		g.setColor(color);
 		for (int i = 0; i < l; ++i) {
 			Object[] obj = (Object[]) render.elementAt(i);
@@ -42,15 +69,20 @@ public class MPLabel extends MPItem {
 		}
 	}
 
-	void layout(int width) {
-		if (layout == width) return;
-		layout = width;
+	int layout(int width) {
+		if (!layoutRequest && layoutWidth == width) {
+			return contentHeight;
+		}
+		layoutWidth = width;
 		
 		width -= WIDTH_MARGIN * 2;
 		
 		if (render == null) {
 			render = new Vector();
 		} else render.removeAllElements();
+		if (urls == null) {
+			urls = new Vector();
+		} else urls.removeAllElements();
 		
 		Vector res = render;
 		int x = 0, y = 0, idx = 0;
@@ -109,7 +141,7 @@ public class MPLabel extends MPItem {
 		}
 		
 		contentWidth = y == 0 ? x : width;
-		contentHeight = y + fh;
+		return contentHeight = y + fh;
 	}
 	
 	private static int[] split(String text, Font font, int width, int x, int y, int idx, int ch, int sl, int fh, Vector res) {
