@@ -101,7 +101,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 	}
 	
-	int layout(int width) {
+	public int layout(int width) {
 		if (!layoutRequest && layoutWidth == width) {
 			return contentHeight;
 		}
@@ -116,6 +116,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 		// time
 		h += MP.smallPlainFontHeight + MARGIN_HEIGHT;
+		
 		return contentHeight = h;
 	}
 	
@@ -142,6 +143,10 @@ public class UIMessage extends UIItem implements LangConstants {
 		int[] menu = focusChild != null ? focusChild.menu() : null;
 		
 		return menu;
+	}
+	
+	public String toString() {
+		return "UIMessage{" + y + " " + contentHeight + "}";
 	}
 
 }

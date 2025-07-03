@@ -69,7 +69,7 @@ public class UILabel extends UIItem {
 		}
 	}
 
-	int layout(int width) {
+	public int layout(int width) {
 		if (!layoutRequest && layoutWidth == width) {
 			return contentHeight;
 		}
@@ -89,6 +89,7 @@ public class UILabel extends UIItem {
 		
 		int fh = 0;
 		int l = parsed.size();
+		int[] out = new int[3];
 		for (int ei = 0; ei < l; ++ei) {
 			int startIdx = idx;
 			Object[] e = (Object[]) parsed.elementAt(ei);
@@ -114,19 +115,19 @@ public class UILabel extends UIItem {
 			}
 			
 			if (text.indexOf('\n', ch) == -1) {
-				int[] out = split(text, font, width, x, y, idx, ch, sl, fh, res);
+				split(text, font, width, x, y, idx, ch, sl, fh, res, out);
 				x = out[0]; y = out[1]; idx = out[2];
 			} else {
 				int j = ch;
 				for (int i = ch; i < sl; ++i) {
 					if ((c = text.charAt(i)) == '\n') {
-						int[] out = split(text, font, width, x, y, idx, j, i, fh, res);
+						split(text, font, width, x, y, idx, j, i, fh, res, out);
 						x = 0; y = out[1] + fh; idx = out[2];
 						j = i + 1;
 					}
 				}
 				if (j != sl) {
-					int[] out = split(text, font, width, x, y, idx, j, sl, fh, res);
+					split(text, font, width, x, y, idx, j, sl, fh, res, out);
 					x = out[0]; y = out[1]; idx = out[2];
 				}
 			}
@@ -144,7 +145,7 @@ public class UILabel extends UIItem {
 		return contentHeight = y + fh;
 	}
 	
-	private static int[] split(String text, Font font, int width, int x, int y, int idx, int ch, int sl, int fh, Vector res) {
+	private static void split(String text, Font font, int width, int x, int y, int idx, int ch, int sl, int fh, Vector res, int[] out) {
 		if (ch != sl) {
 			int ew = font.substringWidth(text, ch, sl - ch);
 			if (x + ew < width) {
@@ -178,7 +179,7 @@ public class UILabel extends UIItem {
 				}
 			}
 		}
-		return new int[] {x, y, idx};
+		out[0] = x; out[1] = y; out[2] = idx;
 	}
 	
 }

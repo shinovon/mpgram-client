@@ -24,7 +24,7 @@ import java.util.Vector;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.Item;
+import javax.microedition.lcdui.Ticker;
 
 public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 
@@ -95,6 +95,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 	int menuAnimTarget = -1;
 	float menuAnimProgress;
 	int menuHeight = 40;
+	
+	String log;
 	
 	ChatCanvas() {
 		setFullScreenMode(true);
@@ -446,6 +448,13 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 				}
 			}
 		}
+		
+		g.setColor(-1);
+		g.setFont(MP.smallPlainFont);
+		g.drawString("w" + width + " h" + height + " c" + this.contentHeight + " l" + this.clipHeight + " s" + scroll + " t" + top, 20, 20, 0);
+		if (log != null) {
+			g.drawString(log, 20, 50, 0);
+		}
 
 		// limit fps
 		if (deltaTime < 32) {
@@ -572,15 +581,20 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 				}
 				if (game == Canvas.DOWN) {
 					if (scrollTargetItem != null && isVisible(scrollTargetItem, clipHeight / 5)) {
+						log = "next down " + clipHeight;
 						repaint = true;
 						focusItem(scrollTargetItem);
 						scrollCurrentItem = scrollTargetItem;
 						if (isEndVisible(scrollTargetItem)) {
 							scrollTargetItem = getFirstFocusableItemOnScreen(items.indexOf(scrollCurrentItem), dir);
+							log = "end 1 " + scrollTargetItem;
 							if (scrollTargetItem != null && isEndVisible(scrollTargetItem)) {
+								log = "break 1 " + scrollTargetItem;
 								break scroll;
 							}
 						}
+					} else {
+						log = "down target not vis " + scrollTargetItem;
 					}
 					repaint = true;
 					scrollTo(Math.min(scroll + scrollAmount, contentHeight - clipHeight));
@@ -590,15 +604,20 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 					}
 				} else {
 					if (scrollTargetItem != null && isVisible(scrollTargetItem, clipHeight / 5)) {
+						log = "next up";
 						repaint = true;
 						focusItem(scrollTargetItem);
 						scrollCurrentItem = scrollTargetItem;
 						if (isTopVisible(scrollTargetItem)) {
 							scrollTargetItem = getFirstFocusableItemOnScreen(items.indexOf(scrollCurrentItem), dir);
+							log = "top 1 " + scrollTargetItem;
 							if (scrollTargetItem != null && isTopVisible(scrollTargetItem)) {
+								log = "break 2 " + scrollTargetItem;
 								break scroll;
 							}
 						}
+					} else {
+						log = "up target not vis " + scrollTargetItem;
 					}
 					repaint = true;
 					scrollTo(Math.max(scroll - scrollAmount, 0));
@@ -709,7 +728,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 	private void layout(int idx, int w, int h, boolean reverse) {
 		int l = items.size();
 		if (l == 0 || idx == -1) return;
-		idx = Math.min(l, idx);
+		idx = Math.min(l - 1, idx);
+		if (idx < 0) idx = 0;
+		else if (idx > 0) idx--;
 		System.out.println("layout " + idx);
 		
 		int prevScroll = scroll;
@@ -732,6 +753,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 		
 		contentHeight = y;
 		System.out.println("layout done " + y);
+		log = "layout done " + y + " " + idx;
 		
 		if (prevScrollItemY != 0) {
 			scroll = prevScroll - prevScrollItemY + scrollItem.y;
@@ -746,7 +768,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 	}
 	
 	public void queueRepaint() {
-		repaint();
+		if (isShown()) repaint();
 	}
 	
 	private boolean focusItem(UIItem item) {
@@ -904,6 +926,24 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 	public void setBotAnswer(JSONObject j) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	//
+	
+	public String getTitle() {
+		return super.getTitle();
+	}
+	
+	public boolean isShown() {
+		return super.isShown();
+	}
+	
+	public Ticker getTicker() {
+		return super.getTicker();
+	}
+	
+	public void setTicker(Ticker t) {
+		super.setTicker(t);
 	}
 	
 	//

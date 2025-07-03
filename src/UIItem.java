@@ -42,7 +42,7 @@ public class UIItem {
 	 * @param width Container width
 	 * @return Calculated height
 	 */
-	int layout(int width) {
+	public int layout(int width) {
 		layoutWidth = width;
 		return contentHeight;
 	}
