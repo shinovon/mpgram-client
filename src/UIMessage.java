@@ -128,6 +128,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				label = new UILabel(text, MP.smallPlainFont, null);
 			}
 			label.color = -1;
+			label.linkColor = 0x71BAFA;
 			this.text = label;
 		}
 		
@@ -264,14 +265,14 @@ public class UIMessage extends UIItem implements LangConstants {
 			return contentHeight = h;
 		}
 		int cw = Math.min(MAX_WIDTH, width) - PADDING * 2 - MARGIN_WIDTH * 2 - MARGIN_SIDE;
-		if (text != null) {
-			text.y = h - MARGIN_HEIGHT - PADDING;
-			h += text.layout(cw);
-		}
 		if (!out) {
 			h += MP.smallBoldFontHeight;
 			nameRender = UILabel.ellipsis(name, MP.smallPlainFont,
 					cw - timeWidth - PADDING * 2 - (edited ? (MP.smallPlainFont.stringWidth(MP.L[Edited]) + 2) : 0));
+		}
+		if (text != null) {
+			text.y = h - MARGIN_HEIGHT - PADDING;
+			h += text.layout(cw);
 		}
 		// time
 		if (out) h += MP.smallPlainFontHeight;
@@ -281,11 +282,18 @@ public class UIMessage extends UIItem implements LangConstants {
 	
 	boolean grabFocus() {
 		focus = true;
+		focusChild = text;
+		if (focusChild != null) {
+			if (!focusChild.grabFocus()) focusChild = null;
+		}
 		return true;
 	}
 	
 	void lostFocus() {
 		focus = false;
+		if (focusChild != null) {
+			focusChild.lostFocus();
+		}
 	}
 	
 	int traverse(int dir, int height, int scrollY) {

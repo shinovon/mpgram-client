@@ -485,9 +485,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 		if (reverse) {
 			int y = h - bottom + scroll;
 			for (int i = 0; i < l; ++i) {
+				if (y < 0) break;
 				UIItem item = (UIItem) items.elementAt(i);
 				int ih = item.contentHeight;
 				y -= ih;
+				if (y > clipHeight) continue;
 				item.paint(g, 0, y, w);
 			}
 		} else {
@@ -522,7 +524,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 					// handle long tap
 					longTap = true;
 					focusItem(pointedItem);
-					pointedItem.longTap(pointerX, pointerY - pointedItem.y - top - scroll);
+					int y = pointerY;
+					pointedItem.longTap(pointerX, reverse ? y - (bottom + scroll - pointedItem.y + height - pointedItem.contentHeight) : y - pointedItem.y - top - scroll);
 				}
 			}
 		}
@@ -698,6 +701,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 	}
 	
 	protected void pointerPressed(int x, int y) {
+		focusItem(null);
 		pressed = true;
 		dragging = false;
 		dragYHold = 0;
@@ -742,7 +746,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 			if (!dragging) {
 				if (pointedItem != null && pointedItem.focusable) {
 					focusItem(pointedItem);
-					pointedItem.tap(x, reverse ? pointedItem.contentHeight - (height - y - top - scroll) : y - pointedItem.y - top - scroll);
+					// h - bottom + scroll - contentHeight
+					pointedItem.tap(x, reverse ? y - (bottom + scroll - pointedItem.y + height - pointedItem.contentHeight) : y - pointedItem.y - top - scroll);
 				}
 			} else {
 				int move = 0;

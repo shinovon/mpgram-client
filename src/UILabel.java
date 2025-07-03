@@ -186,12 +186,19 @@ public class UILabel extends UIItem {
 	}
 	
 	int traverse(int dir, int height, int scrollY) {
+		if (!focusable || urls.size() == 0) return 0;
 		if (dir == Canvas.UP) {
-			if (focusIndex == 0) return 0;
+			if (focusIndex <= 0) {
+				focusLink(focusIndex = 0);
+				return 0;
+			}
 			focusLink(--focusIndex);
 			return Integer.MAX_VALUE;
 		} else if (dir == Canvas.DOWN) {
-			if (focusIndex == urls.size() - 1) return 0;
+			if (focusIndex >= urls.size() - 1) {
+				focusLink(focusIndex = urls.size() - 1);
+				return 0;
+			}
 			focusLink(++focusIndex);
 			return Integer.MAX_VALUE;
 		}
@@ -214,7 +221,6 @@ public class UILabel extends UIItem {
 	
 	synchronized int getUrlAt(int x, int y) {
 		int l = urls.size();
-		System.out.println("get " + l);
 		for (int i = 0; i < l; ++i) {
 			Vector v = (Vector) ((Object[]) urls.elementAt(i))[1];
 			int l2 = v.size();
