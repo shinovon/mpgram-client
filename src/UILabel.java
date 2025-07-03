@@ -19,6 +19,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Font;
@@ -30,19 +31,19 @@ public class UILabel extends UIItem {
 	
 	Vector parsed = new Vector();
 	Vector render;
-	Vector urls;
+	Hashtable urls;
+	Vector selectedParts; String selectedUrl;
 
-	int color;
-	boolean center, wrap, background;
+	int color = -1, bgColor, linkColor;
+	boolean center, wrap = true, background;
 	
 	public UILabel(String text, Font font, String url) {
 		(this.parsed = new Vector())
 		.addElement(new Object[] { text, font, url });
 	}
 	
-	public UILabel(String text, JSONArray entities, boolean wrap) {
+	public UILabel(String text, JSONArray entities) {
 		parsed = new Vector();
-		this.wrap = wrap;
 		MP.wrapRichText(this, null, text, entities, 0);
 	}
 
@@ -55,17 +56,25 @@ public class UILabel extends UIItem {
 		if (render == null) return;
 		int l = render.size();
 		if (background) {
-			g.setColor(color);
-			
+			g.setColor(bgColor);
 		}
 		g.setColor(color);
 		for (int i = 0; i < l; ++i) {
 			Object[] obj = (Object[]) render.elementAt(i);
 			int[] pos = (int[]) obj[2];
-			g.setFont((Font) obj[1]);
-			g.drawString((String) obj[0],
-					x + pos[0] + (center ? w >> 1 : 0) + WIDTH_MARGIN, y + pos[1],
+			Font font;
+			String text;
+			int tx = x + pos[0] + (center ? w >> 1 : 0) + WIDTH_MARGIN;
+			int ty = y + pos[1];
+			g.setFont(font = (Font) obj[1]);
+			g.drawString(text = (String) obj[0],
+					tx, ty,
 					center ? Graphics.TOP | Graphics.HCENTER : 0);
+			if (selectedParts != null && selectedParts.contains(obj)) {
+				g.setColor(0xababab);
+				g.drawRect(tx, ty, font.stringWidth(text), font.getHeight());
+				g.setColor(color);
+			}
 		}
 	}
 
@@ -81,8 +90,8 @@ public class UILabel extends UIItem {
 			render = new Vector();
 		} else render.removeAllElements();
 		if (urls == null) {
-			urls = new Vector();
-		} else urls.removeAllElements();
+			urls = new Hashtable();
+		} else urls.clear();
 		
 		Vector res = render;
 		int x = 0, y = 0, idx = 0;
@@ -137,7 +146,7 @@ public class UILabel extends UIItem {
 				for (int i = startIdx; i < idx; ++i) {
 					v.addElement(res.elementAt(i));
 				}
-				urls.addElement(new Object[] {url, v});
+				urls.put(url, v);
 			}
 		}
 		

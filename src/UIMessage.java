@@ -41,15 +41,37 @@ public class UIMessage extends UIItem implements LangConstants {
 	String name, time;
 	int timeWidth;
 	
-	UIMessage(JSONObject message) {
-		c++;
+	UIMessage(JSONObject message, ChatCanvas chat) {
 		focusable = true;
-		text = new UILabel(c + "", MP.smallPlainFont, "");
-		text.color = -1; // message fg color
-		name = "Shinovon";
-		time = "18:" + MP.n(c % 60);
+		if (message == null) {
+			// test
+			c++;
+			text = new UILabel(c + "", MP.smallPlainFont, "");
+			text.color = -1; // message fg color
+			name = "Shinovon";
+			time = "18:" + MP.n(c % 60);
+			timeWidth = MP.smallPlainFont.stringWidth(time);
+			out = c % 2 == 0;
+			return;
+		}
+		out = message.getBoolean("out", false) && !chat.broadcast;
+		String text = message.getString("text", null);
+		if (text != null) {
+			UILabel label;
+			if (MP.parseRichtext && message.has("entities")) {
+				label = new UILabel(text, message.getArray("entities"));
+			} else {
+				label = new UILabel(text, MP.smallPlainFont, null);
+			}
+			label.color = -1;
+			this.text = label;
+		}
+		
+		StringBuffer sb = new StringBuffer();
+		
+		sb.setLength(0);
+		time = MP.appendTime(sb, message.getLong("date")).toString();
 		timeWidth = MP.smallPlainFont.stringWidth(time);
-		out = c % 2 == 0;
 	}
 	
 	void paint(Graphics g, int x, int y, int w) {
