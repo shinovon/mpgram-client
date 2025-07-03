@@ -518,7 +518,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 	protected void pointerDragged(int x, int y) {
 		final int dY = pointerY - y;
 		if (dragging || dY > 1 || dY < -1
-				|| dragYHold + dY > 4 || dragYHold + dY < -4) {
+				|| dragYHold + dY > 2 || dragYHold + dY < -2) {
 			dragging = true;
 			int d = dY + dragYHold;
 			scroll += d;
@@ -553,7 +553,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 			}
 			System.out.println("k " + move + " " + moveTime);
 			if (moveTime > 0) {
-				float res = (150 * move) / moveTime; 
+				float res = (150f * move) / moveTime; 
 				if (kineticScroll < 0 && res > 0) kineticScroll = 0;
 				kineticScroll += res;
 			}
