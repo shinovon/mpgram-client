@@ -37,6 +37,8 @@ public class UILabel extends UIItem {
 	int color = -1, bgColor, linkColor;
 	boolean center, wrap = true, background;
 	
+	public UILabel() {}
+	
 	public UILabel(String text, Font font, String url) {
 		(this.parsed = new Vector())
 		.addElement(new Object[] { text, font, url });
@@ -62,17 +64,21 @@ public class UILabel extends UIItem {
 		for (int i = 0; i < l; ++i) {
 			Object[] obj = (Object[]) render.elementAt(i);
 			int[] pos = (int[]) obj[2];
-			Font font;
-			String text;
-			int tx = x + pos[0] + (center ? w >> 1 : 0) + WIDTH_MARGIN;
-			int ty = y + pos[1];
-			g.setFont(font = (Font) obj[1]);
-			g.drawString(text = (String) obj[0],
-					tx, ty,
-					center ? Graphics.TOP | Graphics.HCENTER : 0);
+			Font font = (Font) obj[1];
+			String text = (String) obj[0];
+			int tx = x + pos[0] + WIDTH_MARGIN, ty = y + pos[1];
+			int tw = font.stringWidth(text), th = font.getHeight();
+			if (background) {
+				g.setColor(bgColor);
+				g.fillRect(tx, ty, tw, th);
+				g.setColor(color);
+			}
+			g.setFont(font);
+			g.drawString(text,
+					tx, ty, 0);
 			if (selectedParts != null && selectedParts.contains(obj)) {
 				g.setColor(0xababab);
-				g.drawRect(tx, ty, font.stringWidth(text), font.getHeight());
+				g.drawRect(tx, ty, tw, th);
 				g.setColor(color);
 			}
 		}
@@ -95,6 +101,8 @@ public class UILabel extends UIItem {
 		
 		Vector res = render;
 		int x = 0, y = 0, idx = 0;
+		
+		boolean center = this.center;
 		
 		int fh = 0;
 		int l = parsed.size();
@@ -124,19 +132,19 @@ public class UILabel extends UIItem {
 			}
 			
 			if (text.indexOf('\n', ch) == -1) {
-				split(text, font, width, x, y, idx, ch, sl, fh, res, out);
+				split(text, font, width, x, y, idx, ch, sl, fh, res, center, out);
 				x = out[0]; y = out[1]; idx = out[2];
 			} else {
 				int j = ch;
 				for (int i = ch; i < sl; ++i) {
 					if ((c = text.charAt(i)) == '\n') {
-						split(text, font, width, x, y, idx, j, i, fh, res, out);
+						split(text, font, width, x, y, idx, j, i, fh, res, center, out);
 						x = 0; y = out[1] + fh; idx = out[2];
 						j = i + 1;
 					}
 				}
 				if (j != sl) {
-					split(text, font, width, x, y, idx, j, sl, fh, res, out);
+					split(text, font, width, x, y, idx, j, sl, fh, res, center, out);
 					x = out[0]; y = out[1]; idx = out[2];
 				}
 			}
@@ -149,12 +157,26 @@ public class UILabel extends UIItem {
 				urls.put(url, v);
 			}
 		}
+		if (center) centerRow(width, 0, x, y, res);
 		
 		contentWidth = y == 0 ? x : width;
 		return contentHeight = y + fh;
 	}
 	
-	private static void split(String text, Font font, int width, int x, int y, int idx, int ch, int sl, int fh, Vector res, int[] out) {
+	static String ellipsis(String text, Font font, int width) {
+		if (font.stringWidth(text) < width) return text;
+		int l = text.length();
+		width -= font.stringWidth("...") + 6;
+		for (int i = 1; i < l; ++i) {
+			String s = text.substring(0, i);
+			if (font.stringWidth(s) > width) {
+				return s.concat("...");
+			}
+		}
+		return "...";
+	}
+	
+	private static void split(String text, Font font, int width, int x, int y, int idx, int ch, int sl, int fh, Vector res, boolean center, int[] out) {
 		if (ch != sl) {
 			int ew = font.substringWidth(text, ch, sl - ch);
 			if (x + ew < width) {
@@ -167,15 +189,23 @@ public class UILabel extends UIItem {
 							for (int j = i; j > ch; j--) {
 								char c = text.charAt(j);
 								if (c == ' ' || (c >= ',' && c <= '/')) {
-									res.addElement(new Object[] { text.substring(ch, ++ j), font, new int[] {x, y} });
+									String t = text.substring(ch, ++ j);
+									if (center) {
+										x = centerRow(width, font.stringWidth(t), x, y, res);
+									}
+									res.addElement(new Object[] { t, font, new int[] {x, y} });
 									x = 0; y += fh; idx ++;
 									
 									i = ch = j;
 									break w;
 								}
 							}
-	
-							res.addElement(new Object[] { text.substring(ch, i), font, new int[] {x, y} });
+
+							String t = text.substring(ch, i);
+							if (center) {
+								x = centerRow(width, font.stringWidth(t), x, y, res);
+							}
+							res.addElement(new Object[] { t, font, new int[] {x, y} });
 							x = 0; y += fh; idx ++;
 							ch = i;
 						}
@@ -189,6 +219,18 @@ public class UILabel extends UIItem {
 			}
 		}
 		out[0] = x; out[1] = y; out[2] = idx;
+	}
+	
+	private static int centerRow(int width, int t, int x, int y, Vector res) {
+		int rw = (width - (x + t)) / 2;
+		x += rw;
+		for (int k = res.size() - 1; k >= 0; --k) {
+			Object[] obj = (Object[]) res.elementAt(k);
+			if (((int[]) obj[2])[1] == y) {
+				((int[]) obj[2])[0] += rw;
+			} else break;
+		}
+		return x;
 	}
 	
 }

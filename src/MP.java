@@ -165,6 +165,7 @@ public class MP extends MIDlet
 	static final int smallPlainFontHeight = smallPlainFont.getHeight();
 	static final int smallPlainFontSpaceWidth = smallPlainFont.charWidth(' ');
 	static final int smallBoldFontHeight = smallBoldFont.getHeight();
+	static final int medPlainFontHeight = medPlainFont.getHeight();
 
 	static final IllegalStateException cancelException = new IllegalStateException("cancel");
 	
@@ -231,6 +232,7 @@ public class MP extends MIDlet
 	static boolean notifyAvas = true;
 //#endif
 	static boolean updateChatsList;
+	static boolean useChatCanvas = true;
 	
 	// platform
 	static boolean symbianJrt;
@@ -865,10 +867,6 @@ public class MP extends MIDlet
 		f.append(s);
 		
 		authForm = f;
-		
-		openLoad(new ChatCanvas());
-		
-		/*
 		// load main form
 		if (user == null || userState < 3) {
 			display(mainDisplayable = authForm);
@@ -895,7 +893,6 @@ public class MP extends MIDlet
 		}
 		
 		start(RUN_CHECK_OTA, null);
-		*/
 	}
 	
 	// endregion
@@ -3595,6 +3592,10 @@ public class MP extends MIDlet
 		if (d instanceof MPChat && id.equals(((MPChat) d).id())
 				&& ((MPChat) d).postId() == null && ((MPChat) d).query() == null
 				&& ((MPChat) d).mediaFilter() == null) {
+			return;
+		}
+		if (useChatCanvas) {
+			openLoad(new ChatCanvas(id, null, msg, 0));
 			return;
 		}
 		openLoad(new ChatForm(id, null, msg, 0));
