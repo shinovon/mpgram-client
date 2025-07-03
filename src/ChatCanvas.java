@@ -19,12 +19,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 import java.util.Vector;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
 
-public class ChatCanvas extends Canvas implements MPChat {
+public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 
 	Thread thread;
 	
@@ -38,6 +39,23 @@ public class ChatCanvas extends Canvas implements MPChat {
 	int limit = MP.messagesLimit;
 	int addOffset, offsetId;
 	int messageId, topMsgId;
+
+	boolean infoLoaded;
+	boolean left, broadcast, forum;
+	boolean canWrite, canDelete, canBan, canPin;
+	
+	int dir;
+	int firstMsgId, lastMsgId;
+	boolean endReached, hasOffset;
+	private int idOffset;
+	
+	boolean switched;
+	boolean update;
+	
+	// discussion
+	String postPeer, postId;
+	ChatTopicsList topicsList;
+	JSONArray topics;
 	
 	Vector/*<UIItem>*/ items = new Vector();
 	int layoutStart;
@@ -50,21 +68,194 @@ public class ChatCanvas extends Canvas implements MPChat {
 	int lastScrollDir;
 	UIItem scrollCurrentItem, scrollTargetItem;
 	UIItem focusedItem;
+	float kineticScroll;
+	
+	// pointer
+	int pressX, pressY, pointerX, pointerY;
+	boolean pressed, dragging;
+	int dragYHold;
+	
+	static final int moveSamples = 4;
+	int[] moves = new int[moveSamples];
+	long[] moveTimes = new long[moveSamples];
+	int movesIdx;
+	
+	long lastPaintTime;
+	
+	ChatCanvas() {
+		setCommandListener(MP.midlet);
+		addCommand(MP.backCmd);
+		setFullScreenMode(true);
+	}
 	
 	public void load() {
-		// TODO
-		setFullScreenMode(true);
-		add(new UIMessage(null));
-//		add(new UIMessage(null));
-//		add(new UIMessage(null));
-//		add(new UIMessage(null));
-//		add(new UIMessage(null));
-//		add(new UIMessage(null));
-//		add(new UIMessage(null));
-//		add(new UIMessage(null));
-//		add(new UIMessage(null));
-//		add(new UIMessage(null));
-//		add(new UIMessage(null));
+		Thread thread = this.thread = Thread.currentThread();
+		
+		// remove all
+		items.removeAllElements();
+		scrollCurrentItem = scrollTargetItem = focusedItem = null;
+		
+		try {
+			StringBuffer sb = new StringBuffer();
+			if (!infoLoaded) {
+				if (postPeer != null) {
+					sb.append("getDiscussionMessage&peer=").append(postPeer)
+					.append("&id=").append(postId);
+					JSONObject j = (JSONObject) MP.api(sb.toString());
+					id = j.getString("peer_id");
+					topMsgId = j.getInt("id");
+					if (messageId == 0) {
+						messageId = j.getInt("read");
+					} else if (messageId != 0 && j.getInt("unread", 0) > limit) {
+						offsetId = messageId = j.getInt("read");
+						addOffset = -limit;
+						dir = 1;
+					} else {
+						messageId = 0;
+					}
+					sb.setLength(0);
+				}
+				
+				JSONObject peer = MP.getPeer(id, true);
+				
+				left = peer.getBoolean("l", false);
+				broadcast = peer.getBoolean("c", false);
+				forum = peer.getBoolean("f", false);
+				id = peer.getString("id");
+				username = peer.getString("name", null);
+	
+				title = MP.getName(id, false);
+	
+				if (mediaFilter == null) {
+					canWrite = !broadcast;
+					JSONObject info = (JSONObject) MP.api((messageId == -1 && !forum ? "getFullInfo&id=" : "getInfo&id=").concat(id));
+					if (id.charAt(0) == '-') {
+						JSONObject chat = info.getObject("Chat");
+						if (chat.has("admin_rights")) {
+							JSONObject adminRights = chat.getObject("admin_rights");
+							canWrite = !broadcast || adminRights.getBoolean("post_messages", false);
+							canDelete = adminRights.getBoolean("delete_messages", false);
+							canBan = !broadcast && adminRights.getBoolean("ban_users", false);
+							canPin = adminRights.getBoolean("pin_messages", false);
+						}
+						
+						if (forum && topMsgId == 0) {
+							ChatTopicsList list = new ChatTopicsList(this, title);
+							
+							JSONArray topics = ((JSONObject) MP.api("getForumTopics&peer=".concat(id))).getArray("res");
+							int l = topics.size();
+							for (int i = 0; i < l; i++) {
+								JSONObject topic = topics.getObject(i);
+								// TODO
+								list.append(topic.getString("title", "General"), null);
+							}
+							
+							if (thread != this.thread) throw MP.cancelException;
+							MP.deleteFromHistory(this);
+							MP.display(list);
+							
+							this.topics = topics;
+							this.topicsList = list;
+							infoLoaded = true;
+							return;
+						}
+					} else {
+						canPin = true;
+						if (MP.chatStatus && info.getObject("User").has("status")) {
+	//						setStatus(info.getObject("User").getObject("status"));
+						}
+					}
+					JSONObject full;
+					if (messageId == -1 && (full = info.getObject("full")).has("read_inbox_max_id")) {
+						messageId = 0;
+						int maxId = full.getInt("read_inbox_max_id");
+						if (maxId != 0 && full.getInt("unread_count", 0) > limit) {
+							offsetId = messageId = maxId;
+							addOffset = -limit;
+							dir = 1;
+						}
+					}
+				}
+				infoLoaded = true;
+			}
+
+			
+			boolean selfChat = MP.selfId.equals(id);
+			boolean reverse = MP.reverseChat && mediaFilter == null;
+			
+			if (startBot != null) {
+				try {
+					sb.append("startBot&id=").append(id);
+					MP.appendUrl(sb.append("&start="), startBot);
+					
+					MP.api(sb.toString());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				sb.setLength(0);
+			}
+
+			if (messageId == -1) messageId = 0;
+			if (messageId != 0 && offsetId == 0) {
+				// message to focus
+				offsetId = messageId;
+				addOffset = -1;
+			}
+
+			if (query != null || topMsgId != 0 || mediaFilter != null) {
+				sb.append("searchMessages");
+				if (mediaFilter != null) {
+					sb.append("&filter=").append(mediaFilter);
+					setTitle(MP.L[ChatMedia_Title]);
+				}
+				if (query != null) {
+					if (mediaFilter == null) {
+						setTitle(MP.L[Search_TitlePrefix].concat(title));
+					}
+					MP.appendUrl(sb.append("&q="), query);
+				}
+			} else {
+				sb.append("getHistory&read=1");
+			}
+			
+			sb.append("&media=1&peer=").append(id);
+			if (limit != 0) {
+				sb.append("&limit=").append(limit);
+			}
+			if (addOffset != 0) {
+				sb.append("&add_offset=").append(addOffset);
+			}
+			if (offsetId != 0) {
+				sb.append("&offset_id=").append(offsetId);
+			}
+			if (topMsgId != 0) {
+				sb.append("&top_msg_id=").append(topMsgId);
+			}
+			
+			if (thread != this.thread) throw MP.cancelException;
+			
+			JSONObject j = (JSONObject) MP.api(sb.toString());
+			MP.fillPeersCache(j);
+			
+			if (thread != this.thread) throw MP.cancelException;
+			
+			idOffset = j.getInt("off", Integer.MIN_VALUE);
+			if (idOffset != Integer.MIN_VALUE && addOffset < 0) {
+				idOffset += addOffset;
+			}
+			endReached = idOffset == 0 || (idOffset == Integer.MIN_VALUE && addOffset <= 0);
+			hasOffset = addOffset > 0 || offsetId > 0;
+			
+			JSONArray messages = j.getArray("messages");
+			int l = messages.size();
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		for (int i = 0; i < 100; i++)
+			add(new UIMessage(null));
 	}
 	
 	void closed(boolean destroy) {
@@ -80,11 +271,17 @@ public class ChatCanvas extends Canvas implements MPChat {
 	protected void paint(Graphics g) {
 		int w = getWidth(), h = getHeight();
 		int contentHeight = this.contentHeight;
+		
+		long now = System.currentTimeMillis();
+		long deltaTime = now - lastPaintTime;
+		
 //		boolean reverse = MP.reverseChat;
 		if (width != w) {
 			layoutStart = 0;
 		}
 		width = w; height = h;
+		
+		boolean animate = false;
 		
 		if (layoutStart != Integer.MAX_VALUE) {
 			int idx = layoutStart;
@@ -102,8 +299,49 @@ public class ChatCanvas extends Canvas implements MPChat {
 		}
 		
 		if (scrollTarget != -1) {
-			scroll = scrollTarget;
-			scrollTarget = -1;
+			if (contentHeight <= height) {
+				scroll = 0;
+				scrollTarget = -1;
+			} else {
+				if (Math.abs(scroll - scrollTarget) < 1) {
+					scroll = scrollTarget;
+					scrollTarget = -1;
+				} else {
+					scroll = (int) MP.lerp(scroll, scrollTarget, 4, 20);
+					animate = true;
+				}
+				if (scroll < 0) {
+					scroll = 0;
+					scrollTarget = -1;
+					animate = false;
+				} else if (scroll > contentHeight - h) {
+					scroll = contentHeight - h;
+					scrollTarget = -1;
+					animate = false;
+				}
+			}
+		}
+		
+		if (kineticScroll != 0) {
+			if ((kineticScroll > -1 && kineticScroll < 1)
+					|| contentHeight <= height
+					|| scroll <= 0
+					|| scroll >= contentHeight - h) {
+				kineticScroll = 0;
+			} else {
+				scroll += (int) kineticScroll;
+				float mul = pressed ? 0.5f : 0.96f;
+				kineticScroll *= mul;
+				float f;
+				if ((f = deltaTime > 33 ? deltaTime / 33f : 1f) >= 2) {
+					int j = (int) f - 1;
+					for (int i = 0; i < j; i++) {
+						scroll += (int) kineticScroll;
+						kineticScroll *= mul;
+					}
+				}
+				animate = true;
+			}
 		}
 
 		int scroll = this.scroll;
@@ -118,15 +356,38 @@ public class ChatCanvas extends Canvas implements MPChat {
 		int l = items.size();
 //		if (reverse) {
 //			
-//		} else { 
+//		} else {
 			int y = -scroll;
 			for (int i = 0; i < l; ++i) {
 				UIItem item = (UIItem) items.elementAt(i);
-//				if (y < -item.contentHeight) continue;
+				int ih = item.contentHeight;
+				if (y < -ih) {
+					y += ih;
+					continue;
+				}
 				item.paint(g, 0, y, w);
-				if ((y += item.contentHeight) > h) break;
+				if (scrollTargetItem == item) {
+					g.setColor(0xFF00FF);
+					g.drawRect(0, y, 100, ih);
+				}
+				if (scrollCurrentItem == item) {
+					g.setColor(0x00FFFF);
+					g.drawRect(20, y, 100, ih);
+				}
+				if ((y += ih) > h) break;
 			}
 //		}
+
+		// limit fps
+		if (deltaTime < 32) {
+			try {
+				Thread.sleep(33 - deltaTime);
+			} catch (Exception ignored) {}
+		}
+		if (animate) {
+			repaint();
+		}
+		lastPaintTime = now;
 	}
 
 	protected void keyPressed(int key) {
@@ -157,6 +418,7 @@ public class ChatCanvas extends Canvas implements MPChat {
 		} else if (game == Canvas.DOWN || game == Canvas.UP) {
 			scroll: {
 				int dir = game == Canvas.DOWN ? 1 : -1;
+				final int scrollAmount = height / 6;
 				if (scrollTargetItem == null && scrollCurrentItem == null) {
 					// get first visible item
 					int l = items.size();
@@ -175,12 +437,11 @@ public class ChatCanvas extends Canvas implements MPChat {
 					if (t != 0) {
 						repaint = true;
 						if (t != Integer.MAX_VALUE) {
-							scrollTarget = t;
+							scrollTo(t);
 						}
 						break scroll;
 					}
 				}
-				final int scrollAmount = height / 6;
 				if (lastScrollDir != dir) {
 					UIItem item = scrollCurrentItem;
 					if (item != null && !isVisible(item)) {
@@ -197,31 +458,38 @@ public class ChatCanvas extends Canvas implements MPChat {
 				if (item != null && isVisible(item)) {
 					focusItem(item);
 				}
-				repaint = true;
 				if (game == Canvas.DOWN) {
 					if (scrollTargetItem != null && isVisible(scrollTargetItem)) {
+						repaint = true;
 						focusItem(scrollTargetItem);
 						scrollCurrentItem = scrollTargetItem;
 						if (isEndVisible(scrollTargetItem)) {
-							scrollTargetItem = null;
-							break scroll;
+							scrollTargetItem = getFirstFocusableItemOnScreen(items.indexOf(scrollCurrentItem), dir);
+							if (scrollTargetItem != null && isEndVisible(scrollTargetItem)) {
+								break scroll;
+							}
 						}
 					}
-					scroll = Math.min(scroll + scrollAmount, contentHeight - height);
+					repaint = true;
+					scrollTo(Math.min(scroll + scrollAmount, contentHeight - height));
 					
 					if (scrollTargetItem != null && isVisible(scrollTargetItem) && isEndVisible(scrollTargetItem)) {
 						scrollTargetItem = null;
 					}
 				} else {
 					if (scrollTargetItem != null && isVisible(scrollTargetItem)) {
+						repaint = true;
 						focusItem(scrollTargetItem);
 						scrollCurrentItem = scrollTargetItem;
 						if (isTopVisible(scrollTargetItem)) {
-							scrollTargetItem = null;
-							break scroll;
+							scrollTargetItem = getFirstFocusableItemOnScreen(items.indexOf(scrollCurrentItem), dir);
+							if (scrollTargetItem != null && isTopVisible(scrollTargetItem)) {
+								break scroll;
+							}
 						}
 					}
-					scroll = Math.max(scroll - scrollAmount, 0);
+					repaint = true;
+					scrollTo(Math.max(scroll - scrollAmount, 0));
 					
 					if (scrollTargetItem != null && isVisible(scrollTargetItem) && isTopVisible(scrollTargetItem)) {
 						scrollTargetItem = null;
@@ -239,15 +507,62 @@ public class ChatCanvas extends Canvas implements MPChat {
 	}
 	
 	protected void pointerPressed(int x, int y) {
-		
+		pressed = true;
+		dragging = false;
+		dragYHold = 0;
+		pressX = pointerX = x;
+		pressY = pointerY = y;
+		movesIdx = 0;
 	}
 	
 	protected void pointerDragged(int x, int y) {
+		final int dY = pointerY - y;
+		if (dragging || dY > 1 || dY < -1
+				|| dragYHold + dY > 4 || dragYHold + dY < -4) {
+			dragging = true;
+			int d = dY + dragYHold;
+			scroll += d;
+			dragYHold = 0;
+		} else {
+			dragYHold += dY;
+		}
 		
+		moves[movesIdx] = dY;
+		moveTimes[movesIdx] = System.currentTimeMillis();
+		movesIdx = (movesIdx + 1) % moveSamples;
+		pointerX = x;
+		pointerY = y;
+		queueRepaint();
 	}
 	
 	protected void pointerReleased(int x, int y) {
-		
+		long now = System.currentTimeMillis();
+		if (!dragging) {
+			// TODO tap handling
+		} else {
+			int move = 0;
+			long moveTime = 0;
+			for (int i = 0; i < moveSamples; i++) {
+				int idx = (movesIdx + moveSamples - 1 - i) % moveSamples;
+				long time;
+				if ((time = now - moveTimes[idx]) > 200) {
+					break;
+				}
+				move += moves[idx];
+				moveTime += time;
+			}
+			System.out.println("k " + move + " " + moveTime);
+			if (moveTime > 0) {
+				float res = (150 * move) / moveTime; 
+				if (kineticScroll < 0 && res > 0) kineticScroll = 0;
+				kineticScroll += res;
+			}
+			dragging = false;
+		}
+		pressed = false;
+		pointerX = x;
+		pointerY = y;
+		queueRepaint();
 	}
 	
 	// ui
@@ -332,7 +647,11 @@ public class ChatCanvas extends Canvas implements MPChat {
 	
 	private void scrollTo(UIItem item) {
 		scrollCurrentItem = item;
-		scrollTarget = item.y;
+		scrollTo(item.y);
+	}
+	
+	private void scrollTo(int y) {
+		scrollTarget = y;
 	}
 	
 	private boolean isVisible(UIItem item) {
@@ -384,18 +703,15 @@ public class ChatCanvas extends Canvas implements MPChat {
 	}
 
 	public boolean update() {
-		// TODO Auto-generated method stub
-		return false;
+		return update;
 	}
 
 	public boolean endReached() {
-		// TODO Auto-generated method stub
-		return false;
+		return endReached;
 	}
 
 	public boolean forum() {
-		// TODO Auto-generated method stub
-		return false;
+		return forum;
 	}
 
 	public boolean switched() {
@@ -404,8 +720,7 @@ public class ChatCanvas extends Canvas implements MPChat {
 	}
 
 	public int topMsgId() {
-		// TODO Auto-generated method stub
-		return 0;
+		return topMsgId;
 	}
 
 	public int firstMsgId() {
@@ -436,8 +751,7 @@ public class ChatCanvas extends Canvas implements MPChat {
 	}
 
 	public void setUpdate(boolean b) {
-		// TODO Auto-generated method stub
-		
+		this.update = b;
 	}
 
 	public void setBotAnswer(JSONObject j) {

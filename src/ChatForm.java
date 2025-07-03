@@ -129,8 +129,6 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 	}
 
 	void loadInternal(Thread thread) throws Exception {
-		deleteAll();
-		
 		if ((MP.reopenChat || (query == null && mediaFilter == null))
 				&& MP.chatUpdates
 				&& (MP.updatesThread != null || MP.updatesRunning)) {

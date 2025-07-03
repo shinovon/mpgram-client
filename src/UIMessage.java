@@ -60,7 +60,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				cw -= MARGIN_WIDTH * 2 + MARGIN_SIDE, h -= (MARGIN_HEIGHT * 2));
 		if (focus) {
 			g.setColor(-1);
-//			g.drawRect(x, y, cw - 1, h - 1);
+			g.drawRect(x, y, cw - 1, h - 1);
 		}
 		cw -= PADDING * 2;
 		int rx = x;
