@@ -51,7 +51,9 @@ public class UIItem {
 		return false;
 	}
 	
-	void lostFocus() {}
+	void lostFocus() {
+		focus = false;
+	}
 	
 	/**
 	 * @param dir Direction: Canvas.UP or Canvas.DOWN
@@ -66,9 +68,11 @@ public class UIItem {
 	}
 	
 	/**
-	 * Middle key pressed or tapped
+	 * Middle soft key pressed
 	 */
-	void action() {}
+	boolean action() {
+		return false;
+	}
 	
 	/**
 	 * Left soft key pressed or long tapped
@@ -89,8 +93,8 @@ public class UIItem {
 		}
 	}
 
-	public void tap(int x, int y) {}
+	void tap(int x, int y) {}
 
-	public void longTap(int x, int y) {}
+	void longTap(int x, int y) {}
 
 }

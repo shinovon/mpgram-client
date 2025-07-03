@@ -258,18 +258,20 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (action) {
 //			h += MP.medPlainFontHeight;
 			if (text != null) {
+				text.y = h - MARGIN_HEIGHT - PADDING;
 				h += text.layout(width);
 			}
 			return contentHeight = h;
 		}
 		int cw = Math.min(MAX_WIDTH, width) - PADDING * 2 - MARGIN_WIDTH * 2 - MARGIN_SIDE;
+		if (text != null) {
+			text.y = h - MARGIN_HEIGHT - PADDING;
+			h += text.layout(cw);
+		}
 		if (!out) {
 			h += MP.smallBoldFontHeight;
 			nameRender = UILabel.ellipsis(name, MP.smallPlainFont,
 					cw - timeWidth - PADDING * 2 - (edited ? (MP.smallPlainFont.stringWidth(MP.L[Edited]) + 2) : 0));
-		}
-		if (text != null) {
-			h += text.layout(cw);
 		}
 		// time
 		if (out) h += MP.smallPlainFontHeight;
@@ -287,19 +289,41 @@ public class UIMessage extends UIItem implements LangConstants {
 	}
 	
 	int traverse(int dir, int height, int scrollY) {
+		if (focusChild != null) {
+			int t = focusChild.traverse(dir, height, scrollY);
+			if (t != 0) {
+				return t;
+			}
+		}
 		return 0;
 	}
 	
-	void action() {
-		if (focusChild != null) {
-			focusChild.action();
+	boolean action() {
+		if (focusChild != null && focusChild.action()) {
+			return true;
 		}
+		return false;
 	}
 	
 	int[] menu() {
 		int[] menu = focusChild != null ? focusChild.menu() : null;
 		
 		return menu;
+	}
+	
+	void tap(int x, int y) {
+		int w = ((ChatCanvas) container).width;
+		int cw = Math.min(MAX_WIDTH, w);
+		if (out && w < 900) {
+			x -= w - cw;
+		}
+		x -= MARGIN_WIDTH + (out && w < 900 ? MARGIN_SIDE : 0);
+		if (x < 0) return;
+		if (text != null && text.focusable && y > text.y && y < text.y + text.contentHeight) {
+			focusChild = text;
+			text.tap(x, y - text.y);
+			return;
+		}
 	}
 	
 	public String toString() {

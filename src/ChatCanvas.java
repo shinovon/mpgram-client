@@ -20,13 +20,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import java.util.Calendar;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.Ticker;
 
 public class ChatCanvas extends Canvas implements MPChat, LangConstants {
@@ -524,7 +522,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 					// handle long tap
 					longTap = true;
 					focusItem(pointedItem);
-					pointedItem.longTap(pointerX - scroll - top, pointerY);
+					pointedItem.longTap(pointerX, pointerY - pointedItem.y - top - scroll);
 				}
 			}
 		}
@@ -642,6 +640,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 				}
 				if (focusedItem != null) {
 					int t = focusedItem.traverse(game, clipHeight, scroll);
+					repaint = true;
 					if (t != 0) {
 						repaint = true;
 						if (t != Integer.MAX_VALUE) {
@@ -741,10 +740,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 		long now = System.currentTimeMillis();
 		if (!longTap && contentPressed) {
 			if (!dragging) {
-				// TODO tap handling
 				if (pointedItem != null && pointedItem.focusable) {
 					focusItem(pointedItem);
-					pointedItem.tap(x, y - pointedItem.y - top - scroll);
+					pointedItem.tap(x, reverse ? pointedItem.contentHeight - (height - y - top - scroll) : y - pointedItem.y - top - scroll);
 				}
 			} else {
 				int move = 0;

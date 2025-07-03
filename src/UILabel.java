@@ -19,9 +19,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-import java.util.Hashtable;
 import java.util.Vector;
 
+import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
@@ -31,11 +31,13 @@ public class UILabel extends UIItem {
 	
 	Vector parsed = new Vector();
 	Vector render;
-	Hashtable urls;
+	Vector urls;
 	Vector selectedParts; String selectedUrl;
 
 	int color = -1, bgColor, linkColor;
 	boolean center, wrap = true, background;
+	
+	int focusIndex;
 	
 	public UILabel() {}
 	
@@ -63,28 +65,32 @@ public class UILabel extends UIItem {
 		g.setColor(color);
 		for (int i = 0; i < l; ++i) {
 			Object[] obj = (Object[]) render.elementAt(i);
-			int[] pos = (int[]) obj[2];
+			int[] pos = (int[]) obj[3];
 			Font font = (Font) obj[1];
 			String text = (String) obj[0];
 			int tx = x + pos[0] + WIDTH_MARGIN, ty = y + pos[1];
-			int tw = font.stringWidth(text), th = font.getHeight();
+			int tw = pos[2], th = font.getHeight();
 			if (background) {
 				g.setColor(bgColor);
 				g.fillRect(tx, ty, tw, th);
 				g.setColor(color);
 			}
+			if (obj[2] != null) {
+				g.setColor(linkColor);
+			}
 			g.setFont(font);
-			g.drawString(text,
-					tx, ty, 0);
-			if (selectedParts != null && selectedParts.contains(obj)) {
+			g.drawString(text, tx, ty, 0);
+			if (focus && selectedParts != null && selectedParts.contains(obj)) {
 				g.setColor(0xababab);
 				g.drawRect(tx, ty, tw, th);
+				g.setColor(color);
+			} else if (obj[2] != null) {
 				g.setColor(color);
 			}
 		}
 	}
 
-	public int layout(int width) {
+	public synchronized int layout(int width) {
 		if (!layoutRequest && layoutWidth == width) {
 			return contentHeight;
 		}
@@ -96,8 +102,8 @@ public class UILabel extends UIItem {
 			render = new Vector();
 		} else render.removeAllElements();
 		if (urls == null) {
-			urls = new Hashtable();
-		} else urls.clear();
+			urls = new Vector();
+		} else urls.removeAllElements();
 		
 		Vector res = render;
 		int x = 0, y = 0, idx = 0;
@@ -132,35 +138,96 @@ public class UILabel extends UIItem {
 			}
 			
 			if (text.indexOf('\n', ch) == -1) {
-				split(text, font, width, x, y, idx, ch, sl, fh, res, center, out);
+				split(text, font, url, width, x, y, idx, ch, sl, fh, res, center, out);
 				x = out[0]; y = out[1]; idx = out[2];
 			} else {
 				int j = ch;
 				for (int i = ch; i < sl; ++i) {
 					if ((c = text.charAt(i)) == '\n') {
-						split(text, font, width, x, y, idx, j, i, fh, res, center, out);
+						split(text, font, url, width, x, y, idx, j, i, fh, res, center, out);
 						x = 0; y = out[1] + fh; idx = out[2];
 						j = i + 1;
 					}
 				}
 				if (j != sl) {
-					split(text, font, width, x, y, idx, j, sl, fh, res, center, out);
+					split(text, font, url, width, x, y, idx, j, sl, fh, res, center, out);
 					x = out[0]; y = out[1]; idx = out[2];
 				}
 			}
 			
 			if (url != null) {
+				focusable = true;
 				Vector v = new Vector();
 				for (int i = startIdx; i < idx; ++i) {
 					v.addElement(res.elementAt(i));
 				}
-				urls.put(url, v);
+				urls.addElement(new Object[] {url, v});
 			}
 		}
 		if (center) centerRow(width, 0, x, y, res);
 		
 		contentWidth = y == 0 ? x : width;
 		return contentHeight = y + fh;
+	}
+	
+	boolean grabFocus() {
+		if (!focusable) return false;
+		focus = true;
+		if (selectedParts == null) {
+			focusLink(focusIndex);
+		}
+		return true;
+	}
+	
+	void focusLink(int idx) {
+		Object[] o = (Object[]) urls.elementAt(idx);
+		selectedUrl = (String) o[0];
+		selectedParts = (Vector) o[1];
+	}
+	
+	int traverse(int dir, int height, int scrollY) {
+		if (dir == Canvas.UP) {
+			if (focusIndex == 0) return 0;
+			focusLink(--focusIndex);
+			return Integer.MAX_VALUE;
+		} else if (dir == Canvas.DOWN) {
+			if (focusIndex == urls.size() - 1) return 0;
+			focusLink(++focusIndex);
+			return Integer.MAX_VALUE;
+		}
+		return 0;
+	}
+	
+	boolean action() {
+		if (!focusable || selectedUrl == null) return false;
+		MP.openUrl(selectedUrl);
+		return true;
+	}
+	
+	void tap(int x, int y) {
+		int idx = getUrlAt(x, y);
+		if (idx != -1) {
+			focusLink(idx);
+			action();
+		}
+	}
+	
+	synchronized int getUrlAt(int x, int y) {
+		int l = urls.size();
+		System.out.println("get " + l);
+		for (int i = 0; i < l; ++i) {
+			Vector v = (Vector) ((Object[]) urls.elementAt(i))[1];
+			int l2 = v.size();
+			for (int j = 0; j < l2; ++j) {
+				Object[] o = (Object[]) v.elementAt(j);
+				int[] pos = (int[]) o[3];
+				if (x >= pos[0] && x < pos[0] + pos[2] && y >= pos[1] && y < pos[1] + pos[3]) {
+					return i;
+				}
+				if (pos[1] > y) break;
+			}
+		}
+		return -1;
 	}
 	
 	static String ellipsis(String text, Font font, int width) {
@@ -176,11 +243,11 @@ public class UILabel extends UIItem {
 		return "...";
 	}
 	
-	private static void split(String text, Font font, int width, int x, int y, int idx, int ch, int sl, int fh, Vector res, boolean center, int[] out) {
+	private static void split(String text, Font font, String url, int width, int x, int y, int idx, int ch, int sl, int fh, Vector res, boolean center, int[] out) {
 		if (ch != sl) {
 			int ew = font.substringWidth(text, ch, sl - ch);
 			if (x + ew < width) {
-				res.addElement(new Object[] { text.substring(ch, sl), font, new int[] {x, y} });
+				res.addElement(new Object[] { text.substring(ch, sl), font, url, new int[] {x, y, ew, fh} });
 				x += ew; idx ++;
 			} else {
 				for (int i = ch; i < sl; i++) {
@@ -190,10 +257,11 @@ public class UILabel extends UIItem {
 								char c = text.charAt(j);
 								if (c == ' ' || (c >= ',' && c <= '/')) {
 									String t = text.substring(ch, ++ j);
+									int tw = font.stringWidth(t);
 									if (center) {
-										x = centerRow(width, font.stringWidth(t), x, y, res);
+										x = centerRow(width, tw, x, y, res);
 									}
-									res.addElement(new Object[] { t, font, new int[] {x, y} });
+									res.addElement(new Object[] { t, font, url, new int[] {x, y, tw, fh} });
 									x = 0; y += fh; idx ++;
 									
 									i = ch = j;
@@ -202,10 +270,11 @@ public class UILabel extends UIItem {
 							}
 
 							String t = text.substring(ch, i);
+							int tw = font.stringWidth(t);
 							if (center) {
-								x = centerRow(width, font.stringWidth(t), x, y, res);
+								x = centerRow(width, tw, x, y, res);
 							}
-							res.addElement(new Object[] { t, font, new int[] {x, y} });
+							res.addElement(new Object[] { t, font, url, new int[] {x, y, tw, fh} });
 							x = 0; y += fh; idx ++;
 							ch = i;
 						}
@@ -213,8 +282,9 @@ public class UILabel extends UIItem {
 				}
 				if (ch != sl) {
 					String s = text.substring(ch, sl);
-					res.addElement(new Object[] { s, font, new int[] {x, y} });
-					x += font.stringWidth(s); idx ++;
+					int tw = font.stringWidth(s);
+					res.addElement(new Object[] { s, font, url, new int[] {x, y, tw, fh} });
+					x += tw; idx ++;
 				}
 			}
 		}
