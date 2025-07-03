@@ -34,19 +34,22 @@ public class UIMessage extends UIItem implements LangConstants {
 	UIItem focusChild;
 	int focusIndex = -1;
 	
+	static int c;
+	
 	boolean out;
 	boolean edited;
 	String name, time;
 	int timeWidth;
 	
 	UIMessage(JSONObject message) {
+		c++;
 		focusable = true;
-		text = new UILabel("меня ломает невыносимо ломки лютые я не могу больше это терпеть мне нужна доза я хочу кайфа ломки невыносимые на меня нападают бесы очень мощно я хочу кайф и дозу меня угнетает то что у меня нет возможности достать кайф", MP.smallPlainFont, "");
+		text = new UILabel(c + "", MP.smallPlainFont, "");
 		text.color = -1; // message fg color
-		name = "steepy";
-		time = "10:47";
+		name = "Shinovon";
+		time = "18:" + MP.n(c % 60);
 		timeWidth = MP.smallPlainFont.stringWidth(time);
-		out = false;
+		out = c % 2 == 0;
 	}
 	
 	void paint(Graphics g, int x, int y, int w) {
@@ -112,8 +115,8 @@ public class UIMessage extends UIItem implements LangConstants {
 			h += text.layout(cw);
 		}
 		// time
-		h += MP.smallPlainFontHeight;
-		return contentHeight = h + MARGIN_HEIGHT;
+		h += MP.smallPlainFontHeight + MARGIN_HEIGHT;
+		return contentHeight = h;
 	}
 	
 	boolean grabFocus() {

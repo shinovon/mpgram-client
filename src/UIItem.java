@@ -89,4 +89,8 @@ public class UIItem {
 		}
 	}
 
+	public void tap(int x, int y) {}
+
+	public void longTap(int x, int y) {}
+
 }
