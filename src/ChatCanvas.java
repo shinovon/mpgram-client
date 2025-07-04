@@ -92,6 +92,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 	int movesIdx;
 	
 	long lastPaintTime;
+	boolean animating;
 	
 	// animations
 	boolean fieldFocused;
@@ -104,8 +105,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 	float menuAnimProgress;
 	int menuHeight = 40;
 	
-	private ChatCanvas() {
+	boolean touch = hasPointerEvents();
+	
+	ChatCanvas() {
 		setFullScreenMode(true);
+		
 	}
 	
 	public ChatCanvas(String id, String query, int message, int topMsg) {
@@ -118,7 +122,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 	}
 	
 	private void init(boolean field) {
-		
 	}
 
 	public void load() {
@@ -126,11 +129,18 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 		loaded = true;
 		canceled = finished = false;
 		
+		if (id == null) {
+			for (int i = 0; i < 30; i++) {
+				add(new UIMessage(null, this));
+			}
+			return;
+		}
+		
+		
 		if (MP.useLoadingForm) {
 			MP.display(MP.loadingForm);
 		}
 		Thread thread = this.thread = Thread.currentThread();
-		
 		try {
 			// remove all
 			items.removeAllElements();
@@ -372,9 +382,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 		
 		long now = System.currentTimeMillis();
 		long deltaTime = now - lastPaintTime;
-		if (deltaTime > 500) {
-			deltaTime = 1;
-		}
+		if (deltaTime > 500) deltaTime = 500;
 		if (width != w) {
 			layoutStart = 0;
 		}
@@ -410,10 +418,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 			contentHeight = this.contentHeight;
 		}
 		
-		if (focusedItem == null && scrollCurrentItem == null && scrollTargetItem == null) {
-			focusItem(getFirstFocusableItemOnScreen(-1, 1));
-		} else if (focusedItem != null && scrollCurrentItem == null && !isVisible(focusedItem)) {
-			scrollTo(focusedItem);
+		if (!touch) {
+			if (focusedItem == null && scrollCurrentItem == null && scrollTargetItem == null) {
+				focusItem(getFirstFocusableItemOnScreen(-1, 1));
+			} else if (focusedItem != null && scrollCurrentItem == null && !isVisible(focusedItem)) {
+				scrollTo(focusedItem);
+			}
 		}
 		
 		if (scrollTarget != -1) {
@@ -431,7 +441,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 						} else {
 							++ scroll;
 						}
-					} else {
+					} else for (int i = 0; i < 1 + (deltaTime > 33 && animating ? (deltaTime / 33) - 1 : 0); ++i) {
 						scroll = (int) MP.lerp(scroll, scrollTarget, 4, 20);
 					}
 					animate = true;
@@ -455,11 +465,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 					|| scroll >= contentHeight - clipHeight) {
 				kineticScroll = 0;
 			} else {
-				scroll += (int) kineticScroll;
 				float mul = pressed ? 0.5f : 0.96f;
+				scroll += (int) kineticScroll;
 				kineticScroll *= mul;
 				float f;
-				if ((f = deltaTime > 33 ? deltaTime / 33f : 1f) >= 2) {
+				if ((f = deltaTime > 33 && animating ? deltaTime / 33f : 1f) >= 2) {
 					int j = (int) f - 1;
 					for (int i = 0; i < j; i++) {
 						scroll += (int) kineticScroll;
@@ -480,6 +490,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 		g.fillRect(0, 0, w, h);
 		g.setColor(0);
 		
+		int renderedItems = 0;
+		
 		int l = items.size();
 		g.setClip(0, top, w, clipHeight);
 		if (reverse) {
@@ -491,6 +503,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 				y -= ih;
 				if (y > clipHeight) continue;
 				item.paint(g, 0, y, w);
+				renderedItems++;
 			}
 		} else {
 			int y = top - scroll;
@@ -502,6 +515,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 					continue;
 				}
 				item.paint(g, 0, y, w);
+				renderedItems++;
 				if ((y += ih) > h) break;
 			}
 		}
@@ -530,9 +544,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 			}
 		}
 		
-//		g.setColor(-1);
-//		g.setFont(MP.smallPlainFont);
-//		g.drawString("w" + width + " h" + height + " c" + this.contentHeight + " l" + this.clipHeight + " s" + scroll + " t" + top, 20, 20, 0);
+		g.setColor(-1);
+		g.setFont(MP.smallPlainFont);
+		g.drawString("f" + (System.currentTimeMillis() - now) + " r" + (deltaTime) + " i" + renderedItems, 20, 20, 0);
 
 		// limit fps
 		if (deltaTime < 32) {
@@ -540,6 +554,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 				Thread.sleep(33 - deltaTime);
 			} catch (Exception ignored) {}
 		}
+		animating = animate;
 		if (animate) {
 			repaint();
 		}
@@ -717,6 +732,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 	}
 	
 	protected void pointerDragged(int x, int y) {
+		long now = System.currentTimeMillis();
 		if (!longTap && contentPressed) {
 			final int dY = pointerY - y;
 			if (dragging || dY > 1 || dY < -1
@@ -730,10 +746,17 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 			} else {
 				dragYHold += dY;
 			}
-			
-			moves[movesIdx] = dY;
-			moveTimes[movesIdx] = System.currentTimeMillis();
-			movesIdx = (movesIdx + 1) % moveSamples;
+			int prev = movesIdx - 1;
+			if (prev < 0) prev += moveSamples;
+			long prevTime = moveTimes[prev];
+			if (now - prevTime <= 1) {
+				moves[prev] += dY;
+				moveTimes[prev] = now;
+			} else {
+				moves[movesIdx] = dY;
+				moveTimes[movesIdx] = now;
+				movesIdx = (movesIdx + 1) % moveSamples;
+			}
 		}
 		pointerX = x;
 		pointerY = y;

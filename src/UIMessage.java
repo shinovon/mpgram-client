@@ -53,12 +53,14 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (message == null) {
 			// test
 			c++;
-			text = new UILabel(c + "", MP.smallPlainFont, "");
+			text = new UILabel(c + " ", MP.smallPlainFont, null);
 			text.color = -1; // message fg color
-			name = "Shinovonsssssssssssssss";
+			text.linkColor = 0x71BAFA;
+			name = "Shinovon";
 			time = "18:" + MP.n(c % 60);
 			timeWidth = MP.smallPlainFont.stringWidth(time);
 			out = c % 2 == 0;
+			dateRender = "04 Jul";
 			return;
 		}
 		date = message.getLong("date");
@@ -169,7 +171,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		g.setColor(out ? 0x2B5278 : 0x182533); // TODO message bg color
 		g.fillRect(x += MARGIN_WIDTH + (out && w < 900 ? MARGIN_SIDE : 0), y += MARGIN_HEIGHT,
 				cw -= MARGIN_WIDTH * 2 + MARGIN_SIDE, h -= (MARGIN_HEIGHT * 2));
-		if (focus) {
+		if (focus && focusChild == null) {
 			g.setColor(-1);
 			g.drawRect(x, y, cw - 1, h - 1);
 		}
@@ -327,6 +329,10 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 		x -= MARGIN_WIDTH + (out && w < 900 ? MARGIN_SIDE : 0);
 		if (x < 0) return;
+		if (!out && y < MP.smallPlainFontHeight + PADDING + MARGIN_HEIGHT) {
+			if (fromId != null) MP.openProfile(fromId, null, 0);
+			return;
+		}
 		if (text != null && text.focusable && y > text.y && y < text.y + text.contentHeight) {
 			focusChild = text;
 			text.tap(x, y - text.y);

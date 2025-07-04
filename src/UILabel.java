@@ -59,9 +59,6 @@ public class UILabel extends UIItem {
 	void paint(Graphics g, int x, int y, int w) {
 		if (render == null) return;
 		int l = render.size();
-		if (background) {
-			g.setColor(bgColor);
-		}
 		g.setColor(color);
 		for (int i = 0; i < l; ++i) {
 			Object[] obj = (Object[]) render.elementAt(i);
@@ -69,7 +66,7 @@ public class UILabel extends UIItem {
 			Font font = (Font) obj[1];
 			String text = (String) obj[0];
 			int tx = x + pos[0] + WIDTH_MARGIN, ty = y + pos[1];
-			int tw = pos[2], th = font.getHeight();
+			int tw = pos[2], th = pos[3];
 			if (background) {
 				g.setColor(bgColor);
 				g.fillRect(tx, ty, tw, th);
