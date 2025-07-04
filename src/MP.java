@@ -469,15 +469,15 @@ public class MP extends MIDlet
 		f.append("Loading");
 		display.setCurrent(mainDisplayable = f);
 //#ifndef NO_J2ME_LOADER_CHECK
-		try {
-			// check for j2me loader
-			Class.forName("javax.microedition.shell.MicroActivity");
-			f.deleteAll();
-			f.addCommand(exitCmd = new Command("Exit", Command.EXIT, 1));
-			f.setCommandListener(midlet);
-			f.append("J2ME Loader is not supported.");
-			return;
-		} catch (Exception ignored) {}
+//		try {
+//			// check for j2me loader
+//			Class.forName("javax.microedition.shell.MicroActivity");
+//			f.deleteAll();
+//			f.addCommand(exitCmd = new Command("Exit", Command.EXIT, 1));
+//			f.setCommandListener(midlet);
+//			f.append("J2ME Loader is not supported.");
+//			return;
+//		} catch (Exception ignored) {}
 //#endif	
 		// get device name
 		String p, v, d;
