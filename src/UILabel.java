@@ -27,8 +27,6 @@ import javax.microedition.lcdui.Graphics;
 
 public class UILabel extends UIItem {
 	
-	static final int WIDTH_MARGIN = 2;
-	
 	Vector parsed = new Vector();
 	Vector render;
 	Vector urls;
@@ -66,7 +64,7 @@ public class UILabel extends UIItem {
 			int[] pos = (int[]) obj[3];
 			Font font = (Font) obj[1];
 			String text = (String) obj[0];
-			int tx = x + pos[0] + WIDTH_MARGIN, ty = y + pos[1];
+			int tx = x + pos[0], ty = y + pos[1];
 			int tw = pos[2], th = pos[3];
 			if (background) {
 				g.setColor(bgColor);
@@ -93,8 +91,7 @@ public class UILabel extends UIItem {
 			return contentHeight;
 		}
 		layoutWidth = width;
-		
-		width -= WIDTH_MARGIN * 2;
+		width -= 4;
 		
 		if (render == null) {
 			render = new Vector();
@@ -237,6 +234,9 @@ public class UILabel extends UIItem {
 	}
 	
 	static String ellipsis(String text, Font font, int width) {
+		if (text.indexOf('\n') != -1) {
+			text = text.replace('\n', ' ');
+		}
 		if (font.stringWidth(text) < width) return text;
 		int l = text.length();
 		width -= font.stringWidth("...");

@@ -56,6 +56,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 	boolean update;
 	
 	boolean selfChat;
+	boolean user;
 	boolean reverse;
 	
 	// discussion
@@ -110,8 +111,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 	ChatCanvas() {
 		setFullScreenMode(true);
 		if (touch) {
-			top = 0;
-			bottom = 42;
+			top = MP.smallBoldFontHeight + MP.smallPlainFontHeight + 8;
+			bottom = Math.max(MP.medPlainFontHeight + 16, 40);
 		}
 	}
 	
@@ -229,6 +230,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 							return;
 						}
 					} else {
+						user = true;
 						canPin = true;
 						if (MP.chatStatus && info.getObject("User").has("status")) {
 	//						setStatus(info.getObject("User").getObject("status"));
@@ -527,6 +529,26 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 		
 		g.setClip(0, 0, w, h);
 		
+		if (top != 0) {
+			g.setColor(0x17212B);
+			g.fillRect(0, 0, w, top);
+			g.setColor(0x0A121B);
+			g.drawLine(0, top, w, top);
+			g.setColor(-1);
+			g.setFont(MP.smallBoldFont);
+			g.drawString(title, 20, 4, 0);
+			g.setFont(MP.smallPlainFont);
+			g.drawString("123 members", 20, 4 + MP.smallBoldFontHeight, 0);
+		}
+		
+		if (bottom != 0) {
+			g.setColor(0x17212B);
+			int by = h - bottom;
+			g.fillRect(0, by, w, bottom);
+			g.setColor(0x0A121B);
+			g.drawLine(0, by, w, by);
+		}
+		
 		if (menuAnimProgress != 0) {
 			g.setColor(-1);
 			g.fillRect(20, h - (int)menuAnimProgress, w - 40, (int)menuAnimProgress);
@@ -549,9 +571,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 			}
 		}
 		
-		g.setColor(-1);
-		g.setFont(MP.smallPlainFont);
-		g.drawString("f" + (System.currentTimeMillis() - now) + " r" + (deltaTime) + " i" + renderedItems, 20, 20, 0);
+//		g.setColor(-1);
+//		g.setFont(MP.smallPlainFont);
+//		g.drawString("f" + (System.currentTimeMillis() - now) + " r" + (deltaTime) + " i" + renderedItems, 20, 20, 0);
 
 		// limit fps
 		if (deltaTime < 32) {
@@ -608,7 +630,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 		boolean repaint = false;
 		if (key == -7) {
 			// back
-			if (menuFocused) {
+			if (touch) {
+				MP.midlet.commandAction(MP.backCmd, this);
+				return;
+			} else if (menuFocused) {
 				menuFocused = false;
 				menuAnimTarget = 0;
 			} else if (fieldFocused) {
@@ -620,10 +645,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 				fieldFocused = true;
 				fieldAnimTarget = 40;
 			}
-			queueRepaint();
+			repaint = true;
 		} else if (key == -6) {
 			// menu
-			if (menuFocused) {
+			if (touch) {
+				
+			} else if (menuFocused) {
 				menuFocused = false;
 				menuAnimTarget = 0;
 			} else if (fieldFocused) {
@@ -633,11 +660,14 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 				menuFocused = true;
 				menuAnimTarget = 300;
 			}
-			queueRepaint();
+			repaint = true;
 		} else if (menuFocused) {
 			
 		} else if (fieldFocused) {
-			
+			if (game == Canvas.UP) {
+				fieldFocused = false;
+				fieldAnimTarget = 0;
+			}
 		} else if (key == -5 || game == Canvas.FIRE) {
 			// action
 			if (focusedItem != null) {

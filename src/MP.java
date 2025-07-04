@@ -166,6 +166,7 @@ public class MP extends MIDlet
 	static final int smallPlainFontSpaceWidth = smallPlainFont.charWidth(' ');
 	static final int smallBoldFontHeight = smallBoldFont.getHeight();
 	static final int medPlainFontHeight = medPlainFont.getHeight();
+	static final int medBoldFontHeight = medBoldFont.getHeight();
 
 	static final IllegalStateException cancelException = new IllegalStateException("cancel");
 	
