@@ -47,7 +47,12 @@ public class UIItem {
 		return contentHeight;
 	}
 	
-	boolean grabFocus() {
+	/**
+	 * Grab item focus
+	 * @param dir -1: up, 1: down, 0: touched
+	 * @return true if successful
+	 */
+	boolean grabFocus(int dir) {
 		return false;
 	}
 	

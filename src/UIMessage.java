@@ -1,3 +1,4 @@
+import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
 
 /*
@@ -30,9 +31,16 @@ public class UIMessage extends UIItem implements LangConstants {
 	private static final int MARGIN_SIDE = 10;
 	private static final int PADDING = 2;
 	
+	private static final int FOCUS_SENDER = 0;
+	private static final int FOCUS_TEXT = 1;
+	private static final int FOCUS_MEDIA = 2;
+	
 	UILabel text;
+	
 	UIItem focusChild;
-	int focusIndex = -1;
+	int subFocusCurrent = -1;
+	int[] subFocus;
+	int subFocusLength;
 	
 	static int c;
 	
@@ -45,11 +53,12 @@ public class UIMessage extends UIItem implements LangConstants {
 	long date;
 	
 	String time, nameRender, dateRender;
-	int timeWidth, dateWidth;
+	int timeWidth, dateWidth, senderWidth;
 	boolean showDate;
 	
 	UIMessage(JSONObject message, ChatCanvas chat) {
 		focusable = true;
+		subFocus = new int[4];
 		if (message == null) {
 			// test
 			c++;
@@ -121,7 +130,12 @@ public class UIMessage extends UIItem implements LangConstants {
 			return;
 		}
 		
+		int order = 0;
+		
 		out = (message.getBoolean("out", false) && !chat.broadcast) || chat.selfChat;
+		if (!out) {
+			subFocus[order++] = FOCUS_SENDER;
+		}
 		String text = message.getString("text", null);
 		if (text != null) {
 			UILabel label;
@@ -132,6 +146,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			}
 			label.color = -1;
 			label.linkColor = 0x71BAFA;
+			if (label.focusable) subFocus[order++] = FOCUS_TEXT;
 			this.text = label;
 		}
 		
@@ -140,6 +155,8 @@ public class UIMessage extends UIItem implements LangConstants {
 		sb.setLength(0);
 		time = MP.appendTime(sb, date).toString();
 		timeWidth = MP.smallPlainFont.stringWidth(time);
+		
+		subFocusLength = order;
 	}
 	
 	void paint(Graphics g, int x, int y, int w) {
@@ -172,7 +189,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		g.setColor(out ? 0x2B5278 : 0x182533); // TODO message bg color
 		g.fillRect(x += MARGIN_WIDTH + (out && w < 900 ? MARGIN_SIDE : 0), y += MARGIN_HEIGHT,
 				cw -= MARGIN_WIDTH * 2 + MARGIN_SIDE, h -= (MARGIN_HEIGHT * 2));
-		if (focus && focusChild == null) {
+		if (focus && focusChild == null && subFocusCurrent == -1) {
 			g.setColor(-1);
 			g.drawRect(x, y, cw - 1, h - 1);
 		}
@@ -188,8 +205,14 @@ public class UIMessage extends UIItem implements LangConstants {
 			g.setColor(0x71BAFA); // TODO message author color
 			g.setFont(MP.smallBoldFont);
 			if (nameRender != null) g.drawString(nameRender, x, y, 0);
+			if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_SENDER) {
+				g.setColor(0xababab);
+				g.drawRect(x, y, senderWidth, MP.smallBoldFontHeight);
+			}
 			y += MP.smallBoldFontHeight;
 		}
+		
+		// reply
 		
 		// photos
 
@@ -242,11 +265,6 @@ public class UIMessage extends UIItem implements LangConstants {
 				if (idx == l - 1) {
 				} else if (idx < l - 1) {
 					UIMessage next = (UIMessage) ((ChatCanvas) container).items.elementAt(idx + 1);
-//					Calendar c = Calendar.getInstance();
-//					c.setTime(new Date(date * 1000L));
-//					long d = c.get(Calendar.DAY_OF_MONTH) + 100 * c.get(Calendar.MONTH) + 10000 * c.get(Calendar.YEAR);
-//					c.setTime(new Date(next.date * 1000L));
-//					if (d == c.get(Calendar.DAY_OF_MONTH) + 100 * c.get(Calendar.MONTH) + 10000 * c.get(Calendar.YEAR)) {
 					if (dateRender.equals(next.dateRender)) {
 						showDate = false;
 						break date;
@@ -270,8 +288,9 @@ public class UIMessage extends UIItem implements LangConstants {
 		int cw = Math.min(MAX_WIDTH, width) - PADDING * 2 - MARGIN_WIDTH * 2 - MARGIN_SIDE;
 		if (!out) {
 			h += MP.smallBoldFontHeight;
-			nameRender = UILabel.ellipsis(name, MP.smallPlainFont,
+			nameRender = UILabel.ellipsis(name, MP.smallBoldFont,
 					cw - timeWidth - PADDING * 2 - (edited ? (MP.smallPlainFont.stringWidth(MP.L[Edited]) + 2) : 0));
+			senderWidth = MP.smallBoldFont.stringWidth(nameRender);
 		}
 		if (text != null) {
 			text.y = h - MARGIN_HEIGHT - PADDING;
@@ -283,19 +302,40 @@ public class UIMessage extends UIItem implements LangConstants {
 		return contentHeight = h;
 	}
 	
-	boolean grabFocus() {
+	boolean grabFocus(int dir) {
 		focus = true;
-		focusChild = text;
+		System.out.println("grabFocus " + dir);
+		if (dir != 0 && subFocusLength != 0) {
+			if (subFocusCurrent == -1) {
+				subFocusCurrent = dir == -1 ? subFocusLength - 1 : 0;
+			}
+			subFocus(subFocusCurrent);
+		} else {
+			subFocusCurrent = -1;
+		}
 		if (focusChild != null) {
-			if (!focusChild.grabFocus()) focusChild = null;
+			if (!focusChild.grabFocus(dir)) focusChild = null;
 		}
 		return true;
 	}
 	
+	private void subFocus(int idx) {
+		switch (subFocus[idx]) {
+		case FOCUS_SENDER:
+			break;
+		case FOCUS_TEXT:
+			if (text != null) {
+				focusChild = text;
+			}
+			break;
+		}
+	}
+
 	void lostFocus() {
 		focus = false;
 		if (focusChild != null) {
 			focusChild.lostFocus();
+			focusChild = null;
 		}
 	}
 	
@@ -305,12 +345,39 @@ public class UIMessage extends UIItem implements LangConstants {
 			if (t != 0) {
 				return t;
 			}
+			focusChild.lostFocus();
+			focusChild = null;
+		}
+		if (subFocusLength != 0) {
+			if (subFocusCurrent == -1) {
+				subFocusCurrent = 0;
+			}
+			if (dir == Canvas.UP) {
+				if (subFocusCurrent == 0)
+					return 0;
+				subFocus(--subFocusCurrent);
+				if (focusChild != null) {
+					if (!focusChild.grabFocus(dir)) focusChild = null;
+				}
+				return Integer.MAX_VALUE;
+			} else if (dir == Canvas.DOWN) {
+				if (subFocusCurrent == subFocusLength - 1)
+					return 0;
+				subFocus(++subFocusCurrent);
+				if (focusChild != null) {
+					if (!focusChild.grabFocus(dir)) focusChild = null;
+				}
+				return Integer.MAX_VALUE;
+			}
 		}
 		return 0;
 	}
 	
 	boolean action() {
 		if (focusChild != null && focusChild.action()) {
+			return true;
+		} else if (subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_SENDER) {
+			profileAction();
 			return true;
 		}
 		return false;
@@ -323,15 +390,17 @@ public class UIMessage extends UIItem implements LangConstants {
 	}
 	
 	void tap(int x, int y) {
+		subFocusCurrent = -1;
 		int w = ((ChatCanvas) container).width;
 		int cw = Math.min(MAX_WIDTH, w);
 		if (out && w < 900) {
 			x -= w - cw;
 		}
 		x -= MARGIN_WIDTH + (out && w < 900 ? MARGIN_SIDE : 0);
+		System.out.println("tap " + x + " " + y);
 		if (x < 0) return;
-		if (!out && y < MP.smallPlainFontHeight + PADDING + MARGIN_HEIGHT) {
-			if (fromId != null) MP.openProfile(fromId, null, 0);
+		if (!out && y < MP.smallPlainFontHeight + PADDING + MARGIN_HEIGHT && x < PADDING + senderWidth) {
+			profileAction();
 			return;
 		}
 		if (text != null && text.focusable && y > text.y && y < text.y + text.contentHeight) {
@@ -339,6 +408,11 @@ public class UIMessage extends UIItem implements LangConstants {
 			text.tap(x, y - text.y);
 			return;
 		}
+		// TODO options
+	}
+	
+	private void profileAction() {
+		if (fromId != null) MP.openProfile(fromId, null, 0);
 	}
 	
 	public String toString() {

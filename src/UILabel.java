@@ -52,6 +52,7 @@ public class UILabel extends UIItem {
 	}
 
 	void appendWord(String text, Font font, String url) {
+		if (url != null) focusable = true;
 		parsed.addElement(new Object[] { text, font, url });
 		requestLayout();
 	}
@@ -153,7 +154,6 @@ public class UILabel extends UIItem {
 			}
 			
 			if (url != null) {
-				focusable = true;
 				Vector v = new Vector();
 				for (int i = startIdx; i < idx; ++i) {
 					v.addElement(res.elementAt(i));
@@ -167,10 +167,13 @@ public class UILabel extends UIItem {
 		return contentHeight = y + fh;
 	}
 	
-	boolean grabFocus() {
+	boolean grabFocus(int dir) {
 		if (!focusable) return false;
 		focus = true;
 		if (selectedParts == null) {
+			if (dir != 0) {
+				focusIndex = dir == -1 ? urls.size() - 1 : 0;
+			}
 			focusLink(focusIndex);
 		}
 		return true;
@@ -236,7 +239,7 @@ public class UILabel extends UIItem {
 	static String ellipsis(String text, Font font, int width) {
 		if (font.stringWidth(text) < width) return text;
 		int l = text.length();
-		width -= font.stringWidth("...") + 6;
+		width -= font.stringWidth("...");
 		for (int i = 1; i < l; ++i) {
 			String s = text.substring(0, i);
 			if (font.stringWidth(s) > width) {
