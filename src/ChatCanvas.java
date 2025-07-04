@@ -420,7 +420,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 			contentHeight = this.contentHeight;
 		}
 		
-		if (!touch) {
+		if (!touch && scrollTarget == -1) {
 			if (focusedItem == null && scrollCurrentItem == null && scrollTargetItem == null) {
 				focusItem(getFirstFocusableItemOnScreen(-1, 1, clipHeight));
 			} else if (focusedItem != null && scrollCurrentItem == null && !isVisible(focusedItem)) {
