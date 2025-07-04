@@ -103,6 +103,8 @@
 	"Pin": "Pin",
 	"BanMember": "Ban member",
 	"Comments": "Discussion",
+	"Copy": "Copy",
+	"CopyLink": "Copy link",
 	
 	// Item commands
 	"Link_Cmd": "Link",

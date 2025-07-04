@@ -103,6 +103,8 @@
 	"Pin": "Kiinnitä",
 	"BanMember": "Estä käyttäjä",
 	"Comments": "Keskustelu",
+	"Copy": "Copy", // Untranslated
+	"CopyLink": "Copy link", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "Linkki",

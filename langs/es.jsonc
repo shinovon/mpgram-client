@@ -103,6 +103,8 @@
 	"Pin": "Fijado",
 	"BanMember": "Prohibir miembro",
 	"Comments": "Discusión",
+	"Copy": "Copy", // Untranslated
+	"CopyLink": "Copy link", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "Enlace",
