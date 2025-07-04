@@ -133,6 +133,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 			for (int i = 0; i < 30; i++) {
 				add(new UIMessage(null, this));
 			}
+			layoutStart = 0;
 			return;
 		}
 		
@@ -332,6 +333,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 				MP.display(this);
 			}
 			// postLoad
+			layoutStart = 0;
 			if (endReached && !hasOffset
 					&& query == null && mediaFilter == null
 					&& MP.chatUpdates && !update) {
@@ -786,7 +788,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 				}
 				System.out.println("k " + move + " " + moveTime);
 				if (moveTime > 0) {
-					float res = (150f * move) / moveTime; 
+					float res = (120f * move) / moveTime; 
+					if (Math.abs(res) > 50) {
+						res = (res < 0 ? -50 : 50);
+					}
 					if (reverse) res = -res;
 					if (kineticScroll * res < 0) kineticScroll = 0;
 					kineticScroll += res;

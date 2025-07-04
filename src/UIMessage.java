@@ -61,6 +61,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			timeWidth = MP.smallPlainFont.stringWidth(time);
 			out = c % 2 == 0;
 			dateRender = "04 Jul";
+			dateWidth = MP.medPlainFont.stringWidth(dateRender);
 			return;
 		}
 		date = message.getLong("date");
