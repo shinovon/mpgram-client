@@ -656,7 +656,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 		if (text != null && text.focusable && y > text.y && y < text.y + text.contentHeight) {
 			focusChild = text;
-			text.tap(x, y - text.y);
+			text.tap(x, y - text.y, longTap);
 			return;
 		}
 		// TODO options
