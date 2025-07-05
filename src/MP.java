@@ -2068,7 +2068,7 @@ public class MP extends MIDlet
 					commandAction(backCmd, d);
 					((ChatInfoForm) d).chatForm.openMessage(Integer.toString(id), 0);
 				} else {
-					openLoad(new ChatForm(((ChatInfoForm) current).id, null, id, 0));
+					openChat(((ChatInfoForm) current).id, id);
 				}
 				return;
 			}
@@ -2949,7 +2949,7 @@ public class MP extends MIDlet
 				}
 				
 				// open new chat form
-				openLoad(new ChatForm(s[0], null, Integer.parseInt(s[1]), 0));
+				openChat(s[0], Integer.parseInt(s[1]));
 				return;
 			}
 			if (c == botCallbackCmd) {
@@ -4064,11 +4064,14 @@ public class MP extends MIDlet
 								|| domain.equals(((MPChat) current).username()))) {
 							((MPChat) current).openMessage(messageId, topMsg);
 						} else {
-							ChatForm f = new ChatForm(domain, null, msg, topMsg);
-							if (start != null) {
-								f.startBot = start;
+							MPChat chat;
+							if (useChatCanvas) {
+								chat = new ChatCanvas(domain, null, msg, topMsg);
+							} else {
+								chat = new ChatForm(domain, null, msg, topMsg);
 							}
-							openLoad(f);
+							if (start != null) chat.setStartBot(start);
+							openLoad((Displayable) chat);
 						}
 						return true;
 					}

@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Canvas;
@@ -72,8 +73,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	String status, defaultStatus;
 	
-	Vector/*<UIItem>*/ items = new Vector();
-	int layoutStart;
+	Hashtable table;
+	
+	int count;
+	UIItem firstMessage, lastMessage;
+	UIItem layoutStart;
 	
 	// boundaries
 	int width, height;
@@ -143,19 +147,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		loaded = true;
 		canceled = finished = false;
 		
-		if (id == null) {
-			for (int i = 0; i < 30; i++) {
-				add(new UIMessage(null, this));
-			}
-			layoutStart = 0;
-			return;
-		}
-		
 		loading = true;
 		Thread thread = this.thread = Thread.currentThread();
 		try {
 			// remove all
-			items.removeAllElements();
+			count = 0;
+			firstMessage = lastMessage = null;
 			scrollCurrentItem = scrollTargetItem = focusedItem = null;
 			
 			if ((MP.reopenChat || (query == null && mediaFilter == null))
@@ -330,6 +327,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			
 			JSONArray messages = j.getArray("messages");
 			int l = messages.size();
+			table = new Hashtable();
 			
 			for (int i = 0; i < l; i++) {
 				JSONObject message = messages.getObject(i);
@@ -339,7 +337,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				} else if (i == l - 1) {
 					lastMsgId = id;
 				}
-				safeAppend(thread, new UIMessage(message, this));
+				safeAdd(thread, new UIMessage(message, this));
 			}
 			
 			finished = true;
@@ -350,7 +348,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			}
 			// postLoad
 			loading = false;
-			layoutStart = 0;
+			layoutStart = firstMessage;
 			if (endReached && !hasOffset
 					&& query == null && mediaFilter == null
 					&& MP.chatUpdates && !update) {
@@ -412,7 +410,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		long deltaTime = now - lastPaintTime;
 		if (deltaTime > 500) deltaTime = 500;
 		if (width != w) {
-			layoutStart = 0;
+			layoutStart = firstMessage;
 		}
 		width = w; height = h;
 		
@@ -439,16 +437,16 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		
 		int clipHeight = this.clipHeight = h - top - bottom;
 		
-		if (layoutStart != Integer.MAX_VALUE) {
-			int idx = layoutStart;
-			layoutStart = Integer.MAX_VALUE;
+		if (layoutStart != null) {
+			UIItem idx = layoutStart;
+			layoutStart = null;
 			layout(idx, w, clipHeight);
 			contentHeight = this.contentHeight;
 		}
 		
 		if (!touch && scrollTarget == -1) {
 			if (focusedItem == null && scrollCurrentItem == null && scrollTargetItem == null) {
-				focusItem(getFirstFocusableItemOnScreen(-1, 1, clipHeight / 5), 1);
+				focusItem(getFirstFocusableItemOnScreen(null, 1, clipHeight / 5), 1);
 			} else if (focusedItem != null && scrollCurrentItem == null && !isVisible(focusedItem)) {
 				scrollTo(focusedItem);
 			}
@@ -518,34 +516,30 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		g.fillRect(0, 0, w, h);
 		g.setColor(0);
 		
-		int renderedItems = 0;
-		
-		int l = items.size();
-		g.setClip(0, top, w, clipHeight);
-		if (reverse) {
-			clipHeight += top;
-			int y = h - bottom + scroll;
-			for (int i = 0; i < l; ++i) {
-				if (y < 0) break;
-				UIItem item = (UIItem) items.elementAt(i);
-				y -= item.contentHeight;
-				if (y > clipHeight) continue;
-				item.paint(g, 0, y, w);
-				renderedItems++;
-			}
-		} else {
-			int y = top - scroll;
-			clipHeight += bottom;
-			for (int i = 0; i < l; ++i) {
-				UIItem item = (UIItem) items.elementAt(i);
-				int ih = item.contentHeight;
-				if (y < -ih) {
-					y += ih;
-					continue;
-				}
-				item.paint(g, 0, y, w);
-				renderedItems++;
-				if ((y += ih) > clipHeight) break;
+		UIItem msg = firstMessage;
+		if (msg != null) {
+			g.setClip(0, top, w, clipHeight);
+			if (reverse) {
+				clipHeight += top;
+				int y = h - bottom + scroll;
+				do {
+					if (y < 0) break;
+					y -= msg.contentHeight;
+					if (y > clipHeight) continue;
+					msg.paint(g, 0, y, w);
+				} while ((msg = msg.next) != null);
+			} else {
+				int y = top - scroll;
+				clipHeight += bottom;
+				do {
+					int ih = msg.contentHeight;
+					if (y < -ih) {
+						y += ih;
+						continue;
+					}
+					msg.paint(g, 0, y, w);
+					if ((y += ih) > clipHeight) break;
+				} while ((msg = msg.next) != null);
 			}
 		}
 		
@@ -739,7 +733,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				if (reverse) dir = -dir;
 				final int scrollAmount = clipHeight / 4;
 				if (scrollTargetItem == null && scrollCurrentItem == null) {
-					scrollTargetItem = getFirstFocusableItemOnScreen(-1, 1, 0);
+					scrollTargetItem = getFirstFocusableItemOnScreen(null, 1, 0);
 					if (touch && isVisible(scrollTargetItem)) {
 						focusItem(scrollTargetItem, reverse ? -1 : 1);
 						repaint = true;
@@ -767,7 +761,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				}
 				if (scrollCurrentItem != null && scrollTargetItem == null) {
 					// get next scroll target
-					scrollTargetItem = getFirstFocusableItemOnScreen(items.indexOf(scrollCurrentItem), dir, 0);
+					scrollTargetItem = getFirstFocusableItemOnScreen(scrollCurrentItem, dir, 0);
 				}
 				UIItem item = scrollTargetItem;
 				if (item != null && isVisible(item)) {
@@ -778,7 +772,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					focusItem(scrollTargetItem, reverse ? -dir : dir);
 					scrollCurrentItem = scrollTargetItem;
 					if (isCornerVisible(scrollTargetItem, dir) && isVisible(scrollTargetItem)) {
-						scrollTargetItem = getFirstFocusableItemOnScreen(items.indexOf(scrollCurrentItem), dir, 0);
+						scrollTargetItem = getFirstFocusableItemOnScreen(scrollCurrentItem, dir, 0);
 						if (scrollTargetItem != null && isCornerVisible(scrollTargetItem, dir) && isVisible(scrollTargetItem, clipHeight / 5)) {
 							break scroll;
 						}
@@ -918,22 +912,23 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	// ui
 	
 	public void requestLayout(UIItem item) {
-		requestLayout(items.indexOf(item));
-	}
-
-	public void requestLayout(int idx) {
-		if (idx == -1) return;
-		layoutStart = Math.min(layoutStart, idx);
+//		layoutStart = Math.min(layoutStart, idx);
+		if (layoutStart != null || item == null) {
+			layoutStart = firstMessage;
+		} else {
+			layoutStart = (UIItem) item;
+		}
 		queueRepaint();
 	}
 	
-	private void layout(int idx, int w, int h) {
-		int l = items.size();
-		if (l == 0 || idx == -1) return;
-		idx = Math.min(l - 1, idx);
-		if (idx < 0) idx = 0;
-		else if (idx > 0) idx--;
-		System.out.println("layout " + idx);
+	private void layout(UIItem offsetItem, int w, int h) {
+		if (count == 0 || offsetItem == null) return;
+		boolean offset = false;
+		if (offsetItem.prev != null) {
+			offsetItem = offsetItem.prev;
+			offset = true;
+		}
+		System.out.println("layout " + offsetItem);
 		
 		int prevScroll = scroll;
 		int prevScrollItemY = 0;
@@ -942,16 +937,16 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			prevScrollItemY = scrollItem.y;
 		}
 		
+		UIItem item = offsetItem;
 		int y = 0;
-		for (int i = idx; i < l; ++i) {
-			UIItem item = (UIItem) items.elementAt(i);
-			if (idx != 0 && i == idx) {
+		do {
+			if (offset && item == offsetItem) {
 				y = item.y;
 			} else {
 				item.y = y;
 			}
 			y += item.layout(w);
-		}
+		} while ((item = item.next) != null);
 		
 		contentHeight = y;
 		System.out.println("layout done " + y);
@@ -961,36 +956,44 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		}
 	}
 	
-	void safeAppend(Thread thread, UIItem item) {
+	void safeAdd(Thread thread, UIItem item) {
 		if (thread != this.thread) throw MP.cancelException;
 		add(item);
 	}
 	
-	void safeInsert(Thread thread, UIItem item, int idx) {
+	void safeAddFirst(Thread thread, UIItem item) {
 		if (thread != this.thread) throw MP.cancelException;
-		insert(item, idx);
+		addFirst(item);
 	}
 	
-	void insert(UIItem item, int idx) {
+	void addFirst(UIItem item) {
 		if (item == null) return;
-		items.insertElementAt(item, idx);
+		count++;
+		if (firstMessage == null) {
+			firstMessage = item;
+		} else {
+			item.next = firstMessage;
+			firstMessage = (firstMessage.prev = item);
+		}
 		item.container = this;
-		requestLayout(idx);
+		requestLayout(item);
 	}
 	
 	void add(UIItem item) {
 		if (item == null) return;
-		items.addElement(item);
+		count++;
+		if (firstMessage == null || lastMessage == null) {
+			firstMessage = lastMessage = item;
+		} else {
+			item.prev = lastMessage;
+			lastMessage = (lastMessage.next = item);
+		}
 		item.container = this;
-		requestLayout(items.size() - 1);
+		requestLayout(item);
 	}
 	
 	void remove(UIItem item) {
-		int i;
-		if (item == null || (i = items.indexOf(item)) == -1) return;
-		items.removeElement(item);
-		item.container = null;
-		requestLayout(i);
+		// TODO
 	}
 	
 	public void queueRepaint() {
@@ -1050,17 +1053,17 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		}
 	}
 	
-	private UIItem getFirstFocusableItemOnScreen(int offset, int dir, int offsetHeight) {
-		UIItem item = null;
-		int l = items.size();
-		for (offset += dir; offset >= 0 && offset < l; offset += dir) {
-			UIItem t = (UIItem) items.elementAt(offset);
+	private UIItem getFirstFocusableItemOnScreen(UIItem offset, int dir, int offsetHeight) {
+		if (offset == null) offset = firstMessage;
+		UIItem res = null;
+		for (offset = (dir == -1 ? offset.prev : offset.next); offset != null; offset = (dir == -1 ? offset.prev : offset.next)) {
+			UIItem t = offset;
 			if (t.focusable && isVisible(t, offsetHeight)) {
-				item = t;
+				res = t;
 				break;
 			}
 		}
-		return item;
+		return res;
 	}
 	
 	private UIItem getItemAt(int x, int y) {
@@ -1070,13 +1073,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			y -= top - scroll;
 		}
 		if (y < scroll || y > clipHeight + scroll) return null;
-		int l = items.size();
-		for (int i = 0; i < l; ++i) {
-			UIItem item = (UIItem) items.elementAt(i);
+		UIItem item = firstMessage;
+		do {
 			if (y >= item.y && y < item.y + item.contentHeight) {
 				return item;
 			}
-		}
+		} while ((item = item.next) != null);
 		return null;
 	}
 	
@@ -1120,8 +1122,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 
 	public boolean switched() {
-		// TODO Auto-generated method stub
-		return false;
+		return switched;
 	}
 
 	public int topMsgId() {
@@ -1129,13 +1130,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 
 	public int firstMsgId() {
-		// TODO Auto-generated method stub
-		return 0;
+		return firstMsgId;
 	}
 
 	public JSONArray topics() {
-		// TODO Auto-generated method stub
-		return null;
+		return topics;
 	}
 
 	public MPChat parent() {
@@ -1151,8 +1150,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 
 	public void setQuery(String s) {
-		// TODO Auto-generated method stub
-		
+		query = s;
 	}
 
 	public void setUpdate(boolean b) {
@@ -1160,8 +1158,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 
 	public void setBotAnswer(JSONObject j) {
-		// TODO Auto-generated method stub
-		
+//		botAnswer = j;
+	}
+	
+	public void setStartBot(String s) {
+		this.startBot = s;
 	}
 	
 	//
@@ -1236,7 +1237,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			if (update.getObject("message").getInt("id") == firstMsgId)
 				break;
 			
-			insert(new UIMessage(update.getObject("message"), this), 0);
+			addFirst(new UIMessage(update.getObject("message"), this));
 			firstMsgId = update.getObject("message").getInt("id");
 			break;
 		}
@@ -1260,13 +1261,29 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 
 	public void paginate(int dir) {
-		// TODO Auto-generated method stub
-		
+		this.dir = dir;
+		cancel();
+		messageId = 0;
+		update = false;
+		if (dir == 1) {
+			if ((idOffset != Integer.MIN_VALUE && idOffset <= limit) || addOffset == limit) {
+				addOffset = 0;
+				offsetId = 0;
+			} else {
+				addOffset = -limit - 1;
+				offsetId = firstMsgId;
+			}
+		} else {
+			offsetId = firstMsgId;
+			addOffset = limit - 1;
+		}
+		MP.openLoad(this);
 	}
 
 	public void openTopic(int topMsgId, boolean canWrite, String title) {
-		// TODO Auto-generated method stub
-		
+		this.topMsgId = topMsgId;
+		this.canWrite = canWrite;
+		setTitle(this.title = title);
 	}	
 	
 	private void setStatus(JSONObject status) {

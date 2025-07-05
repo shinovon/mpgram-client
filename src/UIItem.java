@@ -29,6 +29,10 @@ public class UIItem {
 	boolean layoutRequest;
 	Object container;
 	
+	// links
+	UIItem prev;
+	UIItem next;
+	
 	/**
 	 * 
 	 * @param g Graphics context

@@ -50,6 +50,7 @@ interface MPChat {
 	void setQuery(String s);
 	void setUpdate(boolean b);
 	void setBotAnswer(JSONObject j);
+	void setStartBot(String s);
 	
 	// from Displayable
 	String getTitle();

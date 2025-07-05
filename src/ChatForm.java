@@ -1257,6 +1257,9 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 		botAnswer = j;
 	}
 	
+	public void setStartBot(String s) {
+		this.startBot = s;
+	}
 	
 	
 	public void sent() {

@@ -329,7 +329,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			g.drawString(MP.L[ForwardedFrom], x, y, 0);
 
 			g.setFont(MP.smallPlainFont);
-			g.drawString(forwardRender, x + forwardedFromWidth, y, 0);
+			if (forwardRender != null) g.drawString(forwardRender, x + forwardedFromWidth, y, 0);
 			y += MP.smallBoldFontHeight;
 		}
 		
@@ -429,14 +429,11 @@ public class UIMessage extends UIItem implements LangConstants {
 		int h = MARGIN_TOP + PADDING_HEIGHT * 2;
 		if (container instanceof ChatCanvas) {
 			ChatCanvas chat = ((ChatCanvas) container);
-			int idx = chat.items.indexOf(this);
-			int l = chat.items.size();
 			boolean reverse = chat.reverse;
 			
 			date: {
-				if (idx == l - 1) {
-				} else if (idx < l - 1) {
-					UIMessage next = (UIMessage) chat.items.elementAt(idx + 1);
+				if (this.next != null) {
+					UIMessage next = (UIMessage) this.next;
 					if (dateRender.equals(next.dateRender)) {
 						showDate = false;
 						break date;
@@ -450,9 +447,8 @@ public class UIMessage extends UIItem implements LangConstants {
 			}
 			if (!chat.broadcast) {
 				boolean group = false;
-				if (idx == l - 1) {
-				} else if (idx < l - 1) {
-					UIMessage next = (UIMessage) chat.items.elementAt(idx + 1);
+				if (this.next != null) {
+					UIMessage next = (UIMessage) this.next;
 					if (fromId.equals(next.fromId) && date - next.date < 6 * 60) {
 						group = true;
 					}
@@ -460,9 +456,8 @@ public class UIMessage extends UIItem implements LangConstants {
 				space = !group;
 				if (!reverse) {
 					group = false;
-					if (idx == 0) {
-					} else if (idx > 0) {
-						UIMessage next = (UIMessage) chat.items.elementAt(idx - 1);
+					if (this.prev != null) {
+						UIMessage next = (UIMessage) this.prev;
 						if (fromId.equals(next.fromId) && next.date - date < 6 * 60) {
 							group = true;
 						}
@@ -666,10 +661,6 @@ public class UIMessage extends UIItem implements LangConstants {
 	
 	private void commentAction() {
 		MP.openLoad(new ChatForm(commentPeer, ((ChatCanvas) container).id, id, commentRead));
-	}
-	
-	public String toString() {
-		return "UIMessage{" + y + " " + contentHeight + "}";
 	}
 
 }
