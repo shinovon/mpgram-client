@@ -640,7 +640,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		return menu;
 	}
 	
-	void tap(int x, int y) {
+	void tap(int x, int y, boolean longTap) {
 		subFocusCurrent = -1;
 		int w = ((ChatCanvas) container).width;
 		int cw = Math.min(MAX_WIDTH, w);

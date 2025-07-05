@@ -102,10 +102,6 @@ public class UIItem {
 		}
 	}
 
-	void tap(int x, int y) {}
-
-	void longTap(int x, int y) {
-		tap(x, y);
-	}
+	void tap(int x, int y, boolean longTap) {}
 
 }

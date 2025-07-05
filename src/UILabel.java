@@ -208,7 +208,8 @@ public class UILabel extends UIItem {
 		return true;
 	}
 	
-	void tap(int x, int y) {
+	void tap(int x, int y, boolean longTap) {
+		if (longTap) return;
 		int idx = getUrlAt(x, y);
 		if (idx != -1) {
 			focusLink(idx);

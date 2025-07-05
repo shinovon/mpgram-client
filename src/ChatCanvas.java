@@ -665,7 +665,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					longTap = true;
 					focusItem(pointedItem, 0);
 					int y = pointerY;
-					pointedItem.longTap(pointerX, reverse ? y - (scroll - bottom -pointedItem.y + height - pointedItem.contentHeight) : y - pointedItem.y - top - scroll);
+					pointedItem.tap(pointerX,
+							reverse ? y - (scroll - bottom -pointedItem.y + height - pointedItem.contentHeight)
+									: y - pointedItem.y - top - scroll,
+									true);
 				}
 			}
 		}
@@ -911,7 +914,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				if (!dragging) {
 					if (pointedItem != null && pointedItem.focusable) {
 						focusItem(pointedItem, 0);
-						pointedItem.tap(x, reverse ? y - (scroll - bottom - pointedItem.y + height - pointedItem.contentHeight) : y - pointedItem.y - top - scroll);
+						pointedItem.tap(x,
+								reverse ? y - (scroll - bottom - pointedItem.y + height - pointedItem.contentHeight)
+										: y - pointedItem.y - top - scroll,
+										false);
 					}
 				} else {
 					int move = 0;
