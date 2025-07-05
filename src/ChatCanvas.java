@@ -21,8 +21,9 @@ SOFTWARE.
 */
 
 import java.util.Hashtable;
-import java.util.Vector;
 
+import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
@@ -68,10 +69,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	long typing;
 	private final Object typingLock = new Object();
 	private Thread typingThread;
-	
 	long wasOnline;
-	
 	String status, defaultStatus;
+	
+	JSONObject botAnswer;
 	
 	Hashtable table;
 	
@@ -90,6 +91,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	int lastScrollDir;
 	UIItem scrollCurrentItem, scrollTargetItem;
 	UIItem focusedItem;
+	UIItem nextFocusItem;
 	float kineticScroll;
 	
 	// pointer
@@ -137,6 +139,16 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		this.messageId = message;
 		this.topMsgId = topMsg;
 		init(query == null);
+	}
+	
+	// post discussion
+	public ChatCanvas(String id, String postPeer, String postId, int readMaxId) {
+		this();
+		this.id = id;
+		this.postPeer = postPeer;
+		this.postId = postId;
+		this.messageId = readMaxId;
+		init(true);
 	}
 	
 	private void init(boolean field) {
@@ -337,7 +349,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				} else if (i == l - 1) {
 					lastMsgId = id;
 				}
-				safeAdd(thread, new UIMessage(message, this));
+				safeAdd(thread, new UIMessage(message, this),
+						this.messageId != 0 ? (messageId == id)
+						: (i == 0 ? ((endReached && dir == 0) || dir == -1) : (i == l - 1 && dir == 1)));
 			}
 			
 			finished = true;
@@ -357,6 +371,17 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
 				(typingThread = new Thread(this)).start();
 			}
+			if (botAnswer != null) {
+				JSONObject b = botAnswer;
+				botAnswer = null;
+				handleBotAnswer(b);
+			}
+//#ifndef NO_NOTIFY
+			try {
+				Notifier.remove(id);
+			} catch (Throwable ignored) {}
+			MP.notificationMessages.remove(id);
+//#endif
 			queueRepaint();
 		} catch (Exception e) {
 			if (e == MP.cancelException || canceled || this.thread != thread) {
@@ -442,6 +467,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			layoutStart = null;
 			layout(idx, w, clipHeight);
 			contentHeight = this.contentHeight;
+		}
+		
+		if (nextFocusItem != null) {
+			setCurrentItem(nextFocusItem);
+			nextFocusItem = null;
 		}
 		
 		if (!touch && scrollTarget == -1) {
@@ -956,13 +986,18 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		}
 	}
 	
-	void safeAdd(Thread thread, UIItem item) {
+	void safeAdd(Thread thread, UIMessage item, boolean focus) {
 		if (thread != this.thread) throw MP.cancelException;
+		table.put(Integer.toString(item.id), item);
 		add(item);
+		if (focus) {
+			nextFocusItem = item;
+		}
 	}
 	
-	void safeAddFirst(Thread thread, UIItem item) {
+	void safeAddFirst(Thread thread, UIMessage item) {
 		if (thread != this.thread) throw MP.cancelException;
+		table.put(Integer.toString(item.id), item);
 		addFirst(item);
 	}
 	
@@ -1093,8 +1128,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 
 	public String postId() {
-		// TODO Auto-generated method stub
-		return null;
+		return postId;
 	}
 
 	public String query() {
@@ -1158,7 +1192,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 
 	public void setBotAnswer(JSONObject j) {
-//		botAnswer = j;
+		botAnswer = j;
 	}
 	
 	public void setStartBot(String s) {
@@ -1191,12 +1225,23 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		messageId = 0;
 		addOffset = 0;
 		offsetId = 0;
+		typing = 0;
+		if (table != null) table.clear();
 		switched = false;
 	}
 
 	public void openMessage(String msg, int topMsg) {
-		// TODO Auto-generated method stub
-		
+		if (table != null && table.containsKey(msg)) {
+			UIItem focus = (UIItem) table.get(msg);
+			if (focus != null) {
+				setCurrentItem(focus);
+				return;
+			}
+		}
+		reset();
+		this.messageId = Integer.parseInt(msg);
+		if (topMsg != -1) this.topMsgId = topMsg;
+		MP.openLoad(this);
 	}
 
 	public void sent() {
@@ -1256,8 +1301,19 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 
 	public void handleBotAnswer(JSONObject j) {
-		// TODO Auto-generated method stub
+		if (j == null) return;
 		
+		if (j.has("message")) {
+			Alert a = new Alert(title);
+			a.setType(AlertType.CONFIRMATION);
+			a.setString(j.getString("message"));
+			a.setTimeout(1500);
+			MP.display(a, this);
+		}
+		
+		if (j.has("url")) {
+			MP.openUrl(j.getString("url"));
+		}
 	}
 
 	public void paginate(int dir) {
