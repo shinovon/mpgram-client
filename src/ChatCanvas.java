@@ -128,7 +128,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		setFullScreenMode(true);
 		if (touch) {
 			top = MP.smallBoldFontHeight + MP.smallPlainFontHeight + 8;
-			bottom = Math.max(MP.medPlainFontHeight + 16, 40);
+			bottom = Math.max(MP.medPlainFontHeight + 16, 48);
 		}
 	}
 	
@@ -425,7 +425,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		g.setClip(0, 0, w, h);
 		
 		if (loading) {
-			
+			g.setColor(0x0E1621);
+			g.fillRect(0, 0, w, h);
+			g.setColor(-1);
+			g.drawString(MP.L[Loading], w >> 1, h >> 1, Graphics.VCENTER | Graphics.HCENTER);
 			return;
 		}
 		
@@ -544,7 +547,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		
 		g.setColor(0x0E1621);
 		g.fillRect(0, 0, w, h);
-		g.setColor(0);
+		g.setColor(-1);
 		
 		UIItem msg = firstMessage;
 		if (msg != null) {
@@ -634,7 +637,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			if (now - pressTime > 200) {
 				g.setColor(-1);
 				int size = Math.min(360, (int) (now - pressTime - 200) / 2);
-				g.fillArc(pointerX - 16, pointerY - 16, 32, 32, 90, size);
+				g.fillArc(pointerX - 25, pointerY - 25, 50, 50, 90, size);
 				if (size >= 360) {
 					// handle long tap
 					longTap = true;
@@ -923,6 +926,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				}
 			} else if (y > height - bottom) {
 				// TODO
+				MP.midlet.commandAction(MP.writeCmd, this);
 			}
 		}
 		dragYHold = 0;

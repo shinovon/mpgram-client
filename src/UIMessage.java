@@ -52,8 +52,6 @@ public class UIMessage extends UIItem implements LangConstants {
 	int[] subFocus;
 	int subFocusLength;
 	
-	static int c;
-	
 	int id;
 	boolean out;
 	boolean edited;
@@ -115,24 +113,24 @@ public class UIMessage extends UIItem implements LangConstants {
 				} else if ("ChatEditTitle".equals(type)) {
 					t = MP.L[NameChanged_Action].concat(act.getString("t", ""));
 				} else {
-					label.appendWord(name, MP.medPlainFont, "t.me/".concat(fromId));
+					label.appendWord(name, MP.smallBoldFont, "t.me/".concat(fromId));
 					if ("ChatAddUser".equals(type) || "ChatDeleteUser".equals(type)) {
 						if (fromId.equals(user)) {
 							t = MP.L["ChatAddUser".equals(type) ? Joined_Action : Left_Action];
 						} else {
-							label.appendWord(MP.L["ChatAddUser".equals(type) ? Added_Action : Removed_Action], MP.medPlainFont, null);
-							label.appendWord(" ", MP.medPlainFont, null);
-							label.appendWord(MP.getName(user, false), MP.medPlainFont, "t.me/".concat(user));
+							label.appendWord(MP.L["ChatAddUser".equals(type) ? Added_Action : Removed_Action], MP.smallPlainFont, null);
+							label.appendWord(" ", MP.smallPlainFont, null);
+							label.appendWord(MP.getName(user, false), MP.smallBoldFont, "t.me/".concat(user));
 							break l;
 						}
 					} else {
-						label.appendWord(" ", MP.medPlainFont, null);
+						label.appendWord(" ", MP.smallPlainFont, null);
 						break l;
 					}
 				}
 				
 				if (t != null) {
-					label.appendWord(t, MP.medPlainFont, null);
+					label.appendWord(t, MP.smallPlainFont, null);
 				}
 			}
 			this.text = label;
