@@ -294,6 +294,8 @@
 	"Media": "Media",
 	"Poll": "Poll",
 	"Geo": "Geo: ",
+	"Photo": "Photo",
+	"Video": "Video",
 	
 	// Chat actions
 	"PinnedMessage_Action": " pinned message",

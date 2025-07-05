@@ -25,7 +25,7 @@ SOFTWARE.
 public class UIMessage extends UIItem implements LangConstants {
 	
 	private static final int MAX_WIDTH = 440;
-	private static final int MARGIN_HEIGHT = 1;
+	private static final int MARGIN_TOP = 1;
 	private static final int MARGIN_WIDTH = 2;
 	private static final int MARGIN_SIDE = 10;
 	private static final int PADDING_WIDTH = 4;
@@ -33,6 +33,8 @@ public class UIMessage extends UIItem implements LangConstants {
 	private static final int TIME_PADDING_WIDTH = 2;
 	private static final int TIME_PADDING_HEIGHT = 1;
 	private static final int DATE_PADDING_HEIGHT = 2;
+	private static final int DATE_MARGIN_HEIGHT = 1;
+	private static final int SPACE_HEIGHT = 4;
 	
 	private static final int FOCUS_SENDER = 0;
 	private static final int FOCUS_FORWARD = 1;
@@ -62,15 +64,18 @@ public class UIMessage extends UIItem implements LangConstants {
 	String commentPeer;
 	int commentRead;
 	
-	boolean fwd, reply, media;
-	String replyName, replyText;
+	boolean fwd, reply, media, photo;
+	String replyName, replyText, replyPrefix;
 	String commentsText;
-	int mediaRows;
 	String mediaTitle, mediaSubtitle;
+	boolean mediaPlayable, mediaDownload, mediaBrowser;
+	String forwardName;
 	
-	String time, nameRender, dateRender, replyNameRender, replyTextRender;
-	int timeWidth, dateWidth, senderWidth;
-	boolean showDate, hideName, timeBreak;
+	String time, nameRender, dateRender, replyNameRender, replyTextRender, forwardRender;
+	int timeWidth, dateWidth, senderWidth, replyPrefixWidth;
+	int mediaRenderHeight;
+	boolean showDate, hideName, timeBreak, space;
+	int forwardedFromWidth;
 	
 	UIMessage(JSONObject message, ChatCanvas chat) {
 		focusable = true;
@@ -80,6 +85,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		fromId = message.has("from_id") ? message.getString("from_id") : chat.id;
 		out = (message.getBoolean("out", false) && !chat.broadcast) || chat.selfChat;
 		hideName = chat.selfChat || chat.user || out;
+		space = chat.broadcast;
 		name = out && !chat.broadcast ? MP.L[You] : MP.getName(fromId, true);
 		dateRender = MP.localizeDate(date, 0);
 		dateWidth = MP.smallBoldFont.stringWidth(dateRender);
@@ -145,6 +151,12 @@ public class UIMessage extends UIItem implements LangConstants {
 			// TODO
 			fwd = true;
 			JSONObject fwd = message.getObject("fwd");
+			String t = null;
+			if ((t = fwd.getString("from_name", null)) == null) {
+				t = MP.getName(fwd.getString("from_id", null), true);
+			}
+			forwardName = t;
+			forwardedFromWidth = MP.smallPlainFont.stringWidth(MP.L[ForwardedFrom]);
 			subFocus[order++] = FOCUS_FORWARD;
 		}
 		
@@ -165,26 +177,43 @@ public class UIMessage extends UIItem implements LangConstants {
 						}
 					}
 					replyName = t;
+					if (replyMsg.has("media")) {
+						String type = replyMsg.getObject("media").getString("type", null);
+						t = MP.L[Media];
+						if (type != null) {
+							if ("photo".equals(type)) {
+								t = MP.L[Photo];
+							} else if ("photo".equals(type)) {
+								t = MP.L[Video];
+							} else if ("document".equals(type)) {
+								t = MP.L[File];
+							}
+						}
+						replyPrefix = t;
+						replyPrefixWidth = MP.smallPlainFont.stringWidth(replyPrefix);
+					}
+					
 					if (reply.has("quote")) {
 						replyText = reply.getString("quote");
 					} else if ((t = replyMsg.getString("text", null)) != null && t.length() != 0) {
 						replyText = t;
-					} else if (replyMsg.has("media")) {
-						replyText = MP.L[Media];
 					}
-					subFocus[order++] = FOCUS_REPLY;
+					if (replyText != null || replyPrefix != null || replyName != null) {
+						subFocus[order++] = FOCUS_REPLY;
+					}
 				}
 			}
 		}
 		
-		// photo
+		// photo TODO
 		boolean photo = false;
 		JSONObject media = message.getObject("media", null);
 		if (MP.showMedia
 				&& message.has("media") && !message.isNull("media")
 				&& media.getString("type").equals("photo")) {
 			photo = true;
-			
+//			this.photo = true;
+//			subFocus[order++] = FOCUS_PHOTO;
 		}
 		
 		// text
@@ -202,13 +231,13 @@ public class UIMessage extends UIItem implements LangConstants {
 			this.text = label;
 		}
 		
-		// media
+		// media TODO
 		if (message.has("media") && !photo) {
 			if (!MP.showMedia || message.isNull("media")) {
 				
 			} else {
-				this.media = true;
-				subFocus[order++] = FOCUS_MEDIA;
+//				this.media = true;
+//				subFocus[order++] = FOCUS_MEDIA;
 			}
 		}
 		
@@ -236,35 +265,39 @@ public class UIMessage extends UIItem implements LangConstants {
 	
 	void paint(Graphics g, int x, int y, int w) {
 		int h = contentHeight;
-		int cw = Math.min(MAX_WIDTH, w);
+		if (space) {
+			if (((ChatCanvas) container).reverse) y += SPACE_HEIGHT;
+			h -= SPACE_HEIGHT;
+		}
 		// date
 		if (showDate) {
 			if (((ChatCanvas) container).reverse) {
-				y += MARGIN_HEIGHT;
+				y += MARGIN_TOP;
 				g.setColor(0x1E2C3A);
 				g.setFont(MP.smallBoldFont);
-				g.fillRect(x - PADDING_WIDTH + (w - dateWidth - x) >> 1, y, dateWidth + PADDING_WIDTH * 2, MP.smallBoldFontHeight + DATE_PADDING_HEIGHT * 2);
+				g.fillRect((((w - dateWidth)) >> 1) - 4, y, dateWidth + 8, MP.smallBoldFontHeight + DATE_PADDING_HEIGHT * 2);
 				g.setColor(-1);
-				g.drawString(dateRender, x + (w - dateWidth - x) >> 1, y += DATE_PADDING_HEIGHT, 0);
-				y += MARGIN_HEIGHT + DATE_PADDING_HEIGHT + MP.smallBoldFontHeight;
+				g.drawString(dateRender, (w - dateWidth) >> 1, y += DATE_PADDING_HEIGHT, 0);
+				y += DATE_MARGIN_HEIGHT + DATE_PADDING_HEIGHT + MP.smallBoldFontHeight;
 			}
-			h -= MARGIN_HEIGHT * 2 + DATE_PADDING_HEIGHT * 2 + MP.medPlainFontHeight;
+			h -= DATE_MARGIN_HEIGHT * 2 + DATE_PADDING_HEIGHT * 2 + MP.smallBoldFontHeight;
 		}
 		if (action) {
 			if (text != null) {
-				y += MARGIN_HEIGHT;
+				y += MARGIN_TOP;
 				g.setColor(0x1E2C3A);
 				g.fillRect(x + (w - text.contentWidth - PADDING_WIDTH) >> 1, y, text.contentWidth + PADDING_WIDTH, text.contentHeight + PADDING_HEIGHT * 2);
 				text.paint(g, x, y + PADDING_HEIGHT, w);
 			}
 			return;
 		}
+		int cw = contentWidth;
 		if (out && w < 900) {
 			x += w - cw;
 		}
 		g.setColor(out ? 0x2B5278 : 0x182533); // TODO message bg color
-		g.fillRect(x += MARGIN_WIDTH + (out && w < 900 ? MARGIN_SIDE : 0), y += MARGIN_HEIGHT,
-				cw -= MARGIN_WIDTH * 2 + MARGIN_SIDE, h -= (MARGIN_HEIGHT * 2));
+		g.fillRect(x += MARGIN_WIDTH + (out && w < 900 ? MARGIN_SIDE : 0), y += MARGIN_TOP,
+				cw -= MARGIN_WIDTH * 2 + MARGIN_SIDE, h -= (MARGIN_TOP));
 		if (focus && focusChild == null && subFocusCurrent == -1) {
 			g.setColor(-1);
 			g.drawRect(x, y, cw - 1, h - 1);
@@ -290,30 +323,51 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 		
 		// forward
+		if (fwd) {
+			g.setColor(0x71BAFA);
+			g.setFont(MP.smallPlainFont);
+			g.drawString(MP.L[ForwardedFrom], x, y, 0);
+
+			g.setFont(MP.smallPlainFont);
+			g.drawString(forwardRender, x + forwardedFromWidth, y, 0);
+			y += MP.smallBoldFontHeight;
+		}
 		
 		// reply
 		if (reply) {
 			y += 2;
-			g.setColor(0x6AB3F3);
+			g.setColor(0x71BAFA);
 			int rh = MP.smallPlainFontHeight;
 			if (replyName != null) {
 				rh += MP.smallPlainFontHeight;
 			}
 			g.fillRect(x, y, 2, rh);
-			if (replyTextRender != null) {
-				g.setColor(0x71BAFA);
+			if (replyNameRender != null) {
+				g.setColor(-1);
 				g.setFont(MP.smallBoldFont);
-				g.drawString(replyNameRender, x + 4, y, 0);
+				g.drawString(replyNameRender, x + 6, y, 0);
 				y += MP.smallPlainFontHeight;
 			}
-			g.setColor(-1);
-			g.setFont(MP.smallPlainFont);
-			g.drawString(replyTextRender, x + 4, y, 0);
+			int px = x + 6;
+			if (replyPrefix != null) {
+				g.setColor(0x71BAFA);
+				g.setFont(MP.smallPlainFont);
+				g.drawString(replyPrefix, x + 6, y, 0);
+				px += MP.smallPlainFontSpaceWidth + replyPrefixWidth;
+			}
+			if (replyTextRender != null) {
+				g.setColor(-1);
+				g.setFont(MP.smallPlainFont);
+				g.drawString(replyTextRender, px, y, 0);
+			}
 			y += MP.smallPlainFontHeight;
 			y += 2;
 		}
 		
 		// photos
+		if (photo) {
+			
+		}
 
 		// text
 		if (text != null) {
@@ -325,7 +379,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		// media
 		if (media) {
 			g.setColor(0x6AB3F3);
-			int rh = MP.smallPlainFontHeight * mediaRows;
+			int rh = mediaRenderHeight;
 			g.fillRect(x, y, 2, rh);
 		}
 		
@@ -353,17 +407,17 @@ public class UIMessage extends UIItem implements LangConstants {
 			y += PADDING_HEIGHT + MP.smallBoldFontHeight;
 		}
 		
-		y += MARGIN_HEIGHT;
+		//y += MARGIN_BOTTOM;
 		
 		// date not reversed
 		if (showDate && !((ChatCanvas) container).reverse) {
-			y += MARGIN_HEIGHT;
+			y += DATE_MARGIN_HEIGHT;
 			g.setColor(0x1E2C3A);
 			g.setFont(MP.smallBoldFont);
 			g.fillRect(x - PADDING_WIDTH + (w - dateWidth - x) >> 1, y, dateWidth + PADDING_WIDTH * 2, MP.smallBoldFontHeight + DATE_PADDING_HEIGHT * 2);
 			g.setColor(-1);
 			g.drawString(dateRender, x + (w - dateWidth - x) >> 1, y += DATE_PADDING_HEIGHT, 0);
-			y += MARGIN_HEIGHT + DATE_PADDING_HEIGHT + MP.smallBoldFontHeight;
+			y += DATE_MARGIN_HEIGHT + DATE_PADDING_HEIGHT + MP.smallBoldFontHeight;
 		}
 	}
 	
@@ -372,15 +426,17 @@ public class UIMessage extends UIItem implements LangConstants {
 			return contentHeight;
 		}
 		layoutWidth = width;
-		int h = MARGIN_HEIGHT * 2 + PADDING_HEIGHT * 2;
+		int h = MARGIN_TOP + PADDING_HEIGHT * 2;
 		if (container instanceof ChatCanvas) {
-			int idx = ((ChatCanvas) container).items.indexOf(this);
-			int l = ((ChatCanvas) container).items.size();
+			ChatCanvas chat = ((ChatCanvas) container);
+			int idx = chat.items.indexOf(this);
+			int l = chat.items.size();
+			boolean reverse = chat.reverse;
 			
 			date: {
 				if (idx == l - 1) {
 				} else if (idx < l - 1) {
-					UIMessage next = (UIMessage) ((ChatCanvas) container).items.elementAt(idx + 1);
+					UIMessage next = (UIMessage) chat.items.elementAt(idx + 1);
 					if (dateRender.equals(next.dateRender)) {
 						showDate = false;
 						break date;
@@ -390,33 +446,68 @@ public class UIMessage extends UIItem implements LangConstants {
 					break date;
 				}
 				showDate = true;
-				h += MARGIN_HEIGHT * 2 + DATE_PADDING_HEIGHT * 2 + MP.smallBoldFontHeight;
+				h += MARGIN_TOP + DATE_PADDING_HEIGHT * 2 + MP.smallBoldFontHeight;
 			}
+			if (!chat.broadcast) {
+				boolean group = false;
+				if (idx == l - 1) {
+				} else if (idx < l - 1) {
+					UIMessage next = (UIMessage) chat.items.elementAt(idx + 1);
+					if (fromId.equals(next.fromId) && date - next.date < 6 * 60) {
+						group = true;
+					}
+				}
+				space = !group;
+				if (!reverse) {
+					group = false;
+					if (idx == 0) {
+					} else if (idx > 0) {
+						UIMessage next = (UIMessage) chat.items.elementAt(idx - 1);
+						if (fromId.equals(next.fromId) && next.date - date < 6 * 60) {
+							group = true;
+						}
+					}
+				}
+				hideName = hideName || (!showDate && group);
+			}
+			if (space && reverse) h += SPACE_HEIGHT;
 		}
 		if (action) {
 //			h += MP.medPlainFontHeight;
 			if (text != null) {
-				text.y = h - MARGIN_HEIGHT - PADDING_HEIGHT;
+				text.y = h - MARGIN_TOP - PADDING_HEIGHT;
 				h += text.layout(width);
 			}
 			return contentHeight = h;
 		}
-		int cw = Math.min(MAX_WIDTH, width) - PADDING_WIDTH * 2 - MARGIN_WIDTH * 2 - MARGIN_SIDE;
+		int maxW = Math.min(MAX_WIDTH, width);
+		int cw = maxW - PADDING_WIDTH * 2 - MARGIN_WIDTH * 2 - MARGIN_SIDE;
 		// sender
 		if (!hideName) {
 			h += MP.smallBoldFontHeight;
-			nameRender = UILabel.ellipsis(name, MP.smallBoldFont,
-					cw - timeWidth - PADDING_WIDTH * 2 - (edited ? (MP.smallPlainFont.stringWidth(MP.L[Edited]) + 2) : 0));
+			nameRender = UILabel.ellipsis(name, MP.smallBoldFont, cw - PADDING_WIDTH * 2);
 			senderWidth = MP.smallBoldFont.stringWidth(nameRender);
+		}
+		
+		// forward
+		if (fwd) {
+			forwardRender = UILabel.ellipsis(forwardName, MP.smallBoldFont, cw - PADDING_WIDTH * 2 - forwardedFromWidth);
+			h += MP.smallBoldFontHeight;
 		}
 		
 		// reply
 		if (reply) {
 			if (replyName != null) {
 				h += MP.smallPlainFontHeight;
-				replyNameRender = UILabel.ellipsis(replyName, MP.smallBoldFont, cw - 8);
+				replyNameRender = UILabel.ellipsis(replyName, MP.smallBoldFont, cw - 10);
 			}
-			replyTextRender = UILabel.ellipsis(replyText, MP.smallPlainFont, cw - 8);
+			int rw = cw - 10;
+			if (replyPrefix != null) {
+				rw -= replyPrefixWidth + MP.smallPlainFontSpaceWidth;
+			}
+			if (replyText != null) {
+				replyTextRender = UILabel.ellipsis(replyText, MP.smallPlainFont, rw);
+			}
 			h += 4 + MP.smallPlainFontHeight;
 		}
 		
@@ -428,12 +519,11 @@ public class UIMessage extends UIItem implements LangConstants {
 		
 		// text
 		if (text != null) {
-			text.y = h - MARGIN_HEIGHT - PADDING_HEIGHT;
+			text.y = h - MARGIN_TOP - PADDING_HEIGHT;
 			h += text.layout(cw);
 			int l = text.render.size(); 
 			if (l != 0) {
 				int[] pos = (int[]) ((Object[]) text.render.elementAt(l - 1))[3];
-				System.out.println(pos[0] + pos[2] + " " + timeWidth + " - " + cw);
 				timeBreak = pos[0] + pos[2] + timeWidth >= cw;
 			}
 		}
@@ -446,7 +536,9 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (commentsText != null) {
 			h += PADDING_HEIGHT * 2 + 1 + MP.smallBoldFontHeight;
 		}
+		if (space && !((ChatCanvas) container).reverse) h += SPACE_HEIGHT;
 		
+		contentWidth = maxW;
 		return contentHeight = h;
 	}
 	
@@ -556,7 +648,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		x -= MARGIN_WIDTH + (out && w < 900 ? MARGIN_SIDE : 0);
 		System.out.println("tap " + x + " " + y);
 		if (x < 0) return;
-		if (!out && y < MP.smallPlainFontHeight + PADDING_HEIGHT + MARGIN_HEIGHT && x < PADDING_WIDTH + senderWidth) {
+		if (!out && y < MP.smallPlainFontHeight + PADDING_HEIGHT + MARGIN_TOP && x < PADDING_WIDTH + senderWidth) {
 			profileAction();
 			return;
 		}

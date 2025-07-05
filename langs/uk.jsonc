@@ -294,6 +294,8 @@
 	"Media": "Медіа",
 	"Poll": "Опитування",
 	"Geo": "Геопозиція: ",
+	"Photo": "Photo", // Untranslated
+	"Video": "Video", // Untranslated
 	
 	// Chat actions
 	"PinnedMessage_Action": " закріпив повідомлення", 

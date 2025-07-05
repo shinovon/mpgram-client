@@ -27,7 +27,7 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Ticker;
 
-public class ChatCanvas extends Canvas implements MPChat, LangConstants {
+public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnable {
 
 	boolean loaded, finished, canceled;
 	Thread thread;
@@ -63,6 +63,14 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 	String postPeer, postId;
 	ChatTopicsList topicsList;
 	JSONArray topics;
+
+	long typing;
+	private final Object typingLock = new Object();
+	private Thread typingThread;
+	
+	long wasOnline;
+	
+	String status, defaultStatus;
 	
 	Vector/*<UIItem>*/ items = new Vector();
 	int layoutStart;
@@ -106,6 +114,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 	float menuAnimProgress;
 	int menuHeight = 40;
 	
+	boolean loading;
+	
 	boolean touch = hasPointerEvents();
 	
 	ChatCanvas() {
@@ -141,10 +151,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 			return;
 		}
 		
-		
-		if (MP.useLoadingForm) {
-			MP.display(MP.loadingForm);
-		}
+		loading = true;
 		Thread thread = this.thread = Thread.currentThread();
 		try {
 			// remove all
@@ -233,11 +240,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 						user = true;
 						canPin = true;
 						if (MP.chatStatus && info.getObject("User").has("status")) {
-	//						setStatus(info.getObject("User").getObject("status"));
+							setStatus(info.getObject("User").getObject("status"));
 						}
 					}
-					JSONObject full;
-					if (messageId == -1 && (full = info.getObject("full")).has("read_inbox_max_id")) {
+					JSONObject full = info.getObject("full");
+					if (messageId == -1 && full.has("read_inbox_max_id")) {
 						messageId = 0;
 						int maxId = full.getInt("read_inbox_max_id");
 						if (maxId != 0 && full.getInt("unread_count", 0) > limit) {
@@ -245,6 +252,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 							addOffset = -limit;
 							dir = 1;
 						}
+					}
+					if (full.has("participants_count")) {
+						defaultStatus = MP.localizePlural(full.getInt("participants_count"),
+								broadcast ? _subscriber : _member);
 					}
 				}
 				infoLoaded = true;
@@ -338,6 +349,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 				MP.display(this);
 			}
 			// postLoad
+			loading = false;
 			layoutStart = 0;
 			if (endReached && !hasOffset
 					&& query == null && mediaFilter == null
@@ -345,16 +357,19 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 				// start updater thread
 				update = true;
 				MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
-//				(typingThread = new Thread(this)).start();
+				(typingThread = new Thread(this)).start();
 			}
+			queueRepaint();
 		} catch (Exception e) {
 			if (e == MP.cancelException || canceled || this.thread != thread) {
 				// ignore exception if cancel detected
 				return;
 			}
+			MP.display(MP.errorAlert(e), this);
 			e.printStackTrace();
 		} finally {
 			if (this.thread == thread) {
+				loading = false;
 				this.thread = null;
 			}
 		}
@@ -385,6 +400,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 	protected void paint(Graphics g) {
 		int w = getWidth(), h = getHeight();
 		g.setClip(0, 0, w, h);
+		
+		if (loading) {
+			
+			return;
+		}
+		
 		int contentHeight = this.contentHeight;
 		
 		long now = System.currentTimeMillis();
@@ -514,6 +535,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 			}
 		} else {
 			int y = top - scroll;
+			clipHeight += bottom;
 			for (int i = 0; i < l; ++i) {
 				UIItem item = (UIItem) items.elementAt(i);
 				int ih = item.contentHeight;
@@ -530,15 +552,43 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 		g.setClip(0, 0, w, h);
 		
 		if (top != 0) {
+			int th = top;
 			g.setColor(0x17212B);
-			g.fillRect(0, 0, w, top);
+			g.fillRect(0, 0, w, th);
 			g.setColor(0x0A121B);
-			g.drawLine(0, top, w, top);
-			g.setColor(-1);
-			g.setFont(MP.smallBoldFont);
-			g.drawString(title, 20, 4, 0);
+			g.drawLine(0, th, w, th);
+			
+			int tx = 4;
+			int tw = w - 8;
+			if (touch) {
+				g.setColor(-1);
+				tx = 40;
+				tw = w - 80;
+				int bty = (th - 2) >> 1;
+				// back button
+				g.drawLine(12, bty, 28, bty);
+				g.drawLine(12, bty, 20, bty-8);
+				g.drawLine(12, bty, 20, bty+8);
+				
+				// menu button
+				g.drawLine(w - 30, bty - 8, w - 10, bty - 8);
+				g.drawLine(w - 30, bty, w - 10, bty);
+				g.drawLine(w - 30, bty + 8, w - 10, bty + 8);
+			}
+			if (title != null) {
+				g.setColor(-1);
+				g.setFont(MP.smallBoldFont);
+				g.drawString(title, tx, 4, 0);
+			}
+			g.setColor(typing != 0 ? 0x73B9F5 : 0x708499);
 			g.setFont(MP.smallPlainFont);
-			g.drawString("123 members", 20, 4 + MP.smallBoldFontHeight, 0);
+			String status = this.status;
+			if (status == null) {
+				status = this.defaultStatus;
+			}
+			if (status != null) {
+				g.drawString(status, tx, 4 + MP.smallBoldFontHeight, 0);
+			}
 		}
 		
 		if (bottom != 0) {
@@ -648,9 +698,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 			repaint = true;
 		} else if (key == -6) {
 			// menu
-			if (touch) {
-				
-			} else if (menuFocused) {
+			if (menuFocused) {
 				menuFocused = false;
 				menuAnimTarget = 0;
 			} else if (fieldFocused) {
@@ -785,6 +833,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 				scroll += d;
 				dragYHold = 0;
 				if (kineticScroll * d < 0) kineticScroll = 0;
+				scrollTarget = -1;
 			} else {
 				dragYHold += dY;
 			}
@@ -807,36 +856,49 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 	
 	protected void pointerReleased(int x, int y) {
 		long now = System.currentTimeMillis();
-		if (!longTap && contentPressed) {
-			if (!dragging) {
-				if (pointedItem != null && pointedItem.focusable) {
-					focusItem(pointedItem, 0);
-					// h - bottom + scroll - contentHeight
-					pointedItem.tap(x, reverse ? y - (scroll - bottom - pointedItem.y + height - pointedItem.contentHeight) : y - pointedItem.y - top - scroll);
-				}
-			} else {
-				int move = 0;
-				long moveTime = 0;
-				for (int i = 0; i < moveSamples; i++) {
-					int idx = (movesIdx + moveSamples - 1 - i) % moveSamples;
-					long time;
-					if ((time = now - moveTimes[idx]) > 200) {
-						break;
+		if (contentPressed) {
+			if (!longTap) {
+				if (!dragging) {
+					if (pointedItem != null && pointedItem.focusable) {
+						focusItem(pointedItem, 0);
+						pointedItem.tap(x, reverse ? y - (scroll - bottom - pointedItem.y + height - pointedItem.contentHeight) : y - pointedItem.y - top - scroll);
 					}
-					move += moves[idx];
-					moveTime += time;
-				}
-				System.out.println("k " + move + " " + moveTime);
-				if (moveTime > 0) {
-					float res = (120f * move) / moveTime; 
-					if (Math.abs(res) > 50) {
-						res = (res < 0 ? -50 : 50);
+				} else {
+					int move = 0;
+					long moveTime = 0;
+					for (int i = 0; i < moveSamples; i++) {
+						int idx = (movesIdx + moveSamples - 1 - i) % moveSamples;
+						long time;
+						if ((time = now - moveTimes[idx]) > 200) {
+							break;
+						}
+						move += moves[idx];
+						moveTime += time;
 					}
-					if (reverse) res = -res;
-					if (kineticScroll * res < 0) kineticScroll = 0;
-					kineticScroll += res;
+					System.out.println("k " + move + " " + moveTime);
+					if (moveTime > 0) {
+						float res = (120f * move) / moveTime; 
+						if (Math.abs(res) > 50) {
+							res = (res < 0 ? -50 : 50);
+						}
+						if (reverse) res = -res;
+						if (kineticScroll * res < 0) kineticScroll = 0;
+						kineticScroll += res;
+					}
+					dragging = false;
 				}
-				dragging = false;
+			}
+		} else if (touch) {
+			if (y < top) {
+				if (x < 40) {
+					keyPressed(-7);
+				} else if (x > width - 40) {
+					keyPressed(-6);
+				} else {
+					openProfile();
+				}
+			} else if (y > height - bottom) {
+				// TODO
 			}
 		}
 		dragYHold = 0;
@@ -1018,6 +1080,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 		return null;
 	}
 	
+	private void openProfile() {
+		
+	}
+	
 	// interface getters
 
 	public String id() {
@@ -1141,9 +1207,28 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 		if (!this.update) return;
 		switch (type) {
 		case UPDATE_USER_STATUS: {
+			if (MP.chatStatus) {
+				setStatus(update.getObject("status"));
+				typing = 0;
+				typingThread.interrupt();
+			}
 			break;
 		}
 		case UPDATE_USER_TYPING: {
+			if ("sendMessageCancelAction".equals(update.getObject("action").getString("_"))) {
+				setStatus(null);
+				typing = 0;
+				typingThread.interrupt();
+				break;
+			}
+			if (id.charAt(0) != '-' && update.has("top_msg_id") && topMsgId != update.getInt("top_msg_id"))
+				break;
+			this.status = "Someone is typing..."; // TODO
+			typing = System.currentTimeMillis();
+			typingThread.interrupt();
+			synchronized (typingLock) {
+				typingLock.notify();
+			}
 			break;
 		}
 		case UPDATE_NEW_MESSAGE: {
@@ -1182,6 +1267,63 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants {
 	public void openTopic(int topMsgId, boolean canWrite, String title) {
 		// TODO Auto-generated method stub
 		
+	}	
+	
+	private void setStatus(JSONObject status) {
+		String s;
+		if (status == null) {
+			this.status = null;
+			if (MP.chatStatus) {
+				if (wasOnline == 1) {
+					s = MP.L[Online];
+				} else if (wasOnline == 2) {
+					s = MP.L[Offline];
+				} else if (wasOnline != 0) {
+					s = /*MP.L[LastSeen] + */MP.localizeDate(wasOnline, 4);
+				} else {
+					s = null;
+				}
+				if (s != this.status) {
+					this.status = s;
+					queueRepaint();
+				}
+			}
+			return;
+		}
+		if ("userStatusOnline".equals(status.getString("_"))) {
+			wasOnline = 1;
+			s = MP.L[Online];
+		} else if ((wasOnline = status.getInt("was_online", 0)) != 0) {
+			s = /*MP.L[LastSeen] + */MP.localizeDate(wasOnline, 4);
+		} else {
+			s = MP.L[Offline];
+			wasOnline = 2;
+		}
+		this.status = s;
+		queueRepaint();
+	}
+	
+	// typing timer loop
+	public void run() {
+		try {
+			while (update) {
+				try {
+					if (typing == 0) {
+						synchronized (typingLock) {
+							typingLock.wait(60000);
+						}
+					}
+					Thread.sleep(5000);
+					typing = 0;
+				} catch (Exception e) {}
+				if (typing == 0) {
+					setStatus(null);
+				}
+			}
+
+			setTicker(null);
+			typing = 0;
+		} catch (Exception e) {}
 	}
 
 }

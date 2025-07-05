@@ -588,7 +588,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 		
 		// media
 		if (message.has("media")) {
-			if (!MP.showMedia || message.isNull("media")) {
+			if (!MP.showMedia || message.isNull("media") || message.getObject("media").has("hide")) {
 				// media is disabled
 				s = new StringItem(null, MP.L[Media]);
 				s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -967,7 +967,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 			offsetId = firstMsgId;
 			addOffset = limit - 1;
 		}
-		load();
+		MP.openLoad(this);
 	}
 	
 	public void reset() {

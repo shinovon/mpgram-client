@@ -294,6 +294,8 @@
 	"Media": "Media",
 	"Poll": "Kysely",
 	"Geo": "Sijainti: ",
+	"Photo": "Photo", // Untranslated
+	"Video": "Video", // Untranslated
 	
 	// Chat actions
 	"PinnedMessage_Action": " kiinnitti viestin",

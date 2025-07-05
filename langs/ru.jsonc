@@ -294,6 +294,8 @@
 	"Media": "Медиа",
 	"Poll": "Опрос",
 	"Geo": "Геопозиция: ",
+	"Photo": "Фото",
+	"Video": "Видео",
 	
 	// Chat actions
 	"PinnedMessage_Action": " закрепил(а) сообщение",

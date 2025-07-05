@@ -294,6 +294,8 @@
 	"Media": "Medien",
 	"Poll": "Umfrage",
 	"Geo": "Geo: ",
+	"Photo": "Photo", // Untranslated
+	"Video": "Video", // Untranslated
 	
 	// Chat actions
 	"PinnedMessage_Action": " anghängte Nachricht",
