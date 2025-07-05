@@ -302,8 +302,8 @@ public class UILabel extends UIItem {
 		x += rw;
 		for (int k = res.size() - 1; k >= 0; --k) {
 			Object[] obj = (Object[]) res.elementAt(k);
-			if (((int[]) obj[2])[1] == y) {
-				((int[]) obj[2])[0] += rw;
+			if (((int[]) obj[3])[1] == y) {
+				((int[]) obj[3])[0] += rw;
 			} else break;
 		}
 		return x;
