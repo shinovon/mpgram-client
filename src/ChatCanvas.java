@@ -129,6 +129,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (touch) {
 			top = MP.smallBoldFontHeight + MP.smallPlainFontHeight + 8;
 			bottom = Math.max(MP.medPlainFontHeight + 16, 48);
+		} else {
+			top = MP.smallBoldFontHeight + 4 + (MP.chatStatus ? MP.smallPlainFontHeight + 4 : 0);
 		}
 	}
 	
@@ -428,6 +430,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			g.setColor(0x0E1621);
 			g.fillRect(0, 0, w, h);
 			g.setColor(-1);
+			g.setFont(MP.medPlainFont);
 			g.drawString(MP.L[Loading], w >> 1, h >> 1, Graphics.VCENTER | Graphics.HCENTER);
 			return;
 		}
@@ -444,6 +447,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		
 		boolean animate = false;
 
+		// animations
+		
 		if (fieldAnimTarget != -1) {
 			if (bottom == fieldAnimTarget || Math.abs(fieldAnimTarget - fieldAnimProgress) < 1) {
 				fieldAnimProgress = bottom = fieldAnimTarget;
@@ -465,12 +470,15 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		
 		int clipHeight = this.clipHeight = h - top - bottom;
 		
+		// layout
 		if (layoutStart != null) {
 			UIItem idx = layoutStart;
 			layoutStart = null;
 			layout(idx, w, clipHeight);
 			contentHeight = this.contentHeight;
 		}
+		
+		// focus
 		
 		if (nextFocusItem != null) {
 			setCurrentItem(nextFocusItem);
@@ -484,6 +492,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				scrollTo(focusedItem);
 			}
 		}
+		
+		// key scroll
 		
 		if (scrollTarget != -1) {
 			if (contentHeight <= clipHeight) {
@@ -517,6 +527,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			}
 		}
 		
+		// touch scroll
+		
 		if (kineticScroll != 0) {
 			if ((kineticScroll > -1 && kineticScroll < 1)
 					|| contentHeight <= clipHeight
@@ -538,6 +550,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				animate = true;
 			}
 		}
+		
+		// limit scroll
 
 		int scroll = this.scroll;
 		if (scroll < 0) this.scroll = scroll = 0;
@@ -545,9 +559,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		else if (scroll > contentHeight - clipHeight) this.scroll = scroll = contentHeight - clipHeight;
 //		System.out.println("scroll " + scroll + " / " + (contentHeight - clipHeight));
 		
+		// background
 		g.setColor(0x0E1621);
 		g.fillRect(0, 0, w, h);
 		g.setColor(-1);
+		
+		// render items
 		
 		UIItem msg = firstMessage;
 		if (msg != null) {
@@ -578,6 +595,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		
 		g.setClip(0, 0, w, h);
 		
+		// top panel
 		if (top != 0) {
 			int th = top;
 			g.setColor(0x17212B);
@@ -602,6 +620,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				g.drawLine(w - 30, bty, w - 10, bty);
 				g.drawLine(w - 30, bty + 8, w - 10, bty + 8);
 			}
+			// TODO title ellipsis
 			if (title != null) {
 				g.setColor(-1);
 				g.setFont(MP.smallBoldFont);
@@ -618,6 +637,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			}
 		}
 		
+		// bottom panel
 		if (bottom != 0) {
 			g.setColor(0x17212B);
 			int by = h - bottom;
@@ -626,11 +646,13 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			g.drawLine(0, by, w, by);
 		}
 		
+		// popup menu TODO
 		if (menuAnimProgress != 0) {
 			g.setColor(-1);
 			g.fillRect(20, h - (int)menuAnimProgress, w - 40, (int)menuAnimProgress);
 		}
-			
+		
+		// process long tap
 		if (pressed && !dragging && !longTap
 				&& pointedItem != null && pointedItem.focusable) {
 			animate = true;
@@ -670,6 +692,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 	
 	protected void keyRepeated(int key) {
+		// TODO own repeater thread
 		key(key, true);
 	}
 	
@@ -1291,6 +1314,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			break;
 		}
 		case UPDATE_DELETE_MESSAGES: {
+			// TODO
 //			JSONArray messages = update.getArray("messages");
 //			int l = messages.size();
 //			
@@ -1300,6 +1324,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			break;
 		}
 		case UPDATE_EDIT_MESSAGE: {
+			// TODO
+			break;
 		}
 		}
 	}
@@ -1356,7 +1382,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				} else if (wasOnline == 2) {
 					s = MP.L[Offline];
 				} else if (wasOnline != 0) {
-					s = /*MP.L[LastSeen] + */MP.localizeDate(wasOnline, 4);
+					s = MP.L[LastSeen] + MP.localizeDate(wasOnline, 4);
 				} else {
 					s = null;
 				}
@@ -1371,7 +1397,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			wasOnline = 1;
 			s = MP.L[Online];
 		} else if ((wasOnline = status.getInt("was_online", 0)) != 0) {
-			s = /*MP.L[LastSeen] + */MP.localizeDate(wasOnline, 4);
+			s = MP.L[LastSeen] + MP.localizeDate(wasOnline, 4);
 		} else {
 			s = MP.L[Offline];
 			wasOnline = 2;

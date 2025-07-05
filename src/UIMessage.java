@@ -1,6 +1,3 @@
-import javax.microedition.lcdui.Canvas;
-import javax.microedition.lcdui.Graphics;
-
 /*
 Copyright (c) 2025 Arman Jussupgaliyev
 
@@ -22,6 +19,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
+import javax.microedition.lcdui.Canvas;
+import javax.microedition.lcdui.Graphics;
+
 public class UIMessage extends UIItem implements LangConstants {
 	
 	private static final int MAX_WIDTH = 440;
@@ -244,6 +245,7 @@ public class UIMessage extends UIItem implements LangConstants {
 //			subFocus[order++] = FOCUS_BUTTONS;
 //		}
 		
+		// comments
 		if (message.has("comments")) {
 			JSONObject comments = message.getObject("comments");
 			commentsText = MP.localizePlural(comments.getInt("count"), _comment);
@@ -280,6 +282,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			}
 			h -= DATE_MARGIN_HEIGHT * 2 + DATE_PADDING_HEIGHT * 2 + MP.smallBoldFontHeight;
 		}
+		// chat action
 		if (action) {
 			if (text != null) {
 				y += MARGIN_TOP;
@@ -394,6 +397,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		
 		y += PADDING_HEIGHT;
 		
+		// comment
 		if (commentsText != null) {
 			y += PADDING_HEIGHT;
 			g.setColor(0x31404E);
@@ -425,6 +429,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 		layoutWidth = width;
 		int h = MARGIN_TOP + PADDING_HEIGHT * 2;
+		// grouping
 		if (container instanceof ChatCanvas) {
 			ChatCanvas chat = ((ChatCanvas) container);
 			boolean reverse = chat.reverse;
@@ -465,6 +470,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			}
 			if (space && reverse) h += SPACE_HEIGHT;
 		}
+		// chat action
 		if (action) {
 //			h += MP.medPlainFontHeight;
 			if (text != null) {
@@ -473,8 +479,10 @@ public class UIMessage extends UIItem implements LangConstants {
 			}
 			return contentHeight = h;
 		}
+		
 		int maxW = Math.min(MAX_WIDTH, width);
 		int cw = maxW - PADDING_WIDTH * 2 - MARGIN_WIDTH * 2 - MARGIN_SIDE;
+		
 		// sender
 		if (!hideName) {
 			h += MP.smallBoldFontHeight;
@@ -531,6 +539,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 		if (space && !((ChatCanvas) container).reverse) h += SPACE_HEIGHT;
 		
+		// TODO pack width
 		contentWidth = maxW;
 		return contentHeight = h;
 	}
