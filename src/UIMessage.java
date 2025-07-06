@@ -420,7 +420,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				g.drawString(forwardRender, x + forwardedFromWidth, y, 0);
 				if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_FORWARD) {
 					g.setColor(0xababab);
-					g.drawRect(x + forwardedFromWidth, ty, forwardNameWidth, MP.smallBoldFontHeight);
+					g.drawRect(x + forwardedFromWidth, y, forwardNameWidth, MP.smallBoldFontHeight);
 				}
 			}
 			y += MP.smallBoldFontHeight;

@@ -684,7 +684,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					fieldAnimTarget = 0;
 					keyGuide = false;
 				}
-			} else {
+			} else if (touch) {
 				// TODO
 				g.setColor(-1);
 				g.setFont(MP.medPlainFont);
