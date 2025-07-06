@@ -120,6 +120,8 @@
 	"Older": "Mensajes antiguos",
 	"Newer": "Mensajes mas recientes",
 	"SendSticker": "Enviar pegatina",
+	"Menu": "Menu", // Untranslated
+	"Write": "Write", // Untranslated
 	
 	// Message writing form commands
 	"Send": "Enviar",
@@ -263,6 +265,7 @@
 	"SendAsVoice": "Enviar como mensaje de voz",
 	"HideWithSpoiler": "Ocultar con spoiler",
 	"EnableHTMLFormatting": "HTML formato",
+	"TextField_Hint": "Write a message...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Mensaje enviado",

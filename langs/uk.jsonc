@@ -120,6 +120,8 @@
 	"Older": "Старше",
 	"Newer": "Новіше",
 	"SendSticker": "Надіслати стікер",
+	"Menu": "Menu", // Untranslated
+	"Write": "Write", // Untranslated
 	
 	// Message writing form commands
 	"Send": "Відправити",
@@ -263,6 +265,7 @@
 	"SendAsVoice": "Надіслати як голосове повідомлення",
 	"HideWithSpoiler": "Позначити як спойлер",
 	"EnableHTMLFormatting": "HTML-форматування",
+	"TextField_Hint": "Write a message...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Повідомлення відправлено",

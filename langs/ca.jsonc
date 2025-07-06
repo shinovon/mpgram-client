@@ -120,6 +120,8 @@
 	"Older": "Més vell",
 	"Newer": "Més nou",
 	"SendSticker": "Envia adhesiu",
+	"Menu": "Menu", // Untranslated
+	"Write": "Write", // Untranslated
 	
 	// Message writing form commands
 	"Send": "Envia",
@@ -263,6 +265,7 @@
 	"SendAsVoice": "Envia com a missatge de veu",
 	"HideWithSpoiler": "Amaga amb spoiler",
 	"EnableHTMLFormatting": "Activa formatació HTML",
+	"TextField_Hint": "Write a message...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Missatge enviat",

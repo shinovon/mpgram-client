@@ -120,6 +120,8 @@
 	"Older": "Старее",
 	"Newer": "Новее",
 	"SendSticker": "Отправить стикер",
+	"Menu": "Меню",
+	"Write": "Написать",
 	
 	// Message writing form commands
 	"Send": "Отправить",
@@ -263,6 +265,7 @@
 	"SendAsVoice": "Отправить как голосовое",
 	"HideWithSpoiler": "Пометить как спойлер",
 	"EnableHTMLFormatting": "HTML-форматирование",
+	"TextField_Hint": "Написать сообщение...",
 	
 	// Alert messages
 	"MessageSent_Alert": "Сообщение отправлено",

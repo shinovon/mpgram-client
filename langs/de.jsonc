@@ -120,6 +120,8 @@
 	"Older": "Älter",
 	"Newer": "Neuer",
 	"SendSticker": "Sende Sticker",
+	"Menu": "Menu", // Untranslated
+	"Write": "Write", // Untranslated
 	
 	// Message writing form commands
 	"Send": "Sende",
@@ -263,6 +265,7 @@
 	"SendAsVoice": "Sprachnachricht senden",
 	"HideWithSpoiler": "Versteckt mit Spoiler",
 	"EnableHTMLFormatting": "HTML-formatting aktivieren",
+	"TextField_Hint": "Write a message...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Nachricht gesendet",

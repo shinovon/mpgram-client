@@ -120,6 +120,8 @@
 	"Older": "Vanhemmat",
 	"Newer": "Uudemmat",
 	"SendSticker": "Lähetä tarra",
+	"Menu": "Menu", // Untranslated
+	"Write": "Write", // Untranslated
 	
 	// Message writing form commands
 	"Send": "Lähetä",
@@ -263,6 +265,7 @@
 	"SendAsVoice": "Lähetä ääniviestinä",
 	"HideWithSpoiler": "Piilota",
 	"EnableHTMLFormatting": "HTML-muotoilu",
+	"TextField_Hint": "Write a message...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Viesti lähetetty",

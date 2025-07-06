@@ -120,6 +120,8 @@
 	"Older": "Daha köhnə",
 	"Newer": "Daha yeni",
 	"SendSticker": "Send sticker", // Untranslated
+	"Menu": "Menu", // Untranslated
+	"Write": "Write", // Untranslated
 	
 	// Message writing form commands
 	"Send": "Göndər",
@@ -263,6 +265,7 @@
 	"SendAsVoice": "Send as voice message", // Untranslated
 	"HideWithSpoiler": "Hide with spoiler", // Untranslated
 	"EnableHTMLFormatting": "Enable HTML-formatting", // Untranslated
+	"TextField_Hint": "Write a message...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Mesaj göndərildi",

@@ -120,6 +120,8 @@
 	"Older": "Older",
 	"Newer": "Newer",
 	"SendSticker": "Send sticker",
+	"Menu": "Menu",
+	"Write": "Write",
 	
 	// Message writing form commands
 	"Send": "Send",
@@ -263,6 +265,7 @@
 	"SendAsVoice": "Send as voice message",
 	"HideWithSpoiler": "Hide with spoiler",
 	"EnableHTMLFormatting": "Enable HTML-formatting",
+	"TextField_Hint": "Write a message...",
 	
 	// Alert messages
 	"MessageSent_Alert": "Message sent",
