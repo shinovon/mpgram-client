@@ -757,7 +757,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 				} else if (type.equals("geo")) {
 					// geo
 					sb.setLength(0);
-					sb.append(MP.L[Geo])
+					sb.append(MP.L[Geo]).append('\n')
 					.append(media.get("lat")).append(", ").append(media.get("long"));
 					s = new StringItem(null, sb.toString());
 					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);

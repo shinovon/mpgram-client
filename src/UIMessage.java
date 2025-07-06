@@ -40,11 +40,10 @@ public class UIMessage extends UIItem implements LangConstants {
 	private static final int FOCUS_SENDER = 0;
 	private static final int FOCUS_FORWARD = 1;
 	private static final int FOCUS_REPLY = 2;
-	private static final int FOCUS_PHOTO = 3; // TODO
+	private static final int FOCUS_MEDIA = 3;
 	private static final int FOCUS_TEXT = 4;
-	private static final int FOCUS_MEDIA = 5; // TODO
-	private static final int FOCUS_BUTTONS = 6; // TODO
-	private static final int FOCUS_COMMENT = 7;
+	private static final int FOCUS_BUTTONS = 5; // TODO
+	private static final int FOCUS_COMMENT = 6;
 	
 	UILabel text;
 	
@@ -69,14 +68,17 @@ public class UIMessage extends UIItem implements LangConstants {
 	String replyName, replyText, replyPrefix;
 	String commentsText;
 	String mediaTitle, mediaSubtitle;
-	boolean mediaPlayable, mediaDownload, mediaBrowser;
+	boolean mediaPlayable, mediaDownload;
+	String mediaFileName, mediaUrl;
 	String forwardName;
 	String fwdFromId, fwdPeer;
 	int fwdMsgId;
 	String replyPeer;
 	int replyMsgId;
 	
-	String time, nameRender, dateRender, replyNameRender, replyTextRender, forwardRender;
+	String time, nameRender, dateRender;
+	String replyNameRender, replyTextRender, forwardRender;
+	String mediaTitleRender, mediaSubtitleRender;
 	int timeWidth, dateWidth, senderWidth, replyPrefixWidth, forwardNameWidth;
 	int mediaRenderHeight;
 	boolean showDate, hideName, timeBreak, space;
@@ -93,6 +95,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		name = out && !chat.broadcast ? MP.L[You] : MP.getName(fromId, true);
 		dateRender = MP.localizeDate(date, 0);
 		dateWidth = MP.smallBoldFont.stringWidth(dateRender);
+		edited = message.has("edit");
 		peerId = chat.id;
 		
 		if ((action = message.has("act"))) {
@@ -164,8 +167,9 @@ public class UIMessage extends UIItem implements LangConstants {
 			fwd = true;
 			JSONObject fwd = message.getObject("fwd");
 			String t = null;
+			fwdFromId = fwd.getString("from_id", null);
 			if ((t = fwd.getString("from_name", null)) == null) {
-				t = MP.getName(fwdFromId = fwd.getString("from_id", null), true);
+				t = MP.getName(fwdFromId, true);
 			}
 			forwardName = t;
 			forwardedFromWidth = chat.selfChat ? 0 : MP.smallPlainFont.stringWidth(MP.L[ForwardedFrom]);
@@ -201,9 +205,8 @@ public class UIMessage extends UIItem implements LangConstants {
 						if (type != null) {
 							if ("photo".equals(type)) {
 								t = MP.L[Photo];
-							} else if ("photo".equals(type)) {
-								t = MP.L[Video];
 							} else if ("document".equals(type)) {
+//								t = MP.L[Video];
 								t = MP.L[File];
 							}
 						}
@@ -225,15 +228,85 @@ public class UIMessage extends UIItem implements LangConstants {
 			}
 		}
 		
-		// photo TODO
-		boolean photo = false;
-		JSONObject media = message.getObject("media", null);
-		if (MP.showMedia
-				&& message.has("media") && !message.isNull("media")
-				&& media.getString("type").equals("photo")) {
-			photo = true;
-//			this.photo = true;
-//			subFocus[order++] = FOCUS_PHOTO;
+		// media
+		if (message.has("media")) {
+			JSONObject media = message.getObject("media");
+			if (!MP.showMedia || message.isNull("media")) {
+				this.media = true;
+				mediaTitle = MP.L[Media];
+			} else {
+				String t;
+				String type = media.getString("type");
+				if (type.equals("undefined")) {
+					mediaTitle = MP.L[Media];
+				} else if (type.equals("webpage")) {
+					if ((t = media.getString("name", null)) != null && t.length() != 0) {
+						mediaTitle = t;
+					}
+					if ((t = media.getString("title", null)) != null && t.length() != 0) {
+						mediaSubtitle = t;
+					}
+					mediaUrl = media.getString("url");
+				} else if (type.equals("document")) {
+					mediaDownload = true;
+					mediaPlayable = media.has("audio")
+							&& ("audio/mpeg".equals(t = media.getString("mime", null))
+									|| "audio/aac".equals(t)
+									|| "audio/m4a".equals(t));
+					mediaFileName = media.getString("name", null);
+					StringBuffer sb = new StringBuffer();
+					name: {
+						if (media.has("audio")) {
+							JSONObject audio = media.getObject("audio");
+							if ((t = audio.getString("artist", null)) != null && t.length() != 0) {
+								sb.append(t).append(" - ");
+							}
+							if ((t = audio.getString("title", null)) != null && t.length() != 0) {
+								sb.append(t);
+								break name;
+							}
+						}
+						if ((t = media.getString("name", null)) != null && t.length() != 0) {
+							sb.append(t);
+						}
+					}
+					mediaTitle = sb.toString();
+					
+					if (!media.isNull("size")) {
+						sb.setLength(0);
+						long size = media.getLong("size");
+						if (size >= 1024 * 1024) {
+							size = (size * 100) / (1024 * 1024);
+							sb.append(size / 100).append('.').append(size % 100).append(" MB");
+						} else {
+							size = (size * 100) / 1024;
+							sb.append(size / 100).append('.').append(size % 100).append(" KB");
+						}
+						mediaSubtitle = sb.toString();
+					}
+					
+					// TODO
+//					if (MP.loadThumbs && media.getBoolean("thumb", false)) {
+//						MP.queueImage(this, this);
+//					}
+				} else if (type.equals("photo")) {
+					// TODO
+					photo = true;
+//					if (MP.loadThumbs) {
+//					} else {
+					mediaTitle = MP.L[Photo];
+//					}
+				} else if (type.equals("poll")) {
+					mediaTitle = MP.L[Poll];
+				} else if (type.equals("geo")) {
+					mediaTitle = MP.L[Geo];
+					mediaSubtitle = media.get("lat") + ", " + media.get("long");
+				} else {
+					mediaTitle = MP.L[Media];
+				}
+				this.media = true;
+				subFocus[order++] = FOCUS_MEDIA;
+			}
 		}
 		
 		// text
@@ -249,16 +322,6 @@ public class UIMessage extends UIItem implements LangConstants {
 			label.linkColor = 0x71BAFA;
 			if (label.focusable) subFocus[order++] = FOCUS_TEXT;
 			this.text = label;
-		}
-		
-		// media TODO
-		if (message.has("media") && !photo) {
-			if (!MP.showMedia || message.isNull("media")) {
-				
-			} else {
-//				this.media = true;
-//				subFocus[order++] = FOCUS_MEDIA;
-			}
 		}
 		
 		// buttons TODO
@@ -372,17 +435,21 @@ public class UIMessage extends UIItem implements LangConstants {
 				rh += MP.smallPlainFontHeight;
 			}
 			g.fillRect(x, y, 2, rh);
+			if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_REPLY) {
+				g.setColor(0x1A3756);
+				g.fillRect(x + 2, y, cw - 4, rh);
+			}
+			int px = x + 6;
 			if (replyNameRender != null) {
 				g.setColor(-1);
 				g.setFont(MP.smallBoldFont);
-				g.drawString(replyNameRender, x + 6, y, 0);
-				y += MP.smallPlainFontHeight;
+				g.drawString(replyNameRender, px, y, 0);
+				y += MP.smallBoldFontHeight;
 			}
-			int px = x + 6;
 			if (replyPrefix != null) {
 				g.setColor(0x71BAFA);
 				g.setFont(MP.smallPlainFont);
-				g.drawString(replyPrefix, x + 6, y, 0);
+				g.drawString(replyPrefix, px, y, 0);
 				px += MP.smallPlainFontSpaceWidth + replyPrefixWidth;
 			}
 			if (replyTextRender != null) {
@@ -394,9 +461,29 @@ public class UIMessage extends UIItem implements LangConstants {
 			y += 2;
 		}
 		
-		// photos
-		if (photo) {
-			
+		// media
+		if (media) {
+			g.setColor(0x6AB3F3);
+			int rh = mediaRenderHeight;
+			g.fillRect(x, y, 2, rh);
+			if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_MEDIA) {
+				g.setColor(0x1A3756);
+				g.fillRect(x + 2, y, cw - 4, rh);
+			}
+			int px = x + 6;
+			if (mediaTitleRender != null) {
+				g.setColor(-1);
+				g.setFont(MP.smallBoldFont);
+				g.drawString(mediaTitleRender, px, y, 0);
+				y += MP.smallBoldFontHeight;
+			}
+			if (mediaSubtitleRender != null) {
+				g.setColor(0x71BAFA);
+				g.setFont(MP.smallPlainFont);
+				g.drawString(mediaSubtitleRender, px, y, 0);
+				y += MP.smallPlainFontHeight;
+			}
+			y += 2;
 		}
 
 		// text
@@ -404,14 +491,6 @@ public class UIMessage extends UIItem implements LangConstants {
 			UILabel text = this.text;
 			text.paint(g, x, y, cw);
 			y += text.contentHeight;
-		}
-		
-		// media
-		if (media) {
-			g.setColor(0x6AB3F3);
-			int rh = mediaRenderHeight;
-			g.fillRect(x, y, 2, rh);
-			y += rh;
 		}
 		
 		// buttons
@@ -549,7 +628,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			int ry = h;
 			if (replyName != null) {
 				replyNameRender = UILabel.ellipsis(replyName, MP.smallBoldFont, cw - 10);
-				h += MP.smallPlainFontHeight;
+				h += MP.smallBoldFontHeight;
 			}
 			int rw = cw - 10;
 			if (replyPrefix != null) {
@@ -571,6 +650,25 @@ public class UIMessage extends UIItem implements LangConstants {
 		boolean timeBreak = text == null;
 		if (edited) {
 			timeWidth += MP.smallPlainFontSpaceWidth + MP.smallPlainFont.stringWidth(MP.L[Edited]);
+		}
+		
+		// media
+		if (media) {
+			int mh = 0;
+			if (mediaTitle != null) {
+				mediaTitleRender = UILabel.ellipsis(mediaTitle, MP.smallBoldFont, cw - 10);
+				mh += MP.smallBoldFontHeight;
+			}
+			if (mediaSubtitle != null) {
+				mediaSubtitleRender = UILabel.ellipsis(mediaSubtitle, MP.smallPlainFont, cw - 10);
+				mh += MP.smallPlainFontHeight;
+			}
+			
+			touchZones[order ++] = x + 2;
+			touchZones[order ++] = h + y;
+			touchZones[order ++] = x + cw;
+			touchZones[order ++] = (h += (mediaRenderHeight = mh) + 2) + y;
+			touchZones[order ++] = FOCUS_MEDIA;
 		}
 		
 		// text
@@ -610,7 +708,8 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (dir != 0 && subFocusLength != 0) {
 			if (subFocusLength != 1 || subFocus[0] != FOCUS_SENDER || !hideName) {
 				if (subFocusCurrent == -1) {
-					subFocusCurrent = dir == -1 ? subFocusLength - 1 : 0;
+					subFocusCurrent = dir == -1 ? subFocusLength - 1
+							: subFocusLength > 1 && subFocus[0] == FOCUS_SENDER && hideName ? 1 : 0;
 				}
 				subFocus(subFocusCurrent);
 			}
@@ -626,14 +725,10 @@ public class UIMessage extends UIItem implements LangConstants {
 	private void subFocus(int idx) {
 		System.out.println("subfocus [" + idx + "] = " + subFocus[idx]);
 		switch (subFocus[idx]) {
-		case FOCUS_SENDER:
-			break;
 		case FOCUS_TEXT:
 			if (text != null) {
 				focusChild = text;
 			}
-			break;
-		case FOCUS_COMMENT:
 			break;
 		}
 	}
@@ -657,11 +752,15 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 		if (subFocusLength != 0) {
 			if (subFocusLength != 1 || subFocus[0] != FOCUS_SENDER || !hideName) {
-				if (subFocusCurrent == -1) {
+				if (subFocusLength > 1 && subFocusCurrent == 0 && subFocus[0] == FOCUS_SENDER && hideName) {
+					subFocusCurrent = 1;
+				} else if (subFocusCurrent == -1) {
 					subFocusCurrent = 0;
 				}
 				if (dir == Canvas.UP) {
 					if (subFocusCurrent == 0)
+						return 0;
+					if (subFocusCurrent == 1 && subFocus[0] == FOCUS_SENDER && hideName)
 						return 0;
 					subFocus(--subFocusCurrent);
 					if (focusChild != null) {
@@ -711,6 +810,17 @@ public class UIMessage extends UIItem implements LangConstants {
 			}
 			MP.openChat(replyPeer, replyMsgId);
 			return true;
+		case FOCUS_MEDIA:
+			if (mediaPlayable) {
+				menuAction(Play_Item);
+			} else if (photo) {
+				menuAction(ViewImage);
+			} else if (mediaDownload) {
+				menuAction(Download);
+			} else if (mediaUrl != null) {
+				MP.midlet.browse(mediaUrl);
+			}
+			return true;
 		case FOCUS_COMMENT:
 			commentAction();
 			return true;
@@ -755,18 +865,34 @@ public class UIMessage extends UIItem implements LangConstants {
 			MP.display(MP.loadingAlert(MP.L[Loading]), MP.current);
 			MP.midlet.start(MP.RUN_DELETE_MESSAGE, new String[] { peerId, idStr });
 			break;
+		case ViewImage:
+			if (MP.useView) {
+				MP.display(new ViewCanvas(peerId, idStr));
+				break;
+			}
+		case Download:
+			MP.midlet.downloadDocument(peerId, idStr, mediaFileName);
+			break;
+		case Play_Item:
+			MP.display(MP.loadingAlert(MP.L[Loading]), MP.current);
+			MP.midlet.start(MP.RUN_LOAD_PLAYLIST, new String[] {peerId, "3", idStr});
+			break;
 		}
 	}
 	
 	int[] menu() {
 		int[] item = focusChild != null ? focusChild.menu() : null;
 		
-		if (item == null && subFocusCurrent != -1) {
+		if (item == null && subFocusCurrent != -1 && subFocusLength != 0) {
 			switch (subFocus[subFocusCurrent]) {
-			// TODO
-			case FOCUS_PHOTO:
-				break;
 			case FOCUS_MEDIA:
+				if (mediaPlayable) {
+					item = new int[] { Play_Item, Download };
+				} else if (photo) {
+					item = new int[] { ViewImage, Download };
+				} else if (mediaDownload) {
+					item = new int[] { Download };
+				}
 				break;
 			}
 		}
@@ -809,7 +935,14 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 		for (int i = 0; i < touchZones.length && touchZones[i] != Integer.MIN_VALUE; i += 5) {
 			if (x >= touchZones[i] && y >= touchZones[i + 1] && x <= touchZones[i + 2] && y <= touchZones[i + 3]) {
-				if (!longTap && action(touchZones[i + 4])) {
+				int focus = touchZones[i + 4];
+				for (int j = 0; j < subFocusLength; j++) {
+					if (subFocus[j] == focus) {
+						subFocus(subFocusCurrent = j);
+						break;
+					}
+				}
+				if (!longTap && action(focus)) {
 					return true;
 				}
 				break;

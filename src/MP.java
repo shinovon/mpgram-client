@@ -2916,14 +2916,9 @@ public class MP extends MIDlet
 				return;
 			}
 			if (c == documentCmd) {
-				// TODO
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
-				if (fileRewrite && s[4] != null) {
-					browse(instanceUrl + "file/" + url(s[4]) + "?c=" + s[0] + "&m=" + s[1] + "&user=" + user);
-				} else {
-					browse(instanceUrl + FILE_URL + "?c=" + s[0] + "&m=" + s[1] + "&user=" + user);
-				}
+				downloadDocument(s[0], s[1], s[4]);
 				return;
 			}
 			if (c == editMsgCmd) {
@@ -3681,6 +3676,15 @@ public class MP extends MIDlet
 		}
 		sb.append(username != null ? username : peerId).append('/').append(msgId);
 		copy("", sb.toString());
+	}
+	
+	void downloadDocument(String peerId, String msgId, String fileName) {
+		// TODO
+		if (fileRewrite && fileName != null) {
+			browse(instanceUrl + "file/" + url(fileName) + "?c=" + peerId + "&m=" + msgId + "&user=" + user);
+		} else {
+			browse(instanceUrl + FILE_URL + "?c=" + peerId + "&m=" + msgId + "&user=" + user);
+		}
 	}
 
 	static Alert errorAlert(Exception e) {
@@ -4833,7 +4837,7 @@ public class MP extends MIDlet
 			boolean skipEntity = false;
 			String entityText = text.substring(entity.getInt("offset"), entity.getInt("offset") + entity.getInt("length"));
 			String type = entity.getString("_");
-			if ("messageEntityUrl".equals(type)) {
+			if ("messageEntityUrl".equals(type) || "messageEntityMention".equals(type)) {
 				state[RT_URL] ++;
 				insert = flush(form, thread, richTextUrl = entityText, insert, state);
 				state[RT_URL] --;
