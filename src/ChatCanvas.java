@@ -223,7 +223,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 				if (mediaFilter == null) {
 					canWrite = !broadcast;
-					JSONObject info = (JSONObject) MP.api((messageId == -1 && !forum ? "getFullInfo&id=" : "getInfo&id=").concat(id));
+					JSONObject info = (JSONObject) MP.api(((messageId == -1 || !user) && !forum ? "getFullInfo&id=" : "getInfo&id=").concat(id));
+					JSONObject full = info.getObject("full", null);
 					if (id.charAt(0) == '-') {
 						JSONObject chat = info.getObject("Chat");
 						if (chat.has("admin_rights")) {
@@ -254,6 +255,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							infoLoaded = true;
 							return;
 						}
+						
+						if (full != null && full.has("participants_count")) {
+							defaultStatus = MP.localizePlural(full.getInt("participants_count"),
+									broadcast ? _subscriber : _member);
+						}
 					} else {
 						user = true;
 						canPin = true;
@@ -261,8 +267,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							setStatus(info.getObject("User").getObject("status"));
 						}
 					}
-					JSONObject full = info.getObject("full");
-					if (messageId == -1 && full.has("read_inbox_max_id")) {
+					if (messageId == -1 && full != null && full.has("read_inbox_max_id")) {
 						messageId = 0;
 						int maxId = full.getInt("read_inbox_max_id");
 						if (maxId != 0 && full.getInt("unread_count", 0) > limit) {
@@ -270,10 +275,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							addOffset = -limit;
 							dir = 1;
 						}
-					}
-					if (full.has("participants_count")) {
-						defaultStatus = MP.localizePlural(full.getInt("participants_count"),
-								broadcast ? _subscriber : _member);
 					}
 				}
 				infoLoaded = true;
@@ -502,7 +503,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		// focus
 		
 		if (nextFocusItem != null) {
-			setCurrentItem(nextFocusItem);
+			focusItem(nextFocusItem, 0);
+			if (!isVisible(nextFocusItem)) scrollTo(nextFocusItem);
 			nextFocusItem = null;
 		}
 		
@@ -670,11 +672,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				g.setColor(-1);
 				g.drawString(MP.L[Chat], 2, by, Graphics.TOP | Graphics.LEFT);
 				g.drawString(MP.L[Back], w - 2, by, Graphics.TOP | Graphics.RIGHT);
-				g.drawString(MP.L[WriteMessage], w >> 1, by, Graphics.TOP | Graphics.HCENTER);
+				g.drawString(MP.L[Write], w >> 1, by, Graphics.TOP | Graphics.HCENTER);
 			} else if (keyGuide) {
 				animate = true;
 				g.setColor(-1);
-				g.drawString("Menu", 2, by + 1, Graphics.TOP | Graphics.LEFT);
+				g.drawString(MP.L[Menu], 2, by + 1, Graphics.TOP | Graphics.LEFT);
 				g.drawString(MP.L[Back], w - 2, by + 1, Graphics.TOP | Graphics.RIGHT);
 				if (keyGuideTime == 0) {
 					keyGuideTime = now;
@@ -686,7 +688,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				// TODO
 				g.setColor(-1);
 				g.setFont(MP.medPlainFont);
-				g.drawString(MP.L[WriteMessage], 20, by + ((bottom - MP.medPlainFontHeight) >> 1), 0);
+				g.drawString(MP.L[TextField_Hint], 20, by + ((bottom - MP.medPlainFontHeight) >> 1), 0);
 			}
 		}
 		
@@ -1190,9 +1192,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (thread != this.thread) throw MP.cancelException;
 		table.put(Integer.toString(item.id), item);
 		add(item);
-		if (focus) {
-			nextFocusItem = item;
-		}
+		if (focus) nextFocusItem = item;
 	}
 	
 	void safeAddFirst(Thread thread, UIMessage item) {
@@ -1251,14 +1251,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			return true;
 		}
 		return false;
-	}
-	
-	public void setCurrentItem(UIItem item) {
-		focusItem(item, 0);
-		// check if item is visible on screen
-		if (item.y + item.contentHeight >= scroll && item.y < scroll + clipHeight) {
-			scrollTo(item);
-		}
 	}
 	
 	private void scrollTo(UIItem item) {
@@ -1457,7 +1449,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (table != null && table.containsKey(msg)) {
 			UIItem focus = (UIItem) table.get(msg);
 			if (focus != null) {
-				setCurrentItem(focus);
+				nextFocusItem = focus;
 				return;
 			}
 		}

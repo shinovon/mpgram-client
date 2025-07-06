@@ -168,7 +168,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				t = MP.getName(fwdFromId = fwd.getString("from_id", null), true);
 			}
 			forwardName = t;
-			forwardedFromWidth = MP.smallPlainFont.stringWidth(MP.L[ForwardedFrom]);
+			forwardedFromWidth = chat.selfChat ? 0 : MP.smallPlainFont.stringWidth(MP.L[ForwardedFrom]);
 			if (fwd.has("peer") && fwd.has("msg")) {
 				fwdPeer = fwd.getString("peer");
 				fwdMsgId = fwd.getInt("msg");
@@ -347,15 +347,17 @@ public class UIMessage extends UIItem implements LangConstants {
 		// forward
 		if (fwd) {
 			g.setColor(0x71BAFA);
-			g.setFont(MP.smallPlainFont);
-			g.drawString(MP.L[ForwardedFrom], x, y, 0);
+			if (forwardedFromWidth != 0) {
+				g.setFont(MP.smallPlainFont);
+				g.drawString(MP.L[ForwardedFrom], x, y, 0);
+			}
 
-			g.setFont(MP.smallPlainFont);
 			if (forwardRender != null) {
+				g.setFont(MP.smallBoldFont);
 				g.drawString(forwardRender, x + forwardedFromWidth, y, 0);
 				if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_FORWARD) {
 					g.setColor(0xababab);
-					g.drawRect(x + forwardedFromWidth, ty, y + MP.smallBoldFontHeight, h);
+					g.drawRect(x + forwardedFromWidth, ty, forwardNameWidth, MP.smallBoldFontHeight);
 				}
 			}
 			y += MP.smallBoldFontHeight;
@@ -606,7 +608,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		focus = true;
 		System.out.println("grabFocus " + dir);
 		if (dir != 0 && subFocusLength != 0) {
-			if (subFocusLength != 1 || (subFocus[0] == FOCUS_SENDER && !hideName)) {
+			if (subFocusLength != 1 || subFocus[0] != FOCUS_SENDER || !hideName) {
 				if (subFocusCurrent == -1) {
 					subFocusCurrent = dir == -1 ? subFocusLength - 1 : 0;
 				}
@@ -654,7 +656,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			focusChild = null;
 		}
 		if (subFocusLength != 0) {
-			if (subFocusLength != 1 || (subFocus[0] == FOCUS_SENDER && !hideName)) {
+			if (subFocusLength != 1 || subFocus[0] != FOCUS_SENDER || !hideName) {
 				if (subFocusCurrent == -1) {
 					subFocusCurrent = 0;
 				}
