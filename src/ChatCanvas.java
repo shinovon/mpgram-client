@@ -431,7 +431,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			g.fillRect(0, 0, w, h);
 			g.setColor(-1);
 			g.setFont(MP.medPlainFont);
-			g.drawString(MP.L[Loading], w >> 1, h >> 1, Graphics.VCENTER | Graphics.HCENTER);
+			g.drawString(MP.L[Loading], w >> 1, h >> 1, Graphics.TOP | Graphics.HCENTER);
 			return;
 		}
 		
