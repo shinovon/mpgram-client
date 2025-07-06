@@ -682,6 +682,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					fieldAnimTarget = 0;
 					keyGuide = false;
 				}
+			} else {
+				// TODO
+				g.setColor(-1);
+				g.setFont(MP.medPlainFont);
+				g.drawString(MP.L[WriteMessage], 4, by - ((bottom - MP.medPlainFontHeight) >> 1), 0);
 			}
 		}
 		
@@ -903,15 +908,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					repaint = true;
 				}
 			}
-		} else if (key == Canvas.KEY_NUM2) {
+		} else if (key == Canvas.KEY_NUM2 || key == Canvas.KEY_NUM8) {
+			int dir = key == Canvas.KEY_NUM2 ? -1 : 1;
+			if (reverse) dir = -dir;
 			focusItem(null, 0);
 			focusedItem = scrollCurrentItem = scrollTargetItem = null;
-			scrollTo(scroll - clipHeight);
-			repaint = true;
-		} else if (key == Canvas.KEY_NUM8) {
-			focusItem(null, 0);
-			focusedItem = scrollCurrentItem = scrollTargetItem = null;
-			scrollTo(scroll + clipHeight);
+			scrollTo(scroll + (clipHeight * dir));
 			repaint = true;
 		} else if (key >= Canvas.KEY_NUM0 && key <= Canvas.KEY_NUM9) {
 			// ignore
