@@ -986,7 +986,7 @@ public class ChatForm extends MPForm implements Runnable {
 		offsetId = 0;
 		typing = 0;
 		loadedMsgs.removeAllElements();
-		urls.clear();
+		if (urls != null) urls.clear();
 		switched = false;
 	}
 	
