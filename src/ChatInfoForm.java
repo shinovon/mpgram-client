@@ -114,7 +114,7 @@ public class ChatInfoForm extends MPForm {
 				JSONObject status = rawPeer.getObject("status");
 				if ("userStatusOnline".equals(status.getString("_"))) {
 					sb.append(MP.L[Online]);
-				} else if(status.has("was_online")) {
+				} else if (status.has("was_online")) {
 					sb.append(MP.L[LastSeen]);
 					sb.append(MP.localizeDate(status.getInt("was_online"), 3));
 				} else {

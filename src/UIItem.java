@@ -104,6 +104,8 @@ public class UIItem {
 		}
 	}
 
-	void tap(int x, int y, boolean longTap) {}
+	boolean tap(int x, int y, boolean longTap) {
+		return false;
+	}
 
 }

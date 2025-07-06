@@ -67,5 +67,6 @@ interface MPChat {
 	void openTopic(int topMsgId, boolean canWrite, String title);
 	
 	void load();
+	void closed(boolean destroy);
 
 }

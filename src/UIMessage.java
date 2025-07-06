@@ -40,10 +40,10 @@ public class UIMessage extends UIItem implements LangConstants {
 	private static final int FOCUS_SENDER = 0;
 	private static final int FOCUS_FORWARD = 1;
 	private static final int FOCUS_REPLY = 2;
-	private static final int FOCUS_PHOTO = 3;
+	private static final int FOCUS_PHOTO = 3; // TODO
 	private static final int FOCUS_TEXT = 4;
-	private static final int FOCUS_MEDIA = 5;
-	private static final int FOCUS_BUTTONS = 6;
+	private static final int FOCUS_MEDIA = 5; // TODO
+	private static final int FOCUS_BUTTONS = 6; // TODO
 	private static final int FOCUS_COMMENT = 7;
 	
 	UILabel text;
@@ -52,7 +52,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	int subFocusCurrent = -1;
 	int[] subFocus = new int[8];
 	int subFocusLength;
-	int[] touchZones = new int[30]; /* [x1, y1, x2, y2, action], ..., Integer.MIN_VALUE */
+	int[] touchZones = new int[31]; /* [x1, y1, x2, y2, action], ..., Integer.MIN_VALUE */
 	
 	int id;
 	boolean out;
@@ -63,6 +63,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	long date;
 	String commentPeer;
 	int commentRead;
+	String peerId;
 	
 	boolean fwd, reply, media, photo;
 	String replyName, replyText, replyPrefix;
@@ -70,6 +71,10 @@ public class UIMessage extends UIItem implements LangConstants {
 	String mediaTitle, mediaSubtitle;
 	boolean mediaPlayable, mediaDownload, mediaBrowser;
 	String forwardName;
+	String fwdFromId, fwdPeer;
+	int fwdMsgId;
+	String replyPeer;
+	int replyMsgId;
 	
 	String time, nameRender, dateRender, replyNameRender, replyTextRender, forwardRender;
 	int timeWidth, dateWidth, senderWidth, replyPrefixWidth, forwardNameWidth;
@@ -88,6 +93,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		name = out && !chat.broadcast ? MP.L[You] : MP.getName(fromId, true);
 		dateRender = MP.localizeDate(date, 0);
 		dateWidth = MP.smallBoldFont.stringWidth(dateRender);
+		peerId = chat.id;
 		
 		if ((action = message.has("act"))) {
 			JSONObject act = message.getObject("act");
@@ -115,18 +121,26 @@ public class UIMessage extends UIItem implements LangConstants {
 					t = MP.L[NameChanged_Action].concat(act.getString("t", ""));
 				} else {
 					label.appendWord(name, MP.smallBoldFont, "t.me/".concat(fromId));
-					if ("ChatAddUser".equals(type) || "ChatDeleteUser".equals(type)) {
-						if (fromId.equals(user)) {
-							t = MP.L["ChatAddUser".equals(type) ? Joined_Action : Left_Action];
+					if ("PinMessage".equals(type)) {
+						t = MP.L[PinnedMessage_Action];
+					} else if ("ChatJoinedByLink".equals(type)) {
+						t = MP.L[JoinedByLink_Action];
+					} else if ("ChatJoinedByRequest".equals(type)) {
+						t = MP.L[JoinedByRequest_Action];
+					} else {
+						if ("ChatAddUser".equals(type) || "ChatDeleteUser".equals(type)) {
+							if (fromId.equals(user)) {
+								t = MP.L["ChatAddUser".equals(type) ? Joined_Action : Left_Action];
+							} else {
+								label.appendWord(MP.L["ChatAddUser".equals(type) ? Added_Action : Removed_Action], MP.smallPlainFont, null);
+								label.appendWord(" ", MP.smallPlainFont, null);
+								label.appendWord(MP.getName(user, false), MP.smallBoldFont, "t.me/".concat(user));
+								break l;
+							}
 						} else {
-							label.appendWord(MP.L["ChatAddUser".equals(type) ? Added_Action : Removed_Action], MP.smallPlainFont, null);
-							label.appendWord(" ", MP.smallPlainFont, null);
-							label.appendWord(MP.getName(user, false), MP.smallBoldFont, "t.me/".concat(user));
+							label.appendWord(MP.L[Action], MP.smallPlainFont, null);
 							break l;
 						}
-					} else {
-						label.appendWord(" ", MP.smallPlainFont, null);
-						break l;
 					}
 				}
 				
@@ -147,16 +161,21 @@ public class UIMessage extends UIItem implements LangConstants {
 		
 		// forwarded from... label
 		if (message.has("fwd")) {
-			// TODO
 			fwd = true;
 			JSONObject fwd = message.getObject("fwd");
 			String t = null;
 			if ((t = fwd.getString("from_name", null)) == null) {
-				t = MP.getName(fwd.getString("from_id", null), true);
+				t = MP.getName(fwdFromId = fwd.getString("from_id", null), true);
 			}
 			forwardName = t;
 			forwardedFromWidth = MP.smallPlainFont.stringWidth(MP.L[ForwardedFrom]);
-			subFocus[order++] = FOCUS_FORWARD;
+			if (fwd.has("peer") && fwd.has("msg")) {
+				fwdPeer = fwd.getString("peer");
+				fwdMsgId = fwd.getInt("msg");
+				subFocus[order++] = FOCUS_FORWARD;
+			} else if (fwdFromId != null) {
+				subFocus[order++] = FOCUS_FORWARD;
+			}
 		}
 		
 		// reply
@@ -197,7 +216,9 @@ public class UIMessage extends UIItem implements LangConstants {
 					} else if ((t = replyMsg.getString("text", null)) != null && t.length() != 0) {
 						replyText = t;
 					}
-					if (replyText != null || replyPrefix != null || replyName != null) {
+					replyPeer = reply.getString("peer", null);
+					replyMsgId = reply.getInt("id", 0);
+					if ((replyText != null || replyPrefix != null || replyName != null) && (replyMsgId != 0)) {
 						subFocus[order++] = FOCUS_REPLY;
 					}
 				}
@@ -330,7 +351,13 @@ public class UIMessage extends UIItem implements LangConstants {
 			g.drawString(MP.L[ForwardedFrom], x, y, 0);
 
 			g.setFont(MP.smallPlainFont);
-			if (forwardRender != null) g.drawString(forwardRender, x + forwardedFromWidth, y, 0);
+			if (forwardRender != null) {
+				g.drawString(forwardRender, x + forwardedFromWidth, y, 0);
+				if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_FORWARD) {
+					g.setColor(0xababab);
+					g.drawRect(x + forwardedFromWidth, ty, y + MP.smallBoldFontHeight, h);
+				}
+			}
 			y += MP.smallBoldFontHeight;
 		}
 		
@@ -382,6 +409,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			g.setColor(0x6AB3F3);
 			int rh = mediaRenderHeight;
 			g.fillRect(x, y, 2, rh);
+			y += rh;
 		}
 		
 		// buttons
@@ -668,14 +696,58 @@ public class UIMessage extends UIItem implements LangConstants {
 			profileAction();
 			return true;
 		case FOCUS_FORWARD:
+			if (fwdPeer != null) {
+				MP.openChat(fwdPeer, fwdMsgId);
+			} else if (fwdFromId != null) {
+				MP.openProfile(fwdFromId, null, 0);
+			}
 			return true;
 		case FOCUS_REPLY:
+			if (replyPeer == null || replyPeer.equals(peerId)) {
+				((ChatCanvas) container).openMessage(Integer.toString(replyMsgId), -1);
+				return true;
+			}
+			MP.openChat(replyPeer, replyMsgId);
 			return true;
 		case FOCUS_COMMENT:
 			commentAction();
 			return true;
 		}
 		return false;
+	}
+	
+	void menuAction(int option) {
+		String idStr = Integer.toString(this.id);
+		switch (option) {
+		case Reply:
+			MP.display(MP.writeForm(peerId, idStr, "", null, null, null));
+			break;
+		case Edit:
+			// TODO
+			
+			break;
+		case Pin:
+			MP.display(MP.loadingAlert(MP.L[Loading]), MP.current);
+			if (MP.reopenChat && MP.updatesThread != null) {
+				MP.cancel(MP.updatesThread, true);
+			}
+			MP.midlet.start(MP.RUN_PIN_MESSAGE, new String[] { peerId, idStr });
+			break;
+		case CopyMessage:
+			// TODO восстанавливать текст из UILabel или хранить оригинал?
+//			MP.copy("", text);
+			break;
+		case CopyMessageLink:
+			// TODO
+			break;
+		case Forward:
+			MP.openLoad(new ChatsList(peerId, idStr));
+			break;
+		case Delete:
+			MP.display(MP.loadingAlert(MP.L[Loading]), MP.current);
+			MP.midlet.start(MP.RUN_DELETE_MESSAGE, new String[] { peerId, idStr });
+			break;
+		}
 	}
 	
 	int[] menu() {
@@ -712,7 +784,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		return menu;
 	}
 	
-	void tap(int x, int y, boolean longTap) {
+	boolean tap(int x, int y, boolean longTap) {
 		subFocusCurrent = -1;
 		int w = ((ChatCanvas) container).width;
 		int cw = contentWidth;
@@ -721,21 +793,22 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 		x -= (out && w < 900 ? MARGIN_SIDE : 0);
 		System.out.println("tap " + x + " " + y + " " + longTap);
-		if (x < 0) return;
+		if (x < 0) return false;
 		if (text != null && text.focusable && y > text.y && y < text.y + text.contentHeight) {
 			focusChild = text;
-			text.tap(x - PADDING_WIDTH - MARGIN_WIDTH, y - text.y, longTap);
-			return;
+			if (text.tap(x - PADDING_WIDTH - MARGIN_WIDTH, y - text.y, longTap))
+				return true;
 		}
 		for (int i = 0; i < touchZones.length && touchZones[i] != Integer.MIN_VALUE; i += 5) {
 			if (x >= touchZones[i] && y >= touchZones[i + 1] && x <= touchZones[i + 2] && y <= touchZones[i + 3]) {
 				if (!longTap && action(touchZones[i + 4])) {
-					return;
+					return true;
 				}
 				break;
 			}
 		}
 		((ChatCanvas) container).showMenu(this, menu());
+		return true;
 	}
 	
 	private void profileAction() {
@@ -743,7 +816,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	}
 	
 	private void commentAction() {
-		MP.openLoad(new ChatForm(commentPeer, ((ChatCanvas) container).id, id, commentRead));
+		MP.openLoad(new ChatForm(commentPeer, peerId, id, commentRead));
 	}
 
 }

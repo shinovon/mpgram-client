@@ -208,13 +208,15 @@ public class UILabel extends UIItem {
 		return true;
 	}
 	
-	void tap(int x, int y, boolean longTap) {
-		if (longTap) return;
+	boolean tap(int x, int y, boolean longTap) {
+		if (longTap) return false;
 		int idx = getUrlAt(x, y);
 		if (idx != -1) {
 			focusLink(idx);
 			action();
+			return true;
 		}
+		return false;
 	}
 	
 	synchronized int getUrlAt(int x, int y) {

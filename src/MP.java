@@ -2066,7 +2066,7 @@ public class MP extends MIDlet
 				int id = ((ChatInfoForm) current).pinnedMessageId;
 				if (((ChatInfoForm) d).chatForm != null) {
 					commandAction(backCmd, d);
-					((ChatInfoForm) d).chatForm.openMessage(Integer.toString(id), 0);
+					((ChatInfoForm) d).chatForm.openMessage(Integer.toString(id), -1);
 				} else {
 					openChat(((ChatInfoForm) current).id, id);
 				}
@@ -2759,7 +2759,7 @@ public class MP extends MIDlet
 //#endif
 			return;
 		}
-		if (c == cancelCmd && d instanceof List) { // go back to write form
+		if (c == cancelCmd && (d instanceof List) && !(d instanceof ChatsList)) { // go back to write form from file picker
 			goBackTo(writeForm);
 			return;
 		}
@@ -2778,6 +2778,11 @@ public class MP extends MIDlet
 			if (d instanceof MPList) {
 				((MPList) d).cancel();
 				start(RUN_LOAD_LIST, d);
+				return;
+			}
+			if (d instanceof ChatCanvas) {
+				((ChatCanvas) d).cancel();
+				start(RUN_LOAD_FORM, d);
 				return;
 			}
 			return;
@@ -3594,7 +3599,7 @@ public class MP extends MIDlet
 				&& ((MPChat) d).postId() == null && ((MPChat) d).query() == null
 				&& ((MPChat) d).mediaFilter() == null) {
 			if (msg > 0) {
-				((MPChat) d).openMessage(Integer.toString(msg), 0);
+				((MPChat) d).openMessage(Integer.toString(msg), -1);
 			}
 			return;
 		}
@@ -3840,6 +3845,8 @@ public class MP extends MIDlet
 			((MPForm) p).closed(back);
 		} else if (p instanceof MPList) {
 			((MPList) p).closed(back);
+		} else if (p instanceof MPChat) {
+			((MPChat) p).closed(back);
 		}
 		if (back) {
 			if (p instanceof MPForm || p instanceof MPList) {
@@ -5235,7 +5242,7 @@ public class MP extends MIDlet
 		case '"': { // string
 			if (last != '"')
 				throw new RuntimeException("JSON: Unexpected end of text");
-			if(str.indexOf('\\') != -1) {
+			if (str.indexOf('\\') != -1) {
 				char[] chars = str.substring(1, length).toCharArray();
 				str = null;
 				int l = chars.length;
