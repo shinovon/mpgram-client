@@ -473,22 +473,19 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		// animations
 		
 		if (fieldAnimTarget != -1) {
-			if (bottom == fieldAnimTarget || Math.abs(fieldAnimTarget - fieldAnimProgress) < 1) {
+			if (slide(1, fieldAnimProgress, fieldAnimTarget, deltaTime)) {
+				animate = true;
+			} else {
 				fieldAnimProgress = bottom = fieldAnimTarget;
 				fieldAnimTarget = -1;
-			} else {
-				bottom = (int) (fieldAnimProgress = MP.lerp(fieldAnimProgress, fieldAnimTarget, 4, 20));
-				animate = true;
 			}
-			if (bottom < 0) bottom = 0;
 		}
 		if (menuAnimTarget != -1) {
-			if (Math.abs(menuAnimTarget - menuAnimProgress) < 1) {
+			if (slide(2, menuAnimProgress, menuAnimTarget, deltaTime)) {
+				animate = true;
+			} else {
 				menuAnimProgress = menuAnimTarget;
 				menuAnimTarget = -1;
-			} else {
-				menuAnimProgress = MP.lerp(menuAnimProgress, menuAnimTarget, 4, 20);
-				animate = true;
 			}
 		}
 		
@@ -524,20 +521,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				scroll = 0;
 				scrollTarget = -1;
 			} else {
-				if (Math.abs(scroll - scrollTarget) < 1) {
+				if (slide(0, scroll, scrollTarget, deltaTime)) {
+					animate = true;
+				} else {
 					scroll = scrollTarget;
 					scrollTarget = -1;
-				} else {
-					if (Math.abs(scrollTarget - scroll) < 5) {
-						if (scrollTarget - scroll < 0) {
-							-- scroll;
-						} else {
-							++ scroll;
-						}
-					} else for (int i = 0; i < 1 + (deltaTime > 33 && animating ? (deltaTime / 33) - 1 : 0); ++i) {
-						scroll = (int) MP.lerp(scroll, scrollTarget, 4, 20);
-					}
-					animate = true;
 				}
 				if (scroll <= 0) {
 					scroll = 0;
@@ -752,6 +740,50 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			repaint();
 		}
 		lastPaintTime = now;
+	}
+
+	private boolean slide(int mode, float val, int target, long deltaTime) {
+		if (!MP.fastScrolling) {
+			float d = Math.abs(target - val);
+			boolean dir = target - val > 0;
+			if (d < 1) {
+				return false;
+			} else if (mode == 0) {
+				if (d < 5) {
+					if (dir) {
+						++ val;
+					} else {
+						-- val;
+					}
+				} else for (int i = 0; i < 1 + (deltaTime > 33 && animating ? (deltaTime / 33) - 1 : 0); ++i) {
+					val = MP.lerp(val, target, 4, 20);
+				}
+			} else {
+				float f = 20F * (1 + (deltaTime > 33 && animating ? (deltaTime / 33f) - 1 : 0));
+				if (dir) {
+					if ((val += f) >= target) {
+						val = target;
+					}
+				} else {
+					if ((val -= f) <= target) {
+						val = target;
+					}
+				}
+				
+			}
+		} else {
+			val = target;
+		}
+		
+		if (mode == 0) {
+			scroll = (int) val;
+		} else if (mode == 1) {
+			bottom = (int) (fieldAnimProgress = val);
+		} else /* (mode == 2) */ {
+			menuAnimProgress = val;
+		}
+		
+		return true;
 	}
 
 	protected void keyPressed(int key) {
