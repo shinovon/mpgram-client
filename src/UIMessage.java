@@ -736,11 +736,17 @@ public class UIMessage extends UIItem implements LangConstants {
 			MP.midlet.start(MP.RUN_PIN_MESSAGE, new String[] { peerId, idStr });
 			break;
 		case CopyMessage:
-			// TODO восстанавливать текст из UILabel или хранить оригинал?
-//			MP.copy("", text);
+			if (text != null) {
+				StringBuffer sb = new StringBuffer();
+				int l = text.parsed.size();
+				for (int i = 0; i < l; i++) {
+					sb.append((String) ((Object[]) text.parsed.elementAt(i))[0]);
+				}
+				MP.copy("", sb.toString());
+			}
 			break;
 		case CopyMessageLink:
-			// TODO
+			MP.copyMessageLink(peerId, idStr);
 			break;
 		case Forward:
 			MP.openLoad(new ChatsList(peerId, idStr));

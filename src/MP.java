@@ -2895,13 +2895,7 @@ public class MP extends MIDlet
 				// copy message link
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
-				StringBuffer sb = new StringBuffer("https://t.me/"); 
-				String username = ((MPChat) current).username();
-				if (s[0].charAt(0) == '-' && username == null) {
-					sb.append("c/");
-				}
-				sb.append(username != null ? username : s[0]).append('/').append(s[1]);
-				copy("", sb.toString());
+				copyMessageLink(s[0], s[1]);
 				return;
 			}
 			if (c == openImageCmd) {
@@ -3673,10 +3667,20 @@ public class MP extends MIDlet
 	
 	static void copy(String title, String text) {
 		// TODO use nokiaui?
-		TextBox t = new TextBox(title, text, text.length() + 1, TextField.UNEDITABLE);
+		TextBox t = new TextBox(title, text, Math.max(2000, text.length() + 1), TextField.UNEDITABLE);
 		t.addCommand(backCmd);
 		t.setCommandListener(midlet);
 		display(t);
+	}
+	
+	static void copyMessageLink(String peerId, String msgId) {
+		StringBuffer sb = new StringBuffer("https://t.me/"); 
+		String username = ((MPChat) current).username();
+		if (peerId.charAt(0) == '-' && username == null) {
+			sb.append("c/");
+		}
+		sb.append(username != null ? username : peerId).append('/').append(msgId);
+		copy("", sb.toString());
 	}
 
 	static Alert errorAlert(Exception e) {
