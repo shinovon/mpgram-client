@@ -278,6 +278,7 @@
 	"Search_TitlePrefix": "Поиск - ",
 	"OlderMessages": "Старые сообщения",
 	"NewerMessages": "Новые сообщения",
+	"SavedMessages": "Сохраненные сообщения",
 	
 	// Message
 	"ForwardedFrom": "Переслано от ",

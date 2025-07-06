@@ -50,8 +50,9 @@ public class UIMessage extends UIItem implements LangConstants {
 	
 	UIItem focusChild;
 	int subFocusCurrent = -1;
-	int[] subFocus;
+	int[] subFocus = new int[8];
 	int subFocusLength;
+	int[] touchZones = new int[30]; /* [x1, y1, x2, y2, action], ..., Integer.MIN_VALUE */
 	
 	int id;
 	boolean out;
@@ -71,18 +72,17 @@ public class UIMessage extends UIItem implements LangConstants {
 	String forwardName;
 	
 	String time, nameRender, dateRender, replyNameRender, replyTextRender, forwardRender;
-	int timeWidth, dateWidth, senderWidth, replyPrefixWidth;
+	int timeWidth, dateWidth, senderWidth, replyPrefixWidth, forwardNameWidth;
 	int mediaRenderHeight;
 	boolean showDate, hideName, timeBreak, space;
 	int forwardedFromWidth;
 	
 	UIMessage(JSONObject message, ChatCanvas chat) {
 		focusable = true;
-		subFocus = new int[8];
 		date = message.getLong("date");
 		id = message.getInt("id");
 		fromId = message.has("from_id") ? message.getString("from_id") : chat.id;
-		out = (message.getBoolean("out", false) && !chat.broadcast) || chat.selfChat;
+		out = (message.getBoolean("out", false) && !chat.broadcast);
 		hideName = chat.selfChat || chat.user || out;
 		space = chat.broadcast;
 		name = out && !chat.broadcast ? MP.L[You] : MP.getName(fromId, true);
@@ -141,7 +141,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		
 		int order = 0;
 		
-		if (!out) {
+		if (!out && !hideName) {
 			subFocus[order++] = FOCUS_SENDER;
 		}
 		
@@ -427,8 +427,10 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (!layoutRequest && layoutWidth == width) {
 			return contentHeight;
 		}
+		int order = 0;
 		layoutWidth = width;
-		int h = MARGIN_TOP + PADDING_HEIGHT * 2;
+		int h = MARGIN_TOP + PADDING_HEIGHT;
+		int y = 0;
 		// grouping
 		if (container instanceof ChatCanvas) {
 			ChatCanvas chat = ((ChatCanvas) container);
@@ -447,6 +449,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				}
 				showDate = true;
 				h += MARGIN_TOP + DATE_PADDING_HEIGHT * 2 + MP.smallBoldFontHeight;
+				if (!reverse) y -= h;
 			}
 			if (!chat.broadcast) {
 				boolean group = false;
@@ -474,33 +477,49 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (action) {
 //			h += MP.medPlainFontHeight;
 			if (text != null) {
-				text.y = h - MARGIN_TOP - PADDING_HEIGHT;
+				text.y = h + y;
 				h += text.layout(width);
 			}
-			return contentHeight = h;
+			
+			touchZones[order] = Integer.MIN_VALUE;
+			return contentHeight = h += PADDING_HEIGHT;
 		}
 		
 		int maxW = Math.min(MAX_WIDTH, width);
 		int cw = maxW - PADDING_WIDTH * 2 - MARGIN_WIDTH * 2 - MARGIN_SIDE;
+		int x = MARGIN_WIDTH + PADDING_WIDTH;
 		
 		// sender
 		if (!hideName) {
-			h += MP.smallBoldFontHeight;
 			nameRender = UILabel.ellipsis(name, MP.smallBoldFont, cw - PADDING_WIDTH * 2);
 			senderWidth = MP.smallBoldFont.stringWidth(nameRender);
+			
+			touchZones[order ++] = x;
+			touchZones[order ++] = h + y;
+			touchZones[order ++] = x + senderWidth;
+			touchZones[order ++] = (h += MP.smallBoldFontHeight) + y;
+			touchZones[order ++] = FOCUS_SENDER;
 		}
 		
 		// forward
 		if (fwd) {
 			forwardRender = UILabel.ellipsis(forwardName, MP.smallBoldFont, cw - PADDING_WIDTH * 2 - forwardedFromWidth);
-			h += MP.smallBoldFontHeight;
+			forwardNameWidth = MP.smallBoldFont.stringWidth(forwardRender);
+			
+			int tx = x + forwardedFromWidth;
+			touchZones[order ++] = tx;
+			touchZones[order ++] = h + y;
+			touchZones[order ++] = tx + forwardNameWidth;
+			touchZones[order ++] = (h += MP.smallBoldFontHeight) + y;
+			touchZones[order ++] = FOCUS_FORWARD;
 		}
 		
 		// reply
 		if (reply) {
+			int ry = h;
 			if (replyName != null) {
-				h += MP.smallPlainFontHeight;
 				replyNameRender = UILabel.ellipsis(replyName, MP.smallBoldFont, cw - 10);
+				h += MP.smallPlainFontHeight;
 			}
 			int rw = cw - 10;
 			if (replyPrefix != null) {
@@ -510,6 +529,12 @@ public class UIMessage extends UIItem implements LangConstants {
 				replyTextRender = UILabel.ellipsis(replyText, MP.smallPlainFont, rw);
 			}
 			h += 4 + MP.smallPlainFontHeight;
+			
+			touchZones[order ++] = x + 2;
+			touchZones[order ++] = ry + y;
+			touchZones[order ++] = x + cw;
+			touchZones[order ++] = h + y;
+			touchZones[order ++] = FOCUS_REPLY;
 		}
 		
 		int timeWidth = this.timeWidth;
@@ -535,23 +560,30 @@ public class UIMessage extends UIItem implements LangConstants {
 		
 		// comment
 		if (commentsText != null) {
-			h += PADDING_HEIGHT * 2 + 1 + MP.smallBoldFontHeight;
+			touchZones[order ++] = x;
+			touchZones[order ++] = h + y;
+			touchZones[order ++] = x + cw;
+			touchZones[order ++] = (h += PADDING_HEIGHT * 2 + 1 + MP.smallBoldFontHeight) + y;
+			touchZones[order ++] = FOCUS_COMMENT;
 		}
 		if (space && !((ChatCanvas) container).reverse) h += SPACE_HEIGHT;
 		
+		touchZones[order] = Integer.MIN_VALUE;
 		// TODO pack width
 		contentWidth = maxW;
-		return contentHeight = h;
+		return contentHeight = h += PADDING_HEIGHT;
 	}
 	
 	boolean grabFocus(int dir) {
 		focus = true;
 		System.out.println("grabFocus " + dir);
 		if (dir != 0 && subFocusLength != 0) {
-			if (subFocusCurrent == -1) {
-				subFocusCurrent = dir == -1 ? subFocusLength - 1 : 0;
+			if (subFocusLength != 1 || (subFocus[0] == FOCUS_SENDER && !hideName)) {
+				if (subFocusCurrent == -1) {
+					subFocusCurrent = dir == -1 ? subFocusLength - 1 : 0;
+				}
+				subFocus(subFocusCurrent);
 			}
-			subFocus(subFocusCurrent);
 		} else {
 			subFocusCurrent = -1;
 		}
@@ -594,25 +626,27 @@ public class UIMessage extends UIItem implements LangConstants {
 			focusChild = null;
 		}
 		if (subFocusLength != 0) {
-			if (subFocusCurrent == -1) {
-				subFocusCurrent = 0;
-			}
-			if (dir == Canvas.UP) {
-				if (subFocusCurrent == 0)
-					return 0;
-				subFocus(--subFocusCurrent);
-				if (focusChild != null) {
-					if (!focusChild.grabFocus(dir)) focusChild = null;
+			if (subFocusLength != 1 || (subFocus[0] == FOCUS_SENDER && !hideName)) {
+				if (subFocusCurrent == -1) {
+					subFocusCurrent = 0;
 				}
-				return Integer.MAX_VALUE;
-			} else if (dir == Canvas.DOWN) {
-				if (subFocusCurrent == subFocusLength - 1)
-					return 0;
-				subFocus(++subFocusCurrent);
-				if (focusChild != null) {
-					if (!focusChild.grabFocus(dir)) focusChild = null;
+				if (dir == Canvas.UP) {
+					if (subFocusCurrent == 0)
+						return 0;
+					subFocus(--subFocusCurrent);
+					if (focusChild != null) {
+						if (!focusChild.grabFocus(dir)) focusChild = null;
+					}
+					return Integer.MAX_VALUE;
+				} else if (dir == Canvas.DOWN) {
+					if (subFocusCurrent == subFocusLength - 1)
+						return 0;
+					subFocus(++subFocusCurrent);
+					if (focusChild != null) {
+						if (!focusChild.grabFocus(dir)) focusChild = null;
+					}
+					return Integer.MAX_VALUE;
 				}
-				return Integer.MAX_VALUE;
 			}
 		}
 		return 0;
@@ -622,44 +656,86 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (focusChild != null && focusChild.action()) {
 			return true;
 		} else if (subFocusCurrent != -1) {
-			switch (subFocus[subFocusCurrent]) {
-			case FOCUS_SENDER:
-				profileAction();
-				return true;
-			case FOCUS_COMMENT:
-				commentAction();
-				return true;
-			}
+			return action(subFocus[subFocusCurrent]);
+		}
+		return false;
+	}
+	
+	private boolean action(int focus) {
+		System.out.println("action " + focus);
+		switch (focus) {
+		case FOCUS_SENDER:
+			profileAction();
+			return true;
+		case FOCUS_FORWARD:
+			return true;
+		case FOCUS_REPLY:
+			return true;
+		case FOCUS_COMMENT:
+			commentAction();
+			return true;
 		}
 		return false;
 	}
 	
 	int[] menu() {
-		int[] menu = focusChild != null ? focusChild.menu() : null;
+		int[] item = focusChild != null ? focusChild.menu() : null;
 		
+		if (item == null && subFocusCurrent != -1) {
+			switch (subFocus[subFocusCurrent]) {
+			// TODO
+			case FOCUS_PHOTO:
+				break;
+			case FOCUS_MEDIA:
+				break;
+			}
+		}
+		
+		int[] general = new int[10];
+		int count = 0;
+		ChatCanvas chat = (ChatCanvas) container;
+		if (chat.canWrite) general[count++] = Reply;
+		if (out) general[count++] = Edit;
+		if (chat.canPin) general[count++] = Pin;
+		general[count++] = CopyMessage;
+		if (!chat.selfChat && !chat.user) general[count++] = CopyMessageLink;
+		general[count++] = Forward;
+		if (chat.canDelete) general[count++] = Delete;
+		general[count] = Integer.MIN_VALUE;
+		if (item == null) {
+			return general;
+		}
+		
+		int[] menu = new int[item.length + general.length];
+		System.arraycopy(item, 0, menu, 0, item.length);
+		System.arraycopy(general, 0, menu, item.length, general.length);
 		return menu;
 	}
 	
 	void tap(int x, int y, boolean longTap) {
 		subFocusCurrent = -1;
 		int w = ((ChatCanvas) container).width;
-		int cw = Math.min(MAX_WIDTH, w);
+		int cw = contentWidth;
 		if (out && w < 900) {
 			x -= w - cw;
 		}
-		x -= MARGIN_WIDTH + (out && w < 900 ? MARGIN_SIDE : 0);
-		System.out.println("tap " + x + " " + y);
+		x -= (out && w < 900 ? MARGIN_SIDE : 0);
+		System.out.println("tap " + x + " " + y + " " + longTap);
 		if (x < 0) return;
-		if (!out && y < MP.smallPlainFontHeight + PADDING_HEIGHT + MARGIN_TOP && x < PADDING_WIDTH + senderWidth) {
-			profileAction();
-			return;
-		}
 		if (text != null && text.focusable && y > text.y && y < text.y + text.contentHeight) {
 			focusChild = text;
-			text.tap(x, y - text.y, longTap);
+			text.tap(x - PADDING_WIDTH - MARGIN_WIDTH, y - text.y, longTap);
 			return;
 		}
-		// TODO options
+		for (int i = 0; i < touchZones.length && touchZones[i] != Integer.MIN_VALUE; i += 5) {
+			if (x >= touchZones[i] && y >= touchZones[i + 1] && x <= touchZones[i + 2] && y <= touchZones[i + 3]) {
+				if (!longTap && action(touchZones[i + 4])) {
+					return;
+				}
+				break;
+			}
+		}
+		((ChatCanvas) container).showMenu(this, menu());
 	}
 	
 	private void profileAction() {

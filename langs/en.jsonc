@@ -278,6 +278,7 @@
 	"Search_TitlePrefix": "Search - ",
 	"OlderMessages": "Older messages",
 	"NewerMessages": "Newer messages",
+	"SavedMessages": "Saved messages",
 	
 	// Message
 	"ForwardedFrom": "Forwarded from ",

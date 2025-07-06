@@ -115,7 +115,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	float fieldAnimProgress;
 	int fieldHeight = 40;
 	
-	boolean menuFocused;
 	int menuAnimTarget = -1;
 	float menuAnimProgress;
 	int menuHeight = 40;
@@ -123,6 +122,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	boolean loading;
 	
 	boolean touch = hasPointerEvents();
+	
+	// menu
+	boolean menuFocused;
+	UIItem menuItem;
+	int[] menu;
 	
 	ChatCanvas() {
 		setFullScreenMode(true);
@@ -648,8 +652,19 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		
 		// popup menu TODO
 		if (menuAnimProgress != 0) {
+			int my = h - (int)menuAnimProgress;
 			g.setColor(-1);
-			g.fillRect(20, h - (int)menuAnimProgress, w - 40, (int)menuAnimProgress);
+			g.fillRect(20, my, w - 40, (int)menuAnimProgress);
+			if (menu != null) {
+				int[] menu = this.menu;
+				g.setColor(0);
+				g.setFont(MP.medPlainFont);
+				for (int i = 0; i < menu.length; i++) {
+					if (menu[i] == Integer.MIN_VALUE) break;
+					g.drawString(MP.L[menu[i]], 24, my + 4, 0);
+					my += MP.medPlainFontHeight + 8;
+				}
+			}
 		}
 		
 		// process long tap
@@ -666,7 +681,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					focusItem(pointedItem, 0);
 					int y = pointerY;
 					pointedItem.tap(pointerX,
-							reverse ? y - (scroll - bottom -pointedItem.y + height - pointedItem.contentHeight)
+							reverse ? y - (scroll - bottom - pointedItem.y + height - pointedItem.contentHeight)
 									: y - pointedItem.y - top - scroll,
 									true);
 				}
@@ -739,6 +754,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			} else if (menuFocused) {
 				menuFocused = false;
 				menuAnimTarget = 0;
+				menuItem = null;
+				menu = null;
 			} else if (fieldFocused) {
 //				fieldFocused = false;
 //				fieldAnimTarget = 0;
@@ -754,12 +771,19 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			if (menuFocused) {
 				menuFocused = false;
 				menuAnimTarget = 0;
+				menuItem = null;
+				menu = null;
 			} else if (fieldFocused) {
 				fieldFocused = false;
 				fieldAnimTarget = 0;
 			} else {
-				menuFocused = true;
-				menuAnimTarget = 300;
+				if (focusedItem != null && focusedItem.focusable) {
+					int[] menu = focusedItem.menu();
+					if (menu != null && menu.length != 0) {
+						menuFocused = true;
+						showMenu(focusedItem, menu);
+					}
+				}
 			}
 			repaint = true;
 		} else if (menuFocused) {
@@ -867,7 +891,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		pressY = pointerY = y;
 		movesIdx = 0;
 		pressTime = System.currentTimeMillis();
-		if (y > top && y < top + clipHeight) {
+		if (!menuFocused && y > top && y < top + clipHeight) {
 			pointedItem = getItemAt(x, y);
 			contentPressed = true;
 		}
@@ -888,6 +912,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				if (kineticScroll * d < 0) kineticScroll = 0;
 				scrollTarget = -1;
 			} else {
+				// hold dragged units until it reaches threshold 
 				dragYHold += dY;
 			}
 			int prev = movesIdx - 1;
@@ -933,16 +958,26 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					}
 					System.out.println("k " + move + " " + moveTime);
 					if (moveTime > 0) {
-						float res = (120f * move) / moveTime; 
-						if (Math.abs(res) > 50) {
-							res = (res < 0 ? -50 : 50);
+						// release kinetic velocity
+						float res = (130f * move) / moveTime; 
+						if (Math.abs(res) > 60) {
+							res = (res < 0 ? -60 : 60);
 						}
 						if (reverse) res = -res;
 						if (kineticScroll * res < 0) kineticScroll = 0;
 						kineticScroll += res;
 					}
-					dragging = false;
 				}
+			}
+		} else if (menuFocused) {
+			int my = height - (int)menuAnimProgress;
+			if (y < my || x < 20 || x > width - 20 || menuItem == null || menu == null) {
+				closeMenu();
+			} else if (!longTap) {
+				closeMenu();
+				int i = (y - my) / (MP.medPlainFontHeight + 8);
+				if (menuItem != null && i < menu.length)
+					menuItem.menuAction(menu[i]);
 			}
 		} else if (touch) {
 			if (y < top) {
@@ -950,7 +985,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					keyPressed(-7);
 				} else if (x > width - 40) {
 					keyPressed(-6);
-				} else {
+				} else if (!selfChat && postId == null) {
 					openProfile();
 				}
 			} else if (y > height - bottom) {
@@ -960,6 +995,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		}
 		dragYHold = 0;
 		pointedItem = null;
+		dragging = false;
 		contentPressed = false;
 		pressed = false;
 		longTap = false;
@@ -1152,6 +1188,27 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	private void openProfile() {
 		
+	}
+
+	void showMenu(UIItem item, int[] menu) {
+		this.menuItem = item;
+		this.menu = menu;
+		menuFocused = true;
+		int len = menu.length;
+		for (int i = 0; i < len; i++) {
+			if (menu[i] == Integer.MIN_VALUE) {
+				len = i;
+				break;
+			}
+		}
+		menuAnimTarget = (MP.medPlainFontHeight + 8) * len;
+	}
+	
+	void closeMenu() {
+		menuFocused = false;
+		menuItem = null;
+		menu = null;
+		menuAnimTarget = 0;
 	}
 	
 	// interface getters

@@ -91,6 +91,8 @@ public class UIItem {
 		return null;
 	}
 	
+	void menuAction(int option) {}
+	
 	/* protected */ void requestLayout() {
 		layoutRequest = true;
 		if (container == null) return;

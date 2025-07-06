@@ -3593,6 +3593,9 @@ public class MP extends MIDlet
 		if (d instanceof MPChat && id.equals(((MPChat) d).id())
 				&& ((MPChat) d).postId() == null && ((MPChat) d).query() == null
 				&& ((MPChat) d).mediaFilter() == null) {
+			if (msg > 0) {
+				((MPChat) d).openMessage(Integer.toString(msg), 0);
+			}
 			return;
 		}
 		if (useChatCanvas) {
