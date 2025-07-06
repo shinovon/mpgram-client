@@ -666,7 +666,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			g.drawLine(0, by, w, by);
 			if (fieldFocused) {
 				// TODO
-				
+				by += 1;
+				g.setColor(-1);
+				g.drawString(MP.L[Chat], 2, by, Graphics.TOP | Graphics.LEFT);
+				g.drawString(MP.L[Back], w - 2, by, Graphics.TOP | Graphics.RIGHT);
+				g.drawString(MP.L[WriteMessage], w >> 1, by, Graphics.TOP | Graphics.HCENTER);
 			} else if (keyGuide) {
 				animate = true;
 				g.setColor(-1);
@@ -748,7 +752,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			boolean dir = target - val > 0;
 			if (d < 1) {
 				return false;
-			} else if (mode == 0) {
+			} else // if (mode == 0) {
 				if (d < 5) {
 					if (dir) {
 						++ val;
@@ -758,7 +762,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				} else for (int i = 0; i < 1 + (deltaTime > 33 && animating ? (deltaTime / 33) - 1 : 0); ++i) {
 					val = MP.lerp(val, target, 4, 20);
 				}
-			} else {
+			/* } else {
 				float f = 20F * (1 + (deltaTime > 33 && animating ? (deltaTime / 33f) - 1 : 0));
 				if (dir) {
 					if ((val += f) >= target) {
@@ -770,7 +774,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					}
 				}
 				
-			}
+			}*/
 		} else {
 			val = target;
 		}
@@ -845,7 +849,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				return;
 			} else {
 				fieldFocused = true;
-				fieldAnimTarget = 40;
+				fieldAnimTarget = MP.smallBoldFontHeight + 4;
 			}
 			repaint = true;
 		} else if (key == -6) {
@@ -857,7 +861,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				menuItem = null;
 				menu = null;
 			} else if (fieldFocused) {
-				showMenu(null, new int[] { ChatInfo, Refresh });
+				showMenu(null, canWrite ? new int[] { Refresh, ChatInfo, SendSticker } : new int[] { Refresh, ChatInfo });
 			} else {
 				if (focusedItem != null && focusedItem.focusable) {
 					int[] menu = focusedItem.menu();
@@ -888,6 +892,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				fieldFocused = false;
 				fieldAnimTarget = 0;
 				repaint = true;
+			} else if (key == -5 || game == Canvas.FIRE) {
+				// TODO text field
+				MP.midlet.commandAction(MP.writeCmd, this);
 			}
 		} else if (key == -5 || game == Canvas.FIRE) {
 			// action
