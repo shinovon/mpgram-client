@@ -594,7 +594,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				} while ((msg = msg.next) != null);
 			} else {
 				int y = top - scroll;
-				clipHeight += bottom;
+				clipHeight += top;
 				do {
 					int ih = msg.contentHeight;
 					if (y < -ih) {
