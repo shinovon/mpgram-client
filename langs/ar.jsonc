@@ -278,6 +278,7 @@
 	"Search_TitlePrefix": "بحث - ",
 	"OlderMessages": "رسائل اقدم",
 	"NewerMessages": "رسائل احدث",
+	"SavedMessages": "Saved messages", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "محولة من ",

@@ -278,6 +278,7 @@
 	"Search_TitlePrefix": "Axtar -",
 	"OlderMessages": "Köhnə mesajlar",
 	"NewerMessages": "Yeni mesajlar",
+	"SavedMessages": "Saved messages", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "Kimdən yönləndirilib",

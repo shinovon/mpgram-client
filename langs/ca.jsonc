@@ -278,6 +278,7 @@
 	"Search_TitlePrefix": "Cerce - ",
 	"OlderMessages": "Missatges més vell",
 	"NewerMessages": "Missatges més nou",
+	"SavedMessages": "Saved messages", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "Reenviat des ",

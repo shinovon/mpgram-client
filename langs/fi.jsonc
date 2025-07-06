@@ -278,6 +278,7 @@
 	"Search_TitlePrefix": "Haku - ",
 	"OlderMessages": "Vanhemmat viestit",
 	"NewerMessages": "Uudemmat viestit",
+	"SavedMessages": "Saved messages", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "Välitetty käyttäjältä ",

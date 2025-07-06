@@ -278,6 +278,7 @@
 	"Search_TitlePrefix": "Buscar - ",
 	"OlderMessages": "Mensajes antiguos",
 	"NewerMessages": "Mensajes mas recientes",
+	"SavedMessages": "Saved messages", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "Reenviado desde ",

@@ -278,6 +278,7 @@
 	"Search_TitlePrefix": "Пошук - ",
 	"OlderMessages": "Нові повідомлення",
 	"NewerMessages": "Старі повідомлення",
+	"SavedMessages": "Saved messages", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "Переслано від ",
