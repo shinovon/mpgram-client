@@ -4776,10 +4776,6 @@ public class MP extends MIDlet
 		}
 	}
 	
-	static float lerp(float start, float target, float mul, float div) {
-		return start + ((target - start) * mul / div);
-	}
-	
 	// endregion
 	
 	// region Rich text

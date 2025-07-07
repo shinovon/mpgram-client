@@ -767,7 +767,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						-- val;
 					}
 				} else for (int i = 0; i < 1 + (deltaTime > 33 && animating ? (deltaTime / 33) - 1 : 0); ++i) {
-					val = MP.lerp(val, target, 4, 20);
+//					val = MP.lerp(val, target, 4, 20);
+					val = val + ((target - val) * 4F / 20);
 				}
 			/* } else {
 				float f = 20F * (1 + (deltaTime > 33 && animating ? (deltaTime / 33f) - 1 : 0));
