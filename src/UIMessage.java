@@ -86,13 +86,14 @@ public class UIMessage extends UIItem implements LangConstants {
 	
 	UIMessage(JSONObject message, ChatCanvas chat) {
 		focusable = true;
+
 		date = message.getLong("date");
 		id = message.getInt("id");
 		fromId = message.has("from_id") ? message.getString("from_id") : chat.id;
 		out = (message.getBoolean("out", false) && !chat.broadcast);
 		hideName = chat.selfChat || chat.user || out;
 		space = chat.broadcast;
-		name = out && !chat.broadcast ? MP.L[You] : MP.getName(fromId, true);
+		name = out && !chat.broadcast ? MP.L[You] : MP.getName(fromId, true).trim();
 		dateRender = MP.localizeDate(date, 0);
 		dateWidth = MP.smallBoldFont.stringWidth(dateRender);
 		edited = message.has("edit");
@@ -156,6 +157,18 @@ public class UIMessage extends UIItem implements LangConstants {
 			return;
 		}
 		
+		init(message, chat);
+		
+		StringBuffer sb = new StringBuffer();
+		sb.setLength(0);
+		time = MP.appendTime(sb, date).toString();
+		timeWidth = MP.smallPlainFont.stringWidth(time);
+	}
+	
+	private void init(JSONObject message, ChatCanvas chat) {
+		subFocusCurrent = -1;
+		layoutWidth = 0;
+		
 		int order = 0;
 		
 		if (!out && !hideName) {
@@ -171,6 +184,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			if ((t = fwd.getString("from_name", null)) == null) {
 				t = MP.getName(fwdFromId, true);
 			}
+			if (t != null) t = t.trim();
 			forwardName = t;
 			forwardedFromWidth = chat.selfChat ? 0 : MP.smallPlainFont.stringWidth(MP.L[ForwardedFrom]);
 			if (fwd.has("peer") && fwd.has("msg")) {
@@ -337,12 +351,6 @@ public class UIMessage extends UIItem implements LangConstants {
 			commentRead = comments.getInt("read", 0);
 			subFocus[order++] = FOCUS_COMMENT;
 		}
-		
-		StringBuffer sb = new StringBuffer();
-		
-		sb.setLength(0);
-		time = MP.appendTime(sb, date).toString();
-		timeWidth = MP.smallPlainFont.stringWidth(time);
 		
 		subFocusLength = order;
 	}
@@ -877,6 +885,11 @@ public class UIMessage extends UIItem implements LangConstants {
 			MP.display(MP.loadingAlert(MP.L[Loading]), MP.current);
 			MP.midlet.start(MP.RUN_LOAD_PLAYLIST, new String[] {peerId, "3", idStr});
 			break;
+		case GoTo:
+			// TODO close chat info
+			((ChatCanvas) container).reset();
+			((ChatCanvas) container).openMessage(idStr, -1);
+			break;
 		}
 	}
 	
@@ -900,13 +913,18 @@ public class UIMessage extends UIItem implements LangConstants {
 		int[] general = new int[10];
 		int count = 0;
 		ChatCanvas chat = (ChatCanvas) container;
-		if (chat.canWrite) general[count++] = Reply;
-		if (out) general[count++] = Edit;
-		if (chat.canPin) general[count++] = Pin;
-		general[count++] = CopyMessage;
-		if (!chat.selfChat && !chat.user) general[count++] = CopyMessageLink;
-		general[count++] = Forward;
-		if (chat.canDelete) general[count++] = Delete;
+		if (chat.query != null || chat.mediaFilter != null) {
+			general[count++] = GoTo;
+			general[count++] = Forward;
+		} else {
+			if (chat.canWrite) general[count++] = Reply;
+			if (out) general[count++] = Edit;
+			if (chat.canPin) general[count++] = Pin;
+			general[count++] = CopyMessage;
+			if (!chat.selfChat && !chat.user) general[count++] = CopyMessageLink;
+			general[count++] = Forward;
+			if (chat.canDelete) general[count++] = Delete;
+		}
 		general[count] = Integer.MIN_VALUE;
 		if (item == null) {
 			return general;
@@ -933,6 +951,10 @@ public class UIMessage extends UIItem implements LangConstants {
 			if (text.tap(x - PADDING_WIDTH - MARGIN_WIDTH, y - text.y, longTap))
 				return true;
 		}
+		if (!longTap && (((ChatCanvas) container).query != null || ((ChatCanvas) container).mediaFilter != null)) {
+			menuAction(GoTo);
+			return true;
+		}
 		for (int i = 0; i < touchZones.length && touchZones[i] != Integer.MIN_VALUE; i += 5) {
 			if (x >= touchZones[i] && y >= touchZones[i + 1] && x <= touchZones[i + 2] && y <= touchZones[i + 3]) {
 				int focus = touchZones[i + 4];
@@ -958,6 +980,11 @@ public class UIMessage extends UIItem implements LangConstants {
 	
 	private void commentAction() {
 		MP.openLoad(new ChatForm(commentPeer, peerId, id, commentRead));
+	}
+
+	public void edit(JSONObject msg, ChatCanvas chat) {
+		edited = true;
+		init(msg, chat);
 	}
 
 }

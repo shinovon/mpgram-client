@@ -175,6 +175,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			count = 0;
 			firstMessage = lastMessage = null;
 			scrollCurrentItem = scrollTargetItem = focusedItem = null;
+			titleRender = null;
 			
 			if ((MP.reopenChat || (query == null && mediaFilter == null))
 					&& MP.chatUpdates
@@ -283,7 +284,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			this.selfChat = MP.selfId.equals(id);
 			this.reverse = MP.reverseChat && mediaFilter == null;
 			
-			if (selfChat) {
+			if (query != null) {
+				title = MP.L[Search];
+			} else if (selfChat) {
 				title = MP.L[SavedMessages];
 			} else if (postId != null || topMsgId != 0) {
 				title = MP.L[Comments];
@@ -375,8 +378,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			
 			// postLoad
 			loading = false;
-			if (touch && (canWrite || left)) {
+			if (touch && (canWrite || left) && mediaFilter == null && query == null) {
 				bottom = Math.max(MP.medPlainFontHeight + 16, 48);
+			} else {
+				bottom = 0;
 			}
 			layoutStart = firstMessage;
 			if (endReached && !hasOffset
@@ -434,6 +439,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			if (MP.updatesThread != null || MP.updatesRunning) {
 				MP.cancel(MP.updatesThread, true);
 			}
+			if (typingThread != null) typingThread.interrupt();
 		}
 		
 		loaded = false;
@@ -630,23 +636,25 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				g.drawLine(12, bty, 20, bty+8);
 				
 				// menu button
-				g.drawLine(w - 30, bty - 8, w - 10, bty - 8);
-				g.drawLine(w - 30, bty, w - 10, bty);
-				g.drawLine(w - 30, bty + 8, w - 10, bty + 8);
+				if (query == null && mediaFilter == null) {
+					g.drawLine(w - 30, bty - 8, w - 10, bty - 8);
+					g.drawLine(w - 30, bty, w - 10, bty);
+					g.drawLine(w - 30, bty + 8, w - 10, bty + 8);
+				}
 			}
 			boolean showStatus = MP.chatStatus || touch;
+			boolean hideStatus = showStatus && (selfChat || postId != null || query != null);
 			if (title != null) {
-				boolean noStatus = showStatus && status == null && defaultStatus == null;
-				Font font = noStatus ? MP.medPlainFont : MP.smallBoldFont;
+				Font font = hideStatus ? MP.medPlainFont : MP.smallBoldFont;
 				if (titleRender == null) {
 					titleRender = UILabel.ellipsis(title, font, tw - 4);
 				}
 				g.setColor(-1);
 				g.setFont(font);
-				g.drawString(titleRender, tx, showStatus ? noStatus ? (th - MP.medPlainFontHeight) >> 1 : 4 : 2, 0);
+				g.drawString(titleRender, tx, showStatus ? hideStatus ? (th - MP.medPlainFontHeight) >> 1 : 4 : 2, 0);
 			}
 			// TODO status ellipsis
-			if (showStatus) {
+			if (showStatus && !hideStatus) {
 				g.setColor(typing != 0 ? 0x73B9F5 : 0x708499);
 				g.setFont(MP.smallPlainFont);
 				String status = this.status;
@@ -688,7 +696,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				// TODO
 				g.setColor(-1);
 				g.setFont(MP.medPlainFont);
-				g.drawString(MP.L[TextField_Hint], 20, by + ((bottom - MP.medPlainFontHeight) >> 1), 0);
+				if (canWrite) {
+					g.drawString(MP.L[TextField_Hint], 20, by + ((bottom - MP.medPlainFontHeight) >> 1), 0);
+				} else if (left) {
+					g.drawString(MP.L[JoinGroup], w >> 1, by + ((bottom - MP.medPlainFontHeight) >> 1), Graphics.TOP | Graphics.HCENTER);
+				}
 			}
 		}
 		
@@ -842,7 +854,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (key == -7) {
 			if (repeat) return;
 			// back
-			if (touch) {
+			if (touch || query != null || mediaFilter != null) {
 				MP.midlet.commandAction(MP.backCmd, this);
 				return;
 			} else if (menuFocused) {
@@ -1094,13 +1106,17 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				if (x < 40) {
 					keyPressed(-7);
 				} else if (x > width - 40) {
-					showMenu(null, new int[] { Refresh });
+					if (query == null && mediaFilter == null)
+						showMenu(null, new int[] { Refresh, SearchMessages });
 				} else if (!selfChat && postId == null) {
 					openProfile();
 				}
 			} else if (y > height - bottom) {
-				// TODO
-				MP.midlet.commandAction(MP.writeCmd, this);
+				if (left) {
+					// TODO
+				} else {
+					MP.midlet.commandAction(MP.writeCmd, this);
+				}
 			}
 		}
 		dragYHold = 0;
@@ -1145,7 +1161,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	// ui
 	
 	public void requestLayout(UIItem item) {
-//		layoutStart = Math.min(layoutStart, idx);
 		if (layoutStart != null || item == null) {
 			layoutStart = firstMessage;
 		} else {
@@ -1209,6 +1224,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			firstMessage = item;
 		} else {
 			item.next = firstMessage;
+			firstMessage.layoutWidth = 0;
 			firstMessage = (firstMessage.prev = item);
 		}
 		item.container = this;
@@ -1222,6 +1238,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			firstMessage = lastMessage = item;
 		} else {
 			item.prev = lastMessage;
+			lastMessage.layoutWidth = 0;
 			lastMessage = (lastMessage.next = item);
 		}
 		item.container = this;
@@ -1229,7 +1246,31 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 	
 	void remove(UIItem item) {
-		// TODO
+		if (item == null) return;
+		UIItem i = firstMessage;
+		if (i == null) return;
+		do {
+			if (i == item) {
+				if (item == firstMessage) {
+					firstMessage = item.next;
+				}
+				if (item == lastMessage) {
+					lastMessage = item.prev;
+				}
+				if (item.prev != null) {
+					item.prev.layoutWidth = 0;
+					item.prev.next = item.next;
+				}
+				if (item.next != null) {
+					item.next.layoutWidth = 0;
+					item.next.prev = item.prev;
+				}
+				item.container = null;
+				count--;
+				requestLayout(item.prev);
+				break;
+			}
+		} while ((i = i.next) != null);
 	}
 	
 	public void queueRepaint() {
@@ -1401,6 +1442,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 
 	public void setQuery(String s) {
 		query = s;
+		switched = true;
 	}
 
 	public void setUpdate(boolean b) {
@@ -1442,6 +1484,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		addOffset = 0;
 		offsetId = 0;
 		typing = 0;
+		query = null;
 		if (table != null) table.clear();
 		switched = false;
 	}
@@ -1498,22 +1541,40 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			if (update.getObject("message").getInt("id") == firstMsgId)
 				break;
 			
+			typing = 0;
+			typingThread.interrupt();
+			
+			// delete old messages
+			while (count >= limit) {
+				remove(lastMessage);
+			}
+			
 			addFirst(new UIMessage(update.getObject("message"), this));
 			firstMsgId = update.getObject("message").getInt("id");
 			break;
 		}
 		case UPDATE_DELETE_MESSAGES: {
-			// TODO
-//			JSONArray messages = update.getArray("messages");
-//			int l = messages.size();
-//			
-//			for (int i = 0; i < l; ++i) {
-//				deleteMessage(messages.getString(i));
-//			}
+			JSONArray messages = update.getArray("messages");
+			int l = messages.size();
+			
+			for (int i = 0; i < l; ++i) {
+				JSONObject message = messages.getObject(i);
+				UIItem item = (UIItem) table.get(message.getString("id"));
+				if (item != null) {
+					remove(item);
+				}
+			}
 			break;
 		}
 		case UPDATE_EDIT_MESSAGE: {
-			// TODO
+			typing = 0;
+			typingThread.interrupt();
+			
+			JSONObject msg = update.getObject("message");
+			UIMessage item = (UIMessage) table.get(msg.getString("id"));
+			if (item != null) {
+				item.edit(msg, this);
+			}
 			break;
 		}
 		}

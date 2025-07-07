@@ -1415,7 +1415,9 @@ public class MP extends MIDlet
 						check = true;
 						if (fails >= 5 && form.update()) {
 							form.setUpdate(false);
-							display(errorAlert("Updates thread died!\n".concat(e.toString())), null);
+							if (form.isShown()) {
+								display(errorAlert("Updates thread died!\n".concat(e.toString())), null);
+							}
 							break;
 						}
 					}

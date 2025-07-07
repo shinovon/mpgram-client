@@ -977,6 +977,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 		addOffset = 0;
 		offsetId = 0;
 		typing = 0;
+		query = null;
 		loadedMsgs.removeAllElements();
 		if (urls != null) urls.clear();
 		switched = false;
