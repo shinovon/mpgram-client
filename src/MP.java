@@ -1309,8 +1309,12 @@ public class MP extends MIDlet
 				MP.api((run == RUN_JOIN_CHANNEL ? "join" : "leave").concat("Channel&id=").concat((String) param));
 				
 				if (run == RUN_JOIN_CHANNEL) {
-					commandAction(backCmd, current);
-					openChat((String) param, 0);
+					if (current instanceof MPChat) {
+						commandAction(latestCmd, current);
+					} else {
+						commandAction(backCmd, current);
+						openChat((String) param, 0);
+					}
 				} else {
 					commandAction(refreshCmd, current);
 				}

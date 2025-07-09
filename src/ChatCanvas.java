@@ -697,7 +697,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				g.setColor(-1);
 				g.setFont(MP.medPlainFont);
 				if (canWrite) {
-					g.drawString(MP.L[TextField_Hint], 20, by + ((bottom - MP.medPlainFontHeight) >> 1), 0);
+					g.drawString(MP.L[TextField_Hint], 40, by + ((bottom - MP.medPlainFontHeight) >> 1), 0);
 				} else if (left) {
 					g.drawString(MP.L[JoinGroup], w >> 1, by + ((bottom - MP.medPlainFontHeight) >> 1), Graphics.TOP | Graphics.HCENTER);
 				}
@@ -1112,8 +1112,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					openProfile();
 				}
 			} else if (y > height - bottom) {
+				// TODO
 				if (left) {
-					// TODO
+					MP.midlet.start(MP.RUN_JOIN_CHANNEL, id);
 				} else {
 					MP.midlet.commandAction(MP.writeCmd, this);
 				}
