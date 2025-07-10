@@ -1028,6 +1028,8 @@ public class MP extends MIDlet
 								.append("&p=");
 								if (msg.photo) {
 									sb.append("rprev&s=").append(photoSize);
+								} else if (msg.sticker) {
+									sb.append("rsticker&s=").append(photoSize);
 								} else {
 									// document thumbnail
 									sb.append("thumbrsprevs&s=").append(MP.smallBoldFontHeight + MP.smallPlainFontHeight);

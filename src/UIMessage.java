@@ -65,7 +65,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	int commentRead;
 	String peerId;
 	
-	boolean fwd, reply, media, photo;
+	boolean fwd, reply, media, photo, sticker;
 	String replyName, replyText, replyPrefix;
 	String commentsText;
 	String mediaTitle, mediaSubtitle;
@@ -268,8 +268,12 @@ public class UIMessage extends UIItem implements LangConstants {
 					mediaUrl = media.getString("url");
 				} else if (type.equals("document")) {
 					if ("image/webp".equals(media.getString("mime", null)) && "sticker.webp".equals(media.getString("name", null))) {
-						// TODO sticker
-						mediaTitle = MP.L[Sticker];
+						sticker = true;
+						if (MP.loadThumbs) {
+							MP.queueImage(this, this);
+						} else {
+							mediaTitle = MP.L[Sticker];
+						}
 					} else {
 						mediaDownload = true;
 						mediaPlayable = media.has("audio")
@@ -483,7 +487,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		
 		// media
 		if (media) {
-			if (photo && mediaTitle == null) {
+			if ((photo || sticker) && mediaTitle == null) {
 				if (mediaImage == null) {
 					// TODO photo placeholder
 					g.setColor(0);
@@ -699,7 +703,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		
 		// media
 		if (media) {
-			if (photo && mediaTitle == null) {
+			if ((photo || sticker) && mediaTitle == null) {
 				int pw, ph;
 				if (mediaImage != null) {
 					ph = mediaImage.getHeight();
