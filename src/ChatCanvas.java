@@ -516,7 +516,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		
 		if (!touch && scrollTarget == -1) {
 			if (focusedItem == null && scrollCurrentItem == null && scrollTargetItem == null) {
-				focusItem(getFirstFocusableItemOnScreen(null, 1, clipHeight / 5), 1);
+				focusItem(getFirstFocusableItemOnScreen(null, 1, clipHeight / 8), 1);
 			} else if (focusedItem != null && scrollCurrentItem == null && !isVisible(focusedItem)) {
 				scrollTo(focusedItem);
 			}
@@ -938,6 +938,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		} else if (game == Canvas.DOWN || game == Canvas.UP) {
 			scroll: {
 				int dir = game == Canvas.DOWN ? 1 : -1;
+				int dir2 = dir;
 				if (reverse) dir = -dir;
 				final int scrollAmount = clipHeight / 4;
 				if (scrollTargetItem == null && scrollCurrentItem == null) {
@@ -954,7 +955,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					if (t != 0) {
 						repaint = true;
 						if (t != Integer.MAX_VALUE) {
-							scrollTo(t);
+							if (dir == 1) {
+								scrollTo(Math.min(scroll + scrollAmount, t));
+							} else {
+								scrollTo(Math.max(scroll - scrollAmount, t));
+							}
 						}
 						break scroll;
 					}
@@ -973,15 +978,15 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				}
 				UIItem item = scrollTargetItem;
 				if (item != null && isVisible(item)) {
-					focusItem(item, reverse ? -dir : dir);
+					focusItem(item, dir2);
 				}
 				if (scrollTargetItem != null && isVisible(scrollTargetItem)) {
 					repaint = true;
-					focusItem(scrollTargetItem, reverse ? -dir : dir);
+					focusItem(scrollTargetItem, dir2);
 					scrollCurrentItem = scrollTargetItem;
-					if (isCornerVisible(scrollTargetItem, dir) && isVisible(scrollTargetItem)) {
+					if (isCornerVisible(scrollTargetItem, dir2) && isVisible(scrollTargetItem)) {
 						scrollTargetItem = getFirstFocusableItemOnScreen(scrollCurrentItem, dir, 0);
-						if (scrollTargetItem != null && isCornerVisible(scrollTargetItem, dir) && isVisible(scrollTargetItem, clipHeight / 5)) {
+						if (scrollTargetItem != null && isCornerVisible(scrollTargetItem, dir2) && isVisible(scrollTargetItem, clipHeight / 8)) {
 							break scroll;
 						}
 					}
@@ -993,7 +998,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					scrollTo(Math.max(scroll - scrollAmount, 0));
 				}
 				
-				if (scrollTargetItem != null && isVisible(scrollTargetItem) && isCornerVisible(scrollTargetItem, dir)) {
+				if (scrollTargetItem != null && isVisible(scrollTargetItem) && isCornerVisible(scrollTargetItem, dir2)) {
 					scrollTargetItem = null;
 				}
 			}

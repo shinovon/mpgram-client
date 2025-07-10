@@ -203,11 +203,15 @@ public class UILabel extends UIItem {
 	
 	int traverse(int dir, int height, int scrollY) {
 		if (!focusable || urls.size() == 0) return 0;
+		
+		// TODO scroll
+		
 		if (dir == Canvas.UP) {
 			if (focusIndex <= 0) {
 				focusLink(focusIndex = 0);
 				return 0;
 			}
+			
 			focusLink(--focusIndex);
 			return Integer.MAX_VALUE;
 		} else if (dir == Canvas.DOWN) {

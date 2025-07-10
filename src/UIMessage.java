@@ -318,6 +318,7 @@ public class UIMessage extends UIItem implements LangConstants {
 						}
 					}
 				} else if (type.equals("photo")) {
+					mediaDownload = true;
 					photo = true;
 					if (MP.loadThumbs) {
 						photoRawWidth = media.getInt("w", 0);
@@ -335,7 +336,7 @@ public class UIMessage extends UIItem implements LangConstants {
 					mediaTitle = MP.L[Media];
 				}
 				this.media = true;
-				subFocus[order++] = FOCUS_MEDIA;
+				if (!sticker) subFocus[order++] = FOCUS_MEDIA;
 			}
 		}
 		
@@ -835,6 +836,9 @@ public class UIMessage extends UIItem implements LangConstants {
 			focusChild.lostFocus();
 			focusChild = null;
 		}
+		
+		// TODO scroll
+		
 		if (subFocusLength != 0) {
 			if (subFocusLength != 1 || subFocus[0] != FOCUS_SENDER || !hideName) {
 				if (subFocusLength > 1 && subFocusCurrent == 0 && subFocus[0] == FOCUS_SENDER && hideName) {
