@@ -33,7 +33,7 @@ public class UILabel extends UIItem {
 	Vector selectedParts; String selectedUrl;
 
 	int color = -1, bgColor, linkColor;
-	boolean center, wrap = true, background;
+	boolean center, ellipsis, background;
 	
 	int focusIndex;
 	
@@ -107,6 +107,7 @@ public class UILabel extends UIItem {
 		
 		int fh = 0;
 		int l = parsed.size();
+		boolean ellipsis = this.ellipsis;
 		int[] out = new int[3];
 		for (int ei = 0; ei < l; ++ei) {
 			int startIdx = idx;
@@ -117,8 +118,12 @@ public class UILabel extends UIItem {
 			
 			fh = font.getHeight();
 			if (text == null || "\n".equals(text)) {
-				x = 0;
-				y += fh;
+				if (ellipsis) {
+					if (x != 0) x += font.charWidth(' ');
+				} else {
+					x = 0;
+					y += fh;
+				}
 				continue;
 			}
 			
@@ -128,11 +133,25 @@ public class UILabel extends UIItem {
 			while (ch < sl && ((c = text.charAt(ch)) < ' ')) {
 				ch++;
 				if (c != '\n') continue;
-				x = 0;
-				y += fh;
+				if (ellipsis) {
+					if (x != 0) x += font.charWidth(' ');
+				} else {
+					x = 0;
+					y += fh;
+				}
 			}
 			
-			if (text.indexOf('\n', ch) == -1) {
+			if (ellipsis) {
+				int tw;
+				boolean end = false;
+				if (x + (tw = font.stringWidth(text = text.substring(ch).replace('\n', ' '))) < width) {
+					tw = font.stringWidth(text = ellipsis(text, font, width - x));
+					end = true;
+				}
+				res.addElement(new Object[] { text, font, url, new int[] {x, y, tw, fh} });
+				x += tw;
+				if (end) break;
+			} else if (text.indexOf('\n', ch) == -1) {
 				split(text, font, url, width, x, y, idx, ch, sl, fh, res, center, out);
 				x = out[0]; y = out[1]; idx = out[2];
 			} else {
