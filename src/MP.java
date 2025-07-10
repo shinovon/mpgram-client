@@ -3307,7 +3307,7 @@ public class MP extends MIDlet
 		}
 		if (target instanceof UIMessage) {
 			((UIMessage) target).mediaImage = img;
-			((UIMessage) target).layoutWidth = 0;
+			if (((UIMessage) target).photoRenderHeight == 0) ((UIMessage) target).layoutWidth = 0;
 			((UIMessage) target).requestPaint();
 		}
 //#ifndef NO_NOTIFY

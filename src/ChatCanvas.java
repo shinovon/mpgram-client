@@ -1253,6 +1253,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (item == null) return;
 		UIItem i = firstMessage;
 		if (i == null) return;
+		table.remove(Integer.toString(((UIMessage) item).id));
 		do {
 			if (i == item) {
 				if (item == firstMessage) {
@@ -1583,6 +1584,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			UIMessage item = (UIMessage) table.get(msg.getString("id"));
 			if (item != null) {
 				item.edit(msg, this);
+				item.layoutWidth = 0;
+				requestLayout(item);
 			}
 			break;
 		}

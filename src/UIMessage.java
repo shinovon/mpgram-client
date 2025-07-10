@@ -705,15 +705,14 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (media) {
 			if ((photo || sticker) && mediaTitle == null) {
 				int pw, ph;
-				if (mediaImage != null) {
-					ph = mediaImage.getHeight();
+				if (mediaImage != null && Math.abs((ph = mediaImage.getHeight()) - photoRenderHeight) < 2) {
 					pw = mediaImage.getWidth();
 					if (pw > cw) {
 						pw = cw;
 						ph = (photoRawHeight * pw) / photoRawWidth;
 					}
 					// resize?
-					photoRenderWidth = ph;
+					photoRenderWidth = pw;
 					photoRenderHeight = ph;
 				} else if (photoRawHeight != 0) {
 					int s = Math.min(cw, MP.photoSize);
