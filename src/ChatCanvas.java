@@ -1568,8 +1568,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			int l = messages.size();
 			
 			for (int i = 0; i < l; ++i) {
-				JSONObject message = messages.getObject(i);
-				UIItem item = (UIItem) table.get(message.getString("id"));
+				UIItem item = (UIItem) table.get(messages.getString(i));
 				if (item != null) {
 					remove(item);
 				}
