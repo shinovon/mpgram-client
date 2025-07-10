@@ -1222,7 +1222,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (item == null) return;
 		count++;
 		if (firstMessage == null) {
-			firstMessage = item;
+			firstMessage = lastMessage = item;
 		} else {
 			item.next = firstMessage;
 			firstMessage.layoutWidth = 0;
