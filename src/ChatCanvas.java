@@ -1276,6 +1276,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				break;
 			}
 		} while ((i = i.next) != null);
+		if (lastMessage == null) {
+			lastMessage = firstMessage;
+		}
 	}
 	
 	public void queueRepaint() {
