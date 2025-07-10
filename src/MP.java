@@ -189,7 +189,7 @@ public class MP extends MIDlet
 	private static int tzOffset;
 	static boolean useLoadingForm;
 	private static int avatarSize;
-	private static int photoSize = 120;
+	static int photoSize = 120;
 	static boolean loadAvatars = true;
 	static boolean loadThumbs = true;
 	static boolean reverseChat;
@@ -1019,6 +1019,20 @@ public class MP extends MIDlet
 							} else if (src instanceof JSONObject) { // sticker or document
 								url = instanceUrl + FILE_URL + "?a&sticker=" + ((JSONObject) src).getString("id")
 										+ "&access_hash=" + ((JSONObject) src).getString("access_hash") + "&p=rsprevs&s=32";
+							} else if (src instanceof UIMessage) {
+								UIMessage msg = (UIMessage) src;
+								StringBuffer sb = new StringBuffer(instanceUrl);
+								sb.append(FILE_URL)
+								.append("?a&c=").append(msg.peerId)
+								.append("&m=").append(msg.id)
+								.append("&p=");
+								if (msg.photo) {
+									sb.append("rprev&s=").append(photoSize);
+								} else {
+									// document thumbnail
+									sb.append("thumbrsprevs&s=").append(MP.smallBoldFontHeight + MP.smallPlainFontHeight);
+								}
+								url = sb.toString();
 							} else {
 								continue;
 							}
@@ -3288,6 +3302,11 @@ public class MP extends MIDlet
 				list.set(idx, list.getString(idx), img);
 				return;
 			}
+		}
+		if (target instanceof UIMessage) {
+			((UIMessage) target).mediaImage = img;
+			((UIMessage) target).layoutWidth = 0;
+			((UIMessage) target).requestPaint();
 		}
 //#ifndef NO_NOTIFY
 		if (target instanceof String) {

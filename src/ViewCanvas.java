@@ -91,8 +91,8 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 			int l = -1;
 			byte[] b;
 			try {
-				b = MP.get(MP.instanceUrl + MP.FILE_URL + "?a&c=" + peer + "&m=" + id + "&p=rprev&s="
-						+ (Math.min(getWidth(), getHeight()) * zoom));
+				b = MP.get(MP.instanceUrl + MP.FILE_URL + "?a&c=" + peer + "&m=" + id + "&p=rview&s="
+						+ (Math.min(getWidth(), getHeight()) * zoom) + "&tw=" + (getWidth() * zoom) + "&th=" + (getHeight() * zoom));
 				l = b.length;
 				origImg = Image.createImage(b, 0, b.length);
 				b = null;

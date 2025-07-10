@@ -812,6 +812,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 
 	protected void keyPressed(int key) {
 		if (!loading) key(key, false);
+		else if (key == -7) {
+			MP.midlet.commandAction(MP.backCmd, this);
+		}
 	}
 	
 	protected void keyRepeated(int key) {
@@ -1377,6 +1380,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		menuItem = null;
 		menu = null;
 		menuAnimTarget = 0;
+	}
+	
+	public void requestPaint(UIItem item) {
+		if (item == null || !isVisible(item)) return;
+		queueRepaint();
 	}
 	
 	// interface getters

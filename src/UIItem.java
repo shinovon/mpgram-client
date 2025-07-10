@@ -107,5 +107,15 @@ public class UIItem {
 	boolean tap(int x, int y, boolean longTap) {
 		return false;
 	}
+	
+	void requestPaint() {
+		if (container == null) return;
+		
+		if (container instanceof UIItem) {
+			((UIItem) container).requestPaint();
+		} else if (container instanceof ChatCanvas) {
+			((ChatCanvas) container).requestPaint(this);
+		}
+	}
 
 }

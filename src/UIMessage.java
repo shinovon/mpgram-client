@@ -22,6 +22,7 @@ SOFTWARE.
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.Image;
 
 public class UIMessage extends UIItem implements LangConstants {
 	
@@ -68,13 +69,14 @@ public class UIMessage extends UIItem implements LangConstants {
 	String replyName, replyText, replyPrefix;
 	String commentsText;
 	String mediaTitle, mediaSubtitle;
-	boolean mediaPlayable, mediaDownload;
+	boolean mediaPlayable, mediaDownload, mediaThumb;
 	String mediaFileName, mediaUrl;
 	String forwardName;
 	String fwdFromId, fwdPeer;
 	int fwdMsgId;
 	String replyPeer;
 	int replyMsgId;
+	int photoRawWidth, photoRawHeight;
 	
 	String time, nameRender, dateRender;
 	String replyNameRender, replyTextRender, forwardRender;
@@ -83,6 +85,9 @@ public class UIMessage extends UIItem implements LangConstants {
 	int mediaRenderHeight;
 	boolean showDate, hideName, timeBreak, space;
 	int forwardedFromWidth;
+	int photoRenderWidth, photoRenderHeight;
+	
+	Image mediaImage;
 	
 	UIMessage(JSONObject message, ChatCanvas chat) {
 		focusable = true;
@@ -262,54 +267,61 @@ public class UIMessage extends UIItem implements LangConstants {
 					}
 					mediaUrl = media.getString("url");
 				} else if (type.equals("document")) {
-					mediaDownload = true;
-					mediaPlayable = media.has("audio")
-							&& ("audio/mpeg".equals(t = media.getString("mime", null))
-									|| "audio/aac".equals(t)
-									|| "audio/m4a".equals(t));
-					mediaFileName = media.getString("name", null);
-					StringBuffer sb = new StringBuffer();
-					name: {
-						if (media.has("audio")) {
-							JSONObject audio = media.getObject("audio");
-							if ((t = audio.getString("artist", null)) != null && t.length() != 0) {
-								sb.append(t).append(" - ");
+					if ("image/webp".equals(media.getString("mime", null)) && "sticker.webp".equals(media.getString("name", null))) {
+						// TODO sticker
+						mediaTitle = MP.L[Sticker];
+					} else {
+						mediaDownload = true;
+						mediaPlayable = media.has("audio")
+								&& ("audio/mpeg".equals(t = media.getString("mime", null))
+										|| "audio/aac".equals(t)
+										|| "audio/m4a".equals(t));
+						mediaFileName = media.getString("name", null);
+						StringBuffer sb = new StringBuffer();
+						name: {
+							if (media.has("audio")) {
+								JSONObject audio = media.getObject("audio");
+								if ((t = audio.getString("artist", null)) != null && t.length() != 0) {
+									sb.append(t).append(" - ");
+								}
+								if ((t = audio.getString("title", null)) != null && t.length() != 0) {
+									sb.append(t);
+									break name;
+								}
 							}
-							if ((t = audio.getString("title", null)) != null && t.length() != 0) {
+							if ((t = media.getString("name", null)) != null && t.length() != 0) {
 								sb.append(t);
-								break name;
 							}
 						}
-						if ((t = media.getString("name", null)) != null && t.length() != 0) {
-							sb.append(t);
+						mediaTitle = sb.toString();
+						
+						if (!media.isNull("size")) {
+							sb.setLength(0);
+							long size = media.getLong("size");
+							if (size >= 1024 * 1024) {
+								size = (size * 100) / (1024 * 1024);
+								sb.append(size / 100).append('.').append(size % 100).append(" MB");
+							} else {
+								size = (size * 100) / 1024;
+								sb.append(size / 100).append('.').append(size % 100).append(" KB");
+							}
+							mediaSubtitle = sb.toString();
+						}
+						
+						if (MP.loadThumbs && media.getBoolean("thumb", false)) {
+							mediaThumb = true;
+							MP.queueImage(this, this);
 						}
 					}
-					mediaTitle = sb.toString();
-					
-					if (!media.isNull("size")) {
-						sb.setLength(0);
-						long size = media.getLong("size");
-						if (size >= 1024 * 1024) {
-							size = (size * 100) / (1024 * 1024);
-							sb.append(size / 100).append('.').append(size % 100).append(" MB");
-						} else {
-							size = (size * 100) / 1024;
-							sb.append(size / 100).append('.').append(size % 100).append(" KB");
-						}
-						mediaSubtitle = sb.toString();
-					}
-					
-					// TODO
-//					if (MP.loadThumbs && media.getBoolean("thumb", false)) {
-//						MP.queueImage(this, this);
-//					}
 				} else if (type.equals("photo")) {
-					// TODO
 					photo = true;
-//					if (MP.loadThumbs) {
-//					} else {
-					mediaTitle = MP.L[Photo];
-//					}
+					if (MP.loadThumbs) {
+						photoRawWidth = media.getInt("w", 0);
+						photoRawHeight = media.getInt("h", 0);
+						MP.queueImage(this, this);
+					} else {
+						mediaTitle = MP.L[Photo];
+					}
 				} else if (type.equals("poll")) {
 					mediaTitle = MP.L[Poll];
 				} else if (type.equals("geo")) {
@@ -471,27 +483,52 @@ public class UIMessage extends UIItem implements LangConstants {
 		
 		// media
 		if (media) {
-			g.setColor(0x6AB3F3);
-			int rh = mediaRenderHeight;
-			g.fillRect(x, y, 2, rh);
-			if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_MEDIA) {
-				g.setColor(0x1A3756);
-				g.fillRect(x + 2, y, cw - 4, rh);
+			if (photo && mediaTitle == null) {
+				if (mediaImage == null) {
+					// TODO photo placeholder
+					g.setColor(0);
+					g.fillRect(x, y + 1, photoRenderWidth, photoRenderHeight);
+				} else {
+					int clipX = g.getClipX(), clipY = g.getClipY(), clipW = g.getClipWidth(), clipH = g.getClipHeight();
+					g.setClip(x, y + 1, photoRenderWidth, photoRenderHeight);
+					g.drawImage(mediaImage, x, y + 1, 0);
+					g.setClip(clipX, clipY, clipW, clipH);
+				}
+				y += photoRenderHeight + 2;
+			} else {
+				g.setColor(0x6AB3F3);
+				int rh = mediaRenderHeight;
+				g.fillRect(x, y, 2, rh);
+				if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_MEDIA) {
+					g.setColor(0x1A3756);
+					g.fillRect(x + 2, y, cw - 4, rh);
+				}
+				int px = x + 6;
+				if (mediaThumb) {
+					int s = MP.smallBoldFontHeight + MP.smallPlainFontHeight;
+					if (mediaImage != null) {
+						g.drawImage(mediaImage, px, ty, 0);
+					} else {
+						// TODO thumb placeholder
+//						g.setColor(0);
+//						g.fillRect(px, y, s, s);
+					}
+					px += s + 2;
+				}
+				if (mediaTitleRender != null) {
+					g.setColor(-1);
+					g.setFont(MP.smallBoldFont);
+					g.drawString(mediaTitleRender, px, y, 0);
+					y += MP.smallBoldFontHeight;
+				}
+				if (mediaSubtitleRender != null) {
+					g.setColor(0x71BAFA);
+					g.setFont(MP.smallPlainFont);
+					g.drawString(mediaSubtitleRender, px, y, 0);
+					y += MP.smallPlainFontHeight;
+				}
+				y += 2;
 			}
-			int px = x + 6;
-			if (mediaTitleRender != null) {
-				g.setColor(-1);
-				g.setFont(MP.smallBoldFont);
-				g.drawString(mediaTitleRender, px, y, 0);
-				y += MP.smallBoldFontHeight;
-			}
-			if (mediaSubtitleRender != null) {
-				g.setColor(0x71BAFA);
-				g.setFont(MP.smallPlainFont);
-				g.drawString(mediaSubtitleRender, px, y, 0);
-				y += MP.smallPlainFontHeight;
-			}
-			y += 2;
 		}
 
 		// text
@@ -662,21 +699,58 @@ public class UIMessage extends UIItem implements LangConstants {
 		
 		// media
 		if (media) {
-			int mh = 0;
-			if (mediaTitle != null) {
-				mediaTitleRender = UILabel.ellipsis(mediaTitle, MP.smallBoldFont, cw - 10);
-				mh += MP.smallBoldFontHeight;
+			if (photo && mediaTitle == null) {
+				int pw, ph;
+				if (mediaImage != null) {
+					ph = mediaImage.getHeight();
+					pw = mediaImage.getWidth();
+					if (pw > cw) {
+						pw = cw;
+						ph = (photoRawHeight * pw) / photoRawWidth;
+					}
+					// resize?
+					photoRenderWidth = ph;
+					photoRenderHeight = ph;
+				} else if (photoRawHeight != 0) {
+					int s = Math.min(cw, MP.photoSize);
+					ph = MP.photoSize;
+					pw = (photoRawWidth * ph) / photoRawHeight;
+					if (pw > s) {
+						pw = s;
+						ph = (photoRawHeight * pw) / photoRawWidth;
+					}
+					photoRenderWidth = pw;
+					photoRenderHeight = ph;
+				} else {
+					ph = pw = photoRenderWidth = photoRenderHeight = Math.min(cw, MP.photoSize);
+				}
+				
+				touchZones[order ++] = x;
+				touchZones[order ++] = h + y;
+				touchZones[order ++] = x + pw;
+				touchZones[order ++] = (h += (ph) + 2) + y;
+				touchZones[order ++] = FOCUS_MEDIA;
+			} else {
+				int mx = 0;
+				if (mediaThumb) {
+					mx += MP.smallBoldFontHeight + MP.smallPlainFontHeight + 2;
+				}
+				int mh = 0;
+				if (mediaTitle != null) {
+					mediaTitleRender = UILabel.ellipsis(mediaTitle, MP.smallBoldFont, cw - 10 - mx);
+					mh += MP.smallBoldFontHeight;
+				}
+				if (mediaSubtitle != null) {
+					mediaSubtitleRender = UILabel.ellipsis(mediaSubtitle, MP.smallPlainFont, cw - 10 - mx);
+					mh += MP.smallPlainFontHeight;
+				}
+				
+				touchZones[order ++] = x + 2;
+				touchZones[order ++] = h + y;
+				touchZones[order ++] = x + cw;
+				touchZones[order ++] = (h += (mediaRenderHeight = mh) + 2) + y;
+				touchZones[order ++] = FOCUS_MEDIA;
 			}
-			if (mediaSubtitle != null) {
-				mediaSubtitleRender = UILabel.ellipsis(mediaSubtitle, MP.smallPlainFont, cw - 10);
-				mh += MP.smallPlainFontHeight;
-			}
-			
-			touchZones[order ++] = x + 2;
-			touchZones[order ++] = h + y;
-			touchZones[order ++] = x + cw;
-			touchZones[order ++] = (h += (mediaRenderHeight = mh) + 2) + y;
-			touchZones[order ++] = FOCUS_MEDIA;
 		}
 		
 		// text
