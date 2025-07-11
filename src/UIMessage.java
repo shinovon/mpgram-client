@@ -735,7 +735,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			touchZones[order ++] = FOCUS_REPLY;
 		}
 		
-		int timeWidth = this.timeWidth + TIME_PADDING_WIDTH * 2;
+		int timeWidth = this.timeWidth + TIME_PADDING_WIDTH;
 		boolean timeBreak = false;
 		if (edited) {
 			timeWidth += MP.smallPlainFontSpaceWidth + MP.smallPlainFont.stringWidth(MP.L[Edited]);
