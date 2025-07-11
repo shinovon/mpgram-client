@@ -276,6 +276,7 @@ public class UILabel extends UIItem {
 	}
 	
 	private static void split(String text, Font font, String url, int width, int x, int y, int idx, int ch, int sl, int fh, Vector res, boolean center, int[] out) {
+		// TODO calc max row width
 		if (ch != sl) {
 			int ew = font.substringWidth(text, ch, sl - ch);
 			if (x + ew < width) {

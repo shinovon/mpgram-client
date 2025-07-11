@@ -622,12 +622,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		}
 		
 		// limit scroll
-
 		int scroll = this.scroll;
 		if (scroll < 0) this.scroll = scroll = 0;
 		else if (contentHeight <= clipHeight) this.scroll = scroll = 0;
 		else if (scroll > contentHeight - clipHeight) this.scroll = scroll = contentHeight - clipHeight;
-//		System.out.println("scroll " + scroll + " / " + (contentHeight - clipHeight));
 		
 		// background
 		g.setColor(colors[COLOR_CHAT_BG]);
@@ -1142,7 +1140,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						move += moves[idx];
 						moveTime += time;
 					}
-					System.out.println("k " + move + " " + moveTime);
 					if (moveTime > 0) {
 						// release kinetic velocity
 						float res = (130f * move) / moveTime; 
@@ -1238,7 +1235,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			offsetItem = offsetItem.prev;
 			offset = true;
 		}
-		System.out.println("layout " + offsetItem);
 		
 		int prevScroll = scroll;
 		int prevScrollItemY = 0;
@@ -1259,7 +1255,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		} while ((item = item.next) != null);
 		
 		contentHeight = y;
-		System.out.println("layout done " + y);
 		
 		if (prevScrollItemY != 0) {
 			scroll = prevScroll - prevScrollItemY + scrollItem.y;

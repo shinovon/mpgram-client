@@ -664,14 +664,15 @@ public class UIMessage extends UIItem implements LangConstants {
 			return contentHeight = h += PADDING_HEIGHT;
 		}
 		
-		int maxW = Math.min(MAX_WIDTH, width);
-		int cw = maxW - PADDING_WIDTH * 2 - MARGIN_WIDTH * 2 - MARGIN_SIDE;
+		int minW = PADDING_WIDTH * 2 + MARGIN_WIDTH * 2 + MARGIN_SIDE, maxW = minW;
+		int cw = Math.min(MAX_WIDTH, width) - PADDING_WIDTH * 2 - MARGIN_WIDTH * 2 - MARGIN_SIDE;
 		int x = MARGIN_WIDTH + PADDING_WIDTH;
 		
 		// sender
 		if (!hideName) {
 			nameRender = UILabel.ellipsis(name, MP.smallBoldFont, cw - PADDING_WIDTH * 2);
 			senderWidth = MP.smallBoldFont.stringWidth(nameRender);
+			maxW = Math.max(maxW, minW + senderWidth);
 			
 			touchZones[order ++] = x;
 			touchZones[order ++] = h + y;
@@ -684,6 +685,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (fwd) {
 			forwardRender = UILabel.ellipsis(forwardName, MP.smallBoldFont, cw - PADDING_WIDTH * 2 - forwardedFromWidth);
 			forwardNameWidth = MP.smallBoldFont.stringWidth(forwardRender);
+			maxW = Math.max(maxW, minW + forwardNameWidth + forwardedFromWidth);
 			
 			int tx = x + forwardedFromWidth;
 			touchZones[order ++] = tx;
@@ -699,13 +701,16 @@ public class UIMessage extends UIItem implements LangConstants {
 			if (replyName != null) {
 				replyNameRender = UILabel.ellipsis(replyName, MP.smallBoldFont, cw - 10);
 				h += MP.smallBoldFontHeight;
+				maxW = Math.max(maxW, minW + MP.smallBoldFont.stringWidth(replyNameRender) + 10);
 			}
 			int rw = cw - 10;
 			if (replyPrefix != null) {
 				rw -= replyPrefixWidth + MP.smallPlainFontSpaceWidth;
+				maxW = Math.max(maxW, minW + replyPrefixWidth + 10);
 			}
 			if (replyText != null) {
 				replyTextRender = UILabel.ellipsis(replyText, MP.smallPlainFont, rw);
+				maxW = Math.max(maxW, minW + MP.smallPlainFont.stringWidth(replyTextRender) + replyPrefixWidth + MP.smallPlainFontSpaceWidth + 10);
 			}
 			h += 4 + MP.smallPlainFontHeight;
 			
@@ -716,8 +721,8 @@ public class UIMessage extends UIItem implements LangConstants {
 			touchZones[order ++] = FOCUS_REPLY;
 		}
 		
-		int timeWidth = this.timeWidth;
-		boolean timeBreak = text == null;
+		int timeWidth = this.timeWidth + TIME_PADDING_WIDTH * 2;
+		boolean timeBreak = false;
 		if (edited) {
 			timeWidth += MP.smallPlainFontSpaceWidth + MP.smallPlainFont.stringWidth(MP.L[Edited]);
 		}
@@ -748,6 +753,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				} else {
 					ph = pw = photoRenderWidth = photoRenderHeight = Math.min(cw, MP.photoSize);
 				}
+				maxW = Math.max(maxW, minW + pw);
 				
 				touchZones[order ++] = x;
 				touchZones[order ++] = h + y;
@@ -755,17 +761,20 @@ public class UIMessage extends UIItem implements LangConstants {
 				touchZones[order ++] = (h += (ph) + 2) + y;
 				touchZones[order ++] = FOCUS_MEDIA;
 			} else {
-				int mx = 0;
+				int mx = 10;
 				if (mediaThumb) {
 					mx += MP.smallBoldFontHeight + MP.smallPlainFontHeight + 2;
 				}
+				maxW = Math.max(maxW, minW + mx);
 				int mh = 0;
 				if (mediaTitle != null) {
-					mediaTitleRender = UILabel.ellipsis(mediaTitle, MP.smallBoldFont, cw - 10 - mx);
+					mediaTitleRender = UILabel.ellipsis(mediaTitle, MP.smallBoldFont, cw - mx);
+					maxW = Math.max(maxW, minW + MP.smallBoldFont.stringWidth(mediaTitleRender) + mx);
 					mh += MP.smallBoldFontHeight;
 				}
 				if (mediaSubtitle != null) {
-					mediaSubtitleRender = UILabel.ellipsis(mediaSubtitle, MP.smallPlainFont, cw - 10 - mx);
+					mediaSubtitleRender = UILabel.ellipsis(mediaSubtitle, MP.smallPlainFont, cw - mx);
+					maxW = Math.max(maxW, minW + MP.smallBoldFont.stringWidth(mediaSubtitleRender) + mx);
 					mh += MP.smallPlainFontHeight;
 				}
 				
@@ -786,14 +795,22 @@ public class UIMessage extends UIItem implements LangConstants {
 				int[] pos = (int[]) ((Object[]) text.render.elementAt(l - 1))[3];
 				timeBreak = pos[0] + pos[2] + timeWidth >= cw;
 			}
+			maxW = Math.max(maxW, minW + text.contentWidth);
+		} else {
+			timeBreak = maxW + timeWidth >= cw;
 		}
 		
 		// time
-		if (timeBreak) h += MP.smallPlainFontHeight;
+		if (timeBreak) {
+			h += MP.smallPlainFontHeight;
+		} else {
+			maxW += timeWidth;
+		}
 		this.timeBreak = timeBreak;
 		
 		// comment
 		if (commentsText != null) {
+			maxW = Math.max(maxW, minW + MP.smallBoldFont.stringWidth(commentsText));
 			touchZones[order ++] = x;
 			touchZones[order ++] = h + y;
 			touchZones[order ++] = x + cw;
@@ -803,14 +820,12 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (space && !((ChatCanvas) container).reverse) h += SPACE_HEIGHT;
 		
 		touchZones[order] = Integer.MIN_VALUE;
-		// TODO pack width
-		contentWidth = maxW;
+		contentWidth = Math.min(maxW, Math.min(MAX_WIDTH, width));
 		return contentHeight = h += PADDING_HEIGHT;
 	}
 	
 	boolean grabFocus(int dir) {
 		focus = true;
-		System.out.println("grabFocus " + dir);
 		if (dir != 0 && subFocusLength != 0) {
 			if (subFocusLength != 1 || subFocus[0] != FOCUS_SENDER || !hideName) {
 				if (subFocusCurrent == -1) {
@@ -829,7 +844,6 @@ public class UIMessage extends UIItem implements LangConstants {
 	}
 	
 	private void subFocus(int idx) {
-		System.out.println("subfocus [" + idx + "] = " + subFocus[idx]);
 		switch (subFocus[idx]) {
 		case FOCUS_TEXT:
 			if (text != null) {
@@ -900,7 +914,6 @@ public class UIMessage extends UIItem implements LangConstants {
 	}
 	
 	private boolean action(int focus) {
-		System.out.println("action " + focus);
 		switch (focus) {
 		case FOCUS_SENDER:
 			profileAction();
@@ -1045,7 +1058,6 @@ public class UIMessage extends UIItem implements LangConstants {
 			x -= w - cw;
 		}
 		x -= (out && w < 900 ? MARGIN_SIDE : 0);
-		System.out.println("tap " + x + " " + y + " " + longTap);
 		if (x < 0) return false;
 		if (text != null && text.focusable && y > text.y && y < text.y + text.contentHeight) {
 			focusChild = text;
