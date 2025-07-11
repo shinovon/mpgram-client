@@ -409,6 +409,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			int l = messages.size();
 			table = new Hashtable();
 			
+			// TODO pagination buttons
+			
 			for (int i = 0; i < l; i++) {
 				JSONObject message = messages.getObject(i);
 				int id = message.getInt("id");
@@ -751,7 +753,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			}
 		}
 		
-		// popup menu TODO
+		// popup menu
 		if (menuAnimProgress != 0) {
 			int my = h - (int)menuAnimProgress;
 			g.setColor(colors[COLOR_CHAT_MENU_BG]);
