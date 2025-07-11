@@ -1082,19 +1082,21 @@ public class UIMessage extends UIItem implements LangConstants {
 			menuAction(GoTo);
 			return true;
 		}
-		for (int i = 0; i < touchZones.length && touchZones[i] != Integer.MIN_VALUE; i += 5) {
-			if (x >= touchZones[i] && y >= touchZones[i + 1] && x <= touchZones[i + 2] && y <= touchZones[i + 3]) {
-				int focus = touchZones[i + 4];
-				for (int j = 0; j < subFocusLength; j++) {
-					if (subFocus[j] == focus) {
-						subFocus(subFocusCurrent = j);
-						break;
+		if (x < contentWidth) {
+			for (int i = 0; i < touchZones.length && touchZones[i] != Integer.MIN_VALUE; i += 5) {
+				if (x >= touchZones[i] && y >= touchZones[i + 1] && x <= touchZones[i + 2] && y <= touchZones[i + 3]) {
+					int focus = touchZones[i + 4];
+					for (int j = 0; j < subFocusLength; j++) {
+						if (subFocus[j] == focus) {
+							subFocus(subFocusCurrent = j);
+							break;
+						}
 					}
+					if (!longTap && action(focus)) {
+						return true;
+					}
+					break;
 				}
-				if (!longTap && action(focus)) {
-					return true;
-				}
-				break;
 			}
 		}
 		((ChatCanvas) container).showMenu(this, menu());
