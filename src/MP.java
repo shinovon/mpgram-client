@@ -1019,6 +1019,7 @@ public class MP extends MIDlet
 							} else if (src instanceof JSONObject) { // sticker or document
 								url = instanceUrl + FILE_URL + "?a&sticker=" + ((JSONObject) src).getString("id")
 										+ "&access_hash=" + ((JSONObject) src).getString("access_hash") + "&p=rsprevs&s=32";
+//#ifndef NO_CHAT_CANVAS
 							} else if (src instanceof UIMessage) {
 								UIMessage msg = (UIMessage) src;
 								StringBuffer sb = new StringBuffer(instanceUrl);
@@ -1035,6 +1036,7 @@ public class MP extends MIDlet
 									sb.append("thumbrsprevs&s=").append(MP.smallBoldFontHeight + MP.smallPlainFontHeight);
 								}
 								url = sb.toString();
+//#endif
 							} else {
 								continue;
 							}
@@ -3307,11 +3309,14 @@ public class MP extends MIDlet
 				return;
 			}
 		}
+//#ifndef NO_CHAT_CANVAS
 		if (target instanceof UIMessage) {
 			((UIMessage) target).mediaImage = img;
 			if (((UIMessage) target).photoRenderHeight == 0) ((UIMessage) target).layoutWidth = 0;
 			((UIMessage) target).requestPaint();
+			return;
 		}
+//#endif
 //#ifndef NO_NOTIFY
 		if (target instanceof String) {
 			// notification
@@ -4959,12 +4964,15 @@ public class MP extends MIDlet
 						}
 						if (!valid) break b;
 						
+//#ifndef NO_CHAT_CANVAS
 						if (form instanceof UILabel) {
 							if (i != 0) {
 								((UILabel) form).appendWord(text.substring(0, j), f, null);
 							}
 							((UILabel) form).appendWord(text.substring(j, k), f, null);
-						} else {
+						} else
+//#endif
+						{
 							if (i != 0) {
 								s = new StringItem(null, text.substring(0, j));
 								s.setFont(f);
@@ -4996,12 +5004,15 @@ public class MP extends MIDlet
 							if (!b && (c < '0' || c > '9')) break b;
 						}
 						if (k == i + 10 || k == i + 1) break b;
+//#ifndef NO_CHAT_CANVAS
 						if (form instanceof UILabel) {
 							if (i != 0) {
 								((UILabel) form).appendWord(text.substring(0, i), f, null);
 							}
 							((UILabel) form).appendWord(text.substring(i, k), f, null);
-						} else {
+						} else
+//#endif
+						{
 							if (i != 0) {
 								s = new StringItem(null, text.substring(0, i));
 								s.setFont(f);
@@ -5023,9 +5034,12 @@ public class MP extends MIDlet
 			}
 		}
 
+//#ifndef NO_CHAT_CANVAS
 		if (form instanceof UILabel) {
 			((UILabel) form).appendWord(text, f, state != null && state[RT_URL] != 0 ? richTextUrl : null);
-		} else {
+		} else
+//#endif
+		{
 			s = new StringItem(null, text);
 			s.setFont(f);
 			if (state != null && state[RT_URL] != 0) {
