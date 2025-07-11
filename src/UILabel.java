@@ -32,7 +32,7 @@ public class UILabel extends UIItem {
 	Vector urls;
 	Vector selectedParts; String selectedUrl;
 
-	int color = -1, bgColor, linkColor;
+	int color = -1, bgColor, linkColor = 0x0000FF, focusColor = 0xABABAB;
 	boolean center, ellipsis, background;
 	
 	int focusIndex;
@@ -77,7 +77,7 @@ public class UILabel extends UIItem {
 			g.setFont(font);
 			g.drawString(text, tx, ty, 0);
 			if (focus && selectedParts != null && selectedParts.contains(obj)) {
-				g.setColor(0xababab);
+				g.setColor(focusColor);
 				g.drawRect(tx, ty, tw, th);
 				g.setColor(color);
 			} else if (obj[2] != null) {

@@ -26,6 +26,24 @@ import javax.microedition.lcdui.Image;
 
 public class UIMessage extends UIItem implements LangConstants {
 	
+	// colors enum
+	static final int COLOR_MESSAGE_BG = 20;
+	static final int COLOR_MESSAGE_OUT_BG = 21;
+	static final int COLOR_MESSAGE_FG = 22;
+	static final int COLOR_MESSAGE_LINK = 23;
+	static final int COLOR_MESSAGE_LINK_FOCUS = 24;
+	static final int COLOR_MESSAGE_SENDER = 25;
+	static final int COLOR_MESSAGE_ATTACHMENT_BORDER = 26;
+	static final int COLOR_MESSAGE_ATTACHMENT_TITLE = 27;
+	static final int COLOR_MESSAGE_ATTACHMENT_SUBTITLE = 28;
+	static final int COLOR_MESSAGE_ATTACHMENT_FOCUS_BG = 29;
+	static final int COLOR_MESSAGE_COMMENT_BORDER = 30;
+	static final int COLOR_MESSAGE_IMAGE = 31;
+	static final int COLOR_MESSAGE_FOCUS_BORDER = 32;
+	static final int COLOR_MESSAGE_TIME = 33;
+	static final int COLOR_MESSAGE_OUT_TIME = 34;
+	static final int COLOR_ACTION_BG = 35;
+	
 	private static final int MAX_WIDTH = 440;
 	private static final int MARGIN_TOP = 1;
 	private static final int MARGIN_WIDTH = 2;
@@ -110,11 +128,12 @@ public class UIMessage extends UIItem implements LangConstants {
 			String user = act.getString("user", null);
 			
 			UILabel label = new UILabel();
-			label.color = -1;
-			label.linkColor = -1;
-			label.bgColor = 0x1E2C3A;
+			label.color = ChatCanvas.colors[COLOR_MESSAGE_FG];
+			label.linkColor = ChatCanvas.colors[COLOR_MESSAGE_FG];
+			label.bgColor = ChatCanvas.colors[COLOR_ACTION_BG];
 			label.background = true;
 			label.center = true;
+			label.focusColor = ChatCanvas.colors[COLOR_MESSAGE_LINK_FOCUS];
 			
 			String t = null;
 			l: {
@@ -349,8 +368,9 @@ public class UIMessage extends UIItem implements LangConstants {
 			} else {
 				label = new UILabel(text, MP.smallPlainFont, null);
 			}
-			label.color = -1;
-			label.linkColor = 0x71BAFA;
+			label.color = ChatCanvas.colors[COLOR_MESSAGE_FG];
+			label.linkColor = ChatCanvas.colors[COLOR_MESSAGE_LINK];
+			label.focusColor = ChatCanvas.colors[COLOR_MESSAGE_LINK_FOCUS];
 			if (label.focusable) subFocus[order++] = FOCUS_TEXT;
 			this.text = label;
 		}
@@ -382,10 +402,10 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (showDate) {
 			if (((ChatCanvas) container).reverse) {
 				y += MARGIN_TOP;
-				g.setColor(0x1E2C3A);
+				g.setColor(ChatCanvas.colors[COLOR_ACTION_BG]);
 				g.setFont(MP.smallBoldFont);
 				g.fillRect((((w - dateWidth)) >> 1) - 4, y, dateWidth + 8, MP.smallBoldFontHeight + DATE_PADDING_HEIGHT * 2);
-				g.setColor(-1);
+				g.setColor(ChatCanvas.colors[COLOR_MESSAGE_FG]);
 				g.drawString(dateRender, (w - dateWidth) >> 1, y += DATE_PADDING_HEIGHT, 0);
 				y += DATE_MARGIN_HEIGHT + DATE_PADDING_HEIGHT + MP.smallBoldFontHeight;
 			}
@@ -395,7 +415,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (action) {
 			if (text != null) {
 				y += MARGIN_TOP;
-				g.setColor(0x1E2C3A);
+				g.setColor(ChatCanvas.colors[COLOR_ACTION_BG]);
 				g.fillRect(x + (w - text.contentWidth - PADDING_WIDTH) >> 1, y, text.contentWidth + PADDING_WIDTH, text.contentHeight + PADDING_HEIGHT * 2);
 				text.paint(g, x, y + PADDING_HEIGHT, w);
 			}
@@ -405,11 +425,11 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (out && w < 900) {
 			x += w - cw;
 		}
-		g.setColor(out ? 0x2B5278 : 0x182533); // TODO message bg color
+		g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_BG : COLOR_MESSAGE_BG]);
 		g.fillRect(x += MARGIN_WIDTH + (out && w < 900 ? MARGIN_SIDE : 0), y += MARGIN_TOP,
 				cw -= MARGIN_WIDTH * 2 + MARGIN_SIDE, h -= (MARGIN_TOP));
 		if (focus && focusChild == null && subFocusCurrent == -1) {
-			g.setColor(-1);
+			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_FOCUS_BORDER]);
 			g.drawRect(x, y, cw - 1, h - 1);
 		}
 		int rw = cw;
@@ -422,11 +442,11 @@ public class UIMessage extends UIItem implements LangConstants {
 		
 		// name
 		if (!hideName) {
-			g.setColor(0x71BAFA); // TODO message author color
+			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_SENDER]);
 			g.setFont(MP.smallBoldFont);
 			if (nameRender != null) g.drawString(nameRender, x, y, 0);
 			if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_SENDER) {
-				g.setColor(0xababab);
+				g.setColor(ChatCanvas.colors[COLOR_MESSAGE_LINK_FOCUS]);
 				g.drawRect(x, y, senderWidth, MP.smallBoldFontHeight);
 			}
 			y += MP.smallBoldFontHeight;
@@ -434,7 +454,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		
 		// forward
 		if (fwd) {
-			g.setColor(0x71BAFA);
+			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_SENDER]);
 			if (forwardedFromWidth != 0) {
 				g.setFont(MP.smallPlainFont);
 				g.drawString(MP.L[ForwardedFrom], x, y, 0);
@@ -444,7 +464,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				g.setFont(MP.smallBoldFont);
 				g.drawString(forwardRender, x + forwardedFromWidth, y, 0);
 				if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_FORWARD) {
-					g.setColor(0xababab);
+					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_LINK_FOCUS]);
 					g.drawRect(x + forwardedFromWidth, y, forwardNameWidth, MP.smallBoldFontHeight);
 				}
 			}
@@ -454,31 +474,31 @@ public class UIMessage extends UIItem implements LangConstants {
 		// reply
 		if (reply) {
 			y += 2;
-			g.setColor(0x71BAFA);
+			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_BORDER]);
 			int rh = MP.smallPlainFontHeight;
 			if (replyName != null) {
 				rh += MP.smallPlainFontHeight;
 			}
 			g.fillRect(x, y, 2, rh);
 			if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_REPLY) {
-				g.setColor(0x1A3756);
+				g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_FOCUS_BG]);
 				g.fillRect(x + 2, y, cw - 4, rh);
 			}
 			int px = x + 6;
 			if (replyNameRender != null) {
-				g.setColor(-1);
+				g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_TITLE]);
 				g.setFont(MP.smallBoldFont);
 				g.drawString(replyNameRender, px, y, 0);
 				y += MP.smallBoldFontHeight;
 			}
 			if (replyPrefix != null) {
-				g.setColor(0x71BAFA);
+				g.setColor(ChatCanvas.colors[COLOR_MESSAGE_SENDER]);
 				g.setFont(MP.smallPlainFont);
 				g.drawString(replyPrefix, px, y, 0);
 				px += MP.smallPlainFontSpaceWidth + replyPrefixWidth;
 			}
 			if (replyTextRender != null) {
-				g.setColor(-1);
+				g.setColor(ChatCanvas.colors[COLOR_MESSAGE_FG]);
 				g.setFont(MP.smallPlainFont);
 				g.drawString(replyTextRender, px, y, 0);
 			}
@@ -491,7 +511,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			if ((photo || sticker) && mediaTitle == null) {
 				if (mediaImage == null) {
 					// TODO photo placeholder
-					g.setColor(0);
+					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_IMAGE]);
 					g.fillRect(x, y + 1, photoRenderWidth, photoRenderHeight);
 				} else {
 					int clipX = g.getClipX(), clipY = g.getClipY(), clipW = g.getClipWidth(), clipH = g.getClipHeight();
@@ -501,11 +521,11 @@ public class UIMessage extends UIItem implements LangConstants {
 				}
 				y += photoRenderHeight + 2;
 			} else {
-				g.setColor(0x6AB3F3);
+				g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_BORDER]);
 				int rh = mediaRenderHeight;
 				g.fillRect(x, y, 2, rh);
 				if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_MEDIA) {
-					g.setColor(0x1A3756);
+					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_FOCUS_BG]);
 					g.fillRect(x + 2, y, cw - 4, rh);
 				}
 				int px = x + 6;
@@ -515,19 +535,19 @@ public class UIMessage extends UIItem implements LangConstants {
 						g.drawImage(mediaImage, px, ty, 0);
 					} else {
 						// TODO thumb placeholder
-//						g.setColor(0);
+//						g.setColor(ChatCanvas.colors[COLOR_MESSAGE_IMAGE]);
 //						g.fillRect(px, y, s, s);
 					}
 					px += s + 2;
 				}
 				if (mediaTitleRender != null) {
-					g.setColor(-1);
+					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_FG]);
 					g.setFont(MP.smallBoldFont);
 					g.drawString(mediaTitleRender, px, y, 0);
 					y += MP.smallBoldFontHeight;
 				}
 				if (mediaSubtitleRender != null) {
-					g.setColor(0x71BAFA);
+					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_SUBTITLE]);
 					g.setFont(MP.smallPlainFont);
 					g.drawString(mediaSubtitleRender, px, y, 0);
 					y += MP.smallPlainFontHeight;
@@ -547,7 +567,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		
 		// time
 		if (timeBreak) y += MP.smallPlainFontHeight;
-		g.setColor(out ? 0x7DA8D3 : 0x6D7F8F);
+		g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_TIME : COLOR_MESSAGE_TIME]);
 		g.setFont(MP.smallPlainFont);
 		g.drawString(time, rx + rw - TIME_PADDING_WIDTH, y + PADDING_HEIGHT - TIME_PADDING_HEIGHT, Graphics.BOTTOM | Graphics.RIGHT);
 		if (edited) {
@@ -559,11 +579,11 @@ public class UIMessage extends UIItem implements LangConstants {
 		// comment
 		if (commentsText != null) {
 			y += PADDING_HEIGHT;
-			g.setColor(0x31404E);
+			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_COMMENT_BORDER]);
 			g.drawLine(rx, y, rx + cw, y++);
 			
 			g.setFont(MP.smallBoldFont);
-			g.setColor(0x71BAFA);
+			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_SENDER]);
 			g.drawString(commentsText, x, y, 0);
 			y += PADDING_HEIGHT + MP.smallBoldFontHeight;
 		}
@@ -573,10 +593,10 @@ public class UIMessage extends UIItem implements LangConstants {
 		// date not reversed
 		if (showDate && !((ChatCanvas) container).reverse) {
 			y += DATE_MARGIN_HEIGHT;
-			g.setColor(0x1E2C3A);
+			g.setColor(ChatCanvas.colors[COLOR_ACTION_BG]);
 			g.setFont(MP.smallBoldFont);
 			g.fillRect(x - PADDING_WIDTH + (w - dateWidth - x) >> 1, y, dateWidth + PADDING_WIDTH * 2, MP.smallBoldFontHeight + DATE_PADDING_HEIGHT * 2);
-			g.setColor(-1);
+			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_FG]);
 			g.drawString(dateRender, x + (w - dateWidth - x) >> 1, y += DATE_PADDING_HEIGHT, 0);
 			y += DATE_MARGIN_HEIGHT + DATE_PADDING_HEIGHT + MP.smallBoldFontHeight;
 		}

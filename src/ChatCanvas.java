@@ -31,6 +31,22 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Ticker;
 
 public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnable {
+	
+	// colors enum
+	static final int COLOR_CHAT_BG = 0;
+	static final int COLOR_CHAT_FG = 1;
+	static final int COLOR_CHAT_HIGHLIGHT_BG = 2;
+	static final int COLOR_CHAT_PANEL_BG = 3;
+	static final int COLOR_CHAT_PANEL_FG = 4;
+	static final int COLOR_CHAT_PANEL_BORDER = 5;
+	static final int COLOR_CHAT_MENU_BG = 6;
+	static final int COLOR_CHAT_MENU_HIGHLIGHT_BG = 7;
+	static final int COLOR_CHAT_MENU_FG = 8;
+	static final int COLOR_CHAT_STATUS_FG = 9;
+	static final int COLOR_CHAT_STATUS_HIGHLIGHT_FG = 10;
+	static final int COLOR_CHAT_POINTER_HOLD = 11;
+	
+	static int[] colors = new int[40];
 
 	boolean loaded, finished, canceled;
 	Thread thread;
@@ -132,8 +148,41 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	String titleRender;
 	
+	boolean hasField;
+	
 	ChatCanvas() {
 		setFullScreenMode(true);
+		
+		colors[COLOR_CHAT_BG] = 0x0E1621;
+		colors[COLOR_CHAT_FG] = 0xFFFFFF;
+//		colors[COLOR_CHAT_HIGHLIGHT_BG] = ;
+		colors[COLOR_CHAT_PANEL_BG] = 0x17212B;
+		colors[COLOR_CHAT_PANEL_FG] = 0xFFFFFF;
+		colors[COLOR_CHAT_PANEL_BORDER] = 0x0A121B;
+		colors[COLOR_CHAT_MENU_BG] = 0x17212B;
+		colors[COLOR_CHAT_MENU_HIGHLIGHT_BG] = 0x232E3C;
+		colors[COLOR_CHAT_MENU_FG] = 0xFFFFFF;
+		colors[COLOR_CHAT_STATUS_FG] = 0x708499;
+		colors[COLOR_CHAT_STATUS_HIGHLIGHT_FG] = 0x73B9F5;
+		colors[COLOR_CHAT_POINTER_HOLD] = 0xFFFFFF;
+		
+		colors[UIMessage.COLOR_MESSAGE_BG] = 0x182533;
+		colors[UIMessage.COLOR_MESSAGE_OUT_BG] = 0x2B5278;
+		colors[UIMessage.COLOR_MESSAGE_FG] = 0xFFFFFF;
+		colors[UIMessage.COLOR_MESSAGE_LINK] = 0x71BAFA;
+		colors[UIMessage.COLOR_MESSAGE_LINK_FOCUS] = 0xABABAB; // TODO
+		colors[UIMessage.COLOR_MESSAGE_SENDER] = 0x71BAFA;
+		colors[UIMessage.COLOR_MESSAGE_ATTACHMENT_BORDER] = 0x6AB3F3;
+		colors[UIMessage.COLOR_MESSAGE_ATTACHMENT_TITLE] = 0xFFFFFF;
+		colors[UIMessage.COLOR_MESSAGE_ATTACHMENT_SUBTITLE] = 0x7DA8D3;
+		colors[UIMessage.COLOR_MESSAGE_ATTACHMENT_FOCUS_BG] = 0x1A3756;
+		colors[UIMessage.COLOR_MESSAGE_COMMENT_BORDER] = 0x31404E;
+		colors[UIMessage.COLOR_MESSAGE_IMAGE] = 0xABABAB; // TODO
+		colors[UIMessage.COLOR_MESSAGE_FOCUS_BORDER] = 0xFFFFFF;
+		colors[UIMessage.COLOR_MESSAGE_TIME] = 0x6D7F8F;
+		colors[UIMessage.COLOR_MESSAGE_OUT_TIME] = 0x7DA8D3;
+		colors[UIMessage.COLOR_ACTION_BG] = 0x1E2C3A;
+		
 		if (touch) {
 			top = MP.smallBoldFontHeight + MP.smallPlainFontHeight + 8;
 		} else {
@@ -161,6 +210,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 	
 	private void init(boolean field) {
+		hasField = field;
 	}
 
 	public void load() {
@@ -378,7 +428,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			
 			// postLoad
 			loading = false;
-			if (touch && (canWrite || left) && mediaFilter == null && query == null) {
+			if (touch && hasField && (canWrite || left) && mediaFilter == null && query == null) {
 				bottom = Math.max(MP.medPlainFontHeight + 16, 48);
 			} else {
 				bottom = 0;
@@ -456,9 +506,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		g.setClip(0, 0, w, h);
 		
 		if (loading) {
-			g.setColor(0x0E1621);
+			g.setColor(colors[COLOR_CHAT_BG]);
 			g.fillRect(0, 0, w, h);
-			g.setColor(-1);
+			g.setColor(colors[COLOR_CHAT_FG]);
 			g.setFont(MP.medPlainFont);
 			g.drawString(MP.L[Loading], w >> 1, h >> 1, Graphics.TOP | Graphics.HCENTER);
 			return;
@@ -580,9 +630,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 //		System.out.println("scroll " + scroll + " / " + (contentHeight - clipHeight));
 		
 		// background
-		g.setColor(0x0E1621);
+		g.setColor(colors[COLOR_CHAT_BG]);
 		g.fillRect(0, 0, w, h);
-		g.setColor(-1);
+		g.setColor(colors[COLOR_CHAT_FG]);
 		
 		// render items
 		
@@ -618,15 +668,15 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		// top panel
 		if (top != 0) {
 			int th = top;
-			g.setColor(0x17212B);
+			g.setColor(colors[COLOR_CHAT_PANEL_BG]);
 			g.fillRect(0, 0, w, th);
-			g.setColor(0x0A121B);
+			g.setColor(colors[COLOR_CHAT_PANEL_BORDER]);
 			g.drawLine(0, th, w, th);
 			
 			int tx = 4;
 			int tw = w - 8;
 			if (touch) {
-				g.setColor(-1);
+				g.setColor(colors[COLOR_CHAT_PANEL_FG]);
 				tx = 40;
 				tw = w - 80;
 				int bty = (th - 2) >> 1;
@@ -649,13 +699,13 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				if (titleRender == null) {
 					titleRender = UILabel.ellipsis(title, font, tw - 4);
 				}
-				g.setColor(-1);
+				g.setColor(colors[COLOR_CHAT_FG]);
 				g.setFont(font);
 				g.drawString(titleRender, tx, showStatus ? hideStatus ? (th - MP.medPlainFontHeight) >> 1 : 4 : 2, 0);
 			}
 			// TODO status ellipsis
 			if (showStatus && !hideStatus) {
-				g.setColor(typing != 0 ? 0x73B9F5 : 0x708499);
+				g.setColor(colors[typing != 0 ? COLOR_CHAT_STATUS_HIGHLIGHT_FG : COLOR_CHAT_STATUS_FG]);
 				g.setFont(MP.smallPlainFont);
 				String status = this.status;
 				if (status == null) {
@@ -669,21 +719,21 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		
 		// bottom panel
 		if (bottom != 0) {
-			g.setColor(0x17212B);
+			g.setColor(colors[COLOR_CHAT_PANEL_BG]);
 			int by = h - bottom;
 			g.fillRect(0, by, w, bottom);
-			g.setColor(0x0A121B);
+			g.setColor(colors[COLOR_CHAT_PANEL_BORDER]);
 			g.drawLine(0, by, w, by);
+			g.setColor(colors[COLOR_CHAT_PANEL_FG]);
 			if (fieldFocused) {
 				// TODO
 				by += 1;
-				g.setColor(-1);
 				g.drawString(MP.L[Chat], 2, by, Graphics.TOP | Graphics.LEFT);
 				g.drawString(MP.L[Back], w - 2, by, Graphics.TOP | Graphics.RIGHT);
-				g.drawString(MP.L[Write], w >> 1, by, Graphics.TOP | Graphics.HCENTER);
+				if (hasField && canWrite)
+					g.drawString(MP.L[Write], w >> 1, by, Graphics.TOP | Graphics.HCENTER);
 			} else if (keyGuide) {
 				animate = true;
-				g.setColor(-1);
 				g.drawString(MP.L[Menu], 2, by + 1, Graphics.TOP | Graphics.LEFT);
 				g.drawString(MP.L[Back], w - 2, by + 1, Graphics.TOP | Graphics.RIGHT);
 				if (keyGuideTime == 0) {
@@ -694,7 +744,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				}
 			} else if (touch) {
 				// TODO
-				g.setColor(-1);
 				g.setFont(MP.medPlainFont);
 				if (canWrite) {
 					g.drawString(MP.L[TextField_Hint], 40, by + ((bottom - MP.medPlainFontHeight) >> 1), 0);
@@ -707,7 +756,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		// popup menu TODO
 		if (menuAnimProgress != 0) {
 			int my = h - (int)menuAnimProgress;
-			g.setColor(0x17212B);
+			g.setColor(colors[COLOR_CHAT_MENU_BG]);
 			g.fillRect(0, my, w, (int)menuAnimProgress);
 			if (menu != null) {
 				int[] menu = this.menu;
@@ -715,10 +764,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				for (int i = 0; i < menu.length; i++) {
 					if (menu[i] == Integer.MIN_VALUE) break;
 					if (i == menuCurrent && (!touch || menuCurrent != -1)) {
-						g.setColor(0x232E3C);
+						g.setColor(colors[COLOR_CHAT_MENU_HIGHLIGHT_BG]);
 						g.fillRect(0, my, w, MP.medPlainFontHeight + 8);
 					}
-					g.setColor(-1);
+					g.setColor(colors[COLOR_CHAT_MENU_FG]);
 					g.drawString(MP.L[menu[i]], 4, my + 4, 0);
 					my += MP.medPlainFontHeight + 8;
 //					g.setColor(0x232F39);
@@ -732,7 +781,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				&& pointedItem != null && pointedItem.focusable) {
 			animate = true;
 			if (now - pressTime > 200) {
-				g.setColor(-1);
+				g.setColor(colors[COLOR_CHAT_POINTER_HOLD]);
 				int size = Math.min(360, (int) (now - pressTime - 200) / 2);
 				g.fillArc(pointerX - 25, pointerY - 25, 50, 50, 90, size);
 				if (size >= 360) {
@@ -884,7 +933,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				menuItem = null;
 				menu = null;
 			} else if (fieldFocused) {
-				showMenu(null, canWrite ? new int[] { Refresh, ChatInfo, SendSticker } : new int[] { Refresh, ChatInfo });
+				showMenu(null, canWrite && hasField ? new int[] { Refresh, ChatInfo, SendSticker } : new int[] { Refresh, ChatInfo });
 			} else {
 				if (focusedItem != null && focusedItem.focusable) {
 					int[] menu = focusedItem.menu();
@@ -917,7 +966,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				repaint = true;
 			} else if (key == -5 || game == Canvas.FIRE) {
 				// TODO text field
-				MP.midlet.commandAction(MP.writeCmd, this);
+				if (canWrite && hasField) {
+					MP.midlet.commandAction(MP.writeCmd, this);
+				}
 			}
 		} else if (key == -5 || game == Canvas.FIRE) {
 			// action
@@ -1070,7 +1121,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (contentPressed) {
 			if (!longTap) {
 				if (!dragging) {
-					if (now - pressTime < 300 && pointedItem != null && pointedItem.focusable) {
+					if (kineticScroll != 0) {
+						kineticScroll = 0;
+					} else if (now - pressTime < 300 && pointedItem != null && pointedItem.focusable) {
 						focusItem(pointedItem, 0);
 						pointedItem.tap(x,
 								reverse ? y - (scroll - bottom - pointedItem.y + height - pointedItem.contentHeight)
@@ -1123,7 +1176,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				// TODO
 				if (left) {
 					MP.midlet.start(MP.RUN_JOIN_CHANNEL, id);
-				} else {
+				} else if (canWrite) {
 					MP.midlet.commandAction(MP.writeCmd, this);
 				}
 			}
