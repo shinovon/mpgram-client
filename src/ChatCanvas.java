@@ -47,6 +47,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	static final int COLOR_CHAT_POINTER_HOLD = 11;
 	
 	static int[] colors = new int[40];
+	static int[] colorsCopy;
+	static boolean shiftColors;
 
 	boolean loaded, finished, canceled;
 	Thread thread;
@@ -182,6 +184,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		colors[UIMessage.COLOR_MESSAGE_TIME] = 0x6D7F8F;
 		colors[UIMessage.COLOR_MESSAGE_OUT_TIME] = 0x7DA8D3;
 		colors[UIMessage.COLOR_ACTION_BG] = 0x1E2C3A;
+		
+		colorsCopy = new int[colors.length];
+		for (int i = 0; i < colors.length; ++i) {
+			colorsCopy[i] = colors[i];
+		}
 		
 		if (touch) {
 			top = MP.smallBoldFontHeight + MP.smallPlainFontHeight + 8;
@@ -797,6 +804,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			}
 		}
 		
+		if (shiftColors) shiftColors = false;
+		
 //		g.setColor(-1);
 //		g.setFont(MP.smallPlainFont);
 //		g.drawString("f" + (System.currentTimeMillis() - now) + " r" + (deltaTime) + " i" + renderedItems, 20, 20, 0);
@@ -910,10 +919,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				MP.midlet.commandAction(MP.backCmd, this);
 				return;
 			} else if (menuFocused) {
-				menuFocused = false;
-				menuAnimTarget = 0;
-				menuItem = null;
-				menu = null;
+				closeMenu();
 			} else if (fieldFocused) {
 //				fieldFocused = false;
 //				fieldAnimTarget = 0;
@@ -928,17 +934,13 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			if (repeat) return;
 			// menu
 			if (menuFocused) {
-				menuFocused = false;
-				menuAnimTarget = 0;
-				menuItem = null;
-				menu = null;
+				closeMenu();
 			} else if (fieldFocused) {
 				showMenu(null, canWrite && hasField ? new int[] { Refresh, ChatInfo, SendSticker } : new int[] { Refresh, ChatInfo });
 			} else {
 				if (focusedItem != null && focusedItem.focusable) {
 					int[] menu = focusedItem.menu();
 					if (menu != null && menu.length != 0) {
-						menuFocused = true;
 						showMenu(focusedItem, menu);
 					}
 				}
@@ -1432,6 +1434,16 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		}
 		menuCount = len;
 		menuAnimTarget = (MP.medPlainFontHeight + 8) * len;
+		
+		if (len != 0 && menu != null) {
+			for (int i = 0; i < colors.length; ++i) {
+				if (i == COLOR_CHAT_MENU_BG || i == COLOR_CHAT_MENU_HIGHLIGHT_BG || i == COLOR_CHAT_MENU_FG)
+					continue;
+				int c = colorsCopy[i];
+				colors[i] = ((((c >> 16) & 0xFF) * 15) >> 5) << 16 | ((((c >> 8) & 0xFF) * 15) >> 5) << 8 | ((((c) & 0xFF) * 15) >> 5);
+			}
+		}
+		shiftColors = true;
 	}
 	
 	void closeMenu() {
@@ -1439,6 +1451,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		menuItem = null;
 		menu = null;
 		menuAnimTarget = 0;
+		for (int i = 0; i < colors.length; ++i) {
+			colors[i] = colorsCopy[i];
+		}
+		shiftColors = true;
 	}
 	
 	public void requestPaint(UIItem item) {
