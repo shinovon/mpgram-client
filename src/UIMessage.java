@@ -510,7 +510,6 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (media) {
 			if ((photo || sticker) && mediaTitle == null) {
 				if (mediaImage == null) {
-					// TODO photo placeholder
 					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_IMAGE]);
 					g.fillRect(x, y + 1, photoRenderWidth, photoRenderHeight);
 				} else {
@@ -518,6 +517,11 @@ public class UIMessage extends UIItem implements LangConstants {
 					g.setClip(x, y + 1, photoRenderWidth, photoRenderHeight);
 					g.drawImage(mediaImage, x, y + 1, 0);
 					g.setClip(clipX, clipY, clipW, clipH);
+				}
+				if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_MEDIA) {
+					// TODO improve contrast
+					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_LINK_FOCUS]);
+					g.drawRect(x, y + 1, photoRenderWidth, photoRenderHeight);
 				}
 				y += photoRenderHeight + 2;
 			} else {
@@ -532,7 +536,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				if (mediaThumb) {
 					int s = MP.smallBoldFontHeight + MP.smallPlainFontHeight;
 					if (mediaImage != null) {
-						g.drawImage(mediaImage, px, ty, 0);
+						g.drawImage(mediaImage, px, y + ((s - mediaImage.getHeight()) >> 1), 0);
 					} else {
 						// TODO thumb placeholder
 //						g.setColor(ChatCanvas.colors[COLOR_MESSAGE_IMAGE]);
