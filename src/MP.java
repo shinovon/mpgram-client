@@ -2803,11 +2803,13 @@ public class MP extends MIDlet
 				start(RUN_LOAD_LIST, d);
 				return;
 			}
+//#ifndef NO_CHAT_CANVAS
 			if (d instanceof ChatCanvas) {
 				((ChatCanvas) d).cancel();
 				start(RUN_LOAD_FORM, d);
 				return;
 			}
+//#endif
 			return;
 		}
 		if (c == updateCmd) {
@@ -3620,10 +3622,12 @@ public class MP extends MIDlet
 			}
 			return;
 		}
+//#ifndef NO_CHAT_CANVAS
 		if (useChatCanvas) {
 			openLoad(new ChatCanvas(id, null, msg, 0));
 			return;
 		}
+//#endif
 		openLoad(new ChatForm(id, null, msg, 0));
 	}
 	
@@ -4111,11 +4115,15 @@ public class MP extends MIDlet
 							((MPChat) current).openMessage(messageId, topMsg);
 						} else {
 							MPChat chat;
+//#ifndef NO_CHAT_CANVAS
 							if (useChatCanvas) {
 								chat = new ChatCanvas(domain, null, msg, topMsg);
 							} else {
+//#endif
 								chat = new ChatForm(domain, null, msg, topMsg);
+//#ifndef NO_CHAT_CANVAS
 							}
+//#endif
 							if (start != null) chat.setStartBot(start);
 							openLoad((Displayable) chat);
 						}
