@@ -506,10 +506,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 	
 	public void showNotify() {
-//		if (!touch && keyGuideTime == 0) {
-//			keyGuide = true;
-//			fieldAnimTarget = MP.smallBoldFontHeight + 2;
-//		}
+		if (!touch && keyGuideTime == 0) {
+			keyGuide = true;
+			fieldAnimTarget = MP.smallBoldFontHeight + 2;
+		}
 		repaint();
 	}
 	
