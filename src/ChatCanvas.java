@@ -103,7 +103,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	Hashtable table;
 	
 	int count;
-	UIItem firstMessage, lastMessage;
+	UIItem firstItem, lastItem;
 	UIItem layoutStart;
 	
 	// boundaries
@@ -159,13 +159,15 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	boolean hasInput;
 	
+	int selected;
+	
 	ChatCanvas() {
 		setFullScreenMode(true);
 		
 		if (colorsCopy == null) {
 			colors[COLOR_CHAT_BG] = 0x0E1621;
 			colors[COLOR_CHAT_FG] = 0xFFFFFF;
-//			colors[COLOR_CHAT_HIGHLIGHT_BG] = ;
+			colors[COLOR_CHAT_HIGHLIGHT_BG] = 0x1A3756;
 			colors[COLOR_CHAT_PANEL_BG] = 0x17212B;
 			colors[COLOR_CHAT_PANEL_FG] = 0xFFFFFF;
 			colors[COLOR_CHAT_PANEL_BORDER] = 0x0A121B;
@@ -244,7 +246,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		try {
 			// remove all
 			count = 0;
-			firstMessage = lastMessage = null;
+			firstItem = lastItem = null;
 			scrollCurrentItem = scrollTargetItem = focusedItem = null;
 			titleRender = null;
 			
@@ -430,7 +432,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			int l = messages.size();
 			table = new Hashtable();
 			
-			// TODO pagination buttons
+			if (!endReached && hasOffset) {
+				add(new UIPageButton(1));
+			}
 			
 			for (int i = 0; i < l; i++) {
 				JSONObject message = messages.getObject(i);
@@ -445,6 +449,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						: (i == 0 ? ((endReached && dir == 0) || dir == -1) : (i == l - 1 && dir == 1)));
 			}
 			
+			if (l == limit && j.has("count")) {
+				add(new UIPageButton(-1));
+			}
+			
 			finished = true;
 	
 			if (thread != this.thread) return;
@@ -456,7 +464,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			} else {
 				bottom = 0;
 			}
-			layoutStart = firstMessage;
+			layoutStart = firstItem;
 			if (endReached && !hasOffset
 					&& query == null && mediaFilter == null
 					&& MP.chatUpdates && !update) {
@@ -543,7 +551,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		long deltaTime = now - lastPaintTime;
 		if (deltaTime > 500) deltaTime = 500;
 		if (width != w) {
-			layoutStart = firstMessage;
+			layoutStart = firstItem;
 			titleRender = null;
 		}
 		width = w; height = h;
@@ -657,7 +665,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		
 		// render items
 		
-		UIItem msg = firstMessage;
+		UIItem msg = firstItem;
 		if (msg != null) {
 			g.setClip(0, top, w, clipHeight);
 			if (reverse) {
@@ -1247,7 +1255,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	public void requestLayout(UIItem item) {
 		if (layoutStart != null || item == null) {
-			layoutStart = firstMessage;
+			layoutStart = firstItem;
 		} else {
 			layoutStart = (UIItem) item;
 		}
@@ -1282,7 +1290,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		
 		contentHeight = y;
 		
-		if (prevScrollItemY != 0) {
+		if (prevScrollItemY != 0 && scroll != 0) {
 			scroll = prevScroll - prevScrollItemY + scrollItem.y;
 		}
 	}
@@ -1303,12 +1311,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	void addFirst(UIItem item) {
 		if (item == null) return;
 		count++;
-		if (firstMessage == null) {
-			firstMessage = lastMessage = item;
+		if (firstItem == null) {
+			firstItem = lastItem = item;
 		} else {
-			item.next = firstMessage;
-			firstMessage.layoutWidth = 0;
-			firstMessage = (firstMessage.prev = item);
+			item.next = firstItem;
+			firstItem.layoutWidth = 0;
+			firstItem = (firstItem.prev = item);
 		}
 		item.container = this;
 		requestLayout(item);
@@ -1317,12 +1325,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	void add(UIItem item) {
 		if (item == null) return;
 		count++;
-		if (firstMessage == null || lastMessage == null) {
-			firstMessage = lastMessage = item;
+		if (firstItem == null || lastItem == null) {
+			firstItem = lastItem = item;
 		} else {
-			item.prev = lastMessage;
-			lastMessage.layoutWidth = 0;
-			lastMessage = (lastMessage.next = item);
+			item.prev = lastItem;
+			lastItem.layoutWidth = 0;
+			lastItem = (lastItem.next = item);
 		}
 		item.container = this;
 		requestLayout(item);
@@ -1330,16 +1338,20 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	void remove(UIItem item) {
 		if (item == null) return;
-		UIItem i = firstMessage;
+		UIItem i = firstItem;
 		if (i == null) return;
-		table.remove(Integer.toString(((UIMessage) item).id));
+		if (item instanceof UIMessage) {
+			if (((UIMessage) item).selected)
+				-- selected;
+			table.remove(Integer.toString(((UIMessage) item).id));
+		}
 		do {
 			if (i == item) {
-				if (item == firstMessage) {
-					firstMessage = item.next;
+				if (item == firstItem) {
+					firstItem = item.next;
 				}
-				if (item == lastMessage) {
-					lastMessage = item.prev;
+				if (item == lastItem) {
+					lastItem = item.prev;
 				}
 				if (item.prev != null) {
 					item.prev.layoutWidth = 0;
@@ -1355,8 +1367,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				break;
 			}
 		} while ((i = i.next) != null);
-		if (lastMessage == null) {
-			lastMessage = firstMessage;
+		if (lastItem == null) {
+			lastItem = firstItem;
 		}
 	}
 	
@@ -1410,7 +1422,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 	
 	private UIItem getFirstFocusableItemOnScreen(UIItem offset, int dir, int offsetHeight) {
-		if (offset == null) offset = firstMessage;
+		if (offset == null) offset = firstItem;
 		UIItem res = null;
 		for (offset = (dir == -1 ? offset.prev : offset.next); offset != null; offset = (dir == -1 ? offset.prev : offset.next)) {
 			UIItem t = offset;
@@ -1429,7 +1441,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			y -= top - scroll;
 		}
 		if (y < scroll || y > clipHeight + scroll) return null;
-		UIItem item = firstMessage;
+		UIItem item = firstItem;
 		do {
 			if (y >= item.y && y < item.y + item.contentHeight) {
 				return item;
@@ -1652,7 +1664,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			
 			// delete old messages
 			while (count >= limit) {
-				remove(lastMessage);
+				remove(lastItem instanceof UIPageButton ? lastItem.prev : lastItem);
 			}
 			
 			addFirst(new UIMessage(update.getObject("message"), this));

@@ -58,7 +58,8 @@ public class UIItem {
 	 * @return true if successful
 	 */
 	boolean grabFocus(int dir) {
-		return false;
+		if (!focusable) return false;
+		return focus = true;
 	}
 	
 	void lostFocus() {

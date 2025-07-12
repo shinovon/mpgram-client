@@ -71,6 +71,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	int[] subFocus = new int[8];
 	int subFocusLength;
 	int[] touchZones = new int[31]; /* [x1, y1, x2, y2, action], ..., Integer.MIN_VALUE */
+	boolean selected;
 	
 	int id;
 	boolean out;
@@ -443,7 +444,6 @@ public class UIMessage extends UIItem implements LangConstants {
 		x += PADDING_WIDTH;
 		y += PADDING_HEIGHT;
 //		cw -= PADDING;
-		int ty = y;
 		
 		// name
 		if (!hideName) {
@@ -630,7 +630,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			boolean reverse = chat.reverse;
 			
 			date: {
-				if (this.next != null) {
+				if (this.next != null && this.next instanceof UIMessage) {
 					UIMessage next = (UIMessage) this.next;
 					if (dateRender.equals(next.dateRender)) {
 						showDate = false;
@@ -646,7 +646,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			}
 			if (!chat.broadcast) {
 				boolean group = false;
-				if (this.next != null) {
+				if (this.next != null && this.next instanceof UIMessage) {
 					UIMessage next = (UIMessage) this.next;
 					if (fromId.equals(next.fromId) && date - next.date < 6 * 60) {
 						group = true;
@@ -655,9 +655,9 @@ public class UIMessage extends UIItem implements LangConstants {
 				space = !group;
 				if (!reverse) {
 					group = false;
-					if (this.prev != null) {
-						UIMessage next = (UIMessage) this.prev;
-						if (fromId.equals(next.fromId) && next.date - date < 6 * 60) {
+					if (this.prev != null && this.prev instanceof UIMessage) {
+						UIMessage prev = (UIMessage) this.prev;
+						if (fromId.equals(prev.fromId) && prev.date - date < 6 * 60) {
 							group = true;
 						}
 					}
