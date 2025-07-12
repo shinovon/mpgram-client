@@ -659,8 +659,8 @@ public class UIMessage extends UIItem implements LangConstants {
 						break date;
 					}
 				} else {
-					showDate = false;
-					break date;
+//					showDate = false;
+//					break date;
 				}
 				showDate = true;
 				h += MARGIN_TOP + DATE_PADDING_HEIGHT * 2 + MP.smallBoldFontHeight;
