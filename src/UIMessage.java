@@ -833,14 +833,14 @@ public class UIMessage extends UIItem implements LangConstants {
 			}
 			maxW = Math.max(maxW, minW + text.contentWidth);
 		} else {
-			timeBreak = maxW + timeWidth >= cw;
+			if (timeBreak = maxW + timeWidth >= cw) {
+				maxW += timeWidth;
+			}
 		}
 		
 		// time
 		if (timeBreak) {
 			h += MP.smallPlainFontHeight;
-		} else {
-			maxW += timeWidth;
 		}
 		this.timeBreak = timeBreak;
 		
