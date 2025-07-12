@@ -399,6 +399,10 @@ public class UIMessage extends UIItem implements LangConstants {
 			if (((ChatCanvas) container).reverse) y += SPACE_HEIGHT;
 			h -= SPACE_HEIGHT;
 		}
+		if (selected) {
+			g.setColor(ChatCanvas.colors[ChatCanvas.COLOR_CHAT_HIGHLIGHT_BG]);
+			g.fillRect(x, y, w, h);
+		}
 		// date
 		if (showDate) {
 			if (((ChatCanvas) container).reverse) {
@@ -431,12 +435,17 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (out && w < 900) {
 			x += w - cw;
 		}
-		g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_BG : COLOR_MESSAGE_BG]);
-		g.fillRect(x += MARGIN_WIDTH + (out && w < 900 ? MARGIN_SIDE : 0), y += MARGIN_TOP,
-				cw -= MARGIN_WIDTH * 2 + MARGIN_SIDE, h -= (MARGIN_TOP));
-		if (focus && focusChild == null && subFocusCurrent == -1) {
-			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_FOCUS_BORDER]);
-			g.drawRect(x, y, cw - 1, h - 1);
+		x += MARGIN_WIDTH + (out && w < 900 ? MARGIN_SIDE : 0);
+		y += MARGIN_TOP;
+		cw -= MARGIN_WIDTH * 2 + MARGIN_SIDE;
+		h -= MARGIN_TOP;
+		if (!selected) {
+			g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_BG : COLOR_MESSAGE_BG]);
+			g.fillRect(x, y, cw, h);
+			if (focus && focusChild == null && subFocusCurrent == -1) {
+				g.setColor(ChatCanvas.colors[COLOR_MESSAGE_FOCUS_BORDER]);
+				g.drawRect(x, y, cw - 1, h - 1);
+			}
 		}
 		int rw = cw;
 		cw -= PADDING_WIDTH * 2;
@@ -1066,13 +1075,34 @@ public class UIMessage extends UIItem implements LangConstants {
 	
 	boolean tap(int x, int y, boolean longTap) {
 		subFocusCurrent = -1;
+		// TODO selecting
+		if (selected) {
+			selected = false;
+			((ChatCanvas) container).unselected(this);
+			return false;
+		}
+		if (((ChatCanvas) container).selected != 0) {
+			if (!selected) {
+				selected = true;
+				((ChatCanvas) container).selected(this);
+				return false;
+			}
+			return false;
+		}
 		int w = ((ChatCanvas) container).width;
 		int cw = contentWidth;
 		if (out && w < 900) {
 			x -= w - cw;
 		}
 		x -= (out && w < 900 ? MARGIN_SIDE : 0);
-		if (x < 0) return false;
+		if (x < 0) {
+//			if (longTap) {
+//				selected = true;
+//				((ChatCanvas) container).selected(this);
+//				return true;
+//			}
+			return false;
+		}
 		if (text != null && text.focusable && y > text.y && y < text.y + text.contentHeight) {
 			focusChild = text;
 			if (text.tap(x - PADDING_WIDTH - MARGIN_WIDTH, y - text.y, longTap))
@@ -1099,6 +1129,11 @@ public class UIMessage extends UIItem implements LangConstants {
 				}
 			}
 		}
+//		if (longTap) {
+//			selected = true;
+//			((ChatCanvas) container).selected(this);
+//			return true;
+//		}
 		((ChatCanvas) container).showMenu(this, menu());
 		return true;
 	}

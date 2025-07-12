@@ -1208,7 +1208,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				if (left) {
 					MP.midlet.start(MP.RUN_JOIN_CHANNEL, id);
 				} else if (canWrite) {
-					MP.midlet.commandAction(MP.writeCmd, this);
+					if (x < 40) {
+						showMenu(null, new int[] { SendSticker, WriteMessage });
+					} else { 
+						MP.midlet.commandAction(MP.writeCmd, this);
+					}
 				}
 			}
 		}
@@ -1238,6 +1242,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					break;
 				case SendSticker:
 					MP.midlet.commandAction(MP.sendStickerCmd, this);
+					break;
+				case WriteMessage:
+					MP.midlet.commandAction(MP.writeCmd, this);
 					break;
 				}
 			} else {
@@ -1496,6 +1503,14 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		queueRepaint();
 	}
 	
+	void selected(UIMessage msg) {
+		++ selected;
+	}
+	
+	void unselected(UIMessage msg) {
+		-- selected;
+	}
+	
 	// interface getters
 
 	public String id() {
@@ -1603,6 +1618,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		offsetId = 0;
 		typing = 0;
 		query = null;
+		selected = 0;
 		if (table != null) table.clear();
 		switched = false;
 	}
