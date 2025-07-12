@@ -20,8 +20,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 //#ifndef NO_CHAT_CANVAS
-import java.io.DataInputStream;
-import java.io.InputStream;
 import java.util.Hashtable;
 
 import javax.microedition.lcdui.Alert;
@@ -30,7 +28,6 @@ import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.Ticker;
 
 public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnable {
@@ -1813,57 +1810,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			typing = 0;
 		} catch (Exception e) {}
 	}
-
-//	private static Image loadRLE(String path, int color) {
-//		try {
-//			int w, h;
-//
-//			InputStream is = "".getClass().getResourceAsStream(path);
-//			DataInputStream dis = new DataInputStream(is);
-//
-//			byte rle[] = new byte[dis.available()];
-//			dis.read(rle);
-//			dis.close();
-//
-//			w = (rle[0] << 24) | (rle[1] << 16) | (rle[2] << 8) | (rle[3] & 0xff);
-//			h = (rle[4] << 24) | (rle[5] << 16) | (rle[6] << 8) | (rle[7] & 0xff);
-//
-//			byte[] alpha = new byte[w * h];
-//			{
-//				int inp = 8;
-//				int alphap = 0;
-//
-//				while (alphap < alpha.length && rle.length - inp >= 3) {
-//					int count = ((rle[inp] & 0xff) << 8) | (rle[inp + 1] & 0xff);
-//					inp += 2;
-//
-//					boolean repeat = count > 0x7fff;
-//					count = (count & 0x7fff) + 1;
-//
-//					if (repeat) {
-//						byte b = rle[inp];
-//						inp++;
-//						int fillEnd = alphap + count;
-//
-//						for (; alphap < fillEnd; alphap++) {
-//							alpha[alphap] = b;
-//						}
-//					} else {
-//						System.arraycopy(rle, inp, alpha, alphap, count);
-//						alphap += count;
-//						inp += count;
-//					}
-//				}
-//			}
-//			int[] rgb = new int[w * h];
-//			for (int i = 0; i < alpha.length; ++i) {
-//				rgb[i] = (alpha[i] << 24) | color;
-//			}
-//			return Image.createRGBImage(rgb, w, h, true);
-//		} catch (Exception e) {
-//			return null;
-//		}
-//	}
 
 }
 //#endif
