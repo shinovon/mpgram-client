@@ -781,9 +781,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				if (canWrite) {
 //					if (attachIcon != null) g.drawImage(attachIcon, 8, by + ((bottom - 24) >> 1), 0);
 					int ty = by + ((bottom - 24) >> 1);
-					g.fillRect(12, ty + 12, 17, 1);
-					g.fillRect(20, ty + 4, 1, 17);
-					g.drawString(MP.L[TextField_Hint], 40, by + ((bottom - MP.medPlainFontHeight) >> 1), 0);
+					g.fillRect(w - 40 + 12, ty + 12, 17, 1);
+					g.fillRect(w - 40 + 20, ty + 4, 1, 17);
+					g.drawString(MP.L[TextField_Hint], 10, by + ((bottom - MP.medPlainFontHeight) >> 1), 0);
 				} else if (left) {
 					g.drawString(MP.L[JoinGroup], w >> 1, by + ((bottom - MP.medPlainFontHeight) >> 1), Graphics.TOP | Graphics.HCENTER);
 				}
@@ -1208,7 +1208,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				if (left) {
 					MP.midlet.start(MP.RUN_JOIN_CHANNEL, id);
 				} else if (canWrite) {
-					if (x < 40) {
+					if (x > width - 40) {
 						showMenu(null, new int[] { SendSticker, WriteMessage });
 					} else { 
 						MP.midlet.commandAction(MP.writeCmd, this);
