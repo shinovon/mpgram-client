@@ -54,6 +54,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	static int[] colors = new int[40];
 	static int[] colorsCopy;
 	static boolean shiftColors;
+	
+	static Image attachIcon;
 
 	boolean loaded, finished, canceled;
 	Thread thread;
@@ -156,7 +158,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	String titleRender;
 	
 	boolean hasInput;
-	Image attachIcon;
 	
 	ChatCanvas() {
 		setFullScreenMode(true);
