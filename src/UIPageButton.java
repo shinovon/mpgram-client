@@ -17,7 +17,8 @@ public class UIPageButton extends UIItem {
 		}
 		g.setColor(ChatCanvas.colors[ChatCanvas.COLOR_CHAT_FG]);
 		g.setFont(MP.medBoldFont);
-		g.drawString(MP.L[dir == -1 ? LangConstants.OlderMessages : LangConstants.NewerMessages], x + (w >> 1), y, Graphics.HCENTER | Graphics.TOP);
+		g.drawString(MP.L[dir == -1 ? LangConstants.OlderMessages : LangConstants.NewerMessages],
+				x + (w >> 1), y + 2, Graphics.HCENTER | Graphics.TOP);
 	}
 	
 	boolean action() {
