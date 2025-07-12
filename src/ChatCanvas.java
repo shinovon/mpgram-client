@@ -945,11 +945,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (key == -7) {
 			if (repeat) return;
 			// back
-			if (touch || query != null || mediaFilter != null) {
+			if (menuFocused) {
+				closeMenu();
+			} else if (touch || query != null || mediaFilter != null) {
 				MP.midlet.commandAction(MP.backCmd, this);
 				return;
-			} else if (menuFocused) {
-				closeMenu();
 			} else if (fieldFocused) {
 //				fieldFocused = false;
 //				fieldAnimTarget = 0;
