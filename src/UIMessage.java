@@ -178,6 +178,9 @@ public class UIMessage extends UIItem implements LangConstants {
 				}
 			}
 			this.text = label;
+			subFocusCurrent = 0;
+			subFocus[0] = FOCUS_TEXT;
+			subFocusLength = 1;
 			
 			return;
 		}
@@ -1056,6 +1059,10 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (chat.query != null || chat.mediaFilter != null) {
 			general[count++] = GoTo;
 			general[count++] = Forward;
+		} else if (action) {
+			if (chat.canWrite) general[count++] = Reply;
+			if (!chat.selfChat && !chat.user) general[count++] = CopyMessageLink;
+			if (chat.canDelete) general[count++] = Delete;
 		} else {
 			if (chat.canWrite) general[count++] = Reply;
 			if (out) general[count++] = Edit;
