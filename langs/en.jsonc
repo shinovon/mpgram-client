@@ -103,6 +103,8 @@
 	"Pin": "Pin",
 	"BanMember": "Ban member",
 	"Comments": "Discussion",
+	"Copy": "Copy",
+	"CopyLink": "Copy link",
 	
 	// Item commands
 	"Link_Cmd": "Link",
@@ -118,6 +120,8 @@
 	"Older": "Older",
 	"Newer": "Newer",
 	"SendSticker": "Send sticker",
+	"Menu": "Menu",
+	"Write": "Write",
 	
 	// Message writing form commands
 	"Send": "Send",
@@ -261,6 +265,7 @@
 	"SendAsVoice": "Send as voice message",
 	"HideWithSpoiler": "Hide with spoiler",
 	"EnableHTMLFormatting": "Enable HTML-formatting",
+	"TextField_Hint": "Write a message...",
 	
 	// Alert messages
 	"MessageSent_Alert": "Message sent",
@@ -276,6 +281,7 @@
 	"Search_TitlePrefix": "Search - ",
 	"OlderMessages": "Older messages",
 	"NewerMessages": "Newer messages",
+	"SavedMessages": "Saved messages",
 	
 	// Message
 	"ForwardedFrom": "Forwarded from ",
@@ -292,6 +298,8 @@
 	"Media": "Media",
 	"Poll": "Poll",
 	"Geo": "Geo: ",
+	"Photo": "Photo",
+	"Video": "Video",
 	
 	// Chat actions
 	"PinnedMessage_Action": " pinned message",

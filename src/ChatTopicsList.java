@@ -2,9 +2,9 @@ import javax.microedition.lcdui.List;
 
 public class ChatTopicsList extends List {
 	
-	ChatForm chatForm;
+	MPChat chatForm;
 
-	ChatTopicsList(ChatForm chatForm, String title) {
+	ChatTopicsList(MPChat chatForm, String title) {
 		super(title, List.IMPLICIT);
 		this.chatForm = chatForm;
 		setFitPolicy(List.TEXT_WRAP_ON);

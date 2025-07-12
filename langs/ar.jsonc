@@ -103,6 +103,8 @@
 	"Pin": "Pin", // Untranslated
 	"BanMember": "Ban member", // Untranslated
 	"Comments": "Discussion", // Untranslated
+	"Copy": "Copy", // Untranslated
+	"CopyLink": "Copy link", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "الرابط",
@@ -118,6 +120,8 @@
 	"Older": "اقدم",
 	"Newer": "احدث",
 	"SendSticker": "Send sticker", // Untranslated
+	"Menu": "Menu", // Untranslated
+	"Write": "Write", // Untranslated
 	
 	// Message writing form commands
 	"Send": "ارسال",
@@ -261,6 +265,7 @@
 	"SendAsVoice": "Send as voice message", // Untranslated
 	"HideWithSpoiler": "Hide with spoiler", // Untranslated
 	"EnableHTMLFormatting": "Enable HTML-formatting", // Untranslated
+	"TextField_Hint": "Write a message...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "الرسالة مرسلة",
@@ -276,6 +281,7 @@
 	"Search_TitlePrefix": "بحث - ",
 	"OlderMessages": "رسائل اقدم",
 	"NewerMessages": "رسائل احدث",
+	"SavedMessages": "Saved messages", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "محولة من ",
@@ -292,6 +298,8 @@
 	"Media": "وسائط",
 	"Poll": "تصويت",
 	"Geo": "جغرافي: ",
+	"Photo": "Photo", // Untranslated
+	"Video": "Video", // Untranslated
 	
 	// Chat actions
 	"PinnedMessage_Action": " pinned message", // Untranslated

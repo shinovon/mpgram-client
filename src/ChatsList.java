@@ -30,7 +30,7 @@ public class ChatsList extends MPList {
 //	long firstMsgDate, lastMsgDate;
 //	long offsetDate;
 	int offset;
-	Vector ids;
+	Vector/*<String>*/ ids;
 	String url;
 	String arrayName;
 	boolean users;

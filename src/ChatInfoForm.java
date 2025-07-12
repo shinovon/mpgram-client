@@ -29,12 +29,12 @@ public class ChatInfoForm extends MPForm {
 	String id;
 	String phone;
 	String invite;
-	ChatForm chatForm;
+	MPChat chatForm;
 	int mode; // 0 - chat info or profile by id, 1 - phone, 2 - invite peek, 3 - invite
 	int pinnedMessageId;
 	boolean canBan;
 	
-	public ChatInfoForm(String id, ChatForm chatForm, int mode) {
+	public ChatInfoForm(String id, MPChat chatForm, int mode) {
 		super(id);
 		this.id = id;
 		this.chatForm = chatForm;
@@ -73,7 +73,7 @@ public class ChatInfoForm extends MPForm {
 		}
 		
 		boolean isUser = id.charAt(0) != '-';
-		boolean topic = mode == 0 && chatForm != null && chatForm.forum;
+		boolean topic = mode == 0 && chatForm != null && chatForm.forum();
 		StringItem s;
 		
 		if (topic) {
@@ -114,7 +114,7 @@ public class ChatInfoForm extends MPForm {
 				JSONObject status = rawPeer.getObject("status");
 				if ("userStatusOnline".equals(status.getString("_"))) {
 					sb.append(MP.L[Online]);
-				} else if(status.has("was_online")) {
+				} else if (status.has("was_online")) {
 					sb.append(MP.L[LastSeen]);
 					sb.append(MP.localizeDate(status.getInt("was_online"), 3));
 				} else {
@@ -188,7 +188,7 @@ public class ChatInfoForm extends MPForm {
 				
 				if (rawPeer.has("username")) {
 					String t = "t.me/".concat(rawPeer.getString("username"));
-					s = new StringItem(MP.L[Link], topic ? t.concat("/").concat(Integer.toString(chatForm.topMsgId)) : t);
+					s = new StringItem(MP.L[Link], topic ? t.concat("/").concat(Integer.toString(chatForm.topMsgId())) : t);
 					s.setFont(MP.medPlainFont);
 					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					s.setItemCommandListener(MP.midlet);

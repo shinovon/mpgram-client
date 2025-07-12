@@ -103,6 +103,8 @@
 	"Pin": "Pin", // Untranslated
 	"BanMember": "Ban member", // Untranslated
 	"Comments": "Discussion", // Untranslated
+	"Copy": "Copy", // Untranslated
+	"CopyLink": "Copy link", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "Aç",
@@ -118,6 +120,8 @@
 	"Older": "Daha köhnə",
 	"Newer": "Daha yeni",
 	"SendSticker": "Send sticker", // Untranslated
+	"Menu": "Menu", // Untranslated
+	"Write": "Write", // Untranslated
 	
 	// Message writing form commands
 	"Send": "Göndər",
@@ -261,6 +265,7 @@
 	"SendAsVoice": "Send as voice message", // Untranslated
 	"HideWithSpoiler": "Hide with spoiler", // Untranslated
 	"EnableHTMLFormatting": "Enable HTML-formatting", // Untranslated
+	"TextField_Hint": "Write a message...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Mesaj göndərildi",
@@ -276,6 +281,7 @@
 	"Search_TitlePrefix": "Axtar -",
 	"OlderMessages": "Köhnə mesajlar",
 	"NewerMessages": "Yeni mesajlar",
+	"SavedMessages": "Saved messages", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "Kimdən yönləndirilib",
@@ -292,6 +298,8 @@
 	"Media": "Media",
 	"Poll": "Poll", // Untranslated
 	"Geo": "Geolokasiya: ",
+	"Photo": "Photo", // Untranslated
+	"Video": "Video", // Untranslated
 	
 	// Chat actions
 	"PinnedMessage_Action": " pinned message", // Untranslated
