@@ -768,7 +768,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			} else if (keyGuide) {
 				animate = true;
 				g.drawString(MP.L[Menu], 2, by + 1, Graphics.TOP | Graphics.LEFT);
-				g.drawString(MP.L[Back], w - 2, by + 1, Graphics.TOP | Graphics.RIGHT);
+				g.drawString(MP.L[Chat], w - 2, by + 1, Graphics.TOP | Graphics.RIGHT);
 				if (keyGuideTime == 0) {
 					keyGuideTime = now;
 				} else if (now - keyGuideTime > 3000) {
@@ -1190,7 +1190,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			int my = height - (int)menuAnimProgress;
 			if (y < my || x < 20 || x > width - 20 || menu == null) {
 				closeMenu();
-			} else if (!longTap && now - pressTime < 300) {
+			} else if (!longTap && now - pressTime < 300 && menuAnimTarget == -1) {
 				menuAction((y - my) / (MP.medPlainFontHeight + 8));
 			}
 		} else if (touch && now - pressTime < 300) {

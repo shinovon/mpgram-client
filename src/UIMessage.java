@@ -1105,14 +1105,11 @@ public class UIMessage extends UIItem implements LangConstants {
 			x -= w - cw;
 		}
 		x -= (out && w < 900 ? MARGIN_SIDE : 0);
-		if (x < 0) {
 //			if (longTap) {
 //				selected = true;
 //				((ChatCanvas) container).selected(this);
 //				return true;
 //			}
-			return false;
-		}
 		if (text != null && text.focusable && y > text.y && y < text.y + text.contentHeight) {
 			focusChild = text;
 			if (text.tap(x - PADDING_WIDTH - MARGIN_WIDTH, y - text.y, longTap))
