@@ -550,7 +550,10 @@ public class UIMessage extends UIItem implements LangConstants {
 				if (mediaThumb) {
 					int s = MP.smallBoldFontHeight + MP.smallPlainFontHeight;
 					if (mediaImage != null) {
+						int clipX = g.getClipX(), clipY = g.getClipY(), clipW = g.getClipWidth(), clipH = g.getClipHeight();
+						g.setClip(px, y + 1, s - 2, s - 2);
 						g.drawImage(mediaImage, px, y + ((s - mediaImage.getHeight()) >> 1), 0);
+						g.setClip(clipX, clipY, clipW, clipH);
 					} else {
 						// TODO thumb placeholder
 //						g.setColor(ChatCanvas.colors[COLOR_MESSAGE_IMAGE]);

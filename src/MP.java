@@ -1033,7 +1033,7 @@ public class MP extends MIDlet
 									sb.append("rsticker&s=").append(photoSize);
 								} else {
 									// document thumbnail
-									sb.append("thumbrsprevs&s=").append(MP.smallBoldFontHeight + MP.smallPlainFontHeight);
+									sb.append("thumbrsprevs&s=").append(MP.smallBoldFontHeight + MP.smallPlainFontHeight - 2);
 								}
 								url = sb.toString();
 //#endif
