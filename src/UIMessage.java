@@ -826,16 +826,16 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (text != null) {
 			text.y = h - MARGIN_TOP - PADDING_HEIGHT;
 			h += text.layout(cw);
-			int l = text.render.size(); 
+			int l = text.render.size();
+			int tw = 0;
 			if (l != 0) {
 				int[] pos = (int[]) ((Object[]) text.render.elementAt(l - 1))[3];
-				timeBreak = pos[0] + pos[2] + timeWidth >= cw;
+				timeBreak = (tw = pos[0] + pos[2] + timeWidth) >= cw;
+				maxW = Math.max(maxW, minW + tw);
 			}
 			maxW = Math.max(maxW, minW + text.contentWidth);
-		} else {
-			if (timeBreak = maxW + timeWidth >= cw) {
-				maxW += timeWidth;
-			}
+		} else if (timeBreak = maxW + timeWidth >= cw) {
+			maxW += timeWidth;
 		}
 		
 		// time
