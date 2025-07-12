@@ -809,8 +809,8 @@ public class MP extends MIDlet
 		loadingForm.addCommand(cancelCmd);
 		loadingForm.setCommandListener(this);
 		
-		// load resources
-		
+		// load resources	
+//#ifndef NO_AVATARS
 		if (loadAvatars) {
 			try {
 				userDefaultImg = resize(Image.createImage("/us.png"), avatarSize, avatarSize);
@@ -821,6 +821,7 @@ public class MP extends MIDlet
 				}
 			} catch (Throwable ignored) {}
 		}
+//#endif
 		
 		// start image loader threads
 
@@ -983,6 +984,7 @@ public class MP extends MIDlet
 							String url;
 							Image img = null;
 							String recordName = null;
+//#ifndef NO_AVATARS
 							if (src instanceof String) { // avatar
 								recordName = AVATAR_RECORD_PREFIX + avatarSize + "r" + (String) src;
 								url = instanceUrl + AVA_URL + "?a&c=" + ((String) src)
@@ -1003,7 +1005,9 @@ public class MP extends MIDlet
 										}
 									} catch (Exception ignored) {}
 								}
-							} else if (src instanceof String[]) { // message file
+							} else
+//#endif
+							if (src instanceof String[]) { // message file
 								String peer = ((String[]) src)[0];
 								String id = ((String[]) src)[1];
 								String p = ((String[]) src)[3];
@@ -1043,6 +1047,7 @@ public class MP extends MIDlet
 							if (img == null) {
 								try {
 									byte[] b = get(url);
+//#ifndef NO_AVATARS
 									if (recordName != null) {
 										// save avatar to storage cache
 										if ((avatarsCache & 2) == 2) {
@@ -1059,9 +1064,12 @@ public class MP extends MIDlet
 											} catch (Exception ignored) {}
 										}
 									}
+//#endif
 									img = Image.createImage(b, 0, b.length);
+//#ifndef NO_AVATARS
 									if (recordName != null && roundAvatars)
 										img = roundImage(img);
+//#endif
 								} catch (Exception e) {
 									e.printStackTrace();
 									if (src instanceof String) {
@@ -1071,7 +1079,7 @@ public class MP extends MIDlet
 							}
 							
 							if (img == null) continue;
-							
+//#ifndef NO_AVATARS
 							// save avatar to hashtable cache
 							if (recordName != null && (avatarsCache & 1) == 1) {
 								if (imagesCache.size() > avatarsCacheThreshold) {
@@ -1079,6 +1087,7 @@ public class MP extends MIDlet
 								}
 								imagesCache.put(src, img);
 							}
+//#endif
 							
 							putImage(target, img);
 						} catch (Exception e) {
@@ -3279,6 +3288,7 @@ public class MP extends MIDlet
 	// region Image queue
 	
 	static void queueAvatar(String id, Object target) {
+//#ifndef NO_AVATARS
 		if (target == null || id == null || !loadAvatars) return;
 		
 		JSONObject peer = getPeer(id, false);
@@ -3295,6 +3305,7 @@ public class MP extends MIDlet
 			imagesToLoad.addElement(new Object[] { id, target });
 			imagesLoadLock.notifyAll();
 		}
+//#endif
 	}
 
 	private static void putImage(Object target, Image img) {
@@ -3302,6 +3313,7 @@ public class MP extends MIDlet
 			((ImageItem) target).setImage(img);
 			return;
 		}
+//#ifndef NO_AVATARS
 		if (target instanceof Object[]) {
 			// list item
 			if (((Object[]) target)[0] instanceof List) {
@@ -3311,6 +3323,7 @@ public class MP extends MIDlet
 				return;
 			}
 		}
+//#endif
 //#ifndef NO_CHAT_CANVAS
 		if (target instanceof UIMessage) {
 			((UIMessage) target).mediaImage = img;
@@ -4766,6 +4779,7 @@ public class MP extends MIDlet
 		return sb;
 	}
 	
+//#ifndef NO_AVATARS
 	public static Image roundImage(Image img) {
 		if (img == null) return null;
 		try {
@@ -4788,6 +4802,7 @@ public class MP extends MIDlet
 			return img;
 		}
 	}
+//#endif
 
 	private static void writeAuth() {
 		try {
@@ -5129,6 +5144,7 @@ public class MP extends MIDlet
 	
 	// endregion
 	
+//#ifndef NO_AVATARS
 	// region ImageUtils
 	
 /*
@@ -5243,6 +5259,7 @@ public class MP extends MIDlet
 	}
 	
 	// endregion
+//#endif
 	
 	// region JSON
 	
