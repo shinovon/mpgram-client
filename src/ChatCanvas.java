@@ -20,6 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 //#ifndef NO_CHAT_CANVAS
+import java.io.DataInputStream;
+import java.io.InputStream;
 import java.util.Hashtable;
 
 import javax.microedition.lcdui.Alert;
@@ -28,6 +30,7 @@ import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.Ticker;
 
 public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnable {
@@ -45,6 +48,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	static final int COLOR_CHAT_STATUS_FG = 9;
 	static final int COLOR_CHAT_STATUS_HIGHLIGHT_FG = 10;
 	static final int COLOR_CHAT_POINTER_HOLD = 11;
+	static final int COLOR_CHAT_INPUT_ICON = 12;
+	static final int COLOR_CHAT_SEND_ICON = 13;
 	
 	static int[] colors = new int[40];
 	static int[] colorsCopy;
@@ -150,48 +155,57 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	String titleRender;
 	
-	boolean hasField;
+	boolean hasInput;
+	Image attachIcon;
 	
 	ChatCanvas() {
 		setFullScreenMode(true);
 		
-		colors[COLOR_CHAT_BG] = 0x0E1621;
-		colors[COLOR_CHAT_FG] = 0xFFFFFF;
-//		colors[COLOR_CHAT_HIGHLIGHT_BG] = ;
-		colors[COLOR_CHAT_PANEL_BG] = 0x17212B;
-		colors[COLOR_CHAT_PANEL_FG] = 0xFFFFFF;
-		colors[COLOR_CHAT_PANEL_BORDER] = 0x0A121B;
-		colors[COLOR_CHAT_MENU_BG] = 0x17212B;
-		colors[COLOR_CHAT_MENU_HIGHLIGHT_BG] = 0x232E3C;
-		colors[COLOR_CHAT_MENU_FG] = 0xFFFFFF;
-		colors[COLOR_CHAT_STATUS_FG] = 0x708499;
-		colors[COLOR_CHAT_STATUS_HIGHLIGHT_FG] = 0x73B9F5;
-		colors[COLOR_CHAT_POINTER_HOLD] = 0xFFFFFF;
-		
-		colors[UIMessage.COLOR_MESSAGE_BG] = 0x182533;
-		colors[UIMessage.COLOR_MESSAGE_OUT_BG] = 0x2B5278;
-		colors[UIMessage.COLOR_MESSAGE_FG] = 0xFFFFFF;
-		colors[UIMessage.COLOR_MESSAGE_LINK] = 0x71BAFA;
-		colors[UIMessage.COLOR_MESSAGE_LINK_FOCUS] = 0xABABAB; // TODO
-		colors[UIMessage.COLOR_MESSAGE_SENDER] = 0x71BAFA;
-		colors[UIMessage.COLOR_MESSAGE_ATTACHMENT_BORDER] = 0x6AB3F3;
-		colors[UIMessage.COLOR_MESSAGE_ATTACHMENT_TITLE] = 0xFFFFFF;
-		colors[UIMessage.COLOR_MESSAGE_ATTACHMENT_SUBTITLE] = 0x7DA8D3;
-		colors[UIMessage.COLOR_MESSAGE_ATTACHMENT_FOCUS_BG] = 0x1A3756;
-		colors[UIMessage.COLOR_MESSAGE_COMMENT_BORDER] = 0x31404E;
-		colors[UIMessage.COLOR_MESSAGE_IMAGE] = 0xABABAB; // TODO
-		colors[UIMessage.COLOR_MESSAGE_FOCUS_BORDER] = 0xFFFFFF;
-		colors[UIMessage.COLOR_MESSAGE_TIME] = 0x6D7F8F;
-		colors[UIMessage.COLOR_MESSAGE_OUT_TIME] = 0x7DA8D3;
-		colors[UIMessage.COLOR_ACTION_BG] = 0x1E2C3A;
-		
-		colorsCopy = new int[colors.length];
-		for (int i = 0; i < colors.length; ++i) {
-			colorsCopy[i] = colors[i];
+		if (colorsCopy == null) {
+			colors[COLOR_CHAT_BG] = 0x0E1621;
+			colors[COLOR_CHAT_FG] = 0xFFFFFF;
+//			colors[COLOR_CHAT_HIGHLIGHT_BG] = ;
+			colors[COLOR_CHAT_PANEL_BG] = 0x17212B;
+			colors[COLOR_CHAT_PANEL_FG] = 0xFFFFFF;
+			colors[COLOR_CHAT_PANEL_BORDER] = 0x0A121B;
+			colors[COLOR_CHAT_MENU_BG] = 0x17212B;
+			colors[COLOR_CHAT_MENU_HIGHLIGHT_BG] = 0x232E3C;
+			colors[COLOR_CHAT_MENU_FG] = 0xFFFFFF;
+			colors[COLOR_CHAT_STATUS_FG] = 0x708499;
+			colors[COLOR_CHAT_STATUS_HIGHLIGHT_FG] = 0x73B9F5;
+			colors[COLOR_CHAT_POINTER_HOLD] = 0xFFFFFF;
+			colors[COLOR_CHAT_INPUT_ICON] = 0x6A7580;
+			colors[COLOR_CHAT_SEND_ICON] = 0x5288C1;
+			
+			colors[UIMessage.COLOR_MESSAGE_BG] = 0x182533;
+			colors[UIMessage.COLOR_MESSAGE_OUT_BG] = 0x2B5278;
+			colors[UIMessage.COLOR_MESSAGE_FG] = 0xFFFFFF;
+			colors[UIMessage.COLOR_MESSAGE_LINK] = 0x71BAFA;
+			colors[UIMessage.COLOR_MESSAGE_LINK_FOCUS] = 0xABABAB; // TODO
+			colors[UIMessage.COLOR_MESSAGE_SENDER] = 0x71BAFA;
+			colors[UIMessage.COLOR_MESSAGE_ATTACHMENT_BORDER] = 0x6AB3F3;
+			colors[UIMessage.COLOR_MESSAGE_ATTACHMENT_TITLE] = 0xFFFFFF;
+			colors[UIMessage.COLOR_MESSAGE_ATTACHMENT_SUBTITLE] = 0x7DA8D3;
+			colors[UIMessage.COLOR_MESSAGE_ATTACHMENT_FOCUS_BG] = 0x1A3756;
+			colors[UIMessage.COLOR_MESSAGE_COMMENT_BORDER] = 0x31404E;
+			colors[UIMessage.COLOR_MESSAGE_IMAGE] = 0xABABAB; // TODO
+			colors[UIMessage.COLOR_MESSAGE_FOCUS_BORDER] = 0xFFFFFF;
+			colors[UIMessage.COLOR_MESSAGE_TIME] = 0x6D7F8F;
+			colors[UIMessage.COLOR_MESSAGE_OUT_TIME] = 0x7DA8D3;
+			colors[UIMessage.COLOR_ACTION_BG] = 0x1E2C3A;
+			
+			colorsCopy = new int[colors.length];
+			for (int i = 0; i < colors.length; ++i) {
+				colorsCopy[i] = colors[i];
+			}
 		}
 		
 		if (touch) {
 			top = MP.smallBoldFontHeight + MP.smallPlainFontHeight + 8;
+			if (attachIcon == null) {
+				attachIcon = loadRLE("/attach.rle", colors[COLOR_CHAT_INPUT_ICON]);
+//				sendIcon = loadRLE("/send.rle", colors[COLOR_CHAT_SEND_ICON]);
+			}
 		} else {
 			top = MP.smallBoldFontHeight + 4 + (MP.chatStatus ? MP.smallPlainFontHeight + 4 : 0);
 		}
@@ -216,8 +230,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		init(true);
 	}
 	
-	private void init(boolean field) {
-		hasField = field;
+	private void init(boolean input) {
+		hasInput = input;
 	}
 
 	public void load() {
@@ -437,7 +451,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			
 			// postLoad
 			loading = false;
-			if (touch && hasField && (canWrite || left) && mediaFilter == null && query == null) {
+			if (touch && hasInput && (canWrite || left) && mediaFilter == null && query == null) {
 				bottom = Math.max(MP.medPlainFontHeight + 16, 48);
 			} else {
 				bottom = 0;
@@ -694,9 +708,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				
 				// menu button
 				if (query == null && mediaFilter == null) {
-					g.drawLine(w - 30, bty - 8, w - 10, bty - 8);
-					g.drawLine(w - 30, bty, w - 10, bty);
-					g.drawLine(w - 30, bty + 8, w - 10, bty + 8);
+					g.fillRect(w - 22, bty - 6, 3, 3);
+					g.fillRect(w - 22, bty, 3, 3);
+					g.fillRect(w - 22, bty + 6, 3, 3);
+//					g.drawLine(w - 30, bty - 8, w - 10, bty - 8);
+//					g.drawLine(w - 30, bty, w - 10, bty);
+//					g.drawLine(w - 30, bty + 8, w - 10, bty + 8);
 				}
 			}
 			boolean showStatus = MP.chatStatus || touch;
@@ -737,7 +754,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				by += 1;
 				g.drawString(MP.L[Chat], 2, by, Graphics.TOP | Graphics.LEFT);
 				g.drawString(MP.L[Back], w - 2, by, Graphics.TOP | Graphics.RIGHT);
-				if (hasField && canWrite)
+				if (hasInput && canWrite)
 					g.drawString(MP.L[Write], w >> 1, by, Graphics.TOP | Graphics.HCENTER);
 			} else if (keyGuide) {
 				animate = true;
@@ -753,6 +770,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				// TODO
 				g.setFont(MP.medPlainFont);
 				if (canWrite) {
+					if (attachIcon != null) g.drawImage(attachIcon, 8, by + ((bottom - 24) >> 1), 0);
 					g.drawString(MP.L[TextField_Hint], 40, by + ((bottom - MP.medPlainFontHeight) >> 1), 0);
 				} else if (left) {
 					g.drawString(MP.L[JoinGroup], w >> 1, by + ((bottom - MP.medPlainFontHeight) >> 1), Graphics.TOP | Graphics.HCENTER);
@@ -936,7 +954,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			if (menuFocused) {
 				closeMenu();
 			} else if (fieldFocused) {
-				showMenu(null, canWrite && hasField ? new int[] { Refresh, ChatInfo, SendSticker } : new int[] { Refresh, ChatInfo });
+				showMenu(null, canWrite && hasInput ? new int[] { Refresh, ChatInfo, SendSticker } : new int[] { Refresh, ChatInfo });
 			} else {
 				if (focusedItem != null && focusedItem.focusable) {
 					int[] menu = focusedItem.menu();
@@ -968,7 +986,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				repaint = true;
 			} else if (key == -5 || game == Canvas.FIRE) {
 				// TODO text field
-				if (canWrite && hasField) {
+				if (canWrite && hasInput) {
 					MP.midlet.commandAction(MP.writeCmd, this);
 				}
 			}
@@ -1762,6 +1780,57 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			setTicker(null);
 			typing = 0;
 		} catch (Exception e) {}
+	}
+
+	private static Image loadRLE(String path, int color) {
+		try {
+			int w, h;
+
+			InputStream is = "".getClass().getResourceAsStream(path);
+			DataInputStream dis = new DataInputStream(is);
+
+			byte rle[] = new byte[dis.available()];
+			dis.read(rle);
+			dis.close();
+
+			w = (rle[0] << 24) | (rle[1] << 16) | (rle[2] << 8) | (rle[3] & 0xff);
+			h = (rle[4] << 24) | (rle[5] << 16) | (rle[6] << 8) | (rle[7] & 0xff);
+
+			byte[] alpha = new byte[w * h];
+			{
+				int inp = 8;
+				int alphap = 0;
+
+				while (alphap < alpha.length && rle.length - inp >= 3) {
+					int count = ((rle[inp] & 0xff) << 8) | (rle[inp + 1] & 0xff);
+					inp += 2;
+
+					boolean repeat = count > 0x7fff;
+					count = (count & 0x7fff) + 1;
+
+					if (repeat) {
+						byte b = rle[inp];
+						inp++;
+						int fillEnd = alphap + count;
+
+						for (; alphap < fillEnd; alphap++) {
+							alpha[alphap] = b;
+						}
+					} else {
+						System.arraycopy(rle, inp, alpha, alphap, count);
+						alphap += count;
+						inp += count;
+					}
+				}
+			}
+			int[] rgb = new int[w * h];
+			for (int i = 0; i < alpha.length; ++i) {
+				rgb[i] = (alpha[i] << 24) | color;
+			}
+			return Image.createRGBImage(rgb, w, h, true);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 }

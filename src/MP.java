@@ -1343,7 +1343,9 @@ public class MP extends MIDlet
 		}
 		case RUN_CHECK_OTA: { // check for client updates
 			try {
-				JSONObject j = parseObject(new String(get(OTA_URL + "?v=" + version + "&l=" + lang + (MINI_BUILD ? "&m=1" : "")), encoding));
+				JSONObject j = parseObject(new String(get(OTA_URL + "?v=" + version + "&l=" + lang
+						+ (MINI_BUILD ? "&m=1" : "")
+						+ (blackberry ? "&bb=1" : "")), encoding));
 				if (j.getBoolean("update_available", false) && checkUpdates) {
 					updateUrl = j.getString("download_url");
 					Alert a = new Alert("", "", null, AlertType.INFO);
@@ -4967,9 +4969,9 @@ public class MP extends MIDlet
 //#ifndef NO_CHAT_CANVAS
 						if (form instanceof UILabel) {
 							if (i != 0) {
-								((UILabel) form).appendWord(text.substring(0, j), f, null);
+								((UILabel) form).append(text.substring(0, j), f, null);
 							}
-							((UILabel) form).appendWord(text.substring(j, k), f, null);
+							((UILabel) form).append(text.substring(j, k), f, null);
 						} else
 //#endif
 						{
@@ -5007,9 +5009,9 @@ public class MP extends MIDlet
 //#ifndef NO_CHAT_CANVAS
 						if (form instanceof UILabel) {
 							if (i != 0) {
-								((UILabel) form).appendWord(text.substring(0, i), f, null);
+								((UILabel) form).append(text.substring(0, i), f, null);
 							}
-							((UILabel) form).appendWord(text.substring(i, k), f, null);
+							((UILabel) form).append(text.substring(i, k), f, null);
 						} else
 //#endif
 						{
@@ -5036,7 +5038,7 @@ public class MP extends MIDlet
 
 //#ifndef NO_CHAT_CANVAS
 		if (form instanceof UILabel) {
-			((UILabel) form).appendWord(text, f, state != null && state[RT_URL] != 0 ? richTextUrl : null);
+			((UILabel) form).append(text, f, state != null && state[RT_URL] != 0 ? richTextUrl : null);
 		} else
 //#endif
 		{

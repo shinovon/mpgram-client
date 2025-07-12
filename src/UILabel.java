@@ -51,7 +51,7 @@ public class UILabel extends UIItem {
 		MP.wrapRichText(this, null, text, entities, 0);
 	}
 
-	void appendWord(String text, Font font, String url) {
+	void append(String text, Font font, String url) {
 		if (url != null) focusable = true;
 		parsed.addElement(new Object[] { text, font, url });
 		requestLayout();
