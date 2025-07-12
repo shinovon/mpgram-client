@@ -743,6 +743,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		
 		// bottom panel
 		if (bottom != 0) {
+			g.setFont(MP.smallBoldFont);
 			g.setColor(colors[COLOR_CHAT_PANEL_BG]);
 			int by = h - bottom;
 			g.fillRect(0, by, w, bottom);
