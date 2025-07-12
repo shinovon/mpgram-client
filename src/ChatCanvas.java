@@ -55,7 +55,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	static int[] colorsCopy;
 	static boolean shiftColors;
 	
-	static Image attachIcon;
+//	static Image attachIcon;
 
 	boolean loaded, finished, canceled;
 	Thread thread;
@@ -203,10 +203,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		
 		if (touch) {
 			top = MP.smallBoldFontHeight + MP.smallPlainFontHeight + 8;
-			if (attachIcon == null) {
-				attachIcon = loadRLE("/attach.rle", colors[COLOR_CHAT_INPUT_ICON]);
-//				sendIcon = loadRLE("/send.rle", colors[COLOR_CHAT_SEND_ICON]);
-			}
+//			if (attachIcon == null) {
+//				attachIcon = loadRLE("/attach.rle", colors[COLOR_CHAT_INPUT_ICON]);
+//			}
 		} else {
 			top = MP.smallBoldFontHeight + 4 + (MP.chatStatus ? MP.smallPlainFontHeight + 4 : 0);
 		}
@@ -771,7 +770,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				// TODO
 				g.setFont(MP.medPlainFont);
 				if (canWrite) {
-					if (attachIcon != null) g.drawImage(attachIcon, 8, by + ((bottom - 24) >> 1), 0);
+//					if (attachIcon != null) g.drawImage(attachIcon, 8, by + ((bottom - 24) >> 1), 0);
+					int ty = by + ((bottom - 24) >> 1);
+					g.fillRect(12, ty + 12, 17, 1);
+					g.fillRect(20, ty + 4, 1, 17);
 					g.drawString(MP.L[TextField_Hint], 40, by + ((bottom - MP.medPlainFontHeight) >> 1), 0);
 				} else if (left) {
 					g.drawString(MP.L[JoinGroup], w >> 1, by + ((bottom - MP.medPlainFontHeight) >> 1), Graphics.TOP | Graphics.HCENTER);
@@ -1783,56 +1785,56 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		} catch (Exception e) {}
 	}
 
-	private static Image loadRLE(String path, int color) {
-		try {
-			int w, h;
-
-			InputStream is = "".getClass().getResourceAsStream(path);
-			DataInputStream dis = new DataInputStream(is);
-
-			byte rle[] = new byte[dis.available()];
-			dis.read(rle);
-			dis.close();
-
-			w = (rle[0] << 24) | (rle[1] << 16) | (rle[2] << 8) | (rle[3] & 0xff);
-			h = (rle[4] << 24) | (rle[5] << 16) | (rle[6] << 8) | (rle[7] & 0xff);
-
-			byte[] alpha = new byte[w * h];
-			{
-				int inp = 8;
-				int alphap = 0;
-
-				while (alphap < alpha.length && rle.length - inp >= 3) {
-					int count = ((rle[inp] & 0xff) << 8) | (rle[inp + 1] & 0xff);
-					inp += 2;
-
-					boolean repeat = count > 0x7fff;
-					count = (count & 0x7fff) + 1;
-
-					if (repeat) {
-						byte b = rle[inp];
-						inp++;
-						int fillEnd = alphap + count;
-
-						for (; alphap < fillEnd; alphap++) {
-							alpha[alphap] = b;
-						}
-					} else {
-						System.arraycopy(rle, inp, alpha, alphap, count);
-						alphap += count;
-						inp += count;
-					}
-				}
-			}
-			int[] rgb = new int[w * h];
-			for (int i = 0; i < alpha.length; ++i) {
-				rgb[i] = (alpha[i] << 24) | color;
-			}
-			return Image.createRGBImage(rgb, w, h, true);
-		} catch (Exception e) {
-			return null;
-		}
-	}
+//	private static Image loadRLE(String path, int color) {
+//		try {
+//			int w, h;
+//
+//			InputStream is = "".getClass().getResourceAsStream(path);
+//			DataInputStream dis = new DataInputStream(is);
+//
+//			byte rle[] = new byte[dis.available()];
+//			dis.read(rle);
+//			dis.close();
+//
+//			w = (rle[0] << 24) | (rle[1] << 16) | (rle[2] << 8) | (rle[3] & 0xff);
+//			h = (rle[4] << 24) | (rle[5] << 16) | (rle[6] << 8) | (rle[7] & 0xff);
+//
+//			byte[] alpha = new byte[w * h];
+//			{
+//				int inp = 8;
+//				int alphap = 0;
+//
+//				while (alphap < alpha.length && rle.length - inp >= 3) {
+//					int count = ((rle[inp] & 0xff) << 8) | (rle[inp + 1] & 0xff);
+//					inp += 2;
+//
+//					boolean repeat = count > 0x7fff;
+//					count = (count & 0x7fff) + 1;
+//
+//					if (repeat) {
+//						byte b = rle[inp];
+//						inp++;
+//						int fillEnd = alphap + count;
+//
+//						for (; alphap < fillEnd; alphap++) {
+//							alpha[alphap] = b;
+//						}
+//					} else {
+//						System.arraycopy(rle, inp, alpha, alphap, count);
+//						alphap += count;
+//						inp += count;
+//					}
+//				}
+//			}
+//			int[] rgb = new int[w * h];
+//			for (int i = 0; i < alpha.length; ++i) {
+//				rgb[i] = (alpha[i] << 24) | color;
+//			}
+//			return Image.createRGBImage(rgb, w, h, true);
+//		} catch (Exception e) {
+//			return null;
+//		}
+//	}
 
 }
 //#endif
