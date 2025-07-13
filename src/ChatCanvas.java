@@ -939,7 +939,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		int game = mapGameAction(key);
 		key = mapKey(key);
 		boolean repaint = false;
-		if (key == -7) {
+		if (key == -7 || (MP.blackberry && (key == 'p' || key == 'P'))) {
 			if (repeat) return;
 			// back
 			if (menuFocused) {
@@ -957,7 +957,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				fieldAnimTarget = MP.smallBoldFontHeight + 4;
 			}
 			repaint = true;
-		} else if (key == -6) {
+		} else if (key == -6 || (MP.blackberry && (key == 'q' || key == 'Q'))) {
 			if (repeat) return;
 			// menu
 			if (menuFocused) {
