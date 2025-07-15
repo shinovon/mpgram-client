@@ -279,10 +279,17 @@ public class UILabel extends UIItem {
 	
 	private static void split(String text, Font font, String url, int width, int x, int y, int idx, int ch, int sl, int fh, Vector res, boolean center, int[] out) {
 		// TODO calc max row width
+		int ay = 0;
+		if (res.size() != 0) {
+			Object[] l = (Object[]) res.elementAt(res.size() - 1);
+			if (((int[]) l[3])[0] != 0 && ((int[]) l[3])[3] != fh) {
+				ay = ((int[]) l[3])[3] - fh;
+			}
+		}
 		if (ch != sl) {
 			int ew = font.substringWidth(text, ch, sl - ch);
 			if (x + ew < width) {
-				res.addElement(new Object[] { text.substring(ch, sl), font, url, new int[] {x, y, ew, fh} });
+				res.addElement(new Object[] { text.substring(ch, sl), font, url, new int[] {x, y + ay, ew, fh} });
 				x += ew; idx ++;
 			} else {
 				for (int i = ch; i < sl; i++) {
@@ -296,7 +303,7 @@ public class UILabel extends UIItem {
 									if (center) {
 										x = centerRow(width, tw, x, y, res);
 									}
-									res.addElement(new Object[] { t, font, url, new int[] {x, y, tw, fh} });
+									res.addElement(new Object[] { t, font, url, new int[] {x, y + ay, tw, fh} });
 									x = 0; y += fh; idx ++;
 									
 									i = ch = j;
@@ -309,7 +316,7 @@ public class UILabel extends UIItem {
 							if (center) {
 								x = centerRow(width, tw, x, y, res);
 							}
-							res.addElement(new Object[] { t, font, url, new int[] {x, y, tw, fh} });
+							res.addElement(new Object[] { t, font, url, new int[] {x, y + ay, tw, fh} });
 							x = 0; y += fh; idx ++;
 							ch = i;
 						}
@@ -318,7 +325,7 @@ public class UILabel extends UIItem {
 				if (ch != sl) {
 					String s = text.substring(ch, sl);
 					int tw = font.stringWidth(s);
-					res.addElement(new Object[] { s, font, url, new int[] {x, y, tw, fh} });
+					res.addElement(new Object[] { s, font, url, new int[] {x, y + ay, tw, fh} });
 					x += tw; idx ++;
 				}
 			}
