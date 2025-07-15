@@ -103,14 +103,14 @@ public class UILabel extends UIItem {
 		} else urls.removeAllElements();
 		
 		Vector res = render;
-		int x = 0, y = 0, idx = 0;
+		int x = 0, y = 0, idx = 0, mw = 0;
 		
 		boolean center = this.center;
 		
 		int fh = 0;
 		int l = parsed.size();
 		boolean ellipsis = this.ellipsis;
-		int[] out = new int[3];
+		int[] out = new int[4];
 		for (int ei = 0; ei < l; ++ei) {
 			int startIdx = idx;
 			Object[] e = (Object[]) parsed.elementAt(ei);
@@ -154,19 +154,19 @@ public class UILabel extends UIItem {
 				x += tw;
 				if (end) break;
 			} else if (text.indexOf('\n', ch) == -1) {
-				split(text, font, url, width, x, y, idx, ch, sl, fh, res, center, out);
+				split(text, font, url, width, x, y, idx, mw, ch, sl, fh, res, center, out);
 				x = out[0]; y = out[1]; idx = out[2];
 			} else {
 				int j = ch;
 				for (int i = ch; i < sl; ++i) {
 					if ((c = text.charAt(i)) == '\n') {
-						split(text, font, url, width, x, y, idx, j, i, fh, res, center, out);
+						split(text, font, url, width, x, y, idx, mw, j, i, fh, res, center, out);
 						x = 0; y = out[1] + fh; idx = out[2];
 						j = i + 1;
 					}
 				}
 				if (j != sl) {
-					split(text, font, url, width, x, y, idx, j, sl, fh, res, center, out);
+					split(text, font, url, width, x, y, idx, mw, j, sl, fh, res, center, out);
 					x = out[0]; y = out[1]; idx = out[2];
 				}
 			}
@@ -181,7 +181,7 @@ public class UILabel extends UIItem {
 		}
 		if (center) centerRow(width, 0, x, y, res);
 		
-		contentWidth = y == 0 ? x : width;
+		contentWidth = y == 0 ? x : mw;
 		return contentHeight = y + fh;
 	}
 	
@@ -277,8 +277,7 @@ public class UILabel extends UIItem {
 		return "...";
 	}
 	
-	private static void split(String text, Font font, String url, int width, int x, int y, int idx, int ch, int sl, int fh, Vector res, boolean center, int[] out) {
-		// TODO calc max row width
+	private static void split(String text, Font font, String url, int width, int x, int y, int idx, int mw, int ch, int sl, int fh, Vector res, boolean center, int[] out) {
 		int ay = 0;
 		if (res.size() != 0) {
 			Object[] l = (Object[]) res.elementAt(res.size() - 1);
@@ -304,7 +303,7 @@ public class UILabel extends UIItem {
 										x = centerRow(width, tw, x, y, res);
 									}
 									res.addElement(new Object[] { t, font, url, new int[] {x, y + ay, tw, fh} });
-									x = 0; y += fh; idx ++;
+									x = 0; y += fh; idx ++; mw = Math.max(mw, x + tw);
 									
 									i = ch = j;
 									break w;
@@ -317,7 +316,7 @@ public class UILabel extends UIItem {
 								x = centerRow(width, tw, x, y, res);
 							}
 							res.addElement(new Object[] { t, font, url, new int[] {x, y + ay, tw, fh} });
-							x = 0; y += fh; idx ++;
+							x = 0; y += fh; idx ++; mw = Math.max(mw, x + tw);
 							ch = i;
 						}
 					}
@@ -330,7 +329,7 @@ public class UILabel extends UIItem {
 				}
 			}
 		}
-		out[0] = x; out[1] = y; out[2] = idx;
+		out[0] = x; out[1] = y; out[2] = idx; out[3] = mw;
 	}
 	
 	private static int centerRow(int width, int t, int x, int y, Vector res) {
