@@ -1,6 +1,6 @@
 {
 	// About this locale file
-	"LocaleInfo": "Arab, by @ZAIOOD999",
+	"LocaleInfo": "Arabic, by @ZAIOOD999, @nourhan5908",
 	"LocaleSlavicPlurals": "",
 	"LocaleCustomPlurals": "",
 	
@@ -37,9 +37,9 @@
 	"Today": "اليوم",
 	"Yesterday": "البارحة",
 	"LastWeek": "الاسبوع الماضي",
-	"LastMonth": "last month", // Untranslated
-	"ALongTimeAgo": "a long time ago", // Untranslated
-	"Recently": "recently", // Untranslated
+	"LastMonth": "الشهر الماضي", 
+	"ALongTimeAgo": "منذ وقت طويل",
+	"Recently": "مؤخرا",
 	// Date suffixes
 	"on_Date": "في ",
 	"at_Time": " في",
@@ -57,10 +57,10 @@
 	"Nov": "نوفمبر",
 	"Dec": "ديسمبر",
 	// Days of week
-	"Sun": "احد",
-	"Mon": "اثنين",
+	"Sun": "أحد",
+	"Mon": "إثنين",
 	"Tue": "ثلاثاء",
-	"Wed": "اربعاء",
+	"Wed": "أربعاء",
 	"Thu": "خميس",
 	"Fri": "جمعة",
 	"Sat": "سبت",
@@ -88,7 +88,7 @@
 	"ArchivedChats": "المحادثات المؤرشفة",
 	"Contacts": "جهات الاتصال",
 	"Search": "البحث",
-	"OpenByLink": "Open by link", // Untranslated
+	"OpenByLink": "فتح عبر الرابط",
 		
 	// Message commands
 	"OpenChat": "فتح المحادثة",
@@ -100,44 +100,44 @@
 	"Delete": "مسح",
 	"Edit": "تعديل",
 	"GoTo": "الذهاب الى",
-	"Pin": "Pin", // Untranslated
-	"BanMember": "Ban member", // Untranslated
-	"Comments": "Discussion", // Untranslated
+	"Pin": "تثبيت",
+	"BanMember": "حظر العضو",
+	"Comments": "مناقشة",
 	
 	// Item commands
 	"Link_Cmd": "الرابط",
 	"ViewImage": "اظهار الصورة",
 	"Call": "اتصال",
 	"Download": "تحميل",
-	"Play_Item": "Play", // Untranslated
+	"Play_Item": "تشغيل", 
 	
 	// Chat form commands
 	"WriteMessage": "كتابة رسالة",
 	"LatestMessages_Cmd": "تحديث",
 	"ChatInfo": "معلومات المحادثة",
-	"Older": "اقدم",
-	"Newer": "احدث",
-	"SendSticker": "Send sticker", // Untranslated
+	"Older": "الاقدم",
+	"Newer": "الاحدث",
+	"SendSticker": "ارسال ملصق",
 	
 	// Message writing form commands
 	"Send": "ارسال",
-	"OpenTextBox": "فتح مربع النص",
-	"ChooseFile": "Choose file", // Untranslated
+	"OpenTextBox": "فتح حقل النص",
+	"ChooseFile": "اختيار ملف",
 	
 	// Profile/chat info commands
 	"Join": "انضمام",
 	"JoinGroup": "الانضمام للمجموعة",
 	"LeaveGroup": "الخروج من المجموعة",
 	"ChatMedia": "وسائط المحادثة",
-	"Members": "اعضاء",
-	"AddToContacts": "Add to contacts", // Untranslated
-	"Photos": "Photos", // Untranslated
-	"Videos": "Videos", // Untranslated
-	"Files": "Files", // Untranslated
-	"AudioFiles": "Music", // Untranslated
+	"Members": "الاعضاء",
+	"AddToContacts": "اضافة لجهات الاتصال",
+	"Photos": "الصور",
+	"Videos": "الفيديوهات",
+	"Files": "الملفات",
+	"AudioFiles": "موسيقى",
 	
 	// Dialog commands
-	"Ok": "تم",
+	"Ok": "تأكيد",
 	"Cancel": "الغاء",
 	
 	// Pagination commands
@@ -147,43 +147,43 @@
 	// Loading states
 	"Loading": "تحميل",
 	"Authorizing": "يتم التحقق",
-	"WaitingForServerResponse": "...انتظار رد الخادم",
+	"WaitingForServerResponse": "...في انتظار رد الخادم",
 	"Sending": "يتم الارسال",
-	"WaitingForPrevChat": "Waiting for previous chat to disconnect...", // Untranslated
+	"WaitingForPrevChat": "في انتظار قطع الاتصال بالمحادثة السابقة....",
 	
 	// Authorization process
 	"Auth_Title": "التحقق",
-	"InstanceURL": "عنوان URL للمثال",
-	"InstancePassword": "كلمة مرور المثال",
+	"InstanceURL": "عنوان URL للنموذج",
+	"InstancePassword": "كلمة مرور النموذج",
 	"ChooseAuthMethod": "اختر طريقة المصادقة",
 	"PhoneNumber": "رقم الهاتف",
 	"SessionCode": "رمز الجلسة",
 	"Code": "رمز",
-	"CloudPassword": "كلمة المرور",
-	"Captcha": "كلمة التحقق",
+	"CloudPassword": " كلمة المرور السحابية",
+	"Captcha": "Captcha",
 	"Auth_Btn": "مصادقة",
-	"InvalidCode_Alert": "Invalid code!", // Untranslated
-	"CodeExpired_Alert": "Code expired!", // Untranslated
-	"Auth_Hint1": "(leave empty if using mp.nnchan.ru or your instance doesn't have a password)", // Untranslated
-	"InvalidInstance_Alert": "Invalid instance URL!", // Untranslated
-	"InvalidPhoneNumber_Alert": "Invalid phone number!", // Untranslated
-	"InvalidCaptcha_Alert": "Invalid captcha!", // Untranslated
-	"CloudPasswordEmpty_Alert": "Cloud password can't be empty!", // Untranslated
-	"CreateNewSession_Btn": "Create new session", // Untranslated
-	"ImportSession_Btn": "Import existing session", // Untranslated
-	"InvalidPassword_Alert": "Invalid password!", // Untranslated
-	"LoginDisabled_Alert": "This instance does not support session creation with API!", // Untranslated
-	"APIDisabled_Alert": "This instance does not support API!", // Untranslated
-	"ClientOutdated_Alert": "Client outdated!", // Untranslated
-	"InvalidInstancePassword_Alert": "Invalid instance password!", // Untranslated
-	"Retry": "Retry", // Untranslated
+	"InvalidCode_Alert": "الرمز غير صالح !", 
+	"CodeExpired_Alert": "الرمز منتهي الصلاحية",
+	"Auth_Hint1": "(اتركه فارغًا إذا كنت تستخدم mp.nnchan.ru أو إذا لم يكن للنموذج الخاص بك كلمة مرور)",
+	"InvalidInstance_Alert": "رابط نموذج غير صالح!",
+	"InvalidPhoneNumber_Alert": "رقم هاتف غير صالح!",
+	"InvalidCaptcha_Alert": "captcha غير صالحة!",
+	"CloudPasswordEmpty_Alert": "كلمة المرور السحابية لا يمكن ان تكون فارغة!",
+	"CreateNewSession_Btn": "انشاء جلسة جديدة", 
+	"ImportSession_Btn": "استيراد جلسة موجودة", 
+	"InvalidPassword_Alert": "كلمة مرور غير صالحة!",
+	"LoginDisabled_Alert": "هذا النموذج لا يدعم انشاء الجلسة باستخدام API!",
+	"APIDisabled_Alert": "هذا النموذج لا يدعم واجهة برمجة التطبيقات (API)!",
+	"ClientOutdated_Alert": "العميل منتهي الصلاحية !",
+	"InvalidInstancePassword_Alert": "كلمة مرور النموذج غير صالحة!",
+	"Retry": "إعادة المحاولة",
 	
 	// Settings sections
 	"UI": "واجهة المستخدم",
 	"Behaviour": "السلوك",
-	"Images": "صور",
+	"Images": "الصور",
 	"Authorization": "المصادقة",
-	"Notifications": "Notifications", // Untranslated
+	"Notifications": "الاشعارات",
 	
 	// UI Settings
 	"Language": "اللغة",
@@ -193,56 +193,56 @@
 	"ThumbnailsSize": "حجم الصور المصغرة",
 	"ChatsCount": "عدد المحادثات",
 	"MessagesCount": "عدد الرسائل",
-	"ChatsListFontSize": "Chats list font size", // Untranslated
-	"Default": "Default", // Untranslated
-	"Small": "Small", // Untranslated
-	"Medium": "Medium", // Untranslated
-	"FocusNewMessages": "Focus new messages", // Untranslated
-	"ChatTextField": "Text field in chat", // Untranslated
-	"BuiltinImageViewer": "Built-in image viewer", // Untranslated
-	"LargeMusicCover": "Large player cover", // Untranslated
+	"ChatsListFontSize": "حجم خط قائمة المحادثات",
+	"Default": "افتراضي", 
+	"Small": "صغير", 
+	"Medium": "متوسط",
+	"FocusNewMessages": "التركيز على الرسائل الجديدة",
+	"ChatTextField": "حقل النص في المحادثة", 
+	"BuiltinImageViewer": "عارض الصور المدمج",
+	"LargeMusicCover": "غلاف كبير لمشغل الوسائط", 
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "انتظار تحميل الصفحة",
 	"UseJSONStream": "JSONStream استخدام",
 	"FormatText": "تنسيق النص",
-	"ParseLinks": "تحليل الروابط",
+	"ParseLinks": "تحليل الروابط",  
 	"ChatAutoUpdate": "تحديث المحادثة تلقائيا",
-	"UpdatesTimeout": "انتهاء وقت التحديث",
-	"KeepSessionAlive": "Keep session alive", // Untranslated
-	"UseUnicode": "Use Unicode", // Untranslated
-	"UseCompression": "Use compression", // Untranslated
-	"NetworkAccess": "Network access", // Untranslated
-	"MobileData": "Data", // Untranslated
-	"WiFi": "Wi-Fi", // Untranslated
+	"UpdatesTimeout": "انتهاء مهلة التحديث", 
+	"KeepSessionAlive": "إبقاء الجلسة نشطة", 
+	"UseUnicode": "استخدام Unicode", 
+	"UseCompression": "استخدام الضغط", 
+	"NetworkAccess": "نقطة اتصال الشبكة",
+	"MobileData": "بيانات الهاتف المحمول",
+	"WiFi": "Wi-Fi",
 	
 	// Images settings
 	"LoadMediaThumbnails": "تحميل صور مصغرة للوسائط",
-	"LoadAvatars": "تحميل صور الحسابات",
+	"LoadAvatars": "تحميل الصور الرمزية",
 	"MultiThreadedLoading": "تحميل متعدد الخيوط",
-	"RoundAvatars": "Rounded avatars", // Untranslated
+	"RoundAvatars": "صور رمزية دائرية", 
 	
 	// Cache settings
-	"AvatarsCaching": "تخزين صور الحسابات مؤقتا",
+	"AvatarsCaching": "تخزين الصور الرمزية مؤقتا",
 	"Disabled": "غير مفعل",
-	"HoldInRAM": "عقد في ذاكرة الوصول العشوائي",
+	"HoldInRAM": "عقد في ذاكرة الوصول العشوائي",  
 	"Store": "خرن",
 	"HoldInRAMandStore": " العقد في ذاكرة الوصول العشوائي والتخزين",
-	"AvatarsCacheThreshold": "عتبة تخزين صور الحسابات المؤقت",
+	"AvatarsCacheThreshold": "عتبة تخزين صور الحسابات المؤقت", 
 	"ProfilesCacheThreshold": "عتبة تخزين الحسابات المؤقت",
-	"RMSCacheCount": "Stored cache count: ", // Untranslated
+	"RMSCacheCount": "مقدار التخزين المؤقت المخزن في الذاكرة: ",
 	
 	// Notifications settings
-	"EnableNotifications": "Notifications", // Untranslated
-	"EnableSound": "Sound", // Untranslated
-	"NotificationMethod": "Notification method", // Untranslated
-	"Off": "Off", // Untranslated
-	"AlertWindow": "Alert window", // Untranslated
+	"EnableNotifications": "الاشعارات", 
+	"EnableSound": "الصوت",
+	"NotificationMethod": "اسلوب الاشعارات", 
+	"Off": "مغلق", 
+	"AlertWindow": "نافذة التنبيه",
 	"PushInterval": "Polling interval", // Untranslated
 	"PushBackgroundInterval": "Background polling interval", // Untranslated
 	
 	// About
-	"AboutText": ".MPGram Web API عميل تلكرام،يعتمد على",
+	"AboutText": "MPGram هو نموذج تليجرام يعتمد على API ",
 	"Developer": "المطور",
 	"Author": "المؤلف",
 	"Donate": "تبرع",
@@ -251,81 +251,81 @@
 	// Write form
 	"Reply_Title": "رد",
 	"Write_Title": "كتابة",
-	"Edit_Title": "Edit", // Untranslated
-	"Forward_Title": "Forward", // Untranslated
+	"Edit_Title": "تعديل", 
+	"Forward_Title": "تحويل",
 	"Message": "رسالة",
-	"File": "File", // Untranslated
-	"File_Prefix": "File: ", // Untranslated
-	"NotSelected": "Not selected", // Untranslated
-	"SendUncompressed": "Send uncompressed", // Untranslated
-	"SendAsVoice": "Send as voice message", // Untranslated
-	"HideWithSpoiler": "Hide with spoiler", // Untranslated
-	"EnableHTMLFormatting": "Enable HTML-formatting", // Untranslated
+	"File": "ملف",
+	"File_Prefix": "ملف: ",
+	"NotSelected": "غير محدد", 
+	"SendUncompressed": "ارسال بدون ضغط", 
+	"SendAsVoice": "ارسال كرسالة صوتية", 
+	"HideWithSpoiler": "اخفاء الرسالة",
+	"EnableHTMLFormatting": "تفعيل تنسيق HTML",
 	
 	// Alert messages
 	"MessageSent_Alert": "الرسالة مرسلة",
 	"MessageDeleted_Alert": "الرسالة ممسوحة",
 	"UpdateAvailable_Alert": "تحديث جديد متوفر",
-	"MemberBanned_Alert": "Member banned", // Untranslated
-	"StickersAdded_Alert": "Stickers added", // Untranslated
-	"ChooseNetwork_Alert": "Choose network access point", // Untranslated
-	"FailedToLoadImage": "Failed to load image", // unwrapped, should be short // Untranslated
+	"MemberBanned_Alert": "تم حظر العضو",
+	"StickersAdded_Alert": "تم اضافة ملصق",
+	"ChooseNetwork_Alert": "اختيار نقطة وصول الشبكة",
+	"FailedToLoadImage": "فشل تحميل الصورة",
 	
 	// Chat form
-	"ChatMedia_Title": "وسائط",
-	"Search_TitlePrefix": "بحث - ",
-	"OlderMessages": "رسائل اقدم",
-	"NewerMessages": "رسائل احدث",
+	"ChatMedia_Title": "الوسائط",
+	"Search_TitlePrefix": "البحث - ",
+	"OlderMessages": "الرسائل الاقدم",
+	"NewerMessages": "الرسائل الاحدث",
 	
 	// Message
 	"ForwardedFrom": "محولة من ",
-	"Action": "فعل",
+	"Action": "اجراءات",
 	"You": "انت",
 	"You_Prefix": "انت: ",
 	"ForwardedMessage": "رسالة محولة",
-	"Edited": "edited", // Untranslated
-	"_comment": " comment", // Untranslated
-	"_comments": " comments", // Untranslated
+	"Edited": "معدلة", 
+	"_comment": "تعليق", 
+	"_comments": " تعليقات",
 	"_comments2": "",
 	
 	// Message media
 	"Media": "وسائط",
-	"Poll": "تصويت",
-	"Geo": "جغرافي: ",
+	"Poll": "استفتاء",
+	"Geo": "موقع جعراقي: ",
 	
 	// Chat actions
-	"PinnedMessage_Action": " pinned message", // Untranslated
-	"Joined_Action": " joined the group", // Untranslated
-	"Added_Action": " added", // Untranslated
-	"Left_Action": " left the group", // Untranslated
-	"Removed_Action": " removed", // Untranslated
-	"JoinedByLink_Action": " joined the group via invite link", // Untranslated
-	"JoinedByRequest_Action": " was accepted to the group", // Untranslated
-	"ChatHistoryCleared_Action": "Chat history was cleared", // Untranslated
-	"GroupCreated_Action": "Group created", // Untranslated
-	"ChannelCreated_Action": "Channel created", // Untranslated
-	"PhotoUpdated_Action": "Photo updated", // Untranslated
-	"NameChanged_Action": "Name was changed to ", // Untranslated
+	"PinnedMessage_Action": " ثبت رسالة", 
+	"Joined_Action": " انضم للمجموعة",
+	"Added_Action": " تمت اضافته", 
+	"Left_Action": " غادر المجموعة", 
+	"Removed_Action": " تمت ازالته",
+	"JoinedByLink_Action": " انضم للمجموعة عبر رابط دعوة",
+	"JoinedByRequest_Action": " تم قبوله للمجموعة", 
+	"ChatHistoryCleared_Action": "تم محو سجل المحادثة",
+	"GroupCreated_Action": "تم انشاء المجموعة",
+	"ChannelCreated_Action": "تم انشاء القناة", 
+	"PhotoUpdated_Action": "تم تحديث الصورة", 
+	"NameChanged_Action": "تم تغيير الاسم الى ", 
 	
 	// Folders
 	"AllChats": "جميع المحادثات",
-	"Archive": "ارشيف",
+	"Archive": "الارشيف",
 	
 	// Stickers
-	"Stickers_Title": "Stickers", // Untranslated
-	"Sticker": "Sticker", // Untranslated
-	"AddStickers": "Add stickers", // Untranslated
+	"Stickers_Title": "الملصقات", 
+	"Sticker": "ملصق",
+	"AddStickers": "اضافة ملصقات", 
 	
 	// Music player
-	"Player_Title": "Music player", // Untranslated
-	"OpenPlayer": "Player", // Untranslated
-	"OpenPlaylist": "Playlist", // Untranslated
-	"Play_Player": "Play", // Untranslated
-	"Pause_Player": "Pause", // Untranslated
-	"Prev_Player": "Prev", // Untranslated
-	"Next_Player": "Next", // Untranslated
-	"UnknownTrack": "Unknown Track", // Untranslated
-	"Playlist_Title": "Playlist", // Untranslated
+	"Player_Title": "مشغل الموسيقى", 
+	"OpenPlayer": "المشغل", 
+	"OpenPlaylist": "قائمة تشغيل",
+	"Play_Player": "تشغيل",
+	"Pause_Player": "ايقاف", 
+	"Prev_Player": "السابق",
+	"Next_Player": "التالي",
+	"UnknownTrack": "مقطع غير معروف",
+	"Playlist_Title": "قائمة تشغيل", 
 	
 	// Profile/chat info
 	"Online": "متصل",
@@ -333,45 +333,45 @@
 	"LastSeen": "اخر ظهور ",
 	"About_User": "النبذة",
 	"About_Chat": "حول",
-	"Mobile": "Mobile", // Untranslated
+	"Mobile": "الهاتف",
 	"Username": "اسم المستخدم",
 	"Link": "الرابط",
 	"SearchMessages": "البحث في الرسائل",
 	"ViewGroup": "اظهار المجموعة",
 	"GoToPinnedMessage": "الذهاب للرسالة المثبتة",
-	"Owner": "owner", // Untranslated
-	"Admin": "admin", // Untranslated
-	"Bot": "bot", // Untranslated
-	"UserInfo": "User info", // Untranslated
-	"GroupInfo": "Group info", // Untranslated
-	"ChannelInfo": "Channel info", // Untranslated
-	"TopicInfo": "Topic Info", // Untranslated
+	"Owner": "المالك", 
+	"Admin": "المدير", 
+	"Bot": "البوت",
+	"UserInfo": "معلومات المستخدم", 
+	"GroupInfo": "معلومات المجموعة", 
+	"ChannelInfo": "معلومات القناة", 
+	"TopicInfo": "معلومات الموضوع", 
 	
 	"_member": " عضو",
 	"_members": " اعضاء",
 	"_members2": "",
 	
 	"_subscriber": " مشترك",
-	"_subscribers": " مشتركين",
+	"_subscribers": " مشتركون",
 	"_subscribers2": "",
 	
-	"_photo": " photo", // Untranslated
-	"_photos": " photos", // Untranslated
+	"_photo": " صورة", 
+	"_photos": " صور", 
 	"_photos2": "",
 	
-	"_video": " video", // Untranslated
-	"_videos": " videos", // Untranslated
+	"_video": " فيديو", 
+	"_videos": " فيديوهات", 
 	"_videos2": "",
 	
-	"_file": " file", // Untranslated
-	"_files": " files", // Untranslated
+	"_file": " ملف", 
+	"_files": " ملفات", 
 	"_files2": "",
 	
-	"_audioFile": " audio file", // Untranslated
-	"_audioFiles": " audio files", // Untranslated
+	"_audioFile": " ملف صوتي", 
+	"_audioFiles": "ملفات الصوتية", 
 	"_audioFiles2": "",
 	
-	"_voiceMessage": " voice message", // Untranslated
-	"_voiceMessages": " voice messages", // Untranslated
+	"_voiceMessage": " رسالة صوتية",
+	"_voiceMessages": "رسائل صوتية", 
 	"_voiceMessages2": ""
 }
