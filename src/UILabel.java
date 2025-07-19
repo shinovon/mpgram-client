@@ -155,19 +155,19 @@ public class UILabel extends UIItem {
 				if (end) break;
 			} else if (text.indexOf('\n', ch) == -1) {
 				split(text, font, url, width, x, y, idx, mw, ch, sl, fh, res, center, out);
-				x = out[0]; y = out[1]; idx = out[2];
+				x = out[0]; y = out[1]; idx = out[2]; mw = out[3];
 			} else {
 				int j = ch;
 				for (int i = ch; i < sl; ++i) {
 					if ((c = text.charAt(i)) == '\n') {
 						split(text, font, url, width, x, y, idx, mw, j, i, fh, res, center, out);
-						x = 0; y = out[1] + fh; idx = out[2];
+						x = 0; y = out[1] + fh; idx = out[2]; mw = out[3];
 						j = i + 1;
 					}
 				}
 				if (j != sl) {
 					split(text, font, url, width, x, y, idx, mw, j, sl, fh, res, center, out);
-					x = out[0]; y = out[1]; idx = out[2];
+					x = out[0]; y = out[1]; idx = out[2]; mw = out[3];
 				}
 			}
 			
