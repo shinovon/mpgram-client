@@ -240,7 +240,7 @@ public class UIMessage extends UIItem implements LangConstants {
 							t = MP.getName(replyFwd.getString("from_id", null), true);
 						}
 					}
-					replyName = t;
+					replyName = t == null && chat.user ? chat.title : t;
 					if (replyMsg.has("media")) {
 						String type = replyMsg.getObject("media").getString("type", null);
 						t = MP.L[Media];
@@ -1157,7 +1157,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	}
 	
 	private void commentAction() {
-		MP.openLoad(new ChatForm(commentPeer, peerId, id, commentRead));
+		MP.openLoad(new ChatForm(commentPeer, peerId, Integer.toString(id), commentRead));
 	}
 
 	public void edit(JSONObject msg, ChatCanvas chat) {
