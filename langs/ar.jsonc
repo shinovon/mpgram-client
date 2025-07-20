@@ -103,6 +103,9 @@
 	"Pin": "تثبيت",
 	"BanMember": "حظر العضو",
 	"Comments": "مناقشة",
+	"Copy": "Copy", // Untranslated
+	"CopyLink": "Copy link", // Untranslated
+	"Select": "Select", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "الرابط",
@@ -118,6 +121,8 @@
 	"Older": "الاقدم",
 	"Newer": "الاحدث",
 	"SendSticker": "ارسال ملصق",
+	"Menu": "Menu", // Untranslated
+	"Write": "Write", // Untranslated
 	
 	// Message writing form commands
 	"Send": "ارسال",
@@ -261,6 +266,7 @@
 	"SendAsVoice": "ارسال كرسالة صوتية", 
 	"HideWithSpoiler": "اخفاء الرسالة",
 	"EnableHTMLFormatting": "تفعيل تنسيق HTML",
+	"TextField_Hint": "Write a message...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "الرسالة مرسلة",
@@ -276,6 +282,7 @@
 	"Search_TitlePrefix": "البحث - ",
 	"OlderMessages": "الرسائل الاقدم",
 	"NewerMessages": "الرسائل الاحدث",
+	"SavedMessages": "Saved messages", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "محولة من ",
@@ -292,6 +299,8 @@
 	"Media": "وسائط",
 	"Poll": "استفتاء",
 	"Geo": "موقع جعراقي: ",
+	"Photo": "Photo", // Untranslated
+	"Video": "Video", // Untranslated
 	
 	// Chat actions
 	"PinnedMessage_Action": " ثبت رسالة", 

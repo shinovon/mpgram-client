@@ -105,6 +105,7 @@
 	"Comments": "Discussion", // Untranslated
 	"Copy": "Copy", // Untranslated
 	"CopyLink": "Copy link", // Untranslated
+	"Select": "Select", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "Enllaç", // assuming noun, if verb - Enllaça
