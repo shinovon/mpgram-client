@@ -405,7 +405,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 		if (selected) {
 			g.setColor(ChatCanvas.colors[ChatCanvas.COLOR_CHAT_HIGHLIGHT_BG]);
-			g.fillRect(x, y, w, h);
+			g.fillRect(0, 0, w, h);
 		}
 		// date
 		if (showDate) {
@@ -838,6 +838,8 @@ public class UIMessage extends UIItem implements LangConstants {
 		} else if (!(timeBreak = maxW + timeWidth >= cw)) {
 			maxW += timeWidth;
 		}
+		
+		// buttons
 		
 		// time
 		if (timeBreak) {

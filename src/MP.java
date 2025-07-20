@@ -581,25 +581,21 @@ public class MP extends MIDlet
 		// Test UTF-8 support
 		byte[] b = new byte[] { (byte) 0xF0, (byte) 0x9F, (byte) 0x98, (byte) 0x83 };
 		try {
-			encoding = "UTF-8";
-			new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
+			new InputStreamReader(new ByteArrayInputStream(b), encoding = "UTF-8").read();
 			if (new String(b, encoding).length() != 2) throw new Exception();
 		} catch (Exception e) {
 			try {
-				encoding = "UTF8";
-				new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
+				new InputStreamReader(new ByteArrayInputStream(b), encoding = "UTF8").read();
 				if (new String(b, encoding).length() != 2) throw new Exception();
 			} catch (Exception e2) {
 				utf = false;
 				b = new byte[] { (byte) 0xD0, (byte) 0xB2, (byte) 0xD1, (byte) 0x8B, (byte) 0xD1, (byte) 0x84 };
 				try {
-					encoding = "UTF-8";
-					new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
+					new InputStreamReader(new ByteArrayInputStream(b), encoding = "UTF-8").read();
 					if (new String(b, encoding).length() != 3) throw new Exception();
 				} catch (Exception e3) {
 					try {
-						encoding = "UTF8";
-						new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
+						new InputStreamReader(new ByteArrayInputStream(b), encoding = "UTF8").read();
 						if (new String(b, encoding).length() != 3) throw new Exception();
 					} catch (Exception e4) {
 						encoding = "ISO-8859-1";
