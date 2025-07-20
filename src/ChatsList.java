@@ -38,6 +38,9 @@ public class ChatsList extends MPList {
 	boolean canBan;
 	String peerId, msgId;
 	int pinnedCount;
+//#ifndef NO_CHAT_CANVAS
+	UIMessage[] msgs;
+//#endif
 
 	// main mode
 	public ChatsList(String title, int folder) {
@@ -76,6 +79,19 @@ public class ChatsList extends MPList {
 		addCommand(MP.cancelCmd);
 //		setFitPolicy(List.TEXT_WRAP_ON);
 	}
+	
+//#ifndef NO_CHAT_CANVAS
+	// forward messages
+	public ChatsList(String peerId, UIMessage[] msgs) {
+		super(MP.L[Forward]);
+		this.folder = 0;
+		this.peerId = peerId;
+		this.msgId = "";
+		this.msgs = msgs;
+		addCommand(MP.archiveCmd);
+		addCommand(MP.cancelCmd);
+	}
+//#endif
 
 	void loadInternal(Thread thread) throws Exception {
 		deleteAll();
@@ -207,6 +223,14 @@ public class ChatsList extends MPList {
 		if (msgId != null) {
 			// forward
 			MP.deleteFromHistory(this);
+//#ifndef NO_CHAT_CANVAS
+			if (msgs != null) {
+				// TODO
+				
+				return;
+			}
+//#endif
+			
 			MP.display(new ChatForm(id, null, 0, 0));
 			MP.display(MP.writeForm(id, null, "", null, peerId, msgId));
 			return;

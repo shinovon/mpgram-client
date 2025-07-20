@@ -1314,6 +1314,17 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				}
 				case Forward: {
 					// TODO
+					UIMessage[] msgs = new UIMessage[selected];
+					int count = 0;
+					UIItem item = firstItem;
+					do {
+						if (!(item instanceof UIMessage) || !((UIMessage) item).selected)
+							continue;
+						msgs[count++] = (UIMessage) item;
+					} while ((item = item.next) != null);
+					selected = 0;
+
+					MP.openLoad(new ChatsList(id, msgs));
 					break;
 				}
 				}
