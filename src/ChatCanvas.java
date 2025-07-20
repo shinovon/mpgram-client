@@ -678,7 +678,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				int d = pointerX - pressX;
 				if (d > 0) {
 					x = d;
-				} else if (focusedItem instanceof UIMessage) {
+				} else if (pointedItem instanceof UIMessage) {
 					x = Math.max(-100, Math.min(0, d));
 				}
 			}
@@ -691,7 +691,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					if (y < 0) break;
 					y -= item.contentHeight;
 					if (y > clipHeight) continue;
-					item.paint(g, focusedItem == item || x > 0 ? x : 0, y, w);
+					item.paint(g, pointedItem == item || x > 0 ? x : 0, y, w);
 				} while ((item = item.next) != null);
 			} else {
 				int y = top - scroll;
@@ -702,7 +702,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						y += ih;
 						continue;
 					}
-					item.paint(g, focusedItem == item || x > 0 ? x : 0, y, w);
+					item.paint(g, pointedItem == item || x > 0 ? x : 0, y, w);
 					if ((y += ih) > clipHeight) break;
 				} while ((item = item.next) != null);
 			}
@@ -1157,6 +1157,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (!menuFocused && y > top && y < top + clipHeight) {
 			pointedItem = getItemAt(x, y);
 			contentPressed = true;
+		} else {
+			pointedItem = null;
 		}
 		queueRepaint();
 	}
@@ -1231,8 +1233,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					int d = pointerX - pressX;
 					if (d > 50) {
 						MP.midlet.commandAction(MP.backCmd, this);
-					} else if (d < -50 && focusedItem instanceof UIMessage) {
-						startReply((UIMessage) focusedItem);
+					} else if (d < -50 && pointedItem instanceof UIMessage) {
+						startReply((UIMessage) pointedItem);
 					}
 				} else {
 					int move = 0;

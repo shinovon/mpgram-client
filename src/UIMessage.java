@@ -539,7 +539,7 @@ public class UIMessage extends UIItem implements LangConstants {
 					g.fillRect(x, y + 1, photoRenderWidth, photoRenderHeight);
 				} else {
 					int clipX = g.getClipX(), clipY = g.getClipY(), clipW = g.getClipWidth(), clipH = g.getClipHeight();
-					g.setClip(x, y + 1, photoRenderWidth, photoRenderHeight);
+					g.clipRect(x, y + 1, photoRenderWidth, photoRenderHeight);
 					g.drawImage(mediaImage, x, y + 1, 0);
 					g.setClip(clipX, clipY, clipW, clipH);
 				}
@@ -562,7 +562,7 @@ public class UIMessage extends UIItem implements LangConstants {
 					int s = MP.smallBoldFontHeight + MP.smallPlainFontHeight;
 					if (mediaImage != null) {
 						int clipX = g.getClipX(), clipY = g.getClipY(), clipW = g.getClipWidth(), clipH = g.getClipHeight();
-						g.setClip(px, y + 1, s - 2, s - 2);
+						g.clipRect(px, y + 1, s - 2, s - 2);
 						g.drawImage(mediaImage, px, y + ((s - mediaImage.getHeight()) >> 1), 0);
 						g.setClip(clipX, clipY, clipW, clipH);
 					} else {
