@@ -290,6 +290,7 @@ public class UILabel extends UIItem {
 			if (x + ew < width) {
 				res.addElement(new Object[] { text.substring(ch, sl), font, url, new int[] {x, y + ay, ew, fh} });
 				x += ew; idx ++;
+				mw = Math.max(mw, x);
 			} else {
 				for (int i = ch; i < sl; i++) {
 					if (x + font.stringWidth(text.substring(ch, i+1)) >= width) {
@@ -328,6 +329,7 @@ public class UILabel extends UIItem {
 					int tw = font.stringWidth(s);
 					res.addElement(new Object[] { s, font, url, new int[] {x, y + ay, tw, fh} });
 					x += tw; idx ++;
+					mw = Math.max(mw, x);
 				}
 			}
 		}
