@@ -466,7 +466,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			// postLoad
 			loading = false;
 			if (touch && hasInput && (canWrite || left) && mediaFilter == null && query == null) {
-				bottom = Math.max(MP.medPlainFontHeight + 16, 48);
+				bottom = Math.max(MP.medPlainFontHeight + 16, 40);
 			} else {
 				bottom = 0;
 			}
@@ -1228,10 +1228,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 										false);
 					}
 				} else if (draggingHorizontally && selected == 0) {
-					if (pointerX - pressX < -50 && focusedItem instanceof UIMessage) {
-						startReply((UIMessage) focusedItem);
-					} else if (pointerX - pressY > 50) {
+					int d = pointerX - pressX;
+					if (d > 50) {
 						MP.midlet.commandAction(MP.backCmd, this);
+					} else if (d < -50 && focusedItem instanceof UIMessage) {
+						startReply((UIMessage) focusedItem);
 					}
 				} else {
 					int move = 0;
