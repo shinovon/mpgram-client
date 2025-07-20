@@ -1013,7 +1013,6 @@ public class UIMessage extends UIItem implements LangConstants {
 			((ChatCanvas) container).startReply(this);
 			break;
 		case Edit:
-			// TODO
 			((ChatCanvas) container).startEdit(this);
 			break;
 		case Pin:
@@ -1061,6 +1060,11 @@ public class UIMessage extends UIItem implements LangConstants {
 			((ChatCanvas) container).reset();
 			((ChatCanvas) container).openMessage(idStr, -1);
 			break;
+		case Select:
+			if (selected) break;
+			selected = true;
+			((ChatCanvas) container).selected(this);
+			break;
 		}
 	}
 	
@@ -1106,6 +1110,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			general[count++] = Forward;
 			if (chat.canDelete) general[count++] = Delete;
 		}
+		general[count++] = Select;
 		general[count] = Integer.MIN_VALUE;
 		if (item == null) {
 			return general;
@@ -1119,7 +1124,6 @@ public class UIMessage extends UIItem implements LangConstants {
 	
 	boolean tap(int x, int y, boolean longTap) {
 		subFocusCurrent = -1;
-		// TODO selecting
 		if (selected) {
 			selected = false;
 			((ChatCanvas) container).unselected(this);

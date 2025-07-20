@@ -933,14 +933,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	private void back() {
 		if (selected != 0) {
-			UIItem item = firstItem;
-			do {
-				if (!(item instanceof UIMessage) || !((UIMessage) item).selected)
-					continue;
-				((UIMessage) item).selected = false;
-			} while ((item = item.next) != null);
-			selected = 0;
-			queueRepaint();
+			unselectAll();
 			return;
 		}
 		MP.midlet.commandAction(MP.backCmd, this);
@@ -1299,32 +1292,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					MP.midlet.commandAction(MP.writeCmd, this);
 					break;
 				case Delete: {
-					UIMessage[] msgs = new UIMessage[selected];
-					int count = 0;
-					UIItem item = firstItem;
-					do {
-						if (!(item instanceof UIMessage) || !((UIMessage) item).selected)
-							continue;
-						msgs[count++] = (UIMessage) item;
-					} while ((item = item.next) != null);
-					selected = 0;
-					
-					MP.midlet.start(MP.RUN_DELETE_MESSAGE, msgs);
+					deleteSelected();
 					break;
 				}
 				case Forward: {
-					// TODO
-					UIMessage[] msgs = new UIMessage[selected];
-					int count = 0;
-					UIItem item = firstItem;
-					do {
-						if (!(item instanceof UIMessage) || !((UIMessage) item).selected)
-							continue;
-						msgs[count++] = (UIMessage) item;
-					} while ((item = item.next) != null);
-					selected = 0;
-
-					MP.openLoad(new ChatsList(id, msgs));
+					forwardSelected();
 					break;
 				}
 				}
@@ -1590,6 +1562,43 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	void unselected(UIMessage msg) {
 		-- selected;
+	}
+	
+	private UIMessage[] getSelected() {
+		UIMessage[] msgs = new UIMessage[selected];
+		int count = 0;
+		UIItem item = firstItem;
+		do {
+			if (!(item instanceof UIMessage) || !((UIMessage) item).selected)
+				continue;
+			msgs[count++] = (UIMessage) item;
+		} while ((item = item.next) != null);
+		return msgs;
+	}
+	
+	private void unselectAll() {
+		UIItem item = firstItem;
+		do {
+			if (!(item instanceof UIMessage) || !((UIMessage) item).selected)
+				continue;
+			((UIMessage) item).selected = false;
+		} while ((item = item.next) != null);
+		selected = 0;
+		queueRepaint();
+	}
+	
+	private void deleteSelected() {
+		UIMessage[] msgs = getSelected();
+		unselectAll();
+		
+		MP.midlet.start(MP.RUN_DELETE_MESSAGE, msgs);
+	}
+	
+	private void forwardSelected() {
+		UIMessage[] msgs = getSelected();
+		unselectAll();
+
+		MP.openLoad(new ChatsList(id, msgs));
 	}
 	
 	// interface getters
