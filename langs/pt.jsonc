@@ -1,0 +1,377 @@
+{
+	// About this locale file
+	"LocaleInfo": "Portuguese, by @kefelili",
+	"LocaleSlavicPlurals": "",
+	"LocaleCustomPlurals": "1",
+	
+	// Common commands
+	"Exit": "Sair",
+	"Back": "Voltar",
+	"Settings": "Configurações",
+	"About": "Sobre",
+	
+	// Date offsets
+	"_secondAgo": "há % segundo",
+	"_secondsAgo": "há % segundos",
+	"_secondsAgo2": "",
+	"_minuteAgo": "há % minuto",
+	"_minutesAgo": "há % minutos",
+	"_minutesAgo2": "",
+	"_hourAgo": "há % hora",
+	"_hoursAgo": "há % horas",
+	"_hoursAgo2": "",
+	"_dayAgo": "há % dia",
+	"_daysAgo": "há % dias",
+	"_daysAgo2": "",
+	"_weekAgo": "há % semana",
+	"_weeksAgo": "há % semanas",
+	"_weeksAgo2": "",
+	"_monthAgo": "há % mês",
+	"_monthsAgo": "há % meses",
+	"_monthsAgo2": "",
+	"_yearAgo": "há % ano",
+	"_yearsAgo": "há % anos",
+	"_yearsAgo2": "",
+	"Now": "agora",
+	"JustNow": "agora",
+	"Today": "hoje",
+	"Yesterday": "ontem",
+	"LastWeek": "semana passada",
+	"LastMonth": "mês passado", 
+	"ALongTimeAgo": "há muito tempo",
+	"Recently": "recentemente",
+	// Date suffixes
+	"on_Date": "em ",
+	"at_Time": " às",
+	// Months
+	"Jan": "Jan",
+	"Feb": "Fev",
+	"Mar": "Mar",
+	"Apr": "Abr",
+	"May": "Mai",
+	"Jun": "Jun",
+	"Jul": "Jul",
+	"Aug": "Ago",
+	"Sep": "Set",
+	"Oct": "Out",
+	"Nov": "Nov",
+	"Dec": "Dez",
+	// Days of week
+	"Sun": "Dom",
+	"Mon": "Seg",
+	"Tue": "Ter",
+	"Wed": "Qua",
+	"Thu": "Qui",
+	"Fri": "Sex",
+	"Sat": "Sáb",
+	"Sunday": "Domingo",
+	"Monday": "Segunda-feira",
+	"Tuesday": "Terça-feira",
+	"Wednesday": "Quarta-feira",
+	"Thursday": "Quinta-feira",
+	"Friday": "Sexta-feira",
+	"Saturday": "Sábado",
+
+	// Auth commands
+	"Auth": "Autenticação",
+	"Next": "Próximo",
+	"NewSession": "Nova sessão",
+	"ImportSession": "Importar sessão",
+
+	// Settings commands
+	"Logout": "Sair da conta",
+	"ClearCache": "Limpar cache",
+
+	// Chats list commands
+	"Folders": "Pastas",
+	"Refresh": "Atualizar",
+	"ArchivedChats": "Conversas arquivadas",
+	"Contacts": "Contatos",
+	"Search": "Buscar",
+	"OpenByLink": "Abrir pelo link",
+
+	// Message commands
+	"OpenChat": "Abrir conversa",
+	"Profile": "Perfil",
+	"Reply": "Responder",
+	"Forward": "Encaminhar",
+	"CopyMessage": "Copiar mensagem",
+	"CopyMessageLink": "Copiar link da mensagem",
+	"Delete": "Excluir",
+	"Edit": "Editar",
+	"GoTo": "Ir para",
+	"Pin": "Fixar",
+	"BanMember": "Banir membro",
+	"Comments": "Comentários",
+	
+	// Item commands
+	"Link_Cmd": "Link",
+	"ViewImage": "Ver imagem",
+	"Call": "Ligar",
+	"Download": "Baixar",
+	"Play_Item": "Reproduzir", 
+	
+	// Chat form commands
+	"WriteMessage": "Escrever mensagem",
+	"LatestMessages_Cmd": "Atualizar",
+	"ChatInfo": "Informações da conversa",
+	"Older": "Mais antigo",
+	"Newer": "Mais recente",
+	"SendSticker": "Enviar figurinha",
+	
+	// Message writing form commands
+	"Send": "Enviar",
+	"OpenTextBox": "Abrir campo de texto",
+	"ChooseFile": "Escolher arquivo",
+	
+	// Profile/chat info commands
+	"Join": "Entrar",
+	"JoinGroup": "Entrar no grupo",
+	"LeaveGroup": "Sair do grupo",
+	"ChatMedia": "Mídia da conversa",
+	"Members": "Membros",
+	"AddToContacts": "Adicionar aos contatos",
+	"Photos": "Fotos",
+	"Videos": "Vídeos",
+	"Files": "Arquivos",
+	"AudioFiles": "Áudios",
+	
+	// Dialog commands
+	"Ok": "OK",
+	"Cancel": "Cancelar",
+	
+	// Pagination commands
+	"NextPage": "Próxima página",
+	"PrevPage": "Página anterior",
+	
+	// Loading states
+	"Loading": "Carregando",
+	"Authorizing": "Autenticando",
+	"WaitingForServerResponse": "Aguardando resposta do servidor...",
+	"Sending": "Enviando",
+	"WaitingForPrevChat": "Aguardando a conversa anterior...",
+	
+	// Authorization process
+	"Auth_Title": "Autenticação",
+	"InstanceURL": "URL da instância",
+	"InstancePassword": "Senha da instância",
+	"ChooseAuthMethod": "Escolha o método de autenticação",
+	"PhoneNumber": "Número de telefone",
+	"SessionCode": "Código da sessão",
+	"Code": "Código",
+	"CloudPassword": "Senha da nuvem",
+	"Captcha": "Captcha",
+	"Auth_Btn": "Autenticar",
+	"InvalidCode_Alert": "Código inválido!",
+	"CodeExpired_Alert": "Código expirado",
+	"Auth_Hint1": "(Deixe em branco se estiver usando mp.nnchan.ru ou se sua instância não tiver senha)",
+	"InvalidInstance_Alert": "URL da instância inválido!",
+	"InvalidPhoneNumber_Alert": "Número de telefone inválido!",
+	"InvalidCaptcha_Alert": "Captcha inválido!",
+	"CloudPasswordEmpty_Alert": "A senha da nuvem não pode estar vazia!",
+	"CreateNewSession_Btn": "Criar nova sessão", 
+	"ImportSession_Btn": "Importar sessão existente", 
+	"InvalidPassword_Alert": "Senha inválida!",
+	"LoginDisabled_Alert": "Esta instância não permite login pela API!",
+	"APIDisabled_Alert": "Esta instância não suporta API!",
+	"ClientOutdated_Alert": "Cliente desatualizado!",
+	"InvalidInstancePassword_Alert": "Senha da instância inválida!",
+	"Retry": "Tentar novamente",
+	
+	// Settings sections
+	"UI": "Interface",
+	"Behaviour": "Comportamento",
+	"Images": "Imagens",
+	"Authorization": "Autenticação",
+	"Notifications": "Notificações",
+	
+	// UI Settings
+	"Language": "Idioma",
+	"ReversedChat": "Conversa invertida",
+	"ShowMedia": "Mostrar mídia",
+	"ShowChatStatus": "Mostrar status da conversa",
+	"ThumbnailsSize": "Tamanho das miniaturas",
+	"ChatsCount": "Número de conversas",
+	"MessagesCount": "Número de mensagens",
+	"ChatsListFontSize": "Tamanho da fonte da lista de chats",
+	"Default": "Padrão", 
+	"Small": "Pequeno", 
+	"Medium": "Médio",
+	"FocusNewMessages": "Focar nas novas mensagens",
+	"ChatTextField": "Campo de texto do chat", 
+	"BuiltinImageViewer": "Visualizador de imagens embutido",
+	"LargeMusicCover": "Capa grande para música", 
+	
+	// Behaviour settings
+	"WaitForPageToLoad": "Aguardar carregamento da página",
+	"UseJSONStream": "Usar JSONStream",
+	"FormatText": "Formatar texto",
+	"ParseLinks": "Interpretar links",  
+	"ChatAutoUpdate": "Atualizar chat automaticamente",
+	"UpdatesTimeout": "Tempo limite de atualização", 
+	"KeepSessionAlive": "Manter sessão ativa", 
+	"UseUnicode": "Usar Unicode", 
+	"UseCompression": "Usar compressão", 
+	"NetworkAccess": "Acesso à rede",
+	"MobileData": "Dados móveis",
+	"WiFi": "Wi-Fi",
+	
+	// Images settings
+	"LoadMediaThumbnails": "Carregar miniaturas da mídia",
+	"LoadAvatars": "Carregar avatares",
+	"MultiThreadedLoading": "Carregamento em múltiplas threads",
+	"RoundAvatars": "Avatares arredondados", 
+	
+	// Cache settings
+	"AvatarsCaching": "Cache de avatares",
+	"Disabled": "Desativado",
+	"HoldInRAM": "Manter na RAM",  
+	"Store": "Armazenar",
+	"HoldInRAMandStore": "Manter na RAM e armazenar",
+	"AvatarsCacheThreshold": "Limite de cache de avatares", 
+	"ProfilesCacheThreshold": "Limite de cache de perfis",
+	"RMSCacheCount": "Itens armazenados em cache: ",
+	
+	// Notifications settings
+	"EnableNotifications": "Ativar notificações", 
+	"EnableSound": "Ativar som",
+	"NotificationMethod": "Método de notificação", 
+	"Off": "Desligado", 
+	"AlertWindow": "Janela de alerta",
+	"PushInterval": "Polling interval",
+	"PushBackgroundInterval": "Background polling interval",
+	
+	// About
+	"AboutText": "MPGram é um cliente baseado na API do Telegram",
+	"Developer": "Desenvolvedor",
+	"Author": "Autor",
+	"Donate": "Doar",
+	"Chat": "Conversa",
+	
+	// Write form
+	"Reply_Title": "Responder",
+	"Write_Title": "Escrever",
+	"Edit_Title": "Editar", 
+	"Forward_Title": "Encaminhar",
+	"Message": "Mensagem",
+	"File": "Arquivo",
+	"File_Prefix": "Arquivo: ",
+	"NotSelected": "Não selecionado", 
+	"SendUncompressed": "Enviar sem compactar", 
+	"SendAsVoice": "Enviar como voz", 
+	"HideWithSpoiler": "Ocultar com spoiler",
+	"EnableHTMLFormatting": "Ativar formatação HTML",
+	
+	// Alert messages
+	"MessageSent_Alert": "Mensagem enviada",
+	"MessageDeleted_Alert": "Mensagem excluída",
+	"UpdateAvailable_Alert": "Atualização disponível",
+	"MemberBanned_Alert": "Membro banido",
+	"StickersAdded_Alert": "Figurinhas adicionadas",
+	"ChooseNetwork_Alert": "Escolher rede",
+	"FailedToLoadImage": "Erro ao carregar imagem",
+	
+	// Chat form
+	"ChatMedia_Title": "Mídia",
+	"Search_TitlePrefix": "Buscar - ",
+	"OlderMessages": "Mensagens antigas",
+	"NewerMessages": "Mensagens recentes",
+	
+	// Message
+	"ForwardedFrom": "Encaminhada de ",
+	"Action": "Ação",
+	"You": "Você",
+	"You_Prefix": "Você: ",
+	"ForwardedMessage": "Mensagem encaminhada",
+	"Edited": " editada", 
+	"_comment": " comentário", 
+	"_comments": " comentários",
+	"_comments2": "",
+	
+	// Message media
+	"Media": "Mídia",
+	"Poll": "Enquete",
+	"Geo": "Localização: ",
+	
+	// Chat actions
+	"PinnedMessage_Action": " mensagem fixada", 
+	"Joined_Action": " entrou no grupo",
+	"Added_Action": " foi adicionado", 
+	"Left_Action": " saiu do grupo", 
+	"Removed_Action": " foi removido",
+	"JoinedByLink_Action": " entrou pelo link de convite",
+	"JoinedByRequest_Action": " solicitação aceita", 
+	"ChatHistoryCleared_Action": "Histórico apagado",
+	"GroupCreated_Action": "Grupo criado",
+	"ChannelCreated_Action": "Canal criado", 
+	"PhotoUpdated_Action": "Foto atualizada", 
+	"NameChanged_Action": "Nome alterado para ", 
+	
+	// Folders
+	"AllChats": "Todas as conversas",
+	"Archive": "Arquivo",
+	
+	// Stickers
+	"Stickers_Title": "Figurinhas", 
+	"Sticker": "Figurinha",
+	"AddStickers": "Adicionar figurinhas", 
+	
+	// Music player
+	"Player_Title": "Reprodutor de música", 
+	"OpenPlayer": "Abrir reprodutor", 
+	"OpenPlaylist": "Abrir playlist",
+	"Play_Player": "Tocar",
+	"Pause_Player": "Pausar", 
+	"Prev_Player": "Anterior",
+	"Next_Player": "Próxima",
+	"UnknownTrack": "Faixa desconhecida",
+	"Playlist_Title": "Playlist", 
+	
+	// Profile/chat info
+	"Online": "online",
+	"Offline": "offline",
+	"LastSeen": "visto por último ",
+	"About_User": "Sobre o usuário",
+	"About_Chat": "Sobre",
+	"Mobile": "Celular",
+	"Username": "Nome de usuário",
+	"Link": "Link",
+	"SearchMessages": "Buscar mensagens",
+	"ViewGroup": "Ver grupo",
+	"GoToPinnedMessage": "Ir para mensagem fixada",
+	"Owner": "dono", 
+	"Admin": "administrador", 
+	"Bot": "bot",
+	"UserInfo": "Informações do usuário", 
+	"GroupInfo": "Informações do grupo", 
+	"ChannelInfo": "Informações do canal", 
+	"TopicInfo": "Informações do tópico", 
+	
+	"_member": " membro",
+	"_members": " membros",
+	"_members2": "",
+	
+	"_subscriber": " inscrito",
+	"_subscribers": " inscritos",
+	"_subscribers2": "",
+	
+	"_photo": " foto", 
+	"_photos": " fotos", 
+	"_photos2": "",
+	
+	"_video": " vídeo", 
+	"_videos": " vídeos", 
+	"_videos2": "",
+	
+	"_file": " arquivo", 
+	"_files": " arquivos", 
+	"_files2": "",
+	
+	"_audioFile": " áudio", 
+	"_audioFiles": " áudios", 
+	"_audioFiles2": "",
+	
+	"_voiceMessage": " mensagem de voz",
+	"_voiceMessages": " mensagens de voz", 
+	"_voiceMessages2": ""
+}
