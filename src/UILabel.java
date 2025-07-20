@@ -303,7 +303,8 @@ public class UILabel extends UIItem {
 										x = centerRow(width, tw, x, y, res);
 									}
 									res.addElement(new Object[] { t, font, url, new int[] {x, y + ay, tw, fh} });
-									x = 0; y += fh; idx ++; mw = Math.max(mw, x + tw);
+									mw = Math.max(mw, x + tw);
+									x = 0; y += fh; idx ++;
 									
 									i = ch = j;
 									break w;
@@ -316,7 +317,8 @@ public class UILabel extends UIItem {
 								x = centerRow(width, tw, x, y, res);
 							}
 							res.addElement(new Object[] { t, font, url, new int[] {x, y + ay, tw, fh} });
-							x = 0; y += fh; idx ++; mw = Math.max(mw, x + tw);
+							mw = Math.max(mw, x + tw);
+							x = 0; y += fh; idx ++;
 							ch = i;
 						}
 					}
