@@ -209,6 +209,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 					}
 				} else {
 					canPin = true;
+					canDelete = true;
 					if (MP.chatStatus && info.getObject("User").has("status")) {
 						setStatus(info.getObject("User").getObject("status"));
 					}

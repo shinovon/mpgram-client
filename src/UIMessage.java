@@ -65,6 +65,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	private static final int FOCUS_COMMENT = 6;
 	
 	UILabel text;
+	String origText;
 	
 	UIItem focusChild;
 	int subFocusCurrent = -1;
@@ -364,7 +365,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 		
 		// text
-		String text = message.getString("text", null);
+		String text = origText = message.getString("text", null);
 		if (text != null && text.length() != 0) {
 			UILabel label;
 			if (MP.parseRichtext && message.has("entities")) {
@@ -442,7 +443,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		y += MARGIN_TOP;
 		cw -= MARGIN_WIDTH * 2 + MARGIN_SIDE;
 		h -= MARGIN_TOP;
-		if (!selected) {
+		if (!selected || true) {
 			g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_BG : COLOR_MESSAGE_BG]);
 			g.fillRect(x, y, cw, h);
 			if (focus && focusChild == null && subFocusCurrent == -1) {
@@ -862,6 +863,10 @@ public class UIMessage extends UIItem implements LangConstants {
 	
 	boolean grabFocus(int dir) {
 		focus = true;
+		if (((ChatCanvas) container).selected != 0) {
+			subFocusCurrent = -1;
+			return true;
+		}
 		if (dir != 0 && subFocusLength != 0) {
 			if (subFocusLength != 1 || subFocus[0] != FOCUS_SENDER || !hideName) {
 				if (subFocusCurrent == -1) {
@@ -898,6 +903,9 @@ public class UIMessage extends UIItem implements LangConstants {
 	}
 	
 	int traverse(int dir, int height, int scrollY) {
+		if (((ChatCanvas) container).selected != 0) {
+			return 0;
+		}
 		if (focusChild != null) {
 			int t = focusChild.traverse(dir, height, scrollY);
 			if (t != 0) {
@@ -941,9 +949,20 @@ public class UIMessage extends UIItem implements LangConstants {
 	}
 	
 	boolean action() {
+		if (selected) {
+			selected = false;
+			((ChatCanvas) container).unselected(this);
+			return true;
+		}
+		if (((ChatCanvas) container).selected != 0) {
+			selected = true;
+			((ChatCanvas) container).selected(this);
+			return true;
+		}
 		if (focusChild != null && focusChild.action()) {
 			return true;
-		} else if (subFocusCurrent != -1) {
+		}
+		if (subFocusCurrent != -1) {
 			return action(subFocus[subFocusCurrent]);
 		}
 		return false;
@@ -990,11 +1009,12 @@ public class UIMessage extends UIItem implements LangConstants {
 		String idStr = Integer.toString(this.id);
 		switch (option) {
 		case Reply:
-			MP.display(MP.writeForm(peerId, idStr, "", null, null, null));
+//			MP.display(MP.writeForm(peerId, idStr, "", null, null, null));
+			((ChatCanvas) container).startReply(this);
 			break;
 		case Edit:
 			// TODO
-			
+			((ChatCanvas) container).startEdit(this);
 			break;
 		case Pin:
 			MP.display(MP.loadingAlert(MP.L[Loading]), MP.current);
@@ -1004,14 +1024,15 @@ public class UIMessage extends UIItem implements LangConstants {
 			MP.midlet.start(MP.RUN_PIN_MESSAGE, new String[] { peerId, idStr });
 			break;
 		case CopyMessage:
-			if (text != null) {
-				StringBuffer sb = new StringBuffer();
-				int l = text.parsed.size();
-				for (int i = 0; i < l; i++) {
-					sb.append((String) ((Object[]) text.parsed.elementAt(i))[0]);
-				}
-				MP.copy("", sb.toString());
-			}
+//			if (text != null) {
+//				StringBuffer sb = new StringBuffer();
+//				int l = text.parsed.size();
+//				for (int i = 0; i < l; i++) {
+//					sb.append((String) ((Object[]) text.parsed.elementAt(i))[0]);
+//				}
+//				MP.copy("", sb.toString());
+//			}
+			MP.copy("", origText);
 			break;
 		case CopyMessageLink:
 			MP.copyMessageLink(peerId, idStr);
@@ -1044,6 +1065,12 @@ public class UIMessage extends UIItem implements LangConstants {
 	}
 	
 	int[] menu() {
+		if (selected) {
+			return null;
+		}
+		if (((ChatCanvas) container).selected != 0) {
+			return null;
+		}
 		int[] item = focusChild != null ? focusChild.menu() : null;
 		
 		if (item == null && subFocusCurrent != -1 && subFocusLength != 0) {
@@ -1112,11 +1139,11 @@ public class UIMessage extends UIItem implements LangConstants {
 			x -= w - cw;
 		}
 		x -= (out && w < 900 ? MARGIN_SIDE : 0);
-//			if (longTap) {
-//				selected = true;
-//				((ChatCanvas) container).selected(this);
-//				return true;
-//			}
+		if (longTap) {
+			selected = true;
+			((ChatCanvas) container).selected(this);
+			return true;
+		}
 		if (text != null && text.focusable && y > text.y && y < text.y + text.contentHeight) {
 			focusChild = text;
 			if (text.tap(x - PADDING_WIDTH - MARGIN_WIDTH, y - text.y, longTap))
@@ -1143,11 +1170,11 @@ public class UIMessage extends UIItem implements LangConstants {
 				}
 			}
 		}
-//		if (longTap) {
-//			selected = true;
-//			((ChatCanvas) container).selected(this);
-//			return true;
-//		}
+		if (longTap) {
+			selected = true;
+			((ChatCanvas) container).selected(this);
+			return true;
+		}
 		((ChatCanvas) container).showMenu(this, menu());
 		return true;
 	}

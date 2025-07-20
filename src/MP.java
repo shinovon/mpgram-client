@@ -1219,6 +1219,21 @@ public class MP extends MIDlet
 		}
 		case RUN_DELETE_MESSAGE: {
 			try {
+//#ifndef NO_CHAT_CANVAS
+				if (param instanceof UIMessage[]) {
+					UIMessage[] msgs = (UIMessage[]) param;
+					StringBuffer sb = new StringBuffer("deleteMessage&id=");
+					for (int i = 0; i < msgs.length; ++i) {
+						sb.append(msgs[i].id).append(',');
+					}
+					sb.setLength(sb.length() - 1);
+					sb.append("&peer=").append(msgs[0].peerId);
+					MP.api(sb.toString());
+					
+					commandAction(refreshCmd, current);
+					break;
+				}
+//#endif
 				String[] s = (String[]) param;
 				MP.api("deleteMessage&peer=".concat(s[0].concat("&id=").concat(s[1])));
 

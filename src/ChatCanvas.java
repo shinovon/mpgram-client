@@ -158,6 +158,13 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	int selected;
 	
+	// input
+	String text;
+	boolean reply;
+	int replyToMsgId;
+	String file;
+	boolean edit;
+	
 	ChatCanvas() {
 		setFullScreenMode(true);
 		
@@ -201,7 +208,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		}
 		
 		if (touch) {
-			top = MP.smallBoldFontHeight + MP.smallPlainFontHeight + 8;
+			top = Math.max(MP.smallBoldFontHeight + MP.smallPlainFontHeight + 8, 48);
 //			if (attachIcon == null) {
 //				attachIcon = loadRLE("/attach.rle", colors[COLOR_CHAT_INPUT_ICON]);
 //			}
@@ -237,6 +244,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (loaded) return;
 		loaded = true;
 		canceled = finished = false;
+		selected = 0;
 		
 		loading = true;
 		Thread thread = this.thread = Thread.currentThread();
@@ -334,6 +342,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					} else {
 						user = true;
 						canPin = true;
+						canDelete = true;
 						if (MP.chatStatus && info.getObject("User").has("status")) {
 							setStatus(info.getObject("User").getObject("status"));
 						}
@@ -706,42 +715,60 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				tx = 40;
 				tw = w - 80;
 				int bty = (th - 2) >> 1;
+				if (selected != 0) g.setColor(colors[COLOR_CHAT_FG]);
 				// back button
 				g.drawLine(12, bty, 28, bty);
 				g.drawLine(12, bty, 20, bty-8);
 				g.drawLine(12, bty, 20, bty+8);
 				
-				// menu button
-				if (query == null && mediaFilter == null) {
+				if (selected != 0) {
+					// selected messages options
+					
+					// delete
+					g.drawLine(w - 29, bty - 8, w - 13, bty + 8);
+					g.drawLine(w - 29, bty + 8, w - 13, bty - 8);
+					
+					// forward
+					g.drawLine(w - 52, bty, w - 68, bty);
+					g.drawLine(w - 68, bty, w - 68, bty + 6);
+					g.drawLine(w - 58, bty - 6, w - 52, bty);
+					g.drawLine(w - 58, bty + 6, w - 52, bty);
+					
+				} else if (query == null && mediaFilter == null) {
+					// menu button
 					g.fillRect(w - 22, bty - 6, 3, 3);
 					g.fillRect(w - 22, bty, 3, 3);
 					g.fillRect(w - 22, bty + 6, 3, 3);
-//					g.drawLine(w - 30, bty - 8, w - 10, bty - 8);
-//					g.drawLine(w - 30, bty, w - 10, bty);
-//					g.drawLine(w - 30, bty + 8, w - 10, bty + 8);
 				}
 			}
-			boolean showStatus = MP.chatStatus || touch;
-			boolean hideStatus = showStatus && (selfChat || postId != null || query != null);
-			if (title != null) {
-				Font font = hideStatus ? MP.medPlainFont : MP.smallBoldFont;
-				if (titleRender == null) {
-					titleRender = UILabel.ellipsis(title, font, tw - 4);
-				}
+			if (selected != 0) {
+				boolean medfont = MP.chatStatus;
+				g.setFont(medfont ? MP.medPlainFont : MP.smallPlainFont);
 				g.setColor(colors[COLOR_CHAT_FG]);
-				g.setFont(font);
-				g.drawString(titleRender, tx, showStatus ? hideStatus ? (th - MP.medPlainFontHeight) >> 1 : 4 : 2, 0);
-			}
-			// TODO status ellipsis
-			if (showStatus && !hideStatus) {
-				g.setColor(colors[typing != 0 ? COLOR_CHAT_STATUS_HIGHLIGHT_FG : COLOR_CHAT_STATUS_FG]);
-				g.setFont(MP.smallPlainFont);
-				String status = this.status;
-				if (status == null) {
-					status = this.defaultStatus;
+				g.drawString(Integer.toString(selected), tx, medfont ? ((th - MP.medPlainFontHeight) >> 1) : 2, 0);
+			} else {
+				boolean showStatus = MP.chatStatus || touch;
+				boolean hideStatus = showStatus && (selfChat || postId != null || query != null);
+				if (title != null) {
+					Font font = hideStatus ? MP.medPlainFont : MP.smallBoldFont;
+					if (titleRender == null) {
+						titleRender = UILabel.ellipsis(title, font, tw - 4);
+					}
+					g.setColor(colors[COLOR_CHAT_FG]);
+					g.setFont(font);
+					g.drawString(titleRender, tx, showStatus ? (hideStatus ? (th - MP.medPlainFontHeight) >> 1 : 4) : 2, 0);
 				}
-				if (status != null) {
-					g.drawString(status, tx, 4 + MP.smallBoldFontHeight, 0);
+				// TODO status ellipsis
+				if (showStatus && !hideStatus) {
+					g.setColor(colors[typing != 0 ? COLOR_CHAT_STATUS_HIGHLIGHT_FG : COLOR_CHAT_STATUS_FG]);
+					g.setFont(MP.smallPlainFont);
+					String status = this.status;
+					if (status == null) {
+						status = this.defaultStatus;
+					}
+					if (status != null) {
+						g.drawString(status, tx, 4 + MP.smallBoldFontHeight, 0);
+					}
 				}
 			}
 		}
@@ -755,7 +782,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			g.setColor(colors[COLOR_CHAT_PANEL_BORDER]);
 			g.drawLine(0, by, w, by);
 			g.setColor(colors[COLOR_CHAT_PANEL_FG]);
-			if (fieldFocused) {
+			if (selected != 0) {
+				
+			} else if (fieldFocused) {
 				// TODO
 				by += 1;
 				g.drawString(MP.L[Chat], 2, by, Graphics.TOP | Graphics.LEFT);
@@ -902,6 +931,21 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		}
 	}
 	
+	private void back() {
+		if (selected != 0) {
+			UIItem item = firstItem;
+			do {
+				if (!(item instanceof UIMessage) || !((UIMessage) item).selected)
+					continue;
+				((UIMessage) item).selected = false;
+			} while ((item = item.next) != null);
+			selected = 0;
+			queueRepaint();
+			return;
+		}
+		MP.midlet.commandAction(MP.backCmd, this);
+	}
+	
 	protected void keyRepeated(int key) {
 		// TODO own repeater thread
 		if (!loading) key(key, true);
@@ -944,13 +988,13 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			// back
 			if (menuFocused) {
 				closeMenu();
-			} else if (touch || query != null || mediaFilter != null) {
-				MP.midlet.commandAction(MP.backCmd, this);
+			} else if (touch || query != null || mediaFilter != null || selected != 0) {
+				back();
 				return;
 			} else if (fieldFocused) {
 //				fieldFocused = false;
 //				fieldAnimTarget = 0;
-				MP.midlet.commandAction(MP.backCmd, this);
+				back();
 				return;
 			} else {
 				fieldFocused = true;
@@ -962,6 +1006,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			// menu
 			if (menuFocused) {
 				closeMenu();
+			} else if (selected != 0) {
+				// TODO
+				showMenu(null, new int[] { Delete, Forward });
 			} else if (fieldFocused) {
 				showMenu(null, canWrite && hasInput ? new int[] { Refresh, ChatInfo, SendSticker } : new int[] { Refresh, ChatInfo });
 			} else {
@@ -1194,6 +1241,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			if (y < top) {
 				if (x < 40) {
 					keyPressed(-7);
+				} else if (selected != 0) {
+					if (x > width - 40) {
+						menuAction(Delete);
+					} else if (x > width - 80) {
+						menuAction(Forward);
+					}
 				} else if (x > width - 40) {
 					if (query == null && mediaFilter == null)
 						showMenu(null, new int[] { Refresh, SearchMessages });
@@ -1202,7 +1255,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				}
 			} else if (y > height - bottom) {
 				// TODO
-				if (left) {
+				if (selected != 0) {
+					
+				} else if (left) {
 					MP.midlet.start(MP.RUN_JOIN_CHANNEL, id);
 				} else if (canWrite) {
 					if (x > width - 40) {
@@ -1243,6 +1298,24 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				case WriteMessage:
 					MP.midlet.commandAction(MP.writeCmd, this);
 					break;
+				case Delete: {
+					UIMessage[] msgs = new UIMessage[selected];
+					int count = 0;
+					UIItem item = firstItem;
+					do {
+						if (!(item instanceof UIMessage) || !((UIMessage) item).selected)
+							continue;
+						msgs[count++] = (UIMessage) item;
+					} while ((item = item.next) != null);
+					selected = 0;
+					
+					MP.midlet.start(MP.RUN_DELETE_MESSAGE, msgs);
+					break;
+				}
+				case Forward: {
+					// TODO
+					break;
+				}
 				}
 			} else {
 				menuItem.menuAction(menu[i]);
@@ -1809,6 +1882,14 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			setTicker(null);
 			typing = 0;
 		} catch (Exception e) {}
+	}
+
+	public void startEdit(UIMessage item) {
+		// TODO
+	}
+	
+	public void startReply(UIMessage item) {
+		// TODO
 	}
 
 }
