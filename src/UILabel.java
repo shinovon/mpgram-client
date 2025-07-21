@@ -280,6 +280,7 @@ public class UILabel extends UIItem {
 	private static void split(String text, Font font, String url, int width, int x, int y, int idx, int mw, int ch, int sl, int fh, Vector res, boolean center, int[] out) {
 		int ay = 0;
 		if (res.size() != 0) {
+			// FIXME
 			Object[] l = (Object[]) res.elementAt(res.size() - 1);
 			if (((int[]) l[3])[0] != 0 && ((int[]) l[3])[3] != fh) {
 				ay = ((int[]) l[3])[3] - fh;

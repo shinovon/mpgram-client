@@ -144,7 +144,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	boolean loading;
 	
-	boolean touch = hasPointerEvents();
+	boolean touch = !MP.forceKeyUI && hasPointerEvents();
 	
 	// menu
 	boolean menuFocused;
@@ -854,10 +854,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				&& pointedItem != null && pointedItem.focusable) {
 			animate = true;
 			if (now - pressTime > 200) {
-				g.setColor(colors[COLOR_CHAT_POINTER_HOLD]);
+				kineticScroll = 0;
 				int size = Math.min(360, (int) (now - pressTime - 200) / 2);
-				g.fillArc(pointerX - 25, pointerY - 25, 50, 50, 90, size);
-				if (size >= 360) {
+//				g.setColor(colors[COLOR_CHAT_POINTER_HOLD]);
+//				g.fillArc(pointerX - 25, pointerY - 25, 50, 50, 90, size);
+				if (size >= 200) {
 					// handle long tap
 					longTap = true;
 					focusItem(pointedItem, 0);
@@ -1061,7 +1062,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			if (reverse) dir = -dir;
 			focusItem(null, 0);
 			focusedItem = scrollCurrentItem = scrollTargetItem = null;
-			scrollTo(scroll + (clipHeight * dir));
+			scrollTo(scroll + ((clipHeight * 7 / 8) * dir));
 			repaint = true;
 		} else if (key >= Canvas.KEY_NUM0 && key <= Canvas.KEY_NUM9) {
 			// ignore
@@ -1273,11 +1274,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					keyPressed(-7);
 				} else if (selected != 0) {
 					if (x > width - 40) {
-						menuAction(Delete);
-					} else if (x > width - 80) {
-						menuAction(Forward);
+						deleteSelected();
+					} else if (x > width - 90) {
+						forwardSelected();
 					}
-				} else if (x > width - 40) {
+				} else if (x > width - 48) {
 					if (query == null && mediaFilter == null)
 						showMenu(null, new int[] { Refresh, SearchMessages });
 				} else if (!selfChat && postId == null) {
@@ -1290,7 +1291,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				} else if (left) {
 					MP.midlet.start(MP.RUN_JOIN_CHANNEL, id);
 				} else if (canWrite) {
-					if (x > width - 40) {
+					if (x > width - 48) {
 						showMenu(null, new int[] { SendSticker, WriteMessage });
 					} else { 
 						MP.midlet.commandAction(MP.writeCmd, this);
@@ -1499,6 +1500,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 	
 	private void scrollTo(int y) {
+		if (MP.fastScrolling) {
+			scroll = y;
+			return;
+		}
 		scrollTarget = y;
 	}
 	
@@ -1554,6 +1559,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 
 	void showMenu(UIItem item, int[] menu) {
+		kineticScroll = 0;
 		this.menuItem = item;
 		this.menu = menu;
 		menuCurrent = touch ? -1 : 0;

@@ -237,6 +237,7 @@ public class MP extends MIDlet
 	static boolean updateChatsList;
 	static boolean useChatCanvas = true;
 	static boolean fastScrolling; // disable animations
+	static boolean forceKeyUI;
 	
 	// platform
 	static boolean symbianJrt;

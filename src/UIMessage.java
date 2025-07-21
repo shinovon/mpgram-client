@@ -399,13 +399,13 @@ public class UIMessage extends UIItem implements LangConstants {
 	
 	void paint(Graphics g, int x, int y, int w) {
 		int h = contentHeight;
+		if (selected) {
+			g.setColor(ChatCanvas.colors[ChatCanvas.COLOR_CHAT_HIGHLIGHT_BG]);
+			g.fillRect(0, y, w, h);
+		}
 		if (space) {
 			if (((ChatCanvas) container).reverse) y += SPACE_HEIGHT;
 			h -= SPACE_HEIGHT;
-		}
-		if (selected) {
-			g.setColor(ChatCanvas.colors[ChatCanvas.COLOR_CHAT_HIGHLIGHT_BG]);
-			g.fillRect(0, 0, w, h);
 		}
 		// date
 		if (showDate) {
@@ -539,7 +539,7 @@ public class UIMessage extends UIItem implements LangConstants {
 					g.fillRect(x, y + 1, photoRenderWidth, photoRenderHeight);
 				} else {
 					int clipX = g.getClipX(), clipY = g.getClipY(), clipW = g.getClipWidth(), clipH = g.getClipHeight();
-					g.clipRect(x, y + 1, photoRenderWidth, photoRenderHeight);
+					g.setClip/*clipRect*/(x, y + 1, photoRenderWidth, photoRenderHeight);
 					g.drawImage(mediaImage, x, y + 1, 0);
 					g.setClip(clipX, clipY, clipW, clipH);
 				}
@@ -562,7 +562,7 @@ public class UIMessage extends UIItem implements LangConstants {
 					int s = MP.smallBoldFontHeight + MP.smallPlainFontHeight;
 					if (mediaImage != null) {
 						int clipX = g.getClipX(), clipY = g.getClipY(), clipW = g.getClipWidth(), clipH = g.getClipHeight();
-						g.clipRect(px, y + 1, s - 2, s - 2);
+						g.setClip/*clipRect*/(px, y + 1, s - 2, s - 2);
 						g.drawImage(mediaImage, px, y + ((s - mediaImage.getHeight()) >> 1), 0);
 						g.setClip(clipX, clipY, clipW, clipH);
 					} else {
@@ -1190,7 +1190,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	}
 	
 	private void commentAction() {
-		MP.openLoad(new ChatForm(commentPeer, peerId, Integer.toString(id), commentRead));
+		MP.openLoad(new ChatCanvas(commentPeer, peerId, Integer.toString(id), commentRead));
 	}
 
 	public void edit(JSONObject msg, ChatCanvas chat) {
