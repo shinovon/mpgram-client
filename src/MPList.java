@@ -33,7 +33,9 @@ public abstract class MPList extends List implements LangConstants {
 	public MPList(String title) {
 		super(title, List.IMPLICIT);
 		addCommand(List.SELECT_COMMAND);
+		//#ifndef MIDP1
 		setSelectCommand(List.SELECT_COMMAND);
+		//#endif
 		setCommandListener(MP.midlet);
 	}
 	
@@ -101,5 +103,11 @@ public abstract class MPList extends List implements LangConstants {
 	abstract void select(int i);
 	
 	void shown() {}
+	
+//#ifdef MIDP1
+//#	public void deleteAll() {
+//#		while (size() != 0) delete(0);
+//#	}
+//#endif
 
 }

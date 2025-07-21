@@ -46,13 +46,15 @@ public class CaptchaForm extends MPForm {
 		ImageItem imgItem = new ImageItem("", img, 0, null);
 		append(imgItem);
 		
-		field = new TextField("", "", 20, TextField.NON_PREDICTIVE);
+		field = new TextField("", "", 20, TextField.ANY);
 		append(field);
 		
+		//#ifndef MIDP1
 		StringItem s = new StringItem(null, MP.L[Next], StringItem.BUTTON);
 		s.setDefaultCommand(MP.authNextCmd);
 		s.setItemCommandListener(MP.midlet);
 		append(s);
+		//#endif
 		
 		MP.display(this);
 	}

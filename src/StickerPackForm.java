@@ -1,8 +1,3 @@
-import java.util.Hashtable;
-
-import javax.microedition.lcdui.ImageItem;
-import javax.microedition.lcdui.Item;
-
 /*
 Copyright (c) 2022-2025 Arman Jussupgaliyev
 
@@ -24,6 +19,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+//#ifndef MIDP1
+import java.util.Hashtable;
+
+import javax.microedition.lcdui.ImageItem;
+import javax.microedition.lcdui.Item;
+
 public class StickerPackForm extends MPForm {
 
 	String id;
@@ -84,3 +85,4 @@ public class StickerPackForm extends MPForm {
 	}
 
 }
+//#endif

@@ -43,7 +43,9 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 		System.gc();
 		loader = new Thread(this);
 		loader.start();
+//#ifndef MIDP1
 		setFullScreenMode(true);
+//#endif
 	}
 
 	public final void run() {
@@ -237,6 +239,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 	protected final void keyPressed(int k) {
 		k = qwertyToNum(k);
 		if (k == -7 || k == -22 || k == 22) {
+			//#ifndef NO_INTERRUPT
 			try {
 				if (loader != null && loader.isAlive()) {
 					loader.interrupt();
@@ -244,6 +247,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 			} catch (RuntimeException e) {
 				e.printStackTrace();
 			}
+			//#endif
 			MP.midlet.commandAction(MP.backCmd, this);
 			toDraw = null;
 			return;

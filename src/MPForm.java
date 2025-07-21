@@ -59,10 +59,12 @@ public abstract class MPForm extends Form implements LangConstants {
 			if (MP.useLoadingForm && MP.current == this) {
 				MP.display(this);
 			}
+			//#ifndef MIDP1
 			if (focusOnFinish != null) {
 				MP.display.setCurrentItem(focusOnFinish);
 				focusOnFinish = null;
 			}
+			//#endif
 			postLoad(true);
 			return;
 		} catch (InterruptedException e) {
@@ -118,5 +120,11 @@ public abstract class MPForm extends Form implements LangConstants {
 	}
 	
 	void shown() {}
+	
+//#ifdef MIDP1
+//#	public void deleteAll() {
+//#		while (size() != 0) delete(0);
+//#	}
+//#endif
 
 }

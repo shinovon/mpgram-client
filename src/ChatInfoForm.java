@@ -21,7 +21,9 @@ SOFTWARE.
 */
 import javax.microedition.lcdui.ImageItem;
 import javax.microedition.lcdui.Item;
+//#ifndef MIDP1
 import javax.microedition.lcdui.Spacer;
+//#endif
 import javax.microedition.lcdui.StringItem;
 
 public class ChatInfoForm extends MPForm {
@@ -75,7 +77,7 @@ public class ChatInfoForm extends MPForm {
 		boolean isUser = id.charAt(0) != '-';
 		boolean topic = mode == 0 && chatForm != null && chatForm.forum();
 		StringItem s;
-		
+		//#ifndef MIDP1
 		if (topic) {
 			s = new StringItem(null, chatForm.getTitle());
 			s.setFont(MP.medPlainFont);
@@ -258,6 +260,7 @@ public class ChatInfoForm extends MPForm {
 			s.setItemCommandListener(MP.midlet);
 			append(s);
 		}
+		//#endif
 	}
 
 }

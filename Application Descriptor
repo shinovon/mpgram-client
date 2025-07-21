@@ -9,7 +9,7 @@ MIDlet-Vendor: nnproject
 progressive_download: enabled
 MIDlet-Icon: /m.png
 MIDlet-1: MPGram,/m.png,MP
-MicroEdition-Profile: MIDP-2.0
+MicroEdition-Profile: MIDP-1.0
 MIDlet-Jar-URL: mpgram.jar
 MIDlet-Permissions: javax.microedition.io.Connector.http
 Nokia-Scalable-Icon-MIDlet-1: /m.svg

@@ -21,8 +21,6 @@ SOFTWARE.
 */
 import java.util.Vector;
 
-import javax.microedition.lcdui.List;
-
 public class ChatsList extends MPList {
 	
 	int limit = MP.chatsLimit;
@@ -52,7 +50,10 @@ public class ChatsList extends MPList {
 		addCommand(MP.backCmd);
 		addCommand(MP.foldersCmd);
 		addCommand(MP.refreshCmd);
-		setFitPolicy(List.TEXT_WRAP_ON);
+
+		//#ifndef MIDP1
+		setFitPolicy(TEXT_WRAP_ON);
+		//#endif
 	}
 	
 	// contacts, members
@@ -65,7 +66,9 @@ public class ChatsList extends MPList {
 		this.peerId = peerId;
 		this.canBan = canBan;
 		addCommand(MP.backCmd);
-		setFitPolicy(List.TEXT_WRAP_ON);
+		//#ifndef MIDP1
+		setFitPolicy(TEXT_WRAP_ON);
+		//#endif
 		if (canBan) addCommand(MP.banMemberCmd);
 	}
 	
@@ -123,6 +126,12 @@ public class ChatsList extends MPList {
 		
 		if (thread != this.thread) throw MP.cancelException;
 		
+		//#ifndef MIDP1
+		final char d = '\n';
+		//#else
+		//# final char d = ' ';
+		//#endif
+		
 		if (users) {
 			JSONArray users = j.getArray("res");
 			int l = users.size();
@@ -137,15 +146,15 @@ public class ChatsList extends MPList {
 				MP.appendOneLine(sb, MP.getName(user, false));
 				
 				if (user.getBoolean("b", false)) { // bot
-					sb.append('\n').append(MP.L[Bot]);
+					sb.append(d).append(MP.L[Bot]);
 				} else if (user.has("s")) { // status
 					long wasOnline;
 					if (user.getBoolean("s")) {
-						sb.append('\n').append(MP.L[Online]);
+						sb.append(d).append(MP.L[Online]);
 					} else if ((wasOnline = user.getLong("w")) != 0) {
-						sb.append('\n').append(MP.L[LastSeen]).append(MP.localizeDate(wasOnline, 4));
+						sb.append(d).append(MP.L[LastSeen]).append(MP.localizeDate(wasOnline, 4));
 					} else {
-						sb.append('\n').append(MP.L[Offline]);
+						sb.append(d).append(MP.L[Offline]);
 					}
 				}
 				if (user.getBoolean("a", false)) { // admin
@@ -153,9 +162,11 @@ public class ChatsList extends MPList {
 				}
 				
 				int itemIdx = safeAppend(thread, sb.toString(), null);
+				//#ifndef MIDP1
 				if (MP.chatsListFontSize != 0) {
 					setFont(itemIdx, MP.chatsListFontSize == 1 ? MP.smallPlainFont : MP.medPlainFont);
 				}
+				//#endif
 				
 				if (noAvas || !MP.loadAvatars) continue;
 				MP.queueAvatar(id, new Object[] { this, new Integer(itemIdx) });
@@ -196,7 +207,7 @@ public class ChatsList extends MPList {
 			if (msgId == null) {
 				int unread = dialog.getInt("unread", 0);
 				if (unread != 0) sb.append(" +").append(unread);
-				MP.appendDialog(sb.append('\n'), peer, id, dialog.getObject("msg", null));
+				MP.appendDialog(sb.append(d), peer, id, dialog.getObject("msg", null));
 			}
 			
 			insert(thread, size(), sb.toString(), id);
@@ -205,11 +216,13 @@ public class ChatsList extends MPList {
 	
 	void insert(Thread thread, int idx, String s, String id) {
 		safeInsert(thread, idx, s, null);
+//#ifndef MIDP1
 		if (MP.chatsListFontSize != 0) {
 			try {
 				setFont(idx, MP.chatsListFontSize == 1 ? MP.smallPlainFont : MP.medPlainFont);
 			} catch (Exception ignored) {}
 		}
+//#endif
 		
 		if (noAvas || !MP.loadAvatars) return;
 		MP.queueAvatar(id, new Object[] { this, new Integer(idx) });
@@ -231,8 +244,10 @@ public class ChatsList extends MPList {
 			}
 //#endif
 			
+//#ifndef MIDP1
 			MP.display(new ChatForm(id, null, 0, 0));
 			MP.display(MP.writeForm(id, null, "", null, peerId, msgId));
+//#endif
 			return;
 		}
 		
