@@ -2271,6 +2271,7 @@ public class MP extends MIDlet
 					f.addCommand(backCmd);
 					f.setCommandListener(this);
 					StringItem s;
+					int i;
 					
 					// ui
 					
@@ -2280,7 +2281,7 @@ public class MP extends MIDlet
 					f.append(s);
 					
 					langChoice = new ChoiceGroup(L[Language], Choice.POPUP, LANGS[1], null);
-					for (int i = 0; i < LANGS[0].length; ++i) {
+					for (i = 0; i < LANGS[0].length; ++i) {
 						if (lang.equals(LANGS[0][i])) {
 							langChoice.setSelectedIndex(i, true);
 							break;
@@ -2296,15 +2297,21 @@ public class MP extends MIDlet
 							L[FocusNewMessages],
 							L[ChatTextField],
 							L[BuiltinImageViewer],
-							L[LargeMusicCover]
+							L[LargeMusicCover],
+//#ifndef NO_CHAT_CANVAS
+							"new chat ui", // TODO
+//#endif
 					}, null);
-					uiChoice.setSelectedIndex(0, reverseChat);
-					uiChoice.setSelectedIndex(1, showMedia);
-					uiChoice.setSelectedIndex(2, chatStatus);
-					uiChoice.setSelectedIndex(3, focusNewMessages);
-					uiChoice.setSelectedIndex(4, chatField);
-					uiChoice.setSelectedIndex(5, useView);
-					uiChoice.setSelectedIndex(6, fullPlayerCover);
+					uiChoice.setSelectedIndex(i = 0, reverseChat);
+					uiChoice.setSelectedIndex(++i, showMedia);
+					uiChoice.setSelectedIndex(++i, chatStatus);
+					uiChoice.setSelectedIndex(++i, focusNewMessages);
+					uiChoice.setSelectedIndex(++i, chatField);
+					uiChoice.setSelectedIndex(++i, useView);
+					uiChoice.setSelectedIndex(++i, fullPlayerCover);
+//#ifndef NO_CHAT_CANVAS
+					uiChoice.setSelectedIndex(++i, useChatCanvas);
+//#endif
 					uiChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(uiChoice);
 					
@@ -2389,16 +2396,20 @@ public class MP extends MIDlet
 							L[ChatAutoUpdate],
 							L[KeepSessionAlive],
 							L[UseUnicode],
+//#ifndef NO_ZIP
 							L[UseCompression]
+//#endif
 					}, null);
-					behChoice.setSelectedIndex(0, useLoadingForm);
-					behChoice.setSelectedIndex(1, jsonStream);
-					behChoice.setSelectedIndex(2, parseRichtext);
-					behChoice.setSelectedIndex(3, parseLinks);
-					behChoice.setSelectedIndex(4, chatUpdates);
-					behChoice.setSelectedIndex(5, keepAlive);
-					behChoice.setSelectedIndex(6, utf);
-					behChoice.setSelectedIndex(7, compress);
+					behChoice.setSelectedIndex(i = 0, useLoadingForm);
+					behChoice.setSelectedIndex(++i, jsonStream);
+					behChoice.setSelectedIndex(++i, parseRichtext);
+					behChoice.setSelectedIndex(++i, parseLinks);
+					behChoice.setSelectedIndex(++i, chatUpdates);
+					behChoice.setSelectedIndex(++i, keepAlive);
+					behChoice.setSelectedIndex(++i, utf);
+//#ifndef NO_ZIP
+					behChoice.setSelectedIndex(++i, compress);
+//#endif
 					behChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(behChoice);
 					
@@ -2408,19 +2419,28 @@ public class MP extends MIDlet
 					
 					imagesChoice = new ChoiceGroup(L[Images], Choice.MULTIPLE, new String[] {
 							L[LoadMediaThumbnails],
+//#ifndef NO_AVATARS
 							L[LoadAvatars],
+//#endif
 							L[MultiThreadedLoading],
+//#ifndef NO_AVATARS
 							L[RoundAvatars]
+//#endif
 					}, null);
-					imagesChoice.setSelectedIndex(0, loadThumbs);
-					imagesChoice.setSelectedIndex(1, loadAvatars);
-					imagesChoice.setSelectedIndex(2, threadedImages);
-					imagesChoice.setSelectedIndex(3, roundAvatars);
+					imagesChoice.setSelectedIndex(i = 0, loadThumbs);
+//#ifndef NO_AVATARS
+					imagesChoice.setSelectedIndex(++i, loadAvatars);
+//#endif
+					imagesChoice.setSelectedIndex(++i, threadedImages);
+//#ifndef NO_AVATARS
+					imagesChoice.setSelectedIndex(++i, roundAvatars);
+//#endif
 					imagesChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(imagesChoice);
 					
 					// cache
 
+//#ifndef NO_AVATARS
 					avaCacheChoice = new ChoiceGroup(L[AvatarsCaching], Choice.POPUP, new String[] {
 							L[Disabled],
 							L[HoldInRAM],
@@ -2434,6 +2454,7 @@ public class MP extends MIDlet
 					avaCacheGauge = new Gauge(L[AvatarsCacheThreshold], true, 20, avatarsCacheThreshold / 5);
 					avaCacheGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(avaCacheGauge);
+//#endif
 					
 					profileCacheGauge = new Gauge(L[ProfilesCacheThreshold], true, 30, peersCacheThreshold / 10);
 					profileCacheGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -2471,15 +2492,19 @@ public class MP extends MIDlet
 			}
 			if (c == backCmd && d == settingsForm) {
 				// apply and save settings
+				int i;
 				lang = LANGS[0][langChoice.getSelectedIndex()];
 				
-				reverseChat = uiChoice.isSelected(0);
-				showMedia = uiChoice.isSelected(1);
-				chatStatus = uiChoice.isSelected(2);
-				focusNewMessages = uiChoice.isSelected(3);
-				chatField = uiChoice.isSelected(4);
-				useView = uiChoice.isSelected(5);
-				fullPlayerCover = uiChoice.isSelected(6);
+				reverseChat = uiChoice.isSelected(i = 0);
+				showMedia = uiChoice.isSelected(++i);
+				chatStatus = uiChoice.isSelected(++i);
+				focusNewMessages = uiChoice.isSelected(++i);
+				chatField = uiChoice.isSelected(++i);
+				useView = uiChoice.isSelected(++i);
+				fullPlayerCover = uiChoice.isSelected(++i);
+//#ifndef NO_CHAT_CANVAS
+				useChatCanvas = uiChoice.isSelected(++i);
+//#endif
 				
 				if ((photoSize = (photoSizeGauge.getValue() * 8)) < 16) {
 					photoSizeGauge.setValue((photoSize = 16) / 8);
@@ -2510,26 +2535,34 @@ public class MP extends MIDlet
 				if (networkChoice != null)
 					blackberryNetwork = networkChoice.getSelectedIndex();
 				
-				useLoadingForm = behChoice.isSelected(0);
-				jsonStream = behChoice.isSelected(1);
-				parseRichtext = behChoice.isSelected(2);
-				parseLinks = behChoice.isSelected(3);
-				chatUpdates = behChoice.isSelected(4);
-				keepAlive = behChoice.isSelected(5);
-				utf = behChoice.isSelected(6);
-				compress = behChoice.isSelected(7);
+				useLoadingForm = behChoice.isSelected(i = 0);
+				jsonStream = behChoice.isSelected(++i);
+				parseRichtext = behChoice.isSelected(++i);
+				parseLinks = behChoice.isSelected(++i);
+				chatUpdates = behChoice.isSelected(++i);
+				keepAlive = behChoice.isSelected(++i);
+				utf = behChoice.isSelected(++i);
+//#ifndef NO_ZIP
+				compress = behChoice.isSelected(++i);
+//#endif
 				
 				if ((updatesTimeout = updateTimeoutGauge.getValue() * 5) < 5) {
 					updateTimeoutGauge.setValue((updatesTimeout = 5) / 5);
 				}
 				
-				loadThumbs = imagesChoice.isSelected(0);
-				loadAvatars = imagesChoice.isSelected(1);
-				threadedImages = imagesChoice.isSelected(2);
-				roundAvatars = imagesChoice.isSelected(3);
+				loadThumbs = imagesChoice.isSelected(i = 0);
+//#ifndef NO_AVATARS
+				loadAvatars = imagesChoice.isSelected(++i);
+//#endif
+				threadedImages = imagesChoice.isSelected(++i);
+//#ifndef NO_AVATARS
+				roundAvatars = imagesChoice.isSelected(++i);
+//#endif
 				
+//#ifndef NO_AVATARS
 				avatarsCache = avaCacheChoice.getSelectedIndex();
 				avatarsCacheThreshold = avaCacheGauge.getValue() * 5;
+//#endif
 				peersCacheThreshold = profileCacheGauge.getValue() * 10;
 				
 				try {
@@ -2576,6 +2609,7 @@ public class MP extends MIDlet
 					j.put("pushBgInterval", pushBgInterval);
 					j.put("notifyMethod", notifyMethod);
 //#endif
+					j.put("useChatCanvas", useChatCanvas);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);

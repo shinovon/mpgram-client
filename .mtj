@@ -86,6 +86,7 @@
             <symbol name="NO_NOKIAUI" value="true"/>
             <symbol name="NOKIAUI" value="1.6"/>
             <symbol name="screen.bitDepth" value="16"/>
+            <symbol name="BLACKBERRY_BUILD" value="true"/>
             <symbol name="NO_NOTIFY" value="true"/>
             <symbol name="SAMSUNGAPI" value="1.0"/>
             <symbol name="WMA" value="1.1"/>
