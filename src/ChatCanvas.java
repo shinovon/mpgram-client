@@ -1038,6 +1038,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				repaint = true;
 			} else if (key == -5 || game == Canvas.FIRE) {
 				menuAction(menuCurrent);
+				repaint = true;
 			}
 		} else if (fieldFocused) {
 			if (game == Canvas.UP) {
@@ -1170,9 +1171,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (!longTap && contentPressed) {
 			final int dY = pointerY - y;
 			final int dX = pointerX - x;
-			if (dX > 1 || dX < -1) {
-				
-			}
 			if (dragging || dY > 1 || dY < -1
 					|| dragYHold + dY > 2 || dragYHold + dY < -2
 					|| dX > 1 || dX < -1
@@ -1594,6 +1592,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			colors[i] = colorsCopy[i];
 		}
 		shiftColors = true;
+		queueRepaint();
 	}
 	
 	public void requestPaint(UIItem item) {
