@@ -155,11 +155,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	String titleRender;
 	
-	boolean hasInput;
-	
 	int selected;
 	
+	boolean arrowShown;
+	
 	// input
+	boolean hasInput;
 	String text;
 	boolean reply;
 	int replyToMsgId;
@@ -850,10 +851,13 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				}
 			}
 		} else {
-			if (scroll >= clipHeight) {
+			if (scroll >= clipHeight || (!endReached && hasOffset)) {
 				g.setColor(colors[COLOR_CHAT_PANEL_FG]);
 				int tx = width - 40, ty = reverse ? height - bottom - 40 : top + 40;
 				g.fillTriangle(tx, ty, tx + 32, ty, tx + 16, reverse ? ty + 32 : ty - 32);
+				arrowShown = true;
+			} else {
+				arrowShown = false;
 			}
 			
 			// process long tap
@@ -1166,7 +1170,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		pressTime = System.currentTimeMillis();
 		if (!menuFocused && y > top && y < top + clipHeight &&
 				// not touching arrow icon
-				!(scroll > clipHeight && x > width - 40
+				!(arrowShown && x > width - 40
 					&& (reverse ? (y > height - bottom - 40) : (y < top + 40)))) {
 			pointedItem = getItemAt(x, y);
 			contentPressed = true;
@@ -1331,9 +1335,14 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						MP.midlet.commandAction(MP.writeCmd, this);
 					}
 				}
-			} else if (scroll > clipHeight && x > width - 40
+			} else if (arrowShown && x > width - 40
 					&& (reverse ? (y > height - bottom - 40) : (y < top + 40))) {
-				scrollTo(0);
+				if (!endReached && hasOffset) {
+					MP.midlet.commandAction(MP.latestCmd, this);
+				} else {
+					scroll = clipHeight * 2;
+					scrollTo(0);
+				}
 			}
 		}
 		dragXHold = 0;
