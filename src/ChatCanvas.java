@@ -122,7 +122,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	boolean pressed, dragging, longTap, contentPressed, draggingHorizontally;
 	long pressTime;
 	int dragXHold, dragYHold;
-	UIItem pointedItem;
+	UIItem pointedItem, heldItem;
+	boolean startSelectDir;
 	
 	static final int moveSamples = 5;
 	int[] moves = new int[moveSamples];
@@ -814,6 +815,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			} else if (touch) {
 				// TODO
 				g.setFont(MP.medPlainFont);
+				g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
 				if (canWrite) {
 //					if (attachIcon != null) g.drawImage(attachIcon, 8, by + ((bottom - 24) >> 1), 0);
 					int ty = by + ((bottom - 24) >> 1);
@@ -847,26 +849,32 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 //					g.drawLine(0, my, w, my);
 				}
 			}
-		}
-		
-		// process long tap
-		if (pressed && !dragging && !longTap
-				&& pointedItem != null && pointedItem.focusable) {
-			animate = true;
-			if (now - pressTime > 200) {
-				kineticScroll = 0;
-				int size = Math.min(360, (int) (now - pressTime - 200) / 2);
-//				g.setColor(colors[COLOR_CHAT_POINTER_HOLD]);
-//				g.fillArc(pointerX - 25, pointerY - 25, 50, 50, 90, size);
-				if (size >= 200) {
-					// handle long tap
-					longTap = true;
-					focusItem(pointedItem, 0);
-					int y = pointerY;
-					pointedItem.tap(pointerX,
-							reverse ? y - (scroll - bottom - pointedItem.y + height - pointedItem.contentHeight)
-									: y - pointedItem.y - top - scroll,
-									true);
+		} else {
+			if (scroll >= clipHeight) {
+				g.setColor(colors[COLOR_CHAT_PANEL_FG]);
+				int tx = width - 40, ty = reverse ? height - bottom - 40 : top + 40;
+				g.fillTriangle(tx, ty, tx + 32, ty, tx + 16, reverse ? ty + 32 : ty - 32);
+			}
+			
+			// process long tap
+			if (pressed && !dragging && !longTap
+					&& pointedItem != null && pointedItem.focusable) {
+				animate = true;
+				if (now - pressTime > 200) {
+					kineticScroll = 0;
+					int size = Math.min(360, (int) (now - pressTime - 200) / 2);
+//					g.setColor(colors[COLOR_CHAT_POINTER_HOLD]);
+//					g.fillArc(pointerX - 25, pointerY - 25, 50, 50, 90, (size * 360) / 200);
+					if (size >= 200) {
+						// handle long tap
+						longTap = true;
+						focusItem(pointedItem, 0);
+						int y = pointerY;
+						pointedItem.tap(pointerX,
+								reverse ? y - (scroll - bottom - pointedItem.y + height - pointedItem.contentHeight)
+										: y - pointedItem.y - top - scroll,
+										true);
+					}
 				}
 			}
 		}
@@ -1156,7 +1164,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		pressY = pointerY = y;
 		movesIdx = 0;
 		pressTime = System.currentTimeMillis();
-		if (!menuFocused && y > top && y < top + clipHeight) {
+		if (!menuFocused && y > top && y < top + clipHeight &&
+				// not touching arrow icon
+				!(scroll > clipHeight && x > width - 40
+					&& (reverse ? (y > height - bottom - 40) : (y < top + 40)))) {
 			pointedItem = getItemAt(x, y);
 			contentPressed = true;
 		} else {
@@ -1168,44 +1179,69 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	protected void pointerDragged(int x, int y) {
 		if (loading) return;
 		long now = System.currentTimeMillis();
-		if (!longTap && contentPressed) {
-			final int dY = pointerY - y;
-			final int dX = pointerX - x;
-			if (dragging || dY > 1 || dY < -1
-					|| dragYHold + dY > 2 || dragYHold + dY < -2
-					|| dX > 1 || dX < -1
-					|| dragXHold + dX > 2 || dragXHold + dX < -2) {
-				int dx2 = dX + dragXHold;
-				int dy2 = dY + dragYHold;
-				if (draggingHorizontally || (!dragging && Math.abs(dx2) > Math.abs(dy2))) {
-					if (!draggingHorizontally) {
-						focusItem(pointedItem, 0);
-					}
-					draggingHorizontally = true;
-				} else if (!draggingHorizontally) {
-					if (reverse) dy2 = -dy2;
-					scroll += dy2;
-					if (kineticScroll * dy2 < 0) kineticScroll = 0;
+		if (contentPressed) {
+			if (longTap) {
+				boolean d = y > pointerY;
+				if (heldItem == null) {
+					heldItem = pointedItem;
+					startSelectDir = d;
 				}
-				dragging = true;
-				dragXHold = 0;
-				dragYHold = 0;
-				scrollTarget = -1;
+				if (heldItem instanceof UIMessage) {
+					UIItem item = getItemAt(x, y);
+					if (item instanceof UIMessage && (item != pointedItem)) {
+						if (d == startSelectDir) {
+							if (((UIMessage) heldItem).selected) {
+								((UIMessage) item).select();
+							} else {
+								((UIMessage) item).unselect();
+							}
+						} else if (((UIMessage) heldItem).selected) {
+							((UIMessage) pointedItem).unselect();
+						} else {
+							((UIMessage) pointedItem).select();
+						}
+						pointedItem = item;
+					}
+				}
 			} else {
-				// hold dragged units until it reaches threshold 
-				dragXHold += dX;
-				dragYHold += dY;
-			}
-			int prev = movesIdx - 1;
-			if (prev < 0) prev += moveSamples;
-			long prevTime = moveTimes[prev];
-			if (now - prevTime <= 1) {
-				moves[prev] += dY;
-				moveTimes[prev] = now;
-			} else {
-				moves[movesIdx] = dY;
-				moveTimes[movesIdx] = now;
-				movesIdx = (movesIdx + 1) % moveSamples;
+				final int dY = pointerY - y;
+				final int dX = pointerX - x;
+				if (dragging || dY > 1 || dY < -1
+						|| dragYHold + dY > 2 || dragYHold + dY < -2
+						|| dX > 1 || dX < -1
+						|| dragXHold + dX > 2 || dragXHold + dX < -2) {
+					int dx2 = dX + dragXHold;
+					int dy2 = dY + dragYHold;
+					if (draggingHorizontally || (!dragging && Math.abs(dx2) > Math.abs(dy2))) {
+						if (!draggingHorizontally) {
+							focusItem(pointedItem, 0);
+						}
+						draggingHorizontally = true;
+					} else if (!draggingHorizontally) {
+						if (reverse) dy2 = -dy2;
+						scroll += dy2;
+						if (kineticScroll * dy2 < 0) kineticScroll = 0;
+					}
+					dragging = true;
+					dragXHold = 0;
+					dragYHold = 0;
+					scrollTarget = -1;
+				} else {
+					// hold dragged units until it reaches threshold 
+					dragXHold += dX;
+					dragYHold += dY;
+				}
+				int prev = movesIdx - 1;
+				if (prev < 0) prev += moveSamples;
+				long prevTime = moveTimes[prev];
+				if (now - prevTime <= 1) {
+					moves[prev] += dY;
+					moveTimes[prev] = now;
+				} else {
+					moves[movesIdx] = dY;
+					moveTimes[movesIdx] = now;
+					movesIdx = (movesIdx + 1) % moveSamples;
+				}
 			}
 		}
 		pointerX = x;
@@ -1295,11 +1331,15 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						MP.midlet.commandAction(MP.writeCmd, this);
 					}
 				}
+			} else if (scroll > clipHeight && x > width - 40
+					&& (reverse ? (y > height - bottom - 40) : (y < top + 40))) {
+				scrollTo(0);
 			}
 		}
 		dragXHold = 0;
 		dragYHold = 0;
 		pointedItem = null;
+		heldItem = null;
 		dragging = false;
 		draggingHorizontally = false;
 		contentPressed = false;

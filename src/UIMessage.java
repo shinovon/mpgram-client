@@ -1197,6 +1197,18 @@ public class UIMessage extends UIItem implements LangConstants {
 		edited = true;
 		init(msg, chat);
 	}
+	
+	void select() {
+		if (selected) return;
+		selected = true;
+		((ChatCanvas) container).selected(this);
+	}
+	
+	void unselect() {
+		if (!selected) return;
+		selected = false;
+		((ChatCanvas) container).unselected(this);
+	}
 
 }
 //#endif
