@@ -1420,7 +1420,8 @@ public class MP extends MIDlet
 						sb.setLength(0);
 						sb.append("updates&media=1&read=1&peer=").append(form.id())
 						.append("&offset=").append(offset)
-						.append("&timeout=").append(updatesTimeout);
+						.append("&timeout=").append(updatesTimeout)
+						.append("&message=").append(form.firstMsgId());
 						if (form.topMsgId() != 0) {
 							sb.append("&top_msg=").append(form.topMsgId());
 						}

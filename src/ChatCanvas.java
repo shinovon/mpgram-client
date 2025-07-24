@@ -851,7 +851,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				}
 			}
 		} else {
-			if (scroll >= clipHeight || (!endReached && hasOffset)) {
+			if (touch && (scroll >= clipHeight || (!endReached && hasOffset))) {
 				g.setColor(colors[COLOR_CHAT_PANEL_FG]);
 				int tx = width - 40, ty = reverse ? height - bottom - 40 : top + 40;
 				g.fillTriangle(tx, ty, tx + 32, ty, tx + 16, reverse ? ty + 32 : ty - 32);

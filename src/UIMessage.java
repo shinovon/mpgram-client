@@ -115,7 +115,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		date = message.getLong("date");
 		id = message.getInt("id");
 		fromId = message.has("from_id") ? message.getString("from_id") : chat.id;
-		out = (message.getBoolean("out", false) && !chat.broadcast);
+		out = !chat.broadcast && (message.getBoolean("out", false) || fromId.equals(MP.selfId));
 		hideName = chat.selfChat || chat.user || out;
 		space = chat.broadcast;
 		name = out && !chat.broadcast ? MP.L[You] : MP.getName(fromId, true).trim();
@@ -1110,7 +1110,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			general[count++] = CopyMessage;
 			if (!chat.selfChat && !chat.user) general[count++] = CopyMessageLink;
 			general[count++] = Forward;
-			if (chat.canDelete) general[count++] = Delete;
+			if (chat.canDelete || out) general[count++] = Delete;
 		}
 		general[count++] = Select;
 		general[count] = Integer.MIN_VALUE;
