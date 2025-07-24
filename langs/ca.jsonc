@@ -103,6 +103,9 @@
 	"Pin": "Fixa",
 	"BanMember": "Prohibeix membre",
 	"Comments": "Discussion", // Untranslated
+	"Copy": "Copy", // Untranslated
+	"CopyLink": "Copy link", // Untranslated
+	"Select": "Select", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "Enllaç", // assuming noun, if verb - Enllaça
@@ -118,6 +121,8 @@
 	"Older": "Més vell",
 	"Newer": "Més nou",
 	"SendSticker": "Envia adhesiu",
+	"Menu": "Menu", // Untranslated
+	"Write": "Write", // Untranslated
 	
 	// Message writing form commands
 	"Send": "Envia",
@@ -261,6 +266,7 @@
 	"SendAsVoice": "Envia com a missatge de veu",
 	"HideWithSpoiler": "Amaga amb spoiler",
 	"EnableHTMLFormatting": "Activa formatació HTML",
+	"TextField_Hint": "Write a message...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Missatge enviat",
@@ -276,6 +282,7 @@
 	"Search_TitlePrefix": "Cerce - ",
 	"OlderMessages": "Missatges més vell",
 	"NewerMessages": "Missatges més nou",
+	"SavedMessages": "Saved messages", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "Reenviat des ",
@@ -292,6 +299,8 @@
 	"Media": "Mèdia",
 	"Poll": "Enquesta",
 	"Geo": "Geo: ",
+	"Photo": "Photo", // Untranslated
+	"Video": "Video", // Untranslated
 	
 	// Chat actions
 	"PinnedMessage_Action": " fixar missatge",
