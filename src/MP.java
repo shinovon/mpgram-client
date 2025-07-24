@@ -2054,7 +2054,17 @@ public class MP extends MIDlet
 				return;
 			}
 			
-			MPChat form = new ChatForm(((ChatInfoForm) current).id, ((TextBox) d).getString(), 0, ((ChatInfoForm) current).chatForm.topMsgId());
+			MPChat form;
+			
+//#ifndef NO_CHAT_CANVAS
+			if (useChatCanvas) {
+				form = new ChatCanvas(((ChatInfoForm) current).id, ((TextBox) d).getString(), 0, ((ChatInfoForm) current).chatForm.topMsgId());
+			} else
+//#endif
+			{
+				form = new ChatForm(((ChatInfoForm) current).id, ((TextBox) d).getString(), 0, ((ChatInfoForm) current).chatForm.topMsgId());
+			}
+			
 			form.setParent(((ChatInfoForm) current).chatForm);
 			openLoad((Displayable) form);
 			return;
@@ -2097,20 +2107,34 @@ public class MP extends MIDlet
 				return;
 			}
 			// Chat media categories
-			if (c == chatPhotosCmd) {
-				openLoad(new ChatForm(((ChatInfoForm) current).id, "Photos", ((ChatInfoForm) current).chatForm.topMsgId()));
-				return;
-			}
-			if (c == chatVideosCmd) {
-				openLoad(new ChatForm(((ChatInfoForm) current).id, "Video", ((ChatInfoForm) current).chatForm.topMsgId()));
-				return;
-			}
-			if (c == chatFilesCmd) {
-				openLoad(new ChatForm(((ChatInfoForm) current).id, "Document", ((ChatInfoForm) current).chatForm.topMsgId()));
-				return;
-			}
-			if (c == chatMusicCmd) {
-				openLoad(new ChatForm(((ChatInfoForm) current).id, "Music", ((ChatInfoForm) current).chatForm.topMsgId()));
+			if (c == chatPhotosCmd || c == chatVideosCmd || c == chatFilesCmd || c == chatMusicCmd) {
+				String mediaFilter;
+				switch (c.getPriority()) {
+				case 1:
+					mediaFilter = "Photos";
+					break;
+				case 2:
+					mediaFilter = "Video";
+					break;
+				case 3:
+					mediaFilter = "Document";
+					break;
+				case 4:
+					mediaFilter = "Music";
+					break;
+				default:
+					return;
+				}
+				Displayable form;
+//#ifndef NO_CHAT_CANVAS
+				if (useChatCanvas) {
+					form = new ChatCanvas(((ChatInfoForm) current).id, mediaFilter, ((ChatInfoForm) current).chatForm.topMsgId());
+				} else
+//#endif
+				{
+					form = new ChatForm(((ChatInfoForm) current).id, mediaFilter, ((ChatInfoForm) current).chatForm.topMsgId());
+				}
+				openLoad(form);
 				return;
 			}
 			if (c == gotoPinnedMsgCmd) {
@@ -2678,8 +2702,16 @@ public class MP extends MIDlet
 //#endif
 			if (c == okCmd) {
 				// full texbox finished
-				messageField.setString(((TextBox) d).getString());
+//#ifndef NO_CHAT_CANVAS
+				if (useChatCanvas) {
+					commandAction(backCmd, d);
+					((ChatCanvas) current).text = ((TextBox) d).getString();
+					((ChatCanvas) current).queueRepaint();
+					return;
+				}
+//#endif
 				
+				messageField.setString(((TextBox) d).getString());
 				c = backCmd;
 			}
 		}
@@ -2946,6 +2978,7 @@ public class MP extends MIDlet
 
 	public void commandAction(Command c, Item item) {
 		{ // message
+			// note: no need to check if canvas ui is enabled, since event came from lcdui item
 			if (c == itemChatCmd) {
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
@@ -2961,7 +2994,7 @@ public class MP extends MIDlet
 			if (c == replyMsgCmd) {
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
-				display(writeForm(((MPChat) current).id(), s[1], "", null, null, null));
+				display(writeForm(((ChatForm) current).id, s[1], "", null, null, null));
 				return;
 			}
 			if (c == forwardMsgCmd) {
@@ -3016,16 +3049,16 @@ public class MP extends MIDlet
 			if (c == gotoMsgCmd) {
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
-				if (((MPChat) current).parent() != null) {
+				if (((ChatForm) current).parent != null) {
 					// from search
-					goBackTo((Displayable) ((MPChat) current).parent());
-					((MPChat) current).openMessage(s[1], -1);
+					goBackTo((Displayable) ((ChatForm) current).parent);
+					((ChatForm) current).openMessage(s[1], -1);
 					return;
 				}
-				if ((s[0] == null || s[0].equals(((MPChat) current).id()))
-						&& ((MPChat) current).query() == null) {
+				if ((s[0] == null || s[0].equals(((ChatForm) current).id))
+						&& ((ChatForm) current).query == null) {
 					// from current chat
-					((MPChat) current).openMessage(s[1], -1);
+					((ChatForm) current).openMessage(s[1], -1);
 					return;
 				}
 				
@@ -3081,7 +3114,7 @@ public class MP extends MIDlet
 			browse("tel:".concat(((StringItem) item).getText()));
 			return;
 		}
-		if (c == sendCmd && current instanceof MPChat) { 
+		if (c == sendCmd && current instanceof ChatForm) { 
 			// textfield send
 			String t;
 			if ((t = ((TextField) item).getString().trim()).length() == 0)
@@ -3094,7 +3127,7 @@ public class MP extends MIDlet
 			if (reopenChat && MP.updatesThread != null) {
 				MP.cancel(MP.updatesThread, true);
 			}
-			start(RUN_SEND_MESSAGE, new Object[] { t, ((MPChat) current).id(), null, null, null, null, null, null });
+			start(RUN_SEND_MESSAGE, new Object[] { t, ((ChatForm) current).id, null, null, null, null, null, null });
 			return;
 		}
 		if (c == stickerItemCmd) {

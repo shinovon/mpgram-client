@@ -115,13 +115,13 @@ public class UIMessage extends UIItem implements LangConstants {
 		date = message.getLong("date");
 		id = message.getInt("id");
 		fromId = message.has("from_id") ? message.getString("from_id") : chat.id;
-		out = !chat.broadcast && (message.getBoolean("out", false) || fromId.equals(MP.selfId));
-		hideName = chat.selfChat || chat.user || out;
+		out = (!chat.broadcast && chat.mediaFilter == null) && (message.getBoolean("out", false) || fromId.equals(MP.selfId));
+		hideName = chat.selfChat || chat.user || out || chat.mediaFilter != null;
 		space = chat.broadcast;
 		name = out && !chat.broadcast ? MP.L[You] : MP.getName(fromId, true).trim();
 		dateRender = MP.localizeDate(date, 0);
 		dateWidth = MP.smallBoldFont.stringWidth(dateRender);
-		edited = message.has("edit");
+		edited = message.has("edit") && chat.mediaFilter == null;
 		peerId = chat.id;
 		
 		if ((action = message.has("act"))) {
@@ -204,68 +204,70 @@ public class UIMessage extends UIItem implements LangConstants {
 			subFocus[order++] = FOCUS_SENDER;
 		}
 		
-		// forwarded from... label
-		if (message.has("fwd")) {
-			fwd = true;
-			JSONObject fwd = message.getObject("fwd");
-			String t = null;
-			fwdFromId = fwd.getString("from_id", null);
-			if ((t = fwd.getString("from_name", null)) == null) {
-				t = MP.getName(fwdFromId, true);
+		if (chat.mediaFilter == null) {
+			// forwarded from... label
+			if (message.has("fwd")) {
+				fwd = true;
+				JSONObject fwd = message.getObject("fwd");
+				String t = null;
+				fwdFromId = fwd.getString("from_id", null);
+				if ((t = fwd.getString("from_name", null)) == null) {
+					t = MP.getName(fwdFromId, true);
+				}
+				if (t != null) t = t.trim();
+				forwardName = t;
+				forwardedFromWidth = chat.selfChat ? 0 : MP.smallPlainFont.stringWidth(MP.L[ForwardedFrom]);
+				if (fwd.has("peer") && fwd.has("msg")) {
+					fwdPeer = fwd.getString("peer");
+					fwdMsgId = fwd.getInt("msg");
+					subFocus[order++] = FOCUS_FORWARD;
+				} else if (fwdFromId != null) {
+					subFocus[order++] = FOCUS_FORWARD;
+				}
 			}
-			if (t != null) t = t.trim();
-			forwardName = t;
-			forwardedFromWidth = chat.selfChat ? 0 : MP.smallPlainFont.stringWidth(MP.L[ForwardedFrom]);
-			if (fwd.has("peer") && fwd.has("msg")) {
-				fwdPeer = fwd.getString("peer");
-				fwdMsgId = fwd.getInt("msg");
-				subFocus[order++] = FOCUS_FORWARD;
-			} else if (fwdFromId != null) {
-				subFocus[order++] = FOCUS_FORWARD;
-			}
-		}
-		
-		// reply
-		if (message.has("reply")) {
-			JSONObject reply = message.getObject("reply");
-			int topMsgId = chat.topMsgId;
-			if (topMsgId == 0 || reply.getInt("id") != topMsgId) {
-				if (reply.has("msg")) {
-					this.reply = true;
-					JSONObject replyMsg = reply.getObject("msg");
-					JSONObject replyFwd;
-					String t = null;
-					if ((t = MP.getName(replyMsg.getString("from_id", null), true, true)) == null
-							&& replyMsg.has("fwd") && (replyFwd = replyMsg.getObject("fwd")).getBoolean("s", false)) {
-						if ((t = replyFwd.getString("from_name", null)) == null) {
-							t = MP.getName(replyFwd.getString("from_id", null), true);
-						}
-					}
-					replyName = t == null && chat.user ? chat.title : t;
-					if (replyMsg.has("media")) {
-						String type = replyMsg.getObject("media").getString("type", null);
-						t = MP.L[Media];
-						if (type != null) {
-							if ("photo".equals(type)) {
-								t = MP.L[Photo];
-							} else if ("document".equals(type)) {
-//								t = MP.L[Video];
-								t = MP.L[File];
+			
+			// reply
+			if (message.has("reply")) {
+				JSONObject reply = message.getObject("reply");
+				int topMsgId = chat.topMsgId;
+				if (topMsgId == 0 || reply.getInt("id") != topMsgId) {
+					if (reply.has("msg")) {
+						this.reply = true;
+						JSONObject replyMsg = reply.getObject("msg");
+						JSONObject replyFwd;
+						String t = null;
+						if ((t = MP.getName(replyMsg.getString("from_id", null), true, true)) == null
+								&& replyMsg.has("fwd") && (replyFwd = replyMsg.getObject("fwd")).getBoolean("s", false)) {
+							if ((t = replyFwd.getString("from_name", null)) == null) {
+								t = MP.getName(replyFwd.getString("from_id", null), true);
 							}
 						}
-						replyPrefix = t;
-						replyPrefixWidth = MP.smallPlainFont.stringWidth(replyPrefix);
-					}
-					
-					if (reply.has("quote")) {
-						replyText = reply.getString("quote");
-					} else if ((t = replyMsg.getString("text", null)) != null && t.length() != 0) {
-						replyText = t;
-					}
-					replyPeer = reply.getString("peer", null);
-					replyMsgId = reply.getInt("id", 0);
-					if ((replyText != null || replyPrefix != null || replyName != null) && (replyMsgId != 0)) {
-						subFocus[order++] = FOCUS_REPLY;
+						replyName = t == null && chat.user ? (chat.selfChat ? MP.L[You] : chat.title) : t;
+						if (replyMsg.has("media")) {
+							String type = replyMsg.getObject("media").getString("type", null);
+							t = MP.L[Media];
+							if (type != null) {
+								if ("photo".equals(type)) {
+									t = MP.L[Photo];
+								} else if ("document".equals(type)) {
+//									t = MP.L[Video];
+									t = MP.L[File];
+								}
+							}
+							replyPrefix = t;
+							replyPrefixWidth = MP.smallPlainFont.stringWidth(replyPrefix);
+						}
+						
+						if (reply.has("quote")) {
+							replyText = reply.getString("quote");
+						} else if ((t = replyMsg.getString("text", null)) != null && t.length() != 0) {
+							replyText = t;
+						}
+						replyPeer = reply.getString("peer", null);
+						replyMsgId = reply.getInt("id", 0);
+						if ((replyText != null || replyPrefix != null || replyName != null) && (replyMsgId != 0)) {
+							subFocus[order++] = FOCUS_REPLY;
+						}
 					}
 				}
 			}
@@ -364,34 +366,36 @@ public class UIMessage extends UIItem implements LangConstants {
 			}
 		}
 		
-		// text
-		String text = origText = message.getString("text", null);
-		if (text != null && text.length() != 0) {
-			UILabel label;
-			if (MP.parseRichtext && message.has("entities")) {
-				label = new UILabel(text, message.getArray("entities"));
-			} else {
-				label = new UILabel(text, MP.smallPlainFont, null);
+		if (chat.mediaFilter == null) {
+			// text
+			String text = origText = message.getString("text", null);
+			if (text != null && text.length() != 0) {
+				UILabel label;
+				if (MP.parseRichtext && message.has("entities")) {
+					label = new UILabel(text, message.getArray("entities"));
+				} else {
+					label = new UILabel(text, MP.smallPlainFont, null);
+				}
+				label.color = ChatCanvas.colors[COLOR_MESSAGE_FG];
+				label.linkColor = ChatCanvas.colors[COLOR_MESSAGE_LINK];
+				label.focusColor = ChatCanvas.colors[COLOR_MESSAGE_LINK_FOCUS];
+				if (label.focusable) subFocus[order++] = FOCUS_TEXT;
+				this.text = label;
 			}
-			label.color = ChatCanvas.colors[COLOR_MESSAGE_FG];
-			label.linkColor = ChatCanvas.colors[COLOR_MESSAGE_LINK];
-			label.focusColor = ChatCanvas.colors[COLOR_MESSAGE_LINK_FOCUS];
-			if (label.focusable) subFocus[order++] = FOCUS_TEXT;
-			this.text = label;
-		}
-		
-		// buttons TODO
-//		if (message.has("markup")) {
-//			subFocus[order++] = FOCUS_BUTTONS;
-//		}
-		
-		// comments
-		if (message.has("comments")) {
-			JSONObject comments = message.getObject("comments");
-			commentsText = MP.localizePlural(comments.getInt("count"), _comment);
-			commentPeer = comments.getString("peer");
-			commentRead = comments.getInt("read", 0);
-			subFocus[order++] = FOCUS_COMMENT;
+			
+			// buttons TODO
+	//		if (message.has("markup")) {
+	//			subFocus[order++] = FOCUS_BUTTONS;
+	//		}
+			
+			// comments
+			if (message.has("comments")) {
+				JSONObject comments = message.getObject("comments");
+				commentsText = MP.localizePlural(comments.getInt("count"), _comment);
+				commentPeer = comments.getString("peer");
+				commentRead = comments.getInt("read", 0);
+				subFocus[order++] = FOCUS_COMMENT;
+			}
 		}
 		
 		subFocusLength = order;

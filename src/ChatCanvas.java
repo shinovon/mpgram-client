@@ -28,6 +28,8 @@ import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.TextBox;
+import javax.microedition.lcdui.TextField;
 import javax.microedition.lcdui.Ticker;
 
 public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnable {
@@ -162,10 +164,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	// input
 	boolean hasInput;
 	String text;
-	boolean reply;
-	int replyToMsgId;
+	int replyMsgId;
+	int editMsgId;
 	String file;
-	boolean edit;
 	
 	ChatCanvas() {
 		setFullScreenMode(true);
@@ -215,7 +216,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 //				attachIcon = loadRLE("/attach.rle", colors[COLOR_CHAT_INPUT_ICON]);
 //			}
 		} else {
-			top = MP.smallBoldFontHeight + 4 + (MP.chatStatus ? MP.smallPlainFontHeight + 4 : 0);
+			top = MP.smallBoldFontHeight + 4 + (MP.chatStatus && mediaFilter == null ? MP.smallPlainFontHeight + 4 : 0);
 		}
 	}
 	
@@ -226,6 +227,16 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		this.messageId = message;
 		this.topMsgId = topMsg;
 		init(query == null);
+	}
+	
+	// create in media mode
+	public ChatCanvas(String id, String mediaFilter, int topMsg) {
+		this();
+		this.id = id;
+		if (mediaFilter == null) mediaFilter = "Photos";
+		this.mediaFilter = mediaFilter;
+		this.topMsgId = topMsg;
+		init(false);
 	}
 	
 	// post discussion
@@ -753,14 +764,13 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					g.fillRect(w - 22, bty + 6, 3, 3);
 				}
 			}
-			if (selected != 0) {
-				boolean medfont = MP.chatStatus;
+			boolean medfont = (MP.chatStatus && mediaFilter == null) || touch;
+			if (selected != 0 || mediaFilter != null) {
 				g.setFont(medfont ? MP.medPlainFont : MP.smallPlainFont);
 				g.setColor(colors[COLOR_CHAT_FG]);
-				g.drawString(Integer.toString(selected), tx, medfont ? ((th - MP.medPlainFontHeight) >> 1) : 2, 0);
+				g.drawString(selected != 0 ? Integer.toString(selected) : mediaFilter /* TODO unlocalized */, tx, medfont ? ((th - MP.medPlainFontHeight) >> 1) : 2, 0);
 			} else {
-				boolean showStatus = MP.chatStatus || touch;
-				boolean hideStatus = showStatus && (selfChat || postId != null || query != null);
+				boolean hideStatus = medfont && (selfChat || postId != null || query != null);
 				if (title != null) {
 					Font font = hideStatus ? MP.medPlainFont : MP.smallBoldFont;
 					if (titleRender == null) {
@@ -768,10 +778,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					}
 					g.setColor(colors[COLOR_CHAT_FG]);
 					g.setFont(font);
-					g.drawString(titleRender, tx, showStatus ? (hideStatus ? (th - MP.medPlainFontHeight) >> 1 : 4) : 2, 0);
+					g.drawString(titleRender, tx, medfont ? (hideStatus ? (th - MP.medPlainFontHeight) >> 1 : 4) : 2, 0);
 				}
 				// TODO status ellipsis
-				if (showStatus && !hideStatus) {
+				if (medfont && !hideStatus) {
 					g.setColor(colors[typing != 0 ? COLOR_CHAT_STATUS_HIGHLIGHT_FG : COLOR_CHAT_STATUS_FG]);
 					g.setFont(MP.smallPlainFont);
 					String status = this.status;
@@ -815,14 +825,33 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				}
 			} else if (touch) {
 				// TODO
-				g.setFont(MP.medPlainFont);
 				g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
 				if (canWrite) {
 //					if (attachIcon != null) g.drawImage(attachIcon, 8, by + ((bottom - 24) >> 1), 0);
-					int ty = by + ((bottom - 24) >> 1);
-					g.fillRect(w - 40 + 12, ty + 12, 17, 1);
-					g.fillRect(w - 40 + 20, ty + 4, 1, 17);
-					g.drawString(MP.L[TextField_Hint], 10, by + ((bottom - MP.medPlainFontHeight) >> 1), 0);
+					if (text == null || text.length() == 0) {
+						g.setFont(MP.medPlainFont);
+						g.drawString(MP.L[TextField_Hint], 10, by + ((bottom - MP.medPlainFontHeight) >> 1), 0);
+					} else {
+						g.setFont(MP.smallPlainFont);
+						g.setColor(colors[COLOR_CHAT_FG]);
+						g.drawString(text, 10, by + ((bottom - MP.smallPlainFontHeight) >> 1), 0);
+					}
+						
+					if ((text != null && text.length() != 0) || file != null) {
+						// send icon
+						int ty = by + ((bottom - 20) >> 1);
+						
+						g.setColor(colors[COLOR_CHAT_SEND_ICON]);
+						g.fillTriangle(w - 8 - 20, ty, w - 8, ty + 10, w - 8 - 20, ty + 20);
+						g.setColor(colors[COLOR_CHAT_PANEL_BG]);
+						g.fillTriangle(w - 8 - 20, ty, w - 8 - 18, ty + 10, w - 8 - 20, ty + 20);
+						g.drawLine(w - 8 - 20, ty + 10, w - 8 - 10, ty + 10);
+					} else {
+						// attach icon
+						int ty = by + ((bottom - 24) >> 1);
+						g.fillRect(w - 40 + 12, ty + 12, 17, 1);
+						g.fillRect(w - 40 + 20, ty + 4, 1, 17);
+					}
 				} else if (left) {
 					g.drawString(MP.L[JoinGroup], w >> 1, by + ((bottom - MP.medPlainFontHeight) >> 1), Graphics.TOP | Graphics.HCENTER);
 				}
@@ -1026,7 +1055,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				// TODO
 				showMenu(null, new int[] { Delete, Forward });
 			} else if (fieldFocused) {
-				showMenu(null, canWrite && hasInput ? new int[] { Refresh, ChatInfo, SendSticker } : new int[] { Refresh, ChatInfo });
+				showMenu(null, canWrite && hasInput ? new int[] { Refresh, ChatInfo, SearchMessages, SendSticker } : new int[] { Refresh, ChatInfo, SearchMessages });
 			} else {
 				if (focusedItem != null && focusedItem.focusable) {
 					int[] menu = focusedItem.menu();
@@ -1325,14 +1354,31 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			} else if (y > height - bottom) {
 				// TODO
 				if (selected != 0) {
-					
 				} else if (left) {
 					MP.midlet.start(MP.RUN_JOIN_CHANNEL, id);
 				} else if (canWrite) {
 					if (x > width - 48) {
-						showMenu(null, new int[] { SendSticker, WriteMessage });
+						if ((text != null && text.length() != 0) || file != null) {
+							// send TODO
+							MP.midlet.start(MP.RUN_SEND_MESSAGE, new Object[] {
+									text, id,
+									replyMsgId == 0 ? null : Integer.toString(replyMsgId),
+									editMsgId == 0 ? null : Integer.toString(editMsgId),
+									file,
+									null, null, null
+									});
+						} else {
+							showMenu(null, new int[] { SendSticker, WriteMessage });
+						}
 					} else { 
-						MP.midlet.commandAction(MP.writeCmd, this);
+//						MP.midlet.commandAction(MP.writeCmd, this);
+						if (text == null) text = "";
+						TextBox t = new TextBox("", text, 500, TextField.ANY);
+						t.addCommand(MP.okCmd);
+						t.addCommand(MP.cancelCmd);
+						t.setCommandListener(MP.midlet);
+						
+						MP.display(t);
 					}
 				}
 			} else if (arrowShown && x > width - 40
@@ -1696,12 +1742,26 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 
 	public void startEdit(UIMessage item) {
 		// TODO
-		MP.display(MP.writeForm(id, null, item.origText, Integer.toString(item.id), null, null));
+		resetInput();
+		text = item.origText;
+		editMsgId = item.id;
+//		MP.display(MP.writeForm(id, null, item.origText, Integer.toString(item.id), null, null));
+		queueRepaint();
 	}
 	
 	public void startReply(UIMessage item) {
 		// TODO
-		MP.display(MP.writeForm(id, Integer.toString(item.id), "", null, null, null));
+		if (editMsgId != 0) resetInput();
+		replyMsgId = item.id;
+//		MP.display(MP.writeForm(id, Integer.toString(item.id), "", null, null, null));
+		queueRepaint();
+	}
+	
+	private void resetInput() {
+		text = "";
+		replyMsgId = 0;
+		editMsgId = 0;
+		file = null;
 	}
 	
 	// interface getters
@@ -1831,8 +1891,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 
 	public void sent() {
-		// TODO Auto-generated method stub
-		
+		resetInput();
+		queueRepaint();
 	}
 
 	public void handleUpdate(int type, JSONObject update) {
