@@ -1111,7 +1111,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			if (chat.canWrite) general[count++] = Reply;
 			if (out) general[count++] = Edit;
 			if (chat.canPin) general[count++] = Pin;
-			general[count++] = CopyMessage;
+			if (origText != null && origText.length() != 0) general[count++] = CopyMessage;
 			if (!chat.selfChat && !chat.user) general[count++] = CopyMessageLink;
 			general[count++] = Forward;
 			if (chat.canDelete || out) general[count++] = Delete;

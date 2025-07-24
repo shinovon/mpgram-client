@@ -235,7 +235,7 @@ public class MP extends MIDlet
 	static boolean notifyAvas = true;
 //#endif
 	static boolean updateChatsList;
-	static boolean useChatCanvas = true;
+	static boolean legacyChatUI;
 	static boolean fastScrolling; // disable animations
 	static boolean forceKeyUI;
 	
@@ -344,6 +344,7 @@ public class MP extends MIDlet
 	static Command okCmd;
 	static Command cancelCmd;
 	static Command goCmd;
+	static Command copyCmd;
 	
 	static Command nextPageCmd;
 	static Command prevPageCmd;
@@ -684,6 +685,7 @@ public class MP extends MIDlet
 			pushBgInterval = j.getLong("pushBgInterval", pushBgInterval);
 			notifyMethod = j.getInt("notifyMethod", notifyMethod);
 //#endif
+			legacyChatUI = j.getBoolean("legacyChatUI", legacyChatUI);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -790,6 +792,7 @@ public class MP extends MIDlet
 		okCmd = new Command(L[Ok], Command.OK, 1);
 		cancelCmd = new Command(L[Cancel], Command.CANCEL, 20);
 		goCmd = new Command(L[Ok], Command.OK, 1);
+		copyCmd = new Command(L[Copy], Command.OK, 1);
 
 		nextPageCmd = new Command(L[NextPage], Command.SCREEN, 6);
 		prevPageCmd = new Command(L[PrevPage], Command.SCREEN, 7);
@@ -2057,7 +2060,7 @@ public class MP extends MIDlet
 			MPChat form;
 			
 //#ifndef NO_CHAT_CANVAS
-			if (useChatCanvas) {
+			if (!legacyChatUI) {
 				form = new ChatCanvas(((ChatInfoForm) current).id, ((TextBox) d).getString(), 0, ((ChatInfoForm) current).chatForm.topMsgId());
 			} else
 //#endif
@@ -2127,7 +2130,7 @@ public class MP extends MIDlet
 				}
 				Displayable form;
 //#ifndef NO_CHAT_CANVAS
-				if (useChatCanvas) {
+				if (!legacyChatUI) {
 					form = new ChatCanvas(((ChatInfoForm) current).id, mediaFilter, ((ChatInfoForm) current).chatForm.topMsgId());
 				} else
 //#endif
@@ -2324,7 +2327,7 @@ public class MP extends MIDlet
 							L[BuiltinImageViewer],
 							L[LargeMusicCover],
 //#ifndef NO_CHAT_CANVAS
-							"new chat ui", // TODO
+							"Legacy UI", // TODO
 //#endif
 					}, null);
 					uiChoice.setSelectedIndex(i = 0, reverseChat);
@@ -2335,7 +2338,7 @@ public class MP extends MIDlet
 					uiChoice.setSelectedIndex(++i, useView);
 					uiChoice.setSelectedIndex(++i, fullPlayerCover);
 //#ifndef NO_CHAT_CANVAS
-					uiChoice.setSelectedIndex(++i, useChatCanvas);
+					uiChoice.setSelectedIndex(++i, legacyChatUI);
 //#endif
 					uiChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(uiChoice);
@@ -2528,7 +2531,7 @@ public class MP extends MIDlet
 				useView = uiChoice.isSelected(++i);
 				fullPlayerCover = uiChoice.isSelected(++i);
 //#ifndef NO_CHAT_CANVAS
-				useChatCanvas = uiChoice.isSelected(++i);
+				legacyChatUI = uiChoice.isSelected(++i);
 //#endif
 				
 				if ((photoSize = (photoSizeGauge.getValue() * 8)) < 16) {
@@ -2634,7 +2637,7 @@ public class MP extends MIDlet
 					j.put("pushBgInterval", pushBgInterval);
 					j.put("notifyMethod", notifyMethod);
 //#endif
-					j.put("useChatCanvas", useChatCanvas);
+					j.put("legacyChatUI", legacyChatUI);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
@@ -2703,7 +2706,7 @@ public class MP extends MIDlet
 			if (c == okCmd) {
 				// full texbox finished
 //#ifndef NO_CHAT_CANVAS
-				if (useChatCanvas) {
+				if (!legacyChatUI) {
 					commandAction(backCmd, d);
 					((ChatCanvas) current).text = ((TextBox) d).getString();
 					((ChatCanvas) current).queueRepaint();
@@ -2946,6 +2949,18 @@ public class MP extends MIDlet
 				display(initPlayerForm());
 			}
 		}
+//#ifndef NO_NOKIAUI
+		if (c == copyCmd) {
+			try {
+				if (checkClass("com.nokia.mid.ui.Clipboard")) {
+					NokiaAPI.copy(((TextBox) d).getString());
+					display(infoAlert("Text copied")); // TODO unlocalized
+					return;
+				}
+			} catch (Throwable ignored) {}
+			return;
+		}
+//#endif
 		if (c == backCmd || c == cancelCmd) {
 			// cancel ota update dialog
 			updateUrl = null;
@@ -3725,7 +3740,7 @@ public class MP extends MIDlet
 			return;
 		}
 //#ifndef NO_CHAT_CANVAS
-		if (useChatCanvas) {
+		if (!legacyChatUI) {
 			openLoad(new ChatCanvas(id, null, msg, 0));
 			return;
 		}
@@ -3794,9 +3809,11 @@ public class MP extends MIDlet
 	}
 	
 	static void copy(String title, String text) {
-		// TODO use nokiaui?
 		TextBox t = new TextBox(title, text, Math.max(2000, text.length() + 1), TextField.UNEDITABLE);
 		t.addCommand(backCmd);
+//#ifndef NO_NOKIAUI
+		if (checkClass("com.nokia.mid.ui.Clipboard")) t.addCommand(copyCmd);
+//#endif
 		t.setCommandListener(midlet);
 		display(t);
 	}
@@ -4218,7 +4235,7 @@ public class MP extends MIDlet
 						} else {
 							MPChat chat;
 //#ifndef NO_CHAT_CANVAS
-							if (useChatCanvas) {
+							if (!legacyChatUI) {
 								chat = new ChatCanvas(domain, null, msg, topMsg);
 							} else {
 //#endif

@@ -19,31 +19,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-public class StickerPacksList extends MPList {
-	
-	JSONArray sets;
-	MPChat chatForm;
+//#ifndef NO_NOKIAUI
+import com.nokia.mid.ui.Clipboard;
 
-	public StickerPacksList(MPChat form) {
-		super(MP.L[Stickers_Title]);
-		this.chatForm = form;
-		addCommand(MP.backCmd);
-	}
+public class NokiaAPI {
 
-	void loadInternal(Thread thread) throws Exception {
-		JSONObject j = (JSONObject) MP.api("getStickerSets");
-		
-		JSONArray sets = this.sets = j.getArray("res");
-		int l = sets.size();
-		
-		for (int i = 0; i < l; ++i) {
-			safeAppend(thread, sets.getObject(i).getString("title"), null);
+	public static boolean copy(String text) {
+		try {
+			Clipboard.copyToClipboard(text);
+			return true;
+		} catch (Throwable e) {
+			return false;
 		}
 	}
-
-	void select(int i) {
-		if (i == -1) return;
-		MP.openLoad(new StickerPackForm(chatForm, sets.getObject(i)));
-	}
-
+	
 }
+//#endif
