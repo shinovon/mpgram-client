@@ -3067,7 +3067,7 @@ public class MP extends MIDlet
 			try {
 				if (checkClass("com.nokia.mid.ui.Clipboard")) {
 					NokiaAPI.copy(((TextBox) d).getString());
-					display(infoAlert("Text copied")); // TODO unlocalized
+					display(infoAlert("Text copied"), current); // TODO unlocalized
 					return;
 				}
 			} catch (Throwable ignored) {}
