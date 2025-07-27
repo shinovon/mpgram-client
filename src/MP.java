@@ -444,7 +444,11 @@ public class MP extends MIDlet
 	private static int playerState; // 1 - playing, 2 - paused, 3 - loading
 	private static Player currentPlayer;
 	
+	// notifications
+//#ifndef NO_NOTIFY
 	static Hashtable notificationMessages = new Hashtable();
+	static Player notificationPlayer;
+//#endif
 	
 	// region MIDlet
 	
@@ -1681,7 +1685,18 @@ public class MP extends MIDlet
 							}
 							
 							if (notified && notifySound) {
-								AlertType.ALARM.playSound(display);	
+								try {
+									if (notificationPlayer == null) {
+										notificationPlayer = Manager.createPlayer(getClass().getResourceAsStream("/msg.mp3"), "audio/mpeg");
+										notificationPlayer.realize();
+										notificationPlayer.prefetch();
+									}
+									notificationPlayer.stop();
+									notificationPlayer.setMediaTime(0);
+									notificationPlayer.start();
+								} catch (Exception e) {
+									AlertType.ALARM.playSound(display);
+								}
 							}
 						}
 						
