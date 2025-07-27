@@ -80,7 +80,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	private int idOffset;
 	
 	boolean switched;
-	boolean update;
+	boolean update, shouldUpdate;
 	
 	boolean selfChat;
 	boolean user;
@@ -488,7 +488,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					&& query == null && mediaFilter == null
 					&& MP.chatUpdates && !update) {
 				// start updater thread
-				update = true;
+				update = shouldUpdate = true;
 				MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
 				(typingThread = new Thread(this)).start();
 			}
@@ -529,6 +529,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			keyGuide = true;
 			fieldAnimTarget = MP.smallBoldFontHeight + 2;
 		}
+		if (shouldUpdate && !update) {
+			MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
+			if (typingThread == null) {
+				(typingThread = new Thread(this)).start();
+			}
+		}
 		repaint();
 	}
 	
@@ -542,6 +548,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			if (typingThread != null) typingThread.interrupt();
 		}
 		
+		shouldUpdate = false;
 		loaded = false;
 		if (finished || thread == null) return;
 		canceled = true;
@@ -1874,6 +1881,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		selected = 0;
 		if (table != null) table.clear();
 		switched = false;
+		shouldUpdate = false;
 	}
 
 	public void openMessage(String msg, int topMsg) {
@@ -2064,7 +2072,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 
 			setTicker(null);
 			typing = 0;
-		} catch (Exception e) {}
+		} catch (Exception ignored) {
+		} finally {
+			typingThread = null;
+		}
 	}
 
 }
