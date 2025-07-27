@@ -106,6 +106,7 @@ public class MP extends MIDlet
 	static final int RUN_LOAD_PLAYLIST = 23;
 	static final int RUN_PLAYER_LOOP = 24;
 	static final int RUN_CANCEL_UPDATES = 25;
+	static final int RUN_DOWNLOAD_DOCUMENT = 26;
 	
 	// RMS
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
@@ -239,6 +240,8 @@ public class MP extends MIDlet
 	static boolean legacyChatUI;
 	static boolean fastScrolling; // disable animations
 	static boolean forceKeyUI;
+	static int downloadMethod; // TODO decide
+	static String downloadPath;
 	
 	// platform
 	static boolean symbianJrt;
@@ -287,6 +290,7 @@ public class MP extends MIDlet
 	
 	private static Command logoutCmd;
 	private static Command clearCacheCmd;
+	private static Command downloadPathCmd;
 
 	static Command refreshCmd;
 	static Command archiveCmd;
@@ -396,6 +400,7 @@ public class MP extends MIDlet
 	private static Gauge pushIntervalGauge;
 	private static Gauge pushBgIntervalGauge;
 //#endif
+	private static TextField downloadPathField;
 	
 	// write items
 	private static TextField messageField;
@@ -426,6 +431,7 @@ public class MP extends MIDlet
 	private static String writeTo, replyTo, sendFile, edit, fwdPeer, fwdMsg;
 	private static String updateUrl;
 	private static long lastType;
+	private static String[] downloadMessage;
 	
 //#ifndef NO_FILE
 	// file picker
@@ -652,14 +658,18 @@ public class MP extends MIDlet
 			r.closeRecordStore();
 			
 			reverseChat = j.getBoolean("reverseChat", reverseChat);
+//#ifndef NO_AVATARS
 			loadAvatars = j.getBoolean("loadAvatars", loadAvatars);
 			avatarSize = j.getInt("avatarSize", avatarSize);
+//#endif
 			showMedia = j.getBoolean("showMedia", showMedia);
 			photoSize = j.getInt("photoSize", photoSize);
 			loadThumbs = j.getBoolean("loadThumbs", loadThumbs);
 			threadedImages = j.getBoolean("threadedImages", threadedImages);
+//#ifndef NO_AVATARS
 			avatarsCache = j.getInt("avatarsCache", avatarsCache);
 			avatarsCacheThreshold = j.getInt("avatarsCacheThreshold", avatarsCacheThreshold);
+//#endif
 			useLoadingForm = j.getBoolean("useLoadingForm", useLoadingForm);
 			chatsLimit = j.getInt("chatsLimit", chatsLimit);
 			messagesLimit = j.getInt("messagesLimit", messagesLimit);
@@ -677,9 +687,13 @@ public class MP extends MIDlet
 			chatsListFontSize = j.getInt("chatsListFontSize", chatsListFontSize);
 			keepAlive = j.getBoolean("keepAlive", keepAlive);
 			chatField = j.getBoolean("chatField", chatField);
+//#ifndef NO_AVATARS
 			roundAvatars = j.getBoolean("roundAvatars", roundAvatars);
+//#endif
 			utf = j.getBoolean("utf", utf);
+//#ifndef NO_ZIP
 			compress = j.getBoolean("compress", compress);
+//#endif
 			useView = j.getBoolean("useView", useView);
 			blackberryNetwork = j.getInt("blackberryNetwork", blackberryNetwork);
 			fullPlayerCover = j.getBoolean("fullPlayerCover", fullPlayerCover);
@@ -690,7 +704,12 @@ public class MP extends MIDlet
 			pushBgInterval = j.getLong("pushBgInterval", pushBgInterval);
 			notifyMethod = j.getInt("notifyMethod", notifyMethod);
 //#endif
+//#ifndef NO_CHAT_CANVAS
 			legacyChatUI = j.getBoolean("legacyChatUI", legacyChatUI);
+//#endif
+//#ifndef NO_FILE
+			downloadPath = j.getString("downloadPath", downloadPath);
+//#endif
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -739,6 +758,7 @@ public class MP extends MIDlet
 		
 		logoutCmd = new Command(L[Logout], Command.ITEM, 1);
 		clearCacheCmd = new Command(L[ClearCache], Command.ITEM, 1);
+		downloadPathCmd = new Command("Locate", Command.ITEM, 1); // TODO unlocalized
 
 		foldersCmd = new Command(L[Folders], Command.SCREEN, 4);
 		refreshCmd = new Command(L[Refresh], Command.SCREEN, 5);
@@ -1949,6 +1969,12 @@ public class MP extends MIDlet
 			} catch (Exception ignored) {}
 			break;
 		}
+		case RUN_DOWNLOAD_DOCUMENT: {
+			// TODO
+			Alert alert = new Alert("");
+			display(alert, current);
+			break;
+		}
 		}
 //		running--;
 	}
@@ -2522,6 +2548,20 @@ public class MP extends MIDlet
 					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(s);
 					
+//#ifndef NO_FILE
+					// downloads TODO
+					
+					downloadPathField = new TextField("Default download path" /*L[DownloadPath]*/, downloadPath, 500, TextField.ANY);
+					downloadPathField.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(downloadPathField);
+					
+					s = new StringItem(null, "...", Item.BUTTON);
+					s.setDefaultCommand(downloadPathCmd);
+					s.setItemCommandListener(this);
+					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(s);
+//#endif
+					
 					// authorization
 					
 					s = new StringItem(null, L[Authorization]);
@@ -2620,6 +2660,10 @@ public class MP extends MIDlet
 				avatarsCacheThreshold = avaCacheGauge.getValue() * 5;
 //#endif
 				peersCacheThreshold = profileCacheGauge.getValue() * 10;
+
+//#ifndef NO_FILE
+				downloadPath = downloadPathField.getString();
+//#endif
 				
 				try {
 					RecordStore.deleteRecordStore(SETTINGS_RECORD_NAME);
@@ -2627,14 +2671,18 @@ public class MP extends MIDlet
 				try {
 					JSONObject j = new JSONObject();
 					j.put("reverseChat", reverseChat);
+//#ifndef NO_AVATARS
 					j.put("loadAvatars", loadAvatars);
 					j.put("avatarSize", avatarSize);
+//#endif
 					j.put("showMedia", showMedia);
 					j.put("photoSize", photoSize);
 					j.put("loadThumbs", loadThumbs);
 					j.put("threadedImages", threadedImages);
+//#ifndef NO_AVATARS
 					j.put("avatarsCache", avatarsCache);
 					j.put("avatarsCacheThreshold", avatarsCacheThreshold);
+//#endif
 					j.put("useLoadingForm", useLoadingForm);
 					j.put("chatsLimit", chatsLimit);
 					j.put("messagesLimit", messagesLimit);
@@ -2654,7 +2702,9 @@ public class MP extends MIDlet
 					j.put("chatField", chatField);
 					j.put("roundAvatars", roundAvatars);
 					j.put("utf", utf);
+//#ifndef NO_ZIP
 					j.put("compress", compress);
+//#endif
 					j.put("useView", useView);
 					j.put("blackberryNetwork", blackberryNetwork);
 					j.put("fullPlayerCover", fullPlayerCover);
@@ -2665,7 +2715,12 @@ public class MP extends MIDlet
 					j.put("pushBgInterval", pushBgInterval);
 					j.put("notifyMethod", notifyMethod);
 //#endif
+//#ifndef NO_CHAT_CANVAS
 					j.put("legacyChatUI", legacyChatUI);
+//#endif
+//#ifndef NO_FILE
+					j.put("downloadPath", downloadPath);
+//#endif
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
@@ -2699,6 +2754,13 @@ public class MP extends MIDlet
 				commandAction(backCmd, d);
 				return;
 			}
+//#ifndef NO_FILE
+			if (c == downloadPathCmd) {
+				downloadMessage = null;
+				openFilePicker(downloadPath, false);
+				return;
+			}
+//#endif
 		}
 		{ // write form commands
 			if (c == sendCmd) {
@@ -2918,7 +2980,14 @@ public class MP extends MIDlet
 				sendFile = "file:///".concat(path);
 				fileLabel.setText(L[File_Prefix].concat(path));
 			} else {
-				// TODO folder selected
+				// folder selected
+				if (downloadMessage == null) {
+					// default download path selected in settings
+					downloadPathField.setString(path);
+					goBackTo(settingsForm);
+				} else {
+					// TODO
+				}
 			}
 //#endif
 			return;
@@ -3711,7 +3780,7 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 	static void openFilePicker(String path, boolean file) {
 		fileMode = file;
-		if (path.length() == 0) path = "/";
+		if (path == null || path.length() == 0) path = "/";
 		display(loadingAlert(L[Loading]), current);
 		try {
 			if (fileImg == null) {
@@ -3874,6 +3943,10 @@ public class MP extends MIDlet
 	
 	void downloadDocument(String peerId, String msgId, String fileName) {
 		// TODO
+		if (fileName != null && !fileName.endsWith(".jar") && !fileName.endsWith(".jad") && downloadMethod != 0) {
+			downloadMessage = new String[] { peerId, msgId, fileName };
+			
+		}
 		if (fileRewrite && fileName != null) {
 			browse(instanceUrl + "file/" + url(fileName) + "?c=" + peerId + "&m=" + msgId + "&user=" + user);
 		} else {
