@@ -105,6 +105,7 @@ public class MP extends MIDlet
 	static final int RUN_INSTALL_STICKER_SET = 22;
 	static final int RUN_LOAD_PLAYLIST = 23;
 	static final int RUN_PLAYER_LOOP = 24;
+	static final int RUN_CANCEL_UPDATES = 25;
 	
 	// RMS
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
@@ -1431,6 +1432,10 @@ public class MP extends MIDlet
 						
 						j = (JSONObject) api(sb.toString());
 						
+						if (j.has("cancel")) {
+							throw cancelException;
+						}
+						
 						JSONArray updates = j.getArray("res");
 						int l = updates.size();
 						
@@ -1457,7 +1462,7 @@ public class MP extends MIDlet
 						}
 						
 					} catch (Exception e) {
-						if (e.toString().indexOf("Interrupted") != -1) {
+						if (e.toString().indexOf("Interrupted") != -1 || e == cancelException) {
 							form.setUpdate(false);
 							break;
 						}
@@ -1691,6 +1696,19 @@ public class MP extends MIDlet
 				}
 			} catch (Exception ignored) {}
 			break;
+		}
+		case RUN_CANCEL_UPDATES: {
+			try {
+				api("cancelUpdates");
+			} catch (Exception ignored) {}
+			try {
+				Thread.sleep(100);
+			} catch (Exception e) {
+				break;
+			}
+			if (!closingConnections.contains(param))
+				break;
+			// continue
 		}
 		case RUN_CLOSE_CONNECTION: {
 			try {
@@ -1936,16 +1954,11 @@ public class MP extends MIDlet
 	static void cancel(Thread thread, boolean updates) {
 		if (thread == null) return;
 		if (updates) updatesThread = null;
-		if (symbianJrt) {
-			thread.interrupt();
-			return;
-		}
 		Connection c = (Connection) threadConnections.get(thread);
 		if (c == null || closingConnections.contains(c)) {
-			thread.interrupt();
 			return;
 		}
-		midlet.start(RUN_CLOSE_CONNECTION, c);
+		midlet.start(updates ? RUN_CANCEL_UPDATES : RUN_CLOSE_CONNECTION, c);
 	}
 
 	// endregion
@@ -4992,6 +5005,14 @@ public class MP extends MIDlet
 			if ("messageEntityUrl".equals(type) || "messageEntityMention".equals(type)) {
 				state[RT_URL] ++;
 				insert = flush(form, thread, richTextUrl = entityText, insert, state);
+				state[RT_URL] --;
+			} else if ("messageEntityMentionName".equals(type)) {
+				state[RT_URL] ++;
+				insert = flush(form, thread, "@".concat(entity.getString("user_id")), insert, state);
+				state[RT_URL] --;
+			} else if ("messageEntityPhone".equals(type)) {
+				state[RT_URL] ++;
+				insert = flush(form, thread, "tel:".concat(entityText), insert, state);
 				state[RT_URL] --;
 			} else if ("messageEntityTextUrl".equals(type)) {
 				state[RT_URL] ++;

@@ -85,6 +85,7 @@ public class UILabel extends UIItem {
 			} else if (obj[2] != null) {
 				g.setColor(color);
 			}
+			// TODO strikethrough style
 		}
 	}
 
