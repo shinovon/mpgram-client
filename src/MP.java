@@ -2805,7 +2805,7 @@ public class MP extends MIDlet
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 
-			s = new StringItem(null, "github.com/shinovon");
+			s = new StringItem(null, "github.com/shinovon/mpgram-client");
 			s.setFont(medBoldFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
@@ -5039,11 +5039,13 @@ public class MP extends MIDlet
 				state[RT_URL] --;
 			} else if ("messageEntityMentionName".equals(type)) {
 				state[RT_URL] ++;
-				insert = flush(form, thread, "@".concat(entity.getString("user_id")), insert, state);
+				richTextUrl = "@".concat(entity.getString("user_id"));
+				insert = flush(form, thread, entityText, insert, state);
 				state[RT_URL] --;
 			} else if ("messageEntityPhone".equals(type)) {
 				state[RT_URL] ++;
-				insert = flush(form, thread, "tel:".concat(entityText), insert, state);
+				richTextUrl = "tel:".concat(entityText);
+				insert = flush(form, thread, entityText, insert, state);
 				state[RT_URL] --;
 			} else if ("messageEntityTextUrl".equals(type)) {
 				state[RT_URL] ++;
