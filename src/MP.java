@@ -105,18 +105,21 @@ public class MP extends MIDlet
 	static final int RUN_INSTALL_STICKER_SET = 22;
 	static final int RUN_LOAD_PLAYLIST = 23;
 	static final int RUN_PLAYER_LOOP = 24;
+	static final int RUN_CANCEL_UPDATES = 25;
 	
+	// RMS
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
 	private static final String AVATAR_RECORD_PREFIX = "mcA";
 	
+	// URLs
 	private static final String DEFAULT_INSTANCE_URL = "http://mp.nnchan.ru/";
 	static final String API_URL = "api.php";
 	static final String AVA_URL = "ava.php";
 	static final String FILE_URL = "file.php";
 	static final String OTA_URL = "http://nnproject.cc/mp/upd.php";
 	
-	static final String API_VERSION = "8";
+	static final String API_VERSION = "9";
 	
 	static final String[][] LANGS = {
 		{
@@ -152,6 +155,7 @@ public class MP extends MIDlet
 //#endif
 	// endregion
 	
+	// Fonts
 	static final Font largePlainFont = Font.getFont(0, 0, Font.SIZE_LARGE);
 	static final Font medPlainFont = Font.getFont(0, 0, Font.SIZE_MEDIUM);
 	static final Font medBoldFont = Font.getFont(0, Font.STYLE_BOLD, Font.SIZE_MEDIUM);
@@ -160,6 +164,12 @@ public class MP extends MIDlet
 	static final Font smallPlainFont = Font.getFont(0, 0, Font.SIZE_SMALL);
 	static final Font smallBoldFont = Font.getFont(0, Font.STYLE_BOLD, Font.SIZE_SMALL);
 	static final Font smallItalicFont = Font.getFont(0, Font.STYLE_ITALIC, Font.SIZE_SMALL);
+	
+	static final int smallPlainFontHeight = smallPlainFont.getHeight();
+	static final int smallPlainFontSpaceWidth = smallPlainFont.charWidth(' ');
+	static final int smallBoldFontHeight = smallBoldFont.getHeight();
+	static final int medPlainFontHeight = medPlainFont.getHeight();
+	static final int medBoldFontHeight = medBoldFont.getHeight();
 
 	static final IllegalStateException cancelException = new IllegalStateException("cancel");
 	
@@ -182,7 +192,7 @@ public class MP extends MIDlet
 	private static int tzOffset;
 	static boolean useLoadingForm;
 	private static int avatarSize;
-	private static int photoSize = 120;
+	static int photoSize = 120;
 	static boolean loadAvatars = true;
 	static boolean loadThumbs = true;
 	static boolean reverseChat;
@@ -226,6 +236,9 @@ public class MP extends MIDlet
 	static boolean notifyAvas = true;
 //#endif
 	static boolean updateChatsList;
+	static boolean legacyChatUI;
+	static boolean fastScrolling; // disable animations
+	static boolean forceKeyUI;
 	
 	// platform
 	static boolean symbianJrt;
@@ -332,6 +345,7 @@ public class MP extends MIDlet
 	static Command okCmd;
 	static Command cancelCmd;
 	static Command goCmd;
+	static Command copyCmd;
 	
 	static Command nextPageCmd;
 	static Command prevPageCmd;
@@ -430,7 +444,11 @@ public class MP extends MIDlet
 	private static int playerState; // 1 - playing, 2 - paused, 3 - loading
 	private static Player currentPlayer;
 	
+	// notifications
+//#ifndef NO_NOTIFY
 	static Hashtable notificationMessages = new Hashtable();
+	static Player notificationPlayer;
+//#endif
 	
 	// region MIDlet
 	
@@ -462,15 +480,15 @@ public class MP extends MIDlet
 		f.append("Loading");
 		display.setCurrent(mainDisplayable = f);
 //#ifndef NO_J2ME_LOADER_CHECK
-		try {
-			// check for j2me loader
-			Class.forName("javax.microedition.shell.MicroActivity");
-			f.deleteAll();
-			f.addCommand(exitCmd = new Command("Exit", Command.EXIT, 1));
-			f.setCommandListener(midlet);
-			f.append("J2ME Loader is not supported.");
-			return;
-		} catch (Exception ignored) {}
+//		try {
+//			// check for j2me loader
+//			Class.forName("javax.microedition.shell.MicroActivity");
+//			f.deleteAll();
+//			f.addCommand(exitCmd = new Command("Exit", Command.EXIT, 1));
+//			f.setCommandListener(midlet);
+//			f.append("J2ME Loader is not supported.");
+//			return;
+//		} catch (Exception ignored) {}
 //#endif	
 		// get device name
 		String p, v, d;
@@ -570,25 +588,21 @@ public class MP extends MIDlet
 		// Test UTF-8 support
 		byte[] b = new byte[] { (byte) 0xF0, (byte) 0x9F, (byte) 0x98, (byte) 0x83 };
 		try {
-			encoding = "UTF-8";
-			new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
+			new InputStreamReader(new ByteArrayInputStream(b), encoding = "UTF-8").read();
 			if (new String(b, encoding).length() != 2) throw new Exception();
 		} catch (Exception e) {
 			try {
-				encoding = "UTF8";
-				new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
+				new InputStreamReader(new ByteArrayInputStream(b), encoding = "UTF8").read();
 				if (new String(b, encoding).length() != 2) throw new Exception();
 			} catch (Exception e2) {
 				utf = false;
 				b = new byte[] { (byte) 0xD0, (byte) 0xB2, (byte) 0xD1, (byte) 0x8B, (byte) 0xD1, (byte) 0x84 };
 				try {
-					encoding = "UTF-8";
-					new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
+					new InputStreamReader(new ByteArrayInputStream(b), encoding = "UTF-8").read();
 					if (new String(b, encoding).length() != 3) throw new Exception();
 				} catch (Exception e3) {
 					try {
-						encoding = "UTF8";
-						new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
+						new InputStreamReader(new ByteArrayInputStream(b), encoding = "UTF8").read();
 						if (new String(b, encoding).length() != 3) throw new Exception();
 					} catch (Exception e4) {
 						encoding = "ISO-8859-1";
@@ -676,6 +690,7 @@ public class MP extends MIDlet
 			pushBgInterval = j.getLong("pushBgInterval", pushBgInterval);
 			notifyMethod = j.getInt("notifyMethod", notifyMethod);
 //#endif
+			legacyChatUI = j.getBoolean("legacyChatUI", legacyChatUI);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -782,6 +797,7 @@ public class MP extends MIDlet
 		okCmd = new Command(L[Ok], Command.OK, 1);
 		cancelCmd = new Command(L[Cancel], Command.CANCEL, 20);
 		goCmd = new Command(L[Ok], Command.OK, 1);
+		copyCmd = new Command(L[Copy], Command.OK, 1);
 
 		nextPageCmd = new Command(L[NextPage], Command.SCREEN, 6);
 		prevPageCmd = new Command(L[PrevPage], Command.SCREEN, 7);
@@ -800,8 +816,8 @@ public class MP extends MIDlet
 		loadingForm.addCommand(cancelCmd);
 		loadingForm.setCommandListener(this);
 		
-		// load resources
-		
+		// load resources	
+//#ifndef NO_AVATARS
 		if (loadAvatars) {
 			try {
 				userDefaultImg = resize(Image.createImage("/us.png"), avatarSize, avatarSize);
@@ -812,6 +828,7 @@ public class MP extends MIDlet
 				}
 			} catch (Throwable ignored) {}
 		}
+//#endif
 		
 		// start image loader threads
 
@@ -860,7 +877,6 @@ public class MP extends MIDlet
 		f.append(s);
 		
 		authForm = f;
-		
 		// load main form
 		if (user == null || userState < 3) {
 			display(mainDisplayable = authForm);
@@ -975,6 +991,7 @@ public class MP extends MIDlet
 							String url;
 							Image img = null;
 							String recordName = null;
+//#ifndef NO_AVATARS
 							if (src instanceof String) { // avatar
 								recordName = AVATAR_RECORD_PREFIX + avatarSize + "r" + (String) src;
 								url = instanceUrl + AVA_URL + "?a&c=" + ((String) src)
@@ -995,7 +1012,9 @@ public class MP extends MIDlet
 										}
 									} catch (Exception ignored) {}
 								}
-							} else if (src instanceof String[]) { // message file
+							} else
+//#endif
+							if (src instanceof String[]) { // message file
 								String peer = ((String[]) src)[0];
 								String id = ((String[]) src)[1];
 								String p = ((String[]) src)[3];
@@ -1011,12 +1030,31 @@ public class MP extends MIDlet
 							} else if (src instanceof JSONObject) { // sticker or document
 								url = instanceUrl + FILE_URL + "?a&sticker=" + ((JSONObject) src).getString("id")
 										+ "&access_hash=" + ((JSONObject) src).getString("access_hash") + "&p=rsprevs&s=32";
+//#ifndef NO_CHAT_CANVAS
+							} else if (src instanceof UIMessage) {
+								UIMessage msg = (UIMessage) src;
+								StringBuffer sb = new StringBuffer(instanceUrl);
+								sb.append(FILE_URL)
+								.append("?a&c=").append(msg.peerId)
+								.append("&m=").append(msg.id)
+								.append("&p=");
+								if (msg.photo) {
+									sb.append("rprev&s=").append(photoSize);
+								} else if (msg.sticker) {
+									sb.append("rsticker&s=").append(photoSize);
+								} else {
+									// document thumbnail
+									sb.append("thumbrsprevs&s=").append(MP.smallBoldFontHeight + MP.smallPlainFontHeight - 2);
+								}
+								url = sb.toString();
+//#endif
 							} else {
 								continue;
 							}
 							if (img == null) {
 								try {
 									byte[] b = get(url);
+//#ifndef NO_AVATARS
 									if (recordName != null) {
 										// save avatar to storage cache
 										if ((avatarsCache & 2) == 2) {
@@ -1033,9 +1071,12 @@ public class MP extends MIDlet
 											} catch (Exception ignored) {}
 										}
 									}
+//#endif
 									img = Image.createImage(b, 0, b.length);
+//#ifndef NO_AVATARS
 									if (recordName != null && roundAvatars)
 										img = roundImage(img);
+//#endif
 								} catch (Exception e) {
 									e.printStackTrace();
 									if (src instanceof String) {
@@ -1045,7 +1086,7 @@ public class MP extends MIDlet
 							}
 							
 							if (img == null) continue;
-							
+//#ifndef NO_AVATARS
 							// save avatar to hashtable cache
 							if (recordName != null && (avatarsCache & 1) == 1) {
 								if (imagesCache.size() > avatarsCacheThreshold) {
@@ -1053,6 +1094,7 @@ public class MP extends MIDlet
 								}
 								imagesCache.put(src, img);
 							}
+//#endif
 							
 							putImage(target, img);
 						} catch (Exception e) {
@@ -1066,6 +1108,14 @@ public class MP extends MIDlet
 			return;
 		}
 		case RUN_LOAD_FORM: {
+			if (param instanceof MPList) {
+				((MPList) param).load();
+				break;
+			}
+			if (param instanceof MPChat) {
+				((MPChat) param).load();
+				break;
+			}
 			((MPForm) param).load();
 			break;
 		}
@@ -1176,6 +1226,21 @@ public class MP extends MIDlet
 		}
 		case RUN_DELETE_MESSAGE: {
 			try {
+//#ifndef NO_CHAT_CANVAS
+				if (param instanceof UIMessage[]) {
+					UIMessage[] msgs = (UIMessage[]) param;
+					StringBuffer sb = new StringBuffer("deleteMessage&id=");
+					for (int i = 0; i < msgs.length; ++i) {
+						sb.append(msgs[i].id).append(',');
+					}
+					sb.setLength(sb.length() - 1);
+					sb.append("&peer=").append(msgs[0].peerId);
+					MP.api(sb.toString());
+					
+					commandAction(refreshCmd, current);
+					break;
+				}
+//#endif
 				String[] s = (String[]) param;
 				MP.api("deleteMessage&peer=".concat(s[0].concat("&id=").concat(s[1])));
 
@@ -1236,13 +1301,13 @@ public class MP extends MIDlet
 //#endif
 				
 				// go back to chat screen
-				if (!(current instanceof ChatForm)) {
+				if (!(current instanceof MPChat)) {
 					commandAction(backCmd, current);
-				} else if (((ChatForm) current).textField != null) {
-					((ChatForm) current).textField.setString("");
+				} else {
+					((MPChat) current).sent();
 				}
 				
-				if (reopenChat || !((ChatForm) current).update || !((ChatForm) current).endReached) {
+				if (reopenChat || !((MPChat) current).update() || !((MPChat) current).endReached()) {
 					// load latest messages
 					commandAction(latestCmd, current);
 				} else if (display.getCurrent() != current) {
@@ -1293,8 +1358,12 @@ public class MP extends MIDlet
 				MP.api((run == RUN_JOIN_CHANNEL ? "join" : "leave").concat("Channel&id=").concat((String) param));
 				
 				if (run == RUN_JOIN_CHANNEL) {
-					commandAction(backCmd, current);
-					openChat((String) param, 0);
+					if (current instanceof MPChat) {
+						commandAction(latestCmd, current);
+					} else {
+						commandAction(backCmd, current);
+						openChat((String) param, 0);
+					}
 				} else {
 					commandAction(refreshCmd, current);
 				}
@@ -1305,7 +1374,9 @@ public class MP extends MIDlet
 		}
 		case RUN_CHECK_OTA: { // check for client updates
 			try {
-				JSONObject j = parseObject(new String(get(OTA_URL + "?v=" + version + "&l=" + lang + (MINI_BUILD ? "&m=1" : "")), encoding));
+				JSONObject j = parseObject(new String(get(OTA_URL + "?v=" + version + "&l=" + lang
+						+ (MINI_BUILD ? "&m=1" : "")
+						+ (blackberry ? "&bb=1" : "")), encoding));
 				if (j.getBoolean("update_available", false) && checkUpdates) {
 					updateUrl = j.getString("download_url");
 					Alert a = new Alert("", "", null, AlertType.INFO);
@@ -1325,22 +1396,22 @@ public class MP extends MIDlet
 			updatesRunning = true;
 			try {
 				StringBuffer sb = new StringBuffer();
-				ChatForm form = (ChatForm) param;
+				MPChat form = (MPChat) param;
 				JSONObject j;
 				
 				int offset = 0;
 				int fails = 0;
 				boolean check = true;
-				while (form.update && updatesThread == thread) {
+				while (form.update() && updatesThread == thread) {
 					try {
 						Thread.sleep(updatesDelay);
-						if (!form.update || updatesThread != thread) break;
+						if (!form.update() || updatesThread != thread) break;
 						if (!form.isShown()) continue;
 						if (check) {
 							sb.setLength(0);
-							sb.append("getLastUpdate&peer=").append(form.id);
+							sb.append("getLastUpdate&peer=").append(form.id());
 							if (offset <= 0) {
-								sb.append("&id=").append(form.firstMsgId);
+								sb.append("&id=").append(form.firstMsgId());
 							}
 							try {
 								j = ((JSONObject) api(sb.toString())).getObject("res");
@@ -1352,17 +1423,22 @@ public class MP extends MIDlet
 							} catch (Exception ignored) {}
 							check = false;
 						}
-						if (!form.update || updatesThread != thread) break;
+						if (!form.update() || updatesThread != thread) break;
 						
 						sb.setLength(0);
-						sb.append("updates&media=1&read=1&peer=").append(form.id)
+						sb.append("updates&media=1&read=1&peer=").append(form.id())
 						.append("&offset=").append(offset)
-						.append("&timeout=").append(updatesTimeout);
-						if (form.topMsgId != 0) {
-							sb.append("&top_msg=").append(form.topMsgId);
+						.append("&timeout=").append(updatesTimeout)
+						.append("&message=").append(form.firstMsgId());
+						if (form.topMsgId() != 0) {
+							sb.append("&top_msg=").append(form.topMsgId());
 						}
 						
 						j = (JSONObject) api(sb.toString());
+						
+						if (j.has("cancel")) {
+							throw cancelException;
+						}
 						
 						JSONArray updates = j.getArray("res");
 						int l = updates.size();
@@ -1373,33 +1449,35 @@ public class MP extends MIDlet
 							update = update.getObject("update");
 							String type = update.getString("_");
 							if ("updateUserStatus".equals(type)) {
-								form.handleUpdate(ChatForm.UPDATE_USER_STATUS, update);
+								form.handleUpdate(MPChat.UPDATE_USER_STATUS, update);
 							} else if ("updateUserTyping".equals(type)
 									|| "updateChatUserTyping".equals(type)
 									|| "updateChannelUserTyping".equals(type)) {
-								form.handleUpdate(ChatForm.UPDATE_USER_TYPING, update);
+								form.handleUpdate(MPChat.UPDATE_USER_TYPING, update);
 							} else if ("updateNewMessage".equals(type)
 									|| "updateNewChannelMessage".equals(type)) {
-								form.handleUpdate(ChatForm.UPDATE_NEW_MESSAGE, update);
+								form.handleUpdate(MPChat.UPDATE_NEW_MESSAGE, update);
 							} else if ("updateDeleteChannelMessages".equals(type)) {
-								form.handleUpdate(ChatForm.UPDATE_DELETE_MESSAGES, update);
+								form.handleUpdate(MPChat.UPDATE_DELETE_MESSAGES, update);
 							} else if ("updateEditMessage".equals(type)
 									|| "updateEditChannelMessage".equals(type)) {
-								form.handleUpdate(ChatForm.UPDATE_EDIT_MESSAGE, update);
+								form.handleUpdate(MPChat.UPDATE_EDIT_MESSAGE, update);
 							}
 						}
 						
 					} catch (Exception e) {
-						if (e.toString().indexOf("Interrupted") != -1) {
-							form.update = false;
+						if (e.toString().indexOf("Interrupted") != -1 || e == cancelException) {
+							form.setUpdate(false);
 							break;
 						}
 						e.printStackTrace();
 						fails++;
 						check = true;
-						if (fails >= 5 && form.update) {
-							form.update = false;
-							display(errorAlert("Updates thread died!\n".concat(e.toString())), null);
+						if (fails >= 5 && form.update()) {
+							form.setUpdate(false);
+							if (form.isShown()) {
+								display(errorAlert("Updates thread died!\n".concat(e.toString())), null);
+							}
 							break;
 						}
 					}
@@ -1416,8 +1494,8 @@ public class MP extends MIDlet
 		case RUN_SET_TYPING: {
 			try {
 				String peer = writeTo;
-				if (current instanceof ChatForm) {
-					peer = ((ChatForm) current).id;
+				if (current instanceof MPChat) {
+					peer = ((MPChat) current).id();
 				}
 				if (peer == null) return;
 				api("setTyping&action=" + (param == null ? "Typing" : (String) param)
@@ -1576,7 +1654,7 @@ public class MP extends MIDlet
 								}
 								String title = sb.toString();
 								
-								if (!paused && current instanceof ChatForm && current.isShown() && peerId.equals(((ChatForm) current).id)) {
+								if (!paused && current instanceof MPChat && current.isShown() && peerId.equals(((MPChat) current).id())) {
 									try {
 										Notifier.remove(peerId);
 									} catch (Throwable ignored) {}
@@ -1607,7 +1685,18 @@ public class MP extends MIDlet
 							}
 							
 							if (notified && notifySound) {
-								AlertType.ALARM.playSound(display);	
+								try {
+									if (notificationPlayer == null) {
+										notificationPlayer = Manager.createPlayer(getClass().getResourceAsStream("/msg.mp3"), "audio/mpeg");
+										notificationPlayer.realize();
+										notificationPlayer.prefetch();
+									}
+									notificationPlayer.stop();
+									notificationPlayer.setMediaTime(0);
+									notificationPlayer.start();
+								} catch (Exception e) {
+									AlertType.ALARM.playSound(display);
+								}
 							}
 						}
 						
@@ -1623,6 +1712,19 @@ public class MP extends MIDlet
 			} catch (Exception ignored) {}
 			break;
 		}
+		case RUN_CANCEL_UPDATES: {
+			try {
+				api("cancelUpdates");
+			} catch (Exception ignored) {}
+			try {
+				Thread.sleep(100);
+			} catch (Exception e) {
+				break;
+			}
+			if (!closingConnections.contains(param))
+				break;
+			// continue
+		}
 		case RUN_CLOSE_CONNECTION: {
 			try {
 				closingConnections.addElement(param);
@@ -1637,7 +1739,7 @@ public class MP extends MIDlet
 			break;
 		}
 		case RUN_BOT_CALLBACK: {
-			ChatForm form = (ChatForm) current;
+			MPChat form = (MPChat) current;
 			Ticker ticker;
 			form.setTicker(ticker = new Ticker(MP.L[Sending]));
 			
@@ -1659,13 +1761,13 @@ public class MP extends MIDlet
 					} else throw e;
 				}
 
-				if (reopenChat || !form.update || !form.endReached) {
+				if (reopenChat || !form.update() || !form.endReached()) {
 					// see ChatForm#postLoad() for answer handling
-					form.botAnswer = j;
+					form.setBotAnswer(j);
 					commandAction(latestCmd, current);
 				} else if (display.getCurrent() != current) {
 					display(current);
-					((ChatForm) current).handleBotAnswer(j);
+					((MPChat) current).handleBotAnswer(j);
 				}
 			} catch (Exception e) {
 				display(errorAlert(e), current);
@@ -1702,7 +1804,7 @@ public class MP extends MIDlet
 				String[] s = (String[]) param;
 				MP.api("pinMessage&peer=".concat(s[0].concat("&id=").concat(s[1])));
 				
-				if (reopenChat || !((ChatForm) current).update || !((ChatForm) current).endReached) {
+				if (reopenChat || !((MPChat) current).update() || !((MPChat) current).endReached()) {
 					// load latest messages
 					commandAction(latestCmd, current);
 				} else if (display.getCurrent() != current) {
@@ -1718,16 +1820,16 @@ public class MP extends MIDlet
 				JSONObject s = (JSONObject) param;
 				StickerPackForm form = (StickerPackForm) current;
 				
-				StringBuffer sb = new StringBuffer("sendMedia&peer=").append(form.chatForm.id);
+				StringBuffer sb = new StringBuffer("sendMedia&peer=").append(form.chatForm.id());
 				sb.append("&doc_id=").append(s.getString("id"))
 				.append("&doc_access_hash=").append(s.getString("access_hash"));
 				
 				MP.api(sb.toString());
 				
-				goBackTo(form.chatForm);
-				if (reopenChat || !((ChatForm) current).update || !((ChatForm) current).endReached) {
+				goBackTo((Displayable) form.chatForm);
+				if (reopenChat || !((MPChat) current).update() || !((MPChat) current).endReached()) {
 					// load latest messages
-					commandAction(latestCmd, form.chatForm);
+					commandAction(latestCmd, (Displayable) form.chatForm);
 				}
 			} catch (Exception e) {
 				display(errorAlert(e), current);
@@ -1867,16 +1969,11 @@ public class MP extends MIDlet
 	static void cancel(Thread thread, boolean updates) {
 		if (thread == null) return;
 		if (updates) updatesThread = null;
-		if (symbianJrt) {
-			thread.interrupt();
-			return;
-		}
 		Connection c = (Connection) threadConnections.get(thread);
 		if (c == null || closingConnections.contains(c)) {
-			thread.interrupt();
 			return;
 		}
-		midlet.start(RUN_CLOSE_CONNECTION, c);
+		midlet.start(updates ? RUN_CANCEL_UPDATES : RUN_CLOSE_CONNECTION, c);
 	}
 
 	// endregion
@@ -1941,22 +2038,22 @@ public class MP extends MIDlet
 				return;
 			}
 		}
-		if (d instanceof ChatForm) { // chat form commands
+		if (d instanceof MPChat) { // chat form commands
 			if (c == latestCmd) {
-				((ChatForm) d).reset();
+				((MPChat) d).reset();
 				start(RUN_LOAD_FORM, d);
 				return;
 			}
 			if (c == olderMessagesCmd || c == newerMessagesCmd) {
-				((ChatForm) d).paginate(c == olderMessagesCmd ? -1 : 1);
+				((MPChat) d).paginate(c == olderMessagesCmd ? -1 : 1);
 				return;
 			}
 			if (c == chatInfoCmd) {
-				openProfile(((ChatForm) d).id, (ChatForm) d, 0);
+				openProfile(((MPChat) d).id(), (MPChat) d, 0);
 				return;
 			}
 			if (c == writeCmd) {
-				display(writeForm(((ChatForm) d).id, Integer.toString(((ChatForm) d).topMsgId), "", null, null, null));
+				display(writeForm(((MPChat) d).id(), Integer.toString(((MPChat) d).topMsgId()), "", null, null, null));
 				return;
 			}
 			if (c == searchMsgCmd) {
@@ -1969,29 +2066,38 @@ public class MP extends MIDlet
 				return;
 			}
 			if (c == sendStickerCmd) {
-				openLoad(new StickerPacksList((ChatForm) d));
+				openLoad(new StickerPacksList((MPChat) d));
 				return;
 			}
-			if (c == backCmd && ((ChatForm) d).query != null && ((ChatForm) d).switched) {
+			if (c == backCmd && ((MPChat) d).query() != null && ((MPChat) d).switched()) {
 				// close search
-				((ChatForm) current).reset();
+				((MPChat) current).reset();
 				start(RUN_LOAD_FORM, current);
 				return;
 			}
 		}
 		if (d instanceof TextBox && c == searchMsgCmd) {
 			commandAction(backCmd, d);
-			if (current instanceof ChatForm) {
-				((ChatForm) current).reset();
-				((ChatForm) current).query = ((TextBox) d).getString();
-				((ChatForm) current).switched = true;
+			if (current instanceof MPChat) {
+				((MPChat) current).reset();
+				((MPChat) current).setQuery(((TextBox) d).getString());
 				start(RUN_LOAD_FORM, current);
 				return;
 			}
 			
-			ChatForm form = new ChatForm(((ChatInfoForm) current).id, ((TextBox) d).getString(), 0, ((ChatInfoForm) current).chatForm.topMsgId);
-			form.parent = ((ChatInfoForm) current).chatForm;
-			openLoad(form);
+			MPChat form;
+			
+//#ifndef NO_CHAT_CANVAS
+			if (!legacyChatUI) {
+				form = new ChatCanvas(((ChatInfoForm) current).id, ((TextBox) d).getString(), 0, ((ChatInfoForm) current).chatForm.topMsgId());
+			} else
+//#endif
+			{
+				form = new ChatForm(((ChatInfoForm) current).id, ((TextBox) d).getString(), 0, ((ChatInfoForm) current).chatForm.topMsgId());
+			}
+			
+			form.setParent(((ChatInfoForm) current).chatForm);
+			openLoad((Displayable) form);
 			return;
 		}
 		if (d instanceof TextBox && c == searchChatsCmd) {
@@ -2032,29 +2138,43 @@ public class MP extends MIDlet
 				return;
 			}
 			// Chat media categories
-			if (c == chatPhotosCmd) {
-				openLoad(new ChatForm(((ChatInfoForm) current).id, "Photos", ((ChatInfoForm) current).chatForm.topMsgId));
-				return;
-			}
-			if (c == chatVideosCmd) {
-				openLoad(new ChatForm(((ChatInfoForm) current).id, "Video", ((ChatInfoForm) current).chatForm.topMsgId));
-				return;
-			}
-			if (c == chatFilesCmd) {
-				openLoad(new ChatForm(((ChatInfoForm) current).id, "Document", ((ChatInfoForm) current).chatForm.topMsgId));
-				return;
-			}
-			if (c == chatMusicCmd) {
-				openLoad(new ChatForm(((ChatInfoForm) current).id, "Music", ((ChatInfoForm) current).chatForm.topMsgId));
+			if (c == chatPhotosCmd || c == chatVideosCmd || c == chatFilesCmd || c == chatMusicCmd) {
+				String mediaFilter;
+				switch (c.getPriority()) {
+				case 1:
+					mediaFilter = "Photos";
+					break;
+				case 2:
+					mediaFilter = "Video";
+					break;
+				case 3:
+					mediaFilter = "Document";
+					break;
+				case 4:
+					mediaFilter = "Music";
+					break;
+				default:
+					return;
+				}
+				Displayable form;
+//#ifndef NO_CHAT_CANVAS
+				if (!legacyChatUI) {
+					form = new ChatCanvas(((ChatInfoForm) current).id, mediaFilter, ((ChatInfoForm) current).chatForm.topMsgId());
+				} else
+//#endif
+				{
+					form = new ChatForm(((ChatInfoForm) current).id, mediaFilter, ((ChatInfoForm) current).chatForm.topMsgId());
+				}
+				openLoad(form);
 				return;
 			}
 			if (c == gotoPinnedMsgCmd) {
 				int id = ((ChatInfoForm) current).pinnedMessageId;
 				if (((ChatInfoForm) d).chatForm != null) {
 					commandAction(backCmd, d);
-					((ChatInfoForm) d).chatForm.openMessage(Integer.toString(id), 0);
+					((ChatInfoForm) d).chatForm.openMessage(Integer.toString(id), -1);
 				} else {
-					openLoad(new ChatForm(((ChatInfoForm) current).id, null, id, 0));
+					openChat(((ChatInfoForm) current).id, id);
 				}
 				return;
 			}
@@ -2068,8 +2188,8 @@ public class MP extends MIDlet
 		}
 		if (d instanceof ChatTopicsList) {
 			if (c == chatInfoCmd) {
-				ChatForm f = ((ChatTopicsList) d).chatForm;
-				openProfile(f.id, /* f */ null, 0);
+				MPChat f = ((ChatTopicsList) d).chatForm;
+				openProfile(f.id(), /* f */ null, 0);
 				return;
 			}
 		}
@@ -2207,6 +2327,7 @@ public class MP extends MIDlet
 					f.addCommand(backCmd);
 					f.setCommandListener(this);
 					StringItem s;
+					int i;
 					
 					// ui
 					
@@ -2216,7 +2337,7 @@ public class MP extends MIDlet
 					f.append(s);
 					
 					langChoice = new ChoiceGroup(L[Language], Choice.POPUP, LANGS[1], null);
-					for (int i = 0; i < LANGS[0].length; ++i) {
+					for (i = 0; i < LANGS[0].length; ++i) {
 						if (lang.equals(LANGS[0][i])) {
 							langChoice.setSelectedIndex(i, true);
 							break;
@@ -2232,15 +2353,21 @@ public class MP extends MIDlet
 							L[FocusNewMessages],
 							L[ChatTextField],
 							L[BuiltinImageViewer],
-							L[LargeMusicCover]
+							L[LargeMusicCover],
+//#ifndef NO_CHAT_CANVAS
+							"Legacy UI", // TODO
+//#endif
 					}, null);
-					uiChoice.setSelectedIndex(0, reverseChat);
-					uiChoice.setSelectedIndex(1, showMedia);
-					uiChoice.setSelectedIndex(2, chatStatus);
-					uiChoice.setSelectedIndex(3, focusNewMessages);
-					uiChoice.setSelectedIndex(4, chatField);
-					uiChoice.setSelectedIndex(5, useView);
-					uiChoice.setSelectedIndex(6, fullPlayerCover);
+					uiChoice.setSelectedIndex(i = 0, reverseChat);
+					uiChoice.setSelectedIndex(++i, showMedia);
+					uiChoice.setSelectedIndex(++i, chatStatus);
+					uiChoice.setSelectedIndex(++i, focusNewMessages);
+					uiChoice.setSelectedIndex(++i, chatField);
+					uiChoice.setSelectedIndex(++i, useView);
+					uiChoice.setSelectedIndex(++i, fullPlayerCover);
+//#ifndef NO_CHAT_CANVAS
+					uiChoice.setSelectedIndex(++i, legacyChatUI);
+//#endif
 					uiChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(uiChoice);
 					
@@ -2325,16 +2452,20 @@ public class MP extends MIDlet
 							L[ChatAutoUpdate],
 							L[KeepSessionAlive],
 							L[UseUnicode],
+//#ifndef NO_ZIP
 							L[UseCompression]
+//#endif
 					}, null);
-					behChoice.setSelectedIndex(0, useLoadingForm);
-					behChoice.setSelectedIndex(1, jsonStream);
-					behChoice.setSelectedIndex(2, parseRichtext);
-					behChoice.setSelectedIndex(3, parseLinks);
-					behChoice.setSelectedIndex(4, chatUpdates);
-					behChoice.setSelectedIndex(5, keepAlive);
-					behChoice.setSelectedIndex(6, utf);
-					behChoice.setSelectedIndex(7, compress);
+					behChoice.setSelectedIndex(i = 0, useLoadingForm);
+					behChoice.setSelectedIndex(++i, jsonStream);
+					behChoice.setSelectedIndex(++i, parseRichtext);
+					behChoice.setSelectedIndex(++i, parseLinks);
+					behChoice.setSelectedIndex(++i, chatUpdates);
+					behChoice.setSelectedIndex(++i, keepAlive);
+					behChoice.setSelectedIndex(++i, utf);
+//#ifndef NO_ZIP
+					behChoice.setSelectedIndex(++i, compress);
+//#endif
 					behChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(behChoice);
 					
@@ -2344,19 +2475,28 @@ public class MP extends MIDlet
 					
 					imagesChoice = new ChoiceGroup(L[Images], Choice.MULTIPLE, new String[] {
 							L[LoadMediaThumbnails],
+//#ifndef NO_AVATARS
 							L[LoadAvatars],
+//#endif
 							L[MultiThreadedLoading],
+//#ifndef NO_AVATARS
 							L[RoundAvatars]
+//#endif
 					}, null);
-					imagesChoice.setSelectedIndex(0, loadThumbs);
-					imagesChoice.setSelectedIndex(1, loadAvatars);
-					imagesChoice.setSelectedIndex(2, threadedImages);
-					imagesChoice.setSelectedIndex(3, roundAvatars);
+					imagesChoice.setSelectedIndex(i = 0, loadThumbs);
+//#ifndef NO_AVATARS
+					imagesChoice.setSelectedIndex(++i, loadAvatars);
+//#endif
+					imagesChoice.setSelectedIndex(++i, threadedImages);
+//#ifndef NO_AVATARS
+					imagesChoice.setSelectedIndex(++i, roundAvatars);
+//#endif
 					imagesChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(imagesChoice);
 					
 					// cache
 
+//#ifndef NO_AVATARS
 					avaCacheChoice = new ChoiceGroup(L[AvatarsCaching], Choice.POPUP, new String[] {
 							L[Disabled],
 							L[HoldInRAM],
@@ -2370,6 +2510,7 @@ public class MP extends MIDlet
 					avaCacheGauge = new Gauge(L[AvatarsCacheThreshold], true, 20, avatarsCacheThreshold / 5);
 					avaCacheGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(avaCacheGauge);
+//#endif
 					
 					profileCacheGauge = new Gauge(L[ProfilesCacheThreshold], true, 30, peersCacheThreshold / 10);
 					profileCacheGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -2407,15 +2548,19 @@ public class MP extends MIDlet
 			}
 			if (c == backCmd && d == settingsForm) {
 				// apply and save settings
+				int i;
 				lang = LANGS[0][langChoice.getSelectedIndex()];
 				
-				reverseChat = uiChoice.isSelected(0);
-				showMedia = uiChoice.isSelected(1);
-				chatStatus = uiChoice.isSelected(2);
-				focusNewMessages = uiChoice.isSelected(3);
-				chatField = uiChoice.isSelected(4);
-				useView = uiChoice.isSelected(5);
-				fullPlayerCover = uiChoice.isSelected(6);
+				reverseChat = uiChoice.isSelected(i = 0);
+				showMedia = uiChoice.isSelected(++i);
+				chatStatus = uiChoice.isSelected(++i);
+				focusNewMessages = uiChoice.isSelected(++i);
+				chatField = uiChoice.isSelected(++i);
+				useView = uiChoice.isSelected(++i);
+				fullPlayerCover = uiChoice.isSelected(++i);
+//#ifndef NO_CHAT_CANVAS
+				legacyChatUI = uiChoice.isSelected(++i);
+//#endif
 				
 				if ((photoSize = (photoSizeGauge.getValue() * 8)) < 16) {
 					photoSizeGauge.setValue((photoSize = 16) / 8);
@@ -2446,26 +2591,34 @@ public class MP extends MIDlet
 				if (networkChoice != null)
 					blackberryNetwork = networkChoice.getSelectedIndex();
 				
-				useLoadingForm = behChoice.isSelected(0);
-				jsonStream = behChoice.isSelected(1);
-				parseRichtext = behChoice.isSelected(2);
-				parseLinks = behChoice.isSelected(3);
-				chatUpdates = behChoice.isSelected(4);
-				keepAlive = behChoice.isSelected(5);
-				utf = behChoice.isSelected(6);
-				compress = behChoice.isSelected(7);
+				useLoadingForm = behChoice.isSelected(i = 0);
+				jsonStream = behChoice.isSelected(++i);
+				parseRichtext = behChoice.isSelected(++i);
+				parseLinks = behChoice.isSelected(++i);
+				chatUpdates = behChoice.isSelected(++i);
+				keepAlive = behChoice.isSelected(++i);
+				utf = behChoice.isSelected(++i);
+//#ifndef NO_ZIP
+				compress = behChoice.isSelected(++i);
+//#endif
 				
 				if ((updatesTimeout = updateTimeoutGauge.getValue() * 5) < 5) {
 					updateTimeoutGauge.setValue((updatesTimeout = 5) / 5);
 				}
 				
-				loadThumbs = imagesChoice.isSelected(0);
-				loadAvatars = imagesChoice.isSelected(1);
-				threadedImages = imagesChoice.isSelected(2);
-				roundAvatars = imagesChoice.isSelected(3);
+				loadThumbs = imagesChoice.isSelected(i = 0);
+//#ifndef NO_AVATARS
+				loadAvatars = imagesChoice.isSelected(++i);
+//#endif
+				threadedImages = imagesChoice.isSelected(++i);
+//#ifndef NO_AVATARS
+				roundAvatars = imagesChoice.isSelected(++i);
+//#endif
 				
+//#ifndef NO_AVATARS
 				avatarsCache = avaCacheChoice.getSelectedIndex();
 				avatarsCacheThreshold = avaCacheGauge.getValue() * 5;
+//#endif
 				peersCacheThreshold = profileCacheGauge.getValue() * 10;
 				
 				try {
@@ -2512,6 +2665,7 @@ public class MP extends MIDlet
 					j.put("pushBgInterval", pushBgInterval);
 					j.put("notifyMethod", notifyMethod);
 //#endif
+					j.put("legacyChatUI", legacyChatUI);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
@@ -2579,8 +2733,16 @@ public class MP extends MIDlet
 //#endif
 			if (c == okCmd) {
 				// full texbox finished
-				messageField.setString(((TextBox) d).getString());
+//#ifndef NO_CHAT_CANVAS
+				if (!legacyChatUI) {
+					commandAction(backCmd, d);
+					((ChatCanvas) current).text = ((TextBox) d).getString();
+					((ChatCanvas) current).queueRepaint();
+					return;
+				}
+//#endif
 				
+				messageField.setString(((TextBox) d).getString());
 				c = backCmd;
 			}
 		}
@@ -2643,7 +2805,7 @@ public class MP extends MIDlet
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 
-			s = new StringItem(null, "github.com/shinovon");
+			s = new StringItem(null, "github.com/shinovon/mpgram-client");
 			s.setFont(medBoldFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
@@ -2691,6 +2853,22 @@ public class MP extends MIDlet
 			s.setDefaultCommand(richTextLinkCmd);
 			s.setItemCommandListener(this);
 			f.append(s);
+
+			s = new StringItem(null, "\n\nLicensed under the MIT license.\n"
+					+ "Copyright (C) 2022-2025 Arman Jussupgaliyev\n\n"
+//#ifndef NO_AVATARS
+					+ "Contains parts of the TUBE42 imagelib, released under the LGPL license.\n"
+					+ "Copyright (C) 2007 Free Software Foundation, Inc.\n\n"
+//#endif
+//#ifndef NO_ZIP
+					+ "Contains parts of GNU Classpath, released under the GPLv2 license.\n"
+					+ "Copyright (C) 1999-2004 Free Software Foundation, Inc."
+//#endif
+					);
+			s.setFont(smallPlainFont);
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			f.append(s);
+			
 			display(f);
 			return;
 		}
@@ -2705,16 +2883,16 @@ public class MP extends MIDlet
 				return;
 			}
 			if (d instanceof ChatTopicsList) {
-				ChatForm form = ((ChatTopicsList) d).chatForm;
+				MPChat form = ((ChatTopicsList) d).chatForm;
 				int i = ((List) d).getSelectedIndex();
 				if (form == null || i == -1) return;
-				JSONObject topic = form.topics.getObject(i);
+				JSONObject topic = form.topics().getObject(i);
 				form.reset();
 				// TODO unread offset
-				form.topMsgId = topic.getInt("id");
-				form.canWrite = !topic.getBoolean("closed", false);
-				form.setTitle(form.title = topic.getString("title", ""));
-				openLoad(form);
+				form.openTopic(topic.getInt("id"),
+						!topic.getBoolean("closed", false),
+						topic.getString("title", ""));
+				openLoad((Displayable) form);
 				
 				return;
 			}
@@ -2745,7 +2923,7 @@ public class MP extends MIDlet
 //#endif
 			return;
 		}
-		if (c == cancelCmd && d instanceof List) { // go back to write form
+		if (c == cancelCmd && (d instanceof List) && !(d instanceof ChatsList)) { // go back to write form from file picker
 			goBackTo(writeForm);
 			return;
 		}
@@ -2766,6 +2944,13 @@ public class MP extends MIDlet
 				start(RUN_LOAD_LIST, d);
 				return;
 			}
+//#ifndef NO_CHAT_CANVAS
+			if (d instanceof ChatCanvas) {
+				((ChatCanvas) d).cancel();
+				start(RUN_LOAD_FORM, d);
+				return;
+			}
+//#endif
 			return;
 		}
 		if (c == updateCmd) {
@@ -2808,6 +2993,18 @@ public class MP extends MIDlet
 				display(initPlayerForm());
 			}
 		}
+//#ifndef NO_NOKIAUI
+		if (c == copyCmd) {
+			try {
+				if (checkClass("com.nokia.mid.ui.Clipboard")) {
+					NokiaAPI.copy(((TextBox) d).getString());
+					display(infoAlert("Text copied")); // TODO unlocalized
+					return;
+				}
+			} catch (Throwable ignored) {}
+			return;
+		}
+//#endif
 		if (c == backCmd || c == cancelCmd) {
 			// cancel ota update dialog
 			updateUrl = null;
@@ -2840,6 +3037,7 @@ public class MP extends MIDlet
 
 	public void commandAction(Command c, Item item) {
 		{ // message
+			// note: no need to check if canvas ui is enabled, since event came from lcdui item
 			if (c == itemChatCmd) {
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
@@ -2875,13 +3073,7 @@ public class MP extends MIDlet
 				// copy message link
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
-				StringBuffer sb = new StringBuffer("https://t.me/"); 
-				String username = ((ChatForm) current).username;
-				if (s[0].charAt(0) == '-' && username == null) {
-					sb.append("c/");
-				}
-				sb.append(username != null ? username : s[0]).append('/').append(s[1]);
-				copy("", sb.toString());
+				copyMessageLink(s[0], s[1]);
 				return;
 			}
 			if (c == openImageCmd) {
@@ -2902,14 +3094,9 @@ public class MP extends MIDlet
 				return;
 			}
 			if (c == documentCmd) {
-				// TODO
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
-				if (fileRewrite && s[4] != null) {
-					browse(instanceUrl + "file/" + url(s[4]) + "?c=" + s[0] + "&m=" + s[1] + "&user=" + user);
-				} else {
-					browse(instanceUrl + FILE_URL + "?c=" + s[0] + "&m=" + s[1] + "&user=" + user);
-				}
+				downloadDocument(s[0], s[1], s[4]);
 				return;
 			}
 			if (c == editMsgCmd) {
@@ -2923,7 +3110,7 @@ public class MP extends MIDlet
 				if (s == null) return;
 				if (((ChatForm) current).parent != null) {
 					// from search
-					goBackTo(((ChatForm) current).parent);
+					goBackTo((Displayable) ((ChatForm) current).parent);
 					((ChatForm) current).openMessage(s[1], -1);
 					return;
 				}
@@ -2935,7 +3122,7 @@ public class MP extends MIDlet
 				}
 				
 				// open new chat form
-				openLoad(new ChatForm(s[0], null, Integer.parseInt(s[1]), 0));
+				openChat(s[0], Integer.parseInt(s[1]));
 				return;
 			}
 			if (c == botCallbackCmd) {
@@ -3242,6 +3429,7 @@ public class MP extends MIDlet
 	// region Image queue
 	
 	static void queueAvatar(String id, Object target) {
+//#ifndef NO_AVATARS
 		if (target == null || id == null || !loadAvatars) return;
 		
 		JSONObject peer = getPeer(id, false);
@@ -3258,6 +3446,7 @@ public class MP extends MIDlet
 			imagesToLoad.addElement(new Object[] { id, target });
 			imagesLoadLock.notifyAll();
 		}
+//#endif
 	}
 
 	private static void putImage(Object target, Image img) {
@@ -3265,6 +3454,7 @@ public class MP extends MIDlet
 			((ImageItem) target).setImage(img);
 			return;
 		}
+//#ifndef NO_AVATARS
 		if (target instanceof Object[]) {
 			// list item
 			if (((Object[]) target)[0] instanceof List) {
@@ -3274,6 +3464,15 @@ public class MP extends MIDlet
 				return;
 			}
 		}
+//#endif
+//#ifndef NO_CHAT_CANVAS
+		if (target instanceof UIMessage) {
+			((UIMessage) target).mediaImage = img;
+			if (((UIMessage) target).photoRenderHeight == 0) ((UIMessage) target).layoutWidth = 0;
+			((UIMessage) target).requestPaint();
+			return;
+		}
+//#endif
 //#ifndef NO_NOTIFY
 		if (target instanceof String) {
 			// notification
@@ -3576,17 +3775,26 @@ public class MP extends MIDlet
 	
 	static void openChat(String id, int msg) {
 		Displayable d = MP.current;
-		if (d instanceof ChatForm && id.equals(((ChatForm) d).id)
-				&& ((ChatForm) d).postId == null && ((ChatForm) d).query == null
-				&& ((ChatForm) d).mediaFilter == null) {
+		if (d instanceof MPChat && id.equals(((MPChat) d).id())
+				&& ((MPChat) d).postId() == null && ((MPChat) d).query() == null
+				&& ((MPChat) d).mediaFilter() == null) {
+			if (msg > 0) {
+				((MPChat) d).openMessage(Integer.toString(msg), -1);
+			}
 			return;
 		}
+//#ifndef NO_CHAT_CANVAS
+		if (!legacyChatUI) {
+			openLoad(new ChatCanvas(id, null, msg, 0));
+			return;
+		}
+//#endif
 		openLoad(new ChatForm(id, null, msg, 0));
 	}
 	
-	static void openProfile(String id, ChatForm chatForm, int mode) {
-		if (chatForm == null && current instanceof ChatForm && id.equals(((ChatForm) current).id)) {
-			chatForm = (ChatForm) current;
+	static void openProfile(String id, MPChat chatForm, int mode) {
+		if (chatForm == null && current instanceof MPChat && id.equals(((MPChat) current).id())) {
+			chatForm = (MPChat) current;
 		}
 		openLoad(new ChatInfoForm(id, chatForm, mode));
 	}
@@ -3645,11 +3853,32 @@ public class MP extends MIDlet
 	}
 	
 	static void copy(String title, String text) {
-		// TODO use nokiaui?
-		TextBox t = new TextBox(title, text, text.length() + 1, TextField.UNEDITABLE);
+		TextBox t = new TextBox(title, text, Math.max(2000, text.length() + 1), TextField.UNEDITABLE);
 		t.addCommand(backCmd);
+//#ifndef NO_NOKIAUI
+		if (checkClass("com.nokia.mid.ui.Clipboard")) t.addCommand(copyCmd);
+//#endif
 		t.setCommandListener(midlet);
 		display(t);
+	}
+	
+	static void copyMessageLink(String peerId, String msgId) {
+		StringBuffer sb = new StringBuffer("https://t.me/"); 
+		String username = ((MPChat) current).username();
+		if (peerId.charAt(0) == '-' && username == null) {
+			sb.append("c/");
+		}
+		sb.append(username != null ? username : peerId).append('/').append(msgId);
+		copy("", sb.toString());
+	}
+	
+	void downloadDocument(String peerId, String msgId, String fileName) {
+		// TODO
+		if (fileRewrite && fileName != null) {
+			browse(instanceUrl + "file/" + url(fileName) + "?c=" + peerId + "&m=" + msgId + "&user=" + user);
+		} else {
+			browse(instanceUrl + FILE_URL + "?c=" + peerId + "&m=" + msgId + "&user=" + user);
+		}
 	}
 
 	static Alert errorAlert(Exception e) {
@@ -3819,6 +4048,8 @@ public class MP extends MIDlet
 			((MPForm) p).closed(back);
 		} else if (p instanceof MPList) {
 			((MPList) p).closed(back);
+		} else if (p instanceof MPChat) {
+			((MPChat) p).closed(back);
 		}
 		if (back) {
 			if (p instanceof MPForm || p instanceof MPList) {
@@ -4041,16 +4272,23 @@ public class MP extends MIDlet
 								topMsg = Integer.parseInt(thread);
 							} catch (Exception ignored) {}
 						}
-						if (current instanceof ChatForm &&
-								(domain.equals(((ChatForm) current).id)
-								|| domain.equals(((ChatForm) current).username))) {
-							((ChatForm) current).openMessage(messageId, topMsg);
+						if (current instanceof MPChat &&
+								(domain.equals(((MPChat) current).id())
+								|| domain.equals(((MPChat) current).username()))) {
+							((MPChat) current).openMessage(messageId, topMsg);
 						} else {
-							ChatForm f = new ChatForm(domain, null, msg, topMsg);
-							if (start != null) {
-								f.startBot = start;
+							MPChat chat;
+//#ifndef NO_CHAT_CANVAS
+							if (!legacyChatUI) {
+								chat = new ChatCanvas(domain, null, msg, topMsg);
+							} else {
+//#endif
+								chat = new ChatForm(domain, null, msg, topMsg);
+//#ifndef NO_CHAT_CANVAS
 							}
-							openLoad(f);
+//#endif
+							if (start != null) chat.setStartBot(start);
+							openLoad((Displayable) chat);
 						}
 						return true;
 					}
@@ -4684,6 +4922,7 @@ public class MP extends MIDlet
 		return sb;
 	}
 	
+//#ifndef NO_AVATARS
 	public static Image roundImage(Image img) {
 		if (img == null) return null;
 		try {
@@ -4706,6 +4945,7 @@ public class MP extends MIDlet
 			return img;
 		}
 	}
+//#endif
 
 	private static void writeAuth() {
 		try {
@@ -4749,11 +4989,11 @@ public class MP extends MIDlet
 			RT_SPOILER = 5,
 			RT_URL = 6;
 
-	static int wrapRichText(MPForm form, Thread thread, String text, JSONArray entities, int insert) {
+	static int wrapRichText(Object form, Thread thread, String text, JSONArray entities, int insert) {
 		return wrapRichText(form, thread, text, entities, insert, new int[8]);
 	}
 	
-	private static int wrapRichNestedText(MPForm form, Thread thread, String text, JSONObject entity, JSONArray allEntities, int insert, int[] state) {
+	private static int wrapRichNestedText(Object form, Thread thread, String text, JSONObject entity, JSONArray allEntities, int insert, int[] state) {
 		int off = entity.getInt("offset");
 		int len = entity.getInt("length");
 		JSONArray entities = new JSONArray();
@@ -4780,7 +5020,7 @@ public class MP extends MIDlet
 		return flush(form, thread, text, insert, state);
 	}
 
-	private static int wrapRichText(MPForm form, Thread thread, String text, JSONArray entities, int insert, int[] state) {
+	private static int wrapRichText(Object form, Thread thread, String text, JSONArray entities, int insert, int[] state) {
 		int len = entities.size();
 		int lastOffset = 0;
 		for (int i = 0; i < len; ++i) {
@@ -4793,9 +5033,19 @@ public class MP extends MIDlet
 			boolean skipEntity = false;
 			String entityText = text.substring(entity.getInt("offset"), entity.getInt("offset") + entity.getInt("length"));
 			String type = entity.getString("_");
-			if ("messageEntityUrl".equals(type)) {
+			if ("messageEntityUrl".equals(type) || "messageEntityMention".equals(type)) {
 				state[RT_URL] ++;
 				insert = flush(form, thread, richTextUrl = entityText, insert, state);
+				state[RT_URL] --;
+			} else if ("messageEntityMentionName".equals(type)) {
+				state[RT_URL] ++;
+				richTextUrl = "@".concat(entity.getString("user_id"));
+				insert = flush(form, thread, entityText, insert, state);
+				state[RT_URL] --;
+			} else if ("messageEntityPhone".equals(type)) {
+				state[RT_URL] ++;
+				richTextUrl = "tel:".concat(entityText);
+				insert = flush(form, thread, entityText, insert, state);
 				state[RT_URL] --;
 			} else if ("messageEntityTextUrl".equals(type)) {
 				state[RT_URL] ++;
@@ -4835,14 +5085,16 @@ public class MP extends MIDlet
 		return flush(form, thread, text.substring(lastOffset), insert, state);
 	}
 	
-	static int flush(MPForm form, Thread thread, String text, int insert, int[] state) {
+	static int flush(Object form, Thread thread, String text, int insert, int[] state) {
 		if (text.length() == 0) return insert;
 		
 		StringBuffer sb = new StringBuffer(text);
 		int space = 0;
-		while (sb.length() != 0 && sb.charAt(sb.length() - 1) == ' ') {
-			sb.setLength(sb.length() - 1);
-			space ++;
+		if (form instanceof MPForm) {
+			while (sb.length() != 0 && sb.charAt(sb.length() - 1) == ' ') {
+				sb.setLength(sb.length() - 1);
+				space ++;
+			}
 		}
 		text = sb.toString();
 		Font f = getFont(state);
@@ -4882,16 +5134,26 @@ public class MP extends MIDlet
 						}
 						if (!valid) break b;
 						
-						if (i != 0) {
-							s = new StringItem(null, text.substring(0, j));
+//#ifndef NO_CHAT_CANVAS
+						if (form instanceof UILabel) {
+							if (i != 0) {
+								((UILabel) form).append(text.substring(0, j), f, null);
+							}
+							((UILabel) form).append(text.substring(j, k), f, null);
+						} else
+//#endif
+						{
+							if (i != 0) {
+								s = new StringItem(null, text.substring(0, j));
+								s.setFont(f);
+								((MPForm) form).safeInsert(thread, insert++, s);
+							}
+							s = new StringItem(null, text.substring(j, k));
 							s.setFont(f);
-							form.safeInsert(thread, insert++, s);
+							s.setDefaultCommand(richTextLinkCmd);
+							s.setItemCommandListener(midlet);
+							((MPForm) form).safeInsert(thread, insert++, s);
 						}
-						s = new StringItem(null, text.substring(j, k));
-						s.setFont(f);
-						s.setDefaultCommand(richTextLinkCmd);
-						s.setItemCommandListener(midlet);
-						form.safeInsert(thread, insert++, s);
 						
 						text = text.substring(k);
 						d = 0;
@@ -4912,16 +5174,26 @@ public class MP extends MIDlet
 							if (!b && (c < '0' || c > '9')) break b;
 						}
 						if (k == i + 10 || k == i + 1) break b;
-						if (i != 0) {
-							s = new StringItem(null, text.substring(0, i));
+//#ifndef NO_CHAT_CANVAS
+						if (form instanceof UILabel) {
+							if (i != 0) {
+								((UILabel) form).append(text.substring(0, i), f, null);
+							}
+							((UILabel) form).append(text.substring(i, k), f, null);
+						} else
+//#endif
+						{
+							if (i != 0) {
+								s = new StringItem(null, text.substring(0, i));
+								s.setFont(f);
+								((MPForm) form).safeInsert(thread, insert++, s);
+							}
+							s = new StringItem(null, text.substring(i, k));
 							s.setFont(f);
-							form.safeInsert(thread, insert++, s);
+							s.setDefaultCommand(richTextLinkCmd);
+							s.setItemCommandListener(midlet);
+							((MPForm) form).safeInsert(thread, insert++, s);
 						}
-						s = new StringItem(null, text.substring(i, k));
-						s.setFont(f);
-						s.setDefaultCommand(richTextLinkCmd);
-						s.setItemCommandListener(midlet);
-						form.safeInsert(thread, insert++, s);
 						
 						text = text.substring(k);
 						d = 0;
@@ -4931,21 +5203,28 @@ public class MP extends MIDlet
 				}
 			}
 		}
-		
-		s = new StringItem(null, text);
-		s.setFont(f);
-		if (state != null && state[RT_URL] != 0) {
-			form.urls.put(s, richTextUrl);
-			s.setDefaultCommand(richTextLinkCmd);
-			s.setItemCommandListener(midlet);
-		}
-		
-		if (text.length() != 0) {
-			form.safeInsert(thread, insert++, s);
+
+//#ifndef NO_CHAT_CANVAS
+		if (form instanceof UILabel) {
+			((UILabel) form).append(text, f, state != null && state[RT_URL] != 0 ? richTextUrl : null);
+		} else
+//#endif
+		{
+			s = new StringItem(null, text);
+			s.setFont(f);
+			if (state != null && state[RT_URL] != 0) {
+				((MPForm) form).urls.put(s, richTextUrl);
+				s.setDefaultCommand(richTextLinkCmd);
+				s.setItemCommandListener(midlet);
+			}
+			
+			if (text.length() != 0) {
+				((MPForm) form).safeInsert(thread, insert++, s);
+			}
 		}
 
-		if (space != 0) {
-			form.safeInsert(thread, insert++, new Spacer(f.charWidth(' ') * space, f.getBaselinePosition()));
+		if (space != 0 /* && instanceof MPForm */ ) {
+			((MPForm) form).safeInsert(thread, insert++, new Spacer(f.charWidth(' ') * space, f.getBaselinePosition()));
 		}
 		
 		return insert;
@@ -5018,6 +5297,7 @@ public class MP extends MIDlet
 	
 	// endregion
 	
+//#ifndef NO_AVATARS
 	// region ImageUtils
 	
 /*
@@ -5132,6 +5412,7 @@ public class MP extends MIDlet
 	}
 	
 	// endregion
+//#endif
 	
 	// region JSON
 	
@@ -5187,7 +5468,7 @@ public class MP extends MIDlet
 		case '"': { // string
 			if (last != '"')
 				throw new RuntimeException("JSON: Unexpected end of text");
-			if(str.indexOf('\\') != -1) {
+			if (str.indexOf('\\') != -1) {
 				char[] chars = str.substring(1, length).toCharArray();
 				str = null;
 				int l = chars.length;

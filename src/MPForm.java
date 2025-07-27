@@ -39,7 +39,7 @@ public abstract class MPForm extends Form implements LangConstants {
 		setCommandListener(MP.midlet);
 	}
 	
-	void load() {
+	public void load() {
 		if (loaded) return;
 		loaded = true;
 		canceled = finished = false;
@@ -113,7 +113,7 @@ public abstract class MPForm extends Form implements LangConstants {
 	
 	protected void postLoad(boolean success) {}
 
-	void closed(boolean destroy) {
+	public void closed(boolean destroy) {
 		if (destroy) cancel();
 	}
 	

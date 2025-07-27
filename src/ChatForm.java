@@ -34,15 +34,9 @@ import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 import javax.microedition.lcdui.Ticker;
 
-public class ChatForm extends MPForm implements Runnable {
+public class ChatForm extends MPForm implements MPChat, Runnable {
 	
 	private static final int SPACER_HEIGHT = 8;
-	
-	static final int UPDATE_USER_STATUS = 1;
-	static final int UPDATE_USER_TYPING = 2;
-	static final int UPDATE_NEW_MESSAGE = 3;
-	static final int UPDATE_DELETE_MESSAGES = 4;
-	static final int UPDATE_EDIT_MESSAGE = 5;
 
 	String id;
 	String username;
@@ -82,7 +76,7 @@ public class ChatForm extends MPForm implements Runnable {
 	long wasOnline;
 	
 	TextField textField;
-	ChatForm parent;
+	MPChat parent;
 
 	JSONObject botAnswer;
 	
@@ -135,8 +129,6 @@ public class ChatForm extends MPForm implements Runnable {
 	}
 
 	void loadInternal(Thread thread) throws Exception {
-		deleteAll();
-		
 		if ((MP.reopenChat || (query == null && mediaFilter == null))
 				&& MP.chatUpdates
 				&& (MP.updatesThread != null || MP.updatesRunning)) {
@@ -217,6 +209,7 @@ public class ChatForm extends MPForm implements Runnable {
 					}
 				} else {
 					canPin = true;
+					canDelete = true;
 					if (MP.chatStatus && info.getObject("User").has("status")) {
 						setStatus(info.getObject("User").getObject("status"));
 					}
@@ -408,7 +401,7 @@ public class ChatForm extends MPForm implements Runnable {
 //#endif
 	}
 
-	void handleBotAnswer(JSONObject j) {
+	public void handleBotAnswer(JSONObject j) {
 		if (j == null) return;
 		
 		if (j.has("message")) {
@@ -596,7 +589,7 @@ public class ChatForm extends MPForm implements Runnable {
 		
 		// media
 		if (message.has("media")) {
-			if (!MP.showMedia || message.isNull("media")) {
+			if (!MP.showMedia || message.isNull("media") || message.getObject("media").has("hide")) {
 				// media is disabled
 				s = new StringItem(null, MP.L[Media]);
 				s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -765,7 +758,7 @@ public class ChatForm extends MPForm implements Runnable {
 				} else if (type.equals("geo")) {
 					// geo
 					sb.setLength(0);
-					sb.append(MP.L[Geo])
+					sb.append(MP.L[Geo]).append('\n')
 					.append(media.get("lat")).append(", ").append(media.get("long"));
 					s = new StringItem(null, sb.toString());
 					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -958,7 +951,7 @@ public class ChatForm extends MPForm implements Runnable {
 		MP.openLoad(this);
 	}
 	
-	void paginate(int dir) {
+	public void paginate(int dir) {
 		this.dir = dir;
 		cancel();
 		messageId = 0;
@@ -975,16 +968,17 @@ public class ChatForm extends MPForm implements Runnable {
 			offsetId = firstMsgId;
 			addOffset = limit - 1;
 		}
-		load();
+		MP.openLoad(this);
 	}
 	
-	void reset() {
+	public void reset() {
 		cancel();
 		dir = 0;
 		messageId = 0;
 		addOffset = 0;
 		offsetId = 0;
 		typing = 0;
+		query = null;
 		loadedMsgs.removeAllElements();
 		if (urls != null) urls.clear();
 		switched = false;
@@ -1024,7 +1018,7 @@ public class ChatForm extends MPForm implements Runnable {
 		}
 	}
 	
-	void handleUpdate(int type, JSONObject update) {
+	public void handleUpdate(int type, JSONObject update) {
 		if (!this.update) return;
 //		System.out.println("update: " + type);
 		switch (type) {
@@ -1192,5 +1186,94 @@ public class ChatForm extends MPForm implements Runnable {
 			typing = 0;
 		} catch (Exception e) {}
 	}
+	
+	// interface getters
+	public String id() {
+		return id;
+	}
+	
+	public String postId() {
+		return postId;
+	}
+	
+	public String query() {
+		return query;
+	}
+	
+	public String mediaFilter() {
+		return mediaFilter;
+	}
+	
+	public String username() {
+		return username;
+	}
+	
+	public boolean update() {
+		return update;
+	}
+	
+	public boolean endReached() {
+		return endReached;
+	}
+	
+	public boolean forum() {
+		return forum;
+	}
+	
+	public boolean switched() {
+		return switched;
+	}
+	
+	public int topMsgId() {
+		return topMsgId;
+	}
+	
+	public int firstMsgId() {
+		return firstMsgId;
+	}
+	
+	public JSONArray topics() {
+		return topics;
+	}
 
+	public MPChat parent() {
+		return parent;
+	}
+	
+	// interface setters
+	
+	public void setParent(MPChat parent) {
+		this.parent = parent;
+	}
+	
+	public void setQuery(String s) {
+		query = s;
+		switched = true;
+	}
+	
+	public void setUpdate(boolean b) {
+		update = b;
+	}
+	
+	public void setBotAnswer(JSONObject j) {
+		botAnswer = j;
+	}
+	
+	public void setStartBot(String s) {
+		this.startBot = s;
+	}
+	
+	
+	public void sent() {
+		if (textField != null) {
+			textField.setString("");
+		}
+	}
+	
+	public void openTopic(int topMsgId, boolean canWrite, String title) {
+		this.topMsgId = topMsgId;
+		this.canWrite = canWrite;
+		setTitle(this.title = title);
+	}
+	
 }

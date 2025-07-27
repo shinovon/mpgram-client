@@ -103,6 +103,9 @@
 	"Pin": "Закріпити",
 	"BanMember": "Ban member", // Untranslated
 	"Comments": "Discussion", // Untranslated
+	"Copy": "Copy", // Untranslated
+	"CopyLink": "Copy link", // Untranslated
+	"Select": "Select", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "Відкрити",
@@ -118,6 +121,8 @@
 	"Older": "Старше",
 	"Newer": "Новіше",
 	"SendSticker": "Надіслати стікер",
+	"Menu": "Menu", // Untranslated
+	"Write": "Write", // Untranslated
 	
 	// Message writing form commands
 	"Send": "Відправити",
@@ -261,6 +266,7 @@
 	"SendAsVoice": "Надіслати як голосове повідомлення",
 	"HideWithSpoiler": "Позначити як спойлер",
 	"EnableHTMLFormatting": "HTML-форматування",
+	"TextField_Hint": "Write a message...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Повідомлення відправлено",
@@ -276,6 +282,7 @@
 	"Search_TitlePrefix": "Пошук - ",
 	"OlderMessages": "Нові повідомлення",
 	"NewerMessages": "Старі повідомлення",
+	"SavedMessages": "Saved messages", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "Переслано від ",
@@ -292,6 +299,8 @@
 	"Media": "Медіа",
 	"Poll": "Опитування",
 	"Geo": "Геопозиція: ",
+	"Photo": "Photo", // Untranslated
+	"Video": "Video", // Untranslated
 	
 	// Chat actions
 	"PinnedMessage_Action": " закріпив повідомлення", 

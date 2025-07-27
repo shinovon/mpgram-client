@@ -103,6 +103,9 @@
 	"Pin": "Anheften",
 	"BanMember": "Mitglied Sperren",
 	"Comments": "Discussion", // Untranslated
+	"Copy": "Copy", // Untranslated
+	"CopyLink": "Copy link", // Untranslated
+	"Select": "Select", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "Link",
@@ -118,6 +121,8 @@
 	"Older": "Älter",
 	"Newer": "Neuer",
 	"SendSticker": "Sende Sticker",
+	"Menu": "Menu", // Untranslated
+	"Write": "Write", // Untranslated
 	
 	// Message writing form commands
 	"Send": "Sende",
@@ -261,6 +266,7 @@
 	"SendAsVoice": "Sprachnachricht senden",
 	"HideWithSpoiler": "Versteckt mit Spoiler",
 	"EnableHTMLFormatting": "HTML-formatting aktivieren",
+	"TextField_Hint": "Write a message...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Nachricht gesendet",
@@ -276,6 +282,7 @@
 	"Search_TitlePrefix": "Suche - ",
 	"OlderMessages": "Ältere Nachrichten",
 	"NewerMessages": "Neuere Nachrichten",
+	"SavedMessages": "Saved messages", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "Weitergeleitet von",
@@ -292,6 +299,8 @@
 	"Media": "Medien",
 	"Poll": "Umfrage",
 	"Geo": "Geo: ",
+	"Photo": "Photo", // Untranslated
+	"Video": "Video", // Untranslated
 	
 	// Chat actions
 	"PinnedMessage_Action": " anghängte Nachricht",
