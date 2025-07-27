@@ -52,7 +52,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	static int[] colors = new int[40];
 	static int[] colorsCopy;
-	static boolean shiftColors;
 	
 //	static Image attachIcon;
 
@@ -919,8 +918,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			}
 		}
 		
-		if (shiftColors) shiftColors = false;
-		
 //		g.setColor(-1);
 //		g.setFont(MP.smallPlainFont);
 //		g.drawString("f" + (System.currentTimeMillis() - now) + " r" + (deltaTime) + " i" + renderedItems, 20, 20, 0);
@@ -1682,7 +1679,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				colors[i] = ((((c >> 16) & 0xFF) * 15) >> 5) << 16 | ((((c >> 8) & 0xFF) * 15) >> 5) << 8 | ((((c) & 0xFF) * 15) >> 5);
 			}
 		}
-		shiftColors = true;
+		
+		updateColors();
 	}
 	
 	void closeMenu() {
@@ -1693,7 +1691,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		for (int i = 0; i < colors.length; ++i) {
 			colors[i] = colorsCopy[i];
 		}
-		shiftColors = true;
+		updateColors();
 		queueRepaint();
 	}
 	
@@ -1769,6 +1767,15 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		replyMsgId = 0;
 		editMsgId = 0;
 		file = null;
+	}
+	
+	private void updateColors() {
+		UIItem item = firstItem;
+		do {
+			if (!(item instanceof UIMessage))
+				continue;
+			((UIMessage) item).updateColors = true;
+		} while ((item = item.next) != null);
 	}
 	
 	// interface getters

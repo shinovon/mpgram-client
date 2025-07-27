@@ -109,6 +109,8 @@ public class UIMessage extends UIItem implements LangConstants {
 	
 	Image mediaImage;
 	
+	boolean updateColors;
+	
 	UIMessage(JSONObject message, ChatCanvas chat) {
 		focusable = true;
 
@@ -430,7 +432,8 @@ public class UIMessage extends UIItem implements LangConstants {
 				y += MARGIN_TOP;
 				g.setColor(ChatCanvas.colors[COLOR_ACTION_BG]);
 				g.fillRect(x + (w - text.contentWidth - PADDING_WIDTH) >> 1, y, text.contentWidth + PADDING_WIDTH, text.contentHeight + PADDING_HEIGHT * 2);
-				if (ChatCanvas.shiftColors) {
+				if (updateColors) {
+					updateColors = false;
 					text.color = ChatCanvas.colors[COLOR_MESSAGE_FG];
 					text.linkColor = ChatCanvas.colors[COLOR_MESSAGE_LINK];
 					text.focusColor = ChatCanvas.colors[COLOR_MESSAGE_LINK_FOCUS];
@@ -595,7 +598,8 @@ public class UIMessage extends UIItem implements LangConstants {
 		// text
 		if (text != null) {
 			UILabel text = this.text;
-			if (ChatCanvas.shiftColors) {
+			if (updateColors) {
+				updateColors = false;
 				text.color = ChatCanvas.colors[COLOR_MESSAGE_FG];
 				text.linkColor = ChatCanvas.colors[COLOR_MESSAGE_LINK];
 				text.focusColor = ChatCanvas.colors[COLOR_MESSAGE_LINK_FOCUS];
