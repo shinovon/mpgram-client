@@ -916,6 +916,10 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (((ChatCanvas) container).selected != 0) {
 			return 0;
 		}
+		if (dir == Canvas.LEFT && ((ChatCanvas) container).canWrite) {
+			menuAction(Reply);
+			return Integer.MAX_VALUE;
+		}
 		if (focusChild != null) {
 			int t = focusChild.traverse(dir, height, scrollY);
 			if (t != 0) {

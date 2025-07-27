@@ -1750,7 +1750,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		resetInput();
 		text = item.origText;
 		editMsgId = item.id;
-//		MP.display(MP.writeForm(id, null, item.origText, Integer.toString(item.id), null, null));
+		if (!touch) {
+//			fieldFocused = true;
+			MP.display(MP.writeForm(id, null, item.origText, Integer.toString(item.id), null, null));
+		}
 		queueRepaint();
 	}
 	
@@ -1758,7 +1761,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		// TODO
 		if (editMsgId != 0) resetInput();
 		replyMsgId = item.id;
-//		MP.display(MP.writeForm(id, Integer.toString(item.id), "", null, null, null));
+		if (!touch) {
+//			fieldFocused = true;
+			MP.display(MP.writeForm(id, Integer.toString(item.id), "", null, null, null));
+		}
 		queueRepaint();
 	}
 	
