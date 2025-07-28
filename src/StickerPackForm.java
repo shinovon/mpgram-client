@@ -4,7 +4,7 @@ import javax.microedition.lcdui.ImageItem;
 import javax.microedition.lcdui.Item;
 
 /*
-Copyright (c) 2022-2025 Arman Jussupgaliyev
+Copyright (c) 2025 Arman Jussupgaliyev
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
