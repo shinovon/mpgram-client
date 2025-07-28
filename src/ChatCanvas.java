@@ -896,23 +896,29 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			}
 			
 			// process long tap
-			if (pressed && !dragging && !longTap
-					&& pointedItem != null && pointedItem.focusable) {
-				animate = true;
-				if (now - pressTime > 200) {
+			if (pressed) {
+				if (now - pressTime > 100) {
+					// TODO test this
 					kineticScroll = 0;
-					int size = Math.min(360, (int) (now - pressTime - 200) / 2);
-//					g.setColor(colors[COLOR_CHAT_POINTER_HOLD]);
-//					g.fillArc(pointerX - 25, pointerY - 25, 50, 50, 90, (size * 360) / 200);
-					if (size >= 200) {
-						// handle long tap
-						longTap = true;
-						focusItem(pointedItem, 0);
-						int y = pointerY;
-						pointedItem.tap(pointerX,
-								reverse ? y - (scroll - bottom - pointedItem.y + height - pointedItem.contentHeight)
-										: y - pointedItem.y - top - scroll,
-										true);
+				}
+				if (!dragging && !longTap
+						&& pointedItem != null && pointedItem.focusable) {
+					animate = true;
+					if (now - pressTime > 200) {
+						kineticScroll = 0;
+						int size = Math.min(360, (int) (now - pressTime - 200) / 2);
+	//					g.setColor(colors[COLOR_CHAT_POINTER_HOLD]);
+	//					g.fillArc(pointerX - 25, pointerY - 25, 50, 50, 90, (size * 360) / 200);
+						if (size >= 200) {
+							// handle long tap
+							longTap = true;
+							focusItem(pointedItem, 0);
+							int y = pointerY;
+							pointedItem.tap(pointerX,
+									reverse ? y - (scroll - bottom - pointedItem.y + height - pointedItem.contentHeight)
+											: y - pointedItem.y - top - scroll,
+											true);
+						}
 					}
 				}
 			}
