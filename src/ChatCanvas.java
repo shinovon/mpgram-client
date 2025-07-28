@@ -1712,16 +1712,19 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		UIMessage[] msgs = new UIMessage[selected];
 		int count = 0;
 		UIItem item = firstItem;
-		do {
-			if (!(item instanceof UIMessage) || !((UIMessage) item).selected)
-				continue;
-			msgs[count++] = (UIMessage) item;
-		} while ((item = item.next) != null);
+		if (item != null) {
+			do {
+				if (!(item instanceof UIMessage) || !((UIMessage) item).selected)
+					continue;
+				msgs[count++] = (UIMessage) item;
+			} while ((item = item.next) != null);
+		}
 		return msgs;
 	}
 	
 	private void unselectAll() {
 		UIItem item = firstItem;
+		if (item == null) return;
 		do {
 			if (!(item instanceof UIMessage) || !((UIMessage) item).selected)
 				continue;
@@ -1777,6 +1780,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	private void updateColors() {
 		UIItem item = firstItem;
+		if (item == null) return;
 		do {
 			if (!(item instanceof UIMessage))
 				continue;
