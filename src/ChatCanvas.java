@@ -1253,8 +1253,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						|| dragYHold + dY > 2 || dragYHold + dY < -2
 						|| dX > 1 || dX < -1
 						|| dragXHold + dX > 2 || dragXHold + dX < -2) {
-					int dx2 = dX + dragXHold;
-					int dy2 = dY + dragYHold;
+					int dx2 = dX;
+					int dy2 = dY;
+					if (now - pressTime < 100) {
+						dx2 += dragXHold;
+						dy2 += dragYHold;
+					}
 					if (draggingHorizontally || (!dragging && Math.abs(dx2) > Math.abs(dy2))) {
 						if (!draggingHorizontally) {
 							focusItem(pointedItem, 0);

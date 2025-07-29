@@ -166,6 +166,7 @@ public class MP extends MIDlet
 	static final Font smallBoldFont = Font.getFont(0, Font.STYLE_BOLD, Font.SIZE_SMALL);
 	static final Font smallItalicFont = Font.getFont(0, Font.STYLE_ITALIC, Font.SIZE_SMALL);
 	
+	// TODO recalculate on sizeChanged()
 	static final int smallPlainFontHeight = smallPlainFont.getHeight();
 	static final int smallPlainFontSpaceWidth = smallPlainFont.charWidth(' ');
 	static final int smallBoldFontHeight = smallBoldFont.getHeight();
