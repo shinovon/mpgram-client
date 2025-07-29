@@ -2916,14 +2916,14 @@ public class MP extends MIDlet
 			s.setItemCommandListener(this);
 			f.append(s);
 
-			s = new StringItem(null, "\n\nLicensed under the MIT license.\n"
+			s = new StringItem(null, "\n\nReleased under the MIT license.\n"
 					+ "Copyright (C) 2022-2025 Arman Jussupgaliyev\n\n"
 //#ifndef NO_AVATARS
-					+ "Contains parts of the TUBE42 imagelib, released under the LGPL license.\n"
+					+ "Contains parts of the TUBE42 imagelib, licensed under the LGPL.\n"
 					+ "Copyright (C) 2007 Free Software Foundation, Inc.\n\n"
 //#endif
 //#ifndef NO_ZIP
-					+ "Contains parts of GNU Classpath, released under the GPLv2 license.\n"
+					+ "Contains parts of GNU Classpath, licensed under the GPL v2\n"
 					+ "Copyright (C) 1999-2004 Free Software Foundation, Inc."
 //#endif
 					);
