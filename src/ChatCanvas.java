@@ -898,7 +898,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			// process long tap
 			if (pressed) {
 				if (now - pressTime > 100) {
-					// TODO test this
 					kineticScroll = 0;
 				}
 				if (!dragging && !longTap
@@ -1256,7 +1255,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					int dx2 = dX;
 					int dy2 = dY;
 					if (now - pressTime < 100) {
-						dx2 += dragXHold;
+//						dx2 += dragXHold;
 						dy2 += dragYHold;
 					}
 					if (draggingHorizontally || (!dragging && Math.abs(dx2) > Math.abs(dy2))) {
@@ -1436,6 +1435,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					MP.midlet.commandAction(MP.sendStickerCmd, this);
 					break;
 				case WriteMessage:
+					if (replyMsgId != 0 || editMsgId != 0) {
+						MP.display(MP.writeForm(id, Integer.toString(Math.max(replyMsgId, topMsgId)), text, editMsgId == 0 ? null : Integer.toString(editMsgId), null, null));
+						resetInput();
+						break;
+					}
 					MP.midlet.commandAction(MP.writeCmd, this);
 					break;
 				case Delete: {

@@ -214,7 +214,7 @@
 	"ParseLinks": "Отображать ссылки",
 	"ChatAutoUpdate": "Авто-обновление чата",
 	"UpdatesTimeout": "Таймаут обновлений",
-	"KeepSessionAlive": "Удерживать сессию активной",
+	"KeepSessionAlive": "Держать сессию активной",
 	"UseUnicode": "Исп. Unicode",
 	"UseCompression": "Исп. сжатие",
 	"NetworkAccess": "Сеть",
