@@ -1,4 +1,6 @@
-from os import listdir
+#!/usr/bin/python3
+
+from os import listdir, makedirs, path
 import json
 
 def load_jsonc(f,lines=None):
@@ -40,6 +42,9 @@ if not err:
         f.write("\tstatic final int LocaleStrings = " + str(len(en_json)) + ";\n")
         f.write("\tstatic final int mpgram = 0;\n")
         f.write("}\n")
+
+    if not path.exists("../res/l/"):
+        makedirs("../res/l")
 
     for n in listdir():
         if not n.endswith(".jsonc"):
