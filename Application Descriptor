@@ -1,6 +1,7 @@
 Nokia-MIDlet-Background-Event: pause
 MIDlet-Version: 1.2.5
 Nokia-UI-Enhancement: IgnoreProfilesBasedSoundMuting
+Manifest-Version: 1.0
 MicroEdition-Configuration: CLDC-1.0
 MIDlet-Name: MPGram
 Nokia-Scalable-Icon: /m.svg
