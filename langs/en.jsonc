@@ -301,6 +301,7 @@
 	"Geo": "Geo: ",
 	"Photo": "Photo",
 	"Video": "Video",
+	"VoiceMessage": "Voice message",
 	
 	// Chat actions
 	"PinnedMessage_Action": " pinned message",
