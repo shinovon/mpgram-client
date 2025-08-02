@@ -301,6 +301,7 @@
 	"Geo": "Геопозиция: ",
 	"Photo": "Фото",
 	"Video": "Видео",
+	"VoiceMessage": "Голосовое сообщение",
 	
 	// Chat actions
 	"PinnedMessage_Action": " закрепил(а) сообщение",

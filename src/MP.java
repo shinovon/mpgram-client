@@ -319,6 +319,7 @@ public class MP extends MIDlet
 	static Command callItemCmd;
 	static Command documentCmd;
 	static Command playItemCmd;
+	static Command playVoiceCmd;
 
 	static Command writeCmd;
 	static Command chatInfoCmd;
@@ -787,6 +788,7 @@ public class MP extends MIDlet
 		callItemCmd = new Command(L[Call], Command.ITEM, 1);
 		documentCmd = new Command(L[Download], Command.ITEM, 2);
 		playItemCmd = new Command(L[Play_Item], Command.ITEM, 1);
+		playVoiceCmd = new Command(L[Play_Item], Command.ITEM, 1);
 		
 		writeCmd = new Command(L[WriteMessage], Command.SCREEN, 5);
 		latestCmd = new Command(L[LatestMessages_Cmd], Command.SCREEN, 7);
@@ -2831,31 +2833,31 @@ public class MP extends MIDlet
 			s.setLayout(Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_VCENTER | Item.LAYOUT_LEFT);
 			f.append(s);
 			
-			s = new StringItem(null, L[AboutText]);
+			s = new StringItem(null, L[AboutText].concat("\n"));
 			s.setFont(Font.getDefaultFont());
 			s.setLayout(Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_NEWLINE_BEFORE);
 			f.append(s);
 			
 			f.append(new Spacer(2, 2));
 
-			s = new StringItem(null, L[Developer]);
+			s = new StringItem(null, L[Developer].concat("\n"));
 			s.setFont(smallPlainFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 
-			s = new StringItem(null, "shinovon");
+			s = new StringItem(null, "shinovon\n");
 			s.setFont(medBoldFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 			
 			f.append(new Spacer(2, 2));
 
-			s = new StringItem(null, L[Author]);
+			s = new StringItem(null, L[Author].concat("\n"));
 			s.setFont(smallPlainFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 
-			s = new StringItem(null, "twsparkle");
+			s = new StringItem(null, "twsparkle\n");
 			s.setFont(medBoldFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setItemCommandListener(this);
@@ -2863,12 +2865,12 @@ public class MP extends MIDlet
 			
 			f.append(new Spacer(2, 2));
 
-			s = new StringItem(null, "GitHub");
+			s = new StringItem(null, "GitHub\n");
 			s.setFont(smallPlainFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 
-			s = new StringItem(null, "github.com/shinovon/mpgram-client");
+			s = new StringItem(null, "github.com/shinovon/mpgram-client\n");
 			s.setFont(medBoldFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
@@ -2877,12 +2879,12 @@ public class MP extends MIDlet
 			
 			f.append(new Spacer(2, 2));
 
-			s = new StringItem(null, "Web");
+			s = new StringItem(null, "Web\n");
 			s.setFont(smallPlainFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 
-			s = new StringItem(null, "nnproject.cc");
+			s = new StringItem(null, "nnproject.cc\n");
 			s.setFont(medBoldFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
@@ -2891,12 +2893,12 @@ public class MP extends MIDlet
 			
 			f.append(new Spacer(2, 2));
 
-			s = new StringItem(null, MP.L[Donate]);
+			s = new StringItem(null, MP.L[Donate].concat("\n"));
 			s.setFont(smallPlainFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 
-			s = new StringItem(null, "boosty.to/nnproject/donate");
+			s = new StringItem(null, "boosty.to/nnproject/donate\n");
 			s.setFont(medBoldFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
@@ -2905,12 +2907,12 @@ public class MP extends MIDlet
 			
 			f.append(new Spacer(2, 2));
 
-			s = new StringItem(null, MP.L[Chat]);
+			s = new StringItem(null, MP.L[Chat].concat("\n"));
 			s.setFont(smallPlainFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 
-			s = new StringItem(null, "t.me/nnmidletschat");
+			s = new StringItem(null, "t.me/nnmidletschat\n");
 			s.setFont(medBoldFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
@@ -3280,6 +3282,13 @@ public class MP extends MIDlet
 			
 			display(loadingAlert(L[Loading]), current);
 			start(RUN_LOAD_PLAYLIST, new String[] {s[0], "3", s[1]});
+			return;
+		}
+		if (c == playVoiceCmd) {
+			// play voice message TODO
+			String[] s = (String[]) ((MPForm) current).urls.get(item);
+			if (s == null) return;
+			
 			return;
 		}
 		if (c == postCommentsCmd) {

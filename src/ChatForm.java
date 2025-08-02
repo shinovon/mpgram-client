@@ -653,16 +653,21 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 								&& ("audio/mpeg".equals(t = media.getString("mime", null))
 										|| "audio/aac".equals(t)
 										|| "audio/m4a".equals(t));
+						boolean voice = false;
 						
 						key[4] = media.getString("name", null);
 						if (media.has("audio")) {
 							JSONObject audio = media.getObject("audio");
-							if ((t = audio.getString("artist", null)) != null && t.length() != 0) {
-								sb.append(t).append(" - ");
-							}
-							if ((t = audio.getString("title", null)) != null && t.length() != 0) {
-								sb.append(t);
-								nameSet = true;
+							if (audio.getBoolean("voice", false)) {
+								voice = true;
+							} else {
+								if ((t = audio.getString("artist", null)) != null && t.length() != 0) {
+									sb.append(t).append(" - ");
+								}
+								if ((t = audio.getString("title", null)) != null && t.length() != 0) {
+									sb.append(t);
+									nameSet = true;
+								}
 							}
 						}
 						
@@ -706,7 +711,10 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 							s = new StringItem(null, sb.toString());
 							s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 							s.setFont(MP.smallItalicFont);
-							if (playable) {
+							if (voice) {
+								s.addCommand(MP.documentCmd);
+								s.setDefaultCommand(MP.playVoiceCmd);
+							} else if (playable) {
 								s.addCommand(MP.documentCmd);
 								s.setDefaultCommand(MP.playItemCmd);
 							} else {
