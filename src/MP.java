@@ -260,7 +260,7 @@ public class MP extends MIDlet
 	static Thread updatesThread, updatesThreadCopy;
 	static Hashtable threadConnections = new Hashtable();
 	static Vector closingConnections = new Vector();
-	private static boolean sending;
+	static boolean sending;
 	static boolean updatesRunning;
 	static Object updatesLock = new Object();
 	

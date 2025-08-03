@@ -1373,13 +1373,16 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					if (x > width - 48) {
 						if ((text != null && text.length() != 0) || file != null) {
 							// send TODO
-							MP.midlet.start(MP.RUN_SEND_MESSAGE, new Object[] {
-									text, id,
-									replyMsgId == 0 ? null : Integer.toString(replyMsgId),
-									editMsgId == 0 ? null : Integer.toString(editMsgId),
-									file,
-									null, null, null
-									});
+							if (!MP.sending) {
+								MP.sending = true;
+								MP.midlet.start(MP.RUN_SEND_MESSAGE, new Object[] {
+										text, id,
+										replyMsgId == 0 ? null : Integer.toString(replyMsgId),
+										editMsgId == 0 ? null : Integer.toString(editMsgId),
+										file,
+										null, null, null
+										});
+							}
 						} else {
 							showMenu(null, new int[] { SendSticker, WriteMessage });
 						}
