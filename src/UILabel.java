@@ -280,11 +280,11 @@ public class UILabel extends UIItem {
 	
 	private static void split(String text, Font font, String url, int width, int x, int y, int idx, int mw, int ch, int sl, int fh, Vector res, boolean center, int[] out) {
 		int ay = 0;
-		if (res.size() != 0) {
-			// FIXME
+		if (res.size() != 0 && x != 0) {
 			Object[] l = (Object[]) res.elementAt(res.size() - 1);
-			if (((int[]) l[3])[0] != 0 && ((int[]) l[3])[3] != fh) {
-				ay = ((int[]) l[3])[3] - fh;
+			int lfh = ((int[]) l[3])[3];
+			if (lfh != fh) {
+				ay = fh - lfh + ((Font) l[1]).getBaselinePosition() - font.getBaselinePosition();
 			}
 		}
 		if (ch != sl) {
@@ -307,7 +307,7 @@ public class UILabel extends UIItem {
 									}
 									res.addElement(new Object[] { t, font, url, new int[] {x, y + ay, tw, fh} });
 									mw = Math.max(mw, x + tw);
-									x = 0; y += fh; idx ++;
+									x = 0; y += fh; ay = 0; idx ++;
 									
 									i = ch = j;
 									break w;
@@ -321,7 +321,7 @@ public class UILabel extends UIItem {
 							}
 							res.addElement(new Object[] { t, font, url, new int[] {x, y + ay, tw, fh} });
 							mw = Math.max(mw, x + tw);
-							x = 0; y += fh; idx ++;
+							x = 0; y += fh; ay = 0; idx ++;
 							ch = i;
 						}
 					}
