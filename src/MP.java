@@ -2364,6 +2364,7 @@ public class MP extends MIDlet
 					Form f = new Form(L[Settings]);
 					f.addCommand(backCmd);
 					f.setCommandListener(this);
+//					f.setItemStateListener(this);
 					StringItem s;
 					int i;
 					
@@ -2393,7 +2394,7 @@ public class MP extends MIDlet
 							L[BuiltinImageViewer],
 							L[LargeMusicCover],
 //#ifndef NO_CHAT_CANVAS
-							"Legacy UI", // TODO
+							L[LegacyUI],
 //#endif
 					}, null);
 					uiChoice.setSelectedIndex(i = 0, reverseChat);
@@ -2493,7 +2494,7 @@ public class MP extends MIDlet
 //#ifndef NO_ZIP
 							L[UseCompression],
 //#endif
-							"Longpoll" // TODO: unlocalized
+							L[Longpoll]
 					}, null);
 					behChoice.setSelectedIndex(i = 0, useLoadingForm);
 					behChoice.setSelectedIndex(++i, jsonStream);
@@ -2509,7 +2510,7 @@ public class MP extends MIDlet
 					behChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(behChoice);
 					
-					updateTimeoutGauge = new Gauge(L[UpdatesTimeout], true, 20, updatesTimeout / 5);
+					updateTimeoutGauge = new Gauge(L[longpoll ? UpdatesTimeout : UpdatesInterval], true, 20, updatesTimeout / 5);
 					updateTimeoutGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(updateTimeoutGauge);
 					
@@ -2590,6 +2591,8 @@ public class MP extends MIDlet
 					f.append(s);
 					
 					settingsForm = f;
+				} else {
+					updateTimeoutGauge.setLabel(L[longpoll ? UpdatesTimeout : UpdatesInterval]);
 				}
 				
 				display(settingsForm);
@@ -3334,6 +3337,9 @@ public class MP extends MIDlet
 			lastType = l;
 			start(RUN_SET_TYPING, ((TextField) item).getString().length() == 0 ? "Cancel" : null);
 		}
+		// TODO update updateTimeoutGauge label when longpoll is changed
+//		if (item == behChoice) {
+//		}
 	}
 	
 	// endregion

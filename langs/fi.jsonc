@@ -206,6 +206,7 @@
 	"ChatTextField": "Näytä tekstikenttä",
 	"BuiltinImageViewer": "Näytä kuvat sovelluksessa",
 	"LargeMusicCover": "Suuri soittimen kansikuva",
+	"LegacyUI": "Legacy UI", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Odota sivun latausta",
@@ -220,6 +221,8 @@
 	"NetworkAccess": "Yhteystapa",
 	"MobileData": "Mobiilidata",
 	"WiFi": "Wi-Fi",
+	"Longpoll": "Longpoll", // Untranslated
+	"UpdatesInterval": "Updates interval", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "Kuvien esikatselu",
@@ -301,6 +304,7 @@
 	"Geo": "Sijainti: ",
 	"Photo": "Photo", // Untranslated
 	"Video": "Video", // Untranslated
+	"VoiceMessage": "Voice message", // Untranslated
 	
 	// Chat actions
 	"PinnedMessage_Action": " kiinnitti viestin",

@@ -206,6 +206,7 @@
 	"ChatTextField": "Text field in chat", // Untranslated
 	"BuiltinImageViewer": "Built-in image viewer", // Untranslated
 	"LargeMusicCover": "Large player cover", // Untranslated
+	"LegacyUI": "Legacy UI", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Чекати повного завантаження",
@@ -220,6 +221,8 @@
 	"NetworkAccess": "Network access", // Untranslated
 	"MobileData": "Data", // Untranslated
 	"WiFi": "Wi-Fi", // Untranslated
+	"Longpoll": "Longpoll", // Untranslated
+	"UpdatesInterval": "Updates interval", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "Завантажувати медіа",
@@ -301,6 +304,7 @@
 	"Geo": "Геопозиція: ",
 	"Photo": "Photo", // Untranslated
 	"Video": "Video", // Untranslated
+	"VoiceMessage": "Voice message", // Untranslated
 	
 	// Chat actions
 	"PinnedMessage_Action": " закріпив повідомлення", 

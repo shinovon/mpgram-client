@@ -206,6 +206,7 @@
 	"ChatTextField": "حقل النص في المحادثة", 
 	"BuiltinImageViewer": "عارض الصور المدمج",
 	"LargeMusicCover": "غلاف كبير لمشغل الوسائط", 
+	"LegacyUI": "Legacy UI", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "انتظار تحميل الصفحة",
@@ -220,6 +221,8 @@
 	"NetworkAccess": "نقطة اتصال الشبكة",
 	"MobileData": "بيانات الهاتف المحمول",
 	"WiFi": "Wi-Fi",
+	"Longpoll": "Longpoll", // Untranslated
+	"UpdatesInterval": "Updates interval", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "تحميل صور مصغرة للوسائط",
@@ -301,6 +304,7 @@
 	"Geo": "موقع جعراقي: ",
 	"Photo": "Photo", // Untranslated
 	"Video": "Video", // Untranslated
+	"VoiceMessage": "Voice message", // Untranslated
 	
 	// Chat actions
 	"PinnedMessage_Action": " ثبت رسالة", 

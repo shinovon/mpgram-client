@@ -206,6 +206,7 @@
 	"ChatTextField": "Текстовое поле в чате",
 	"BuiltinImageViewer": "Встроен. просмотр изображений",
 	"LargeMusicCover": "Большая обложка в плеере",
+	"LegacyUI": "Legacy UI", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Ждать полной загрузки",
@@ -220,6 +221,8 @@
 	"NetworkAccess": "Сеть",
 	"MobileData": "Мобильные данные",
 	"WiFi": "Wi-Fi",
+	"Longpoll": "Лонгполл",
+	"UpdatesInterval": "Интервал обновлений",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Загружать медиа",

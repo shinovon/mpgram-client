@@ -206,6 +206,7 @@
 	"ChatTextField": "Text field in chat",
 	"BuiltinImageViewer": "Built-in image viewer",
 	"LargeMusicCover": "Large player cover",
+	"LegacyUI": "Legacy UI",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Wait for page to load",
@@ -220,6 +221,8 @@
 	"NetworkAccess": "Network access",
 	"MobileData": "Data",
 	"WiFi": "Wi-Fi",
+	"Longpoll": "Longpoll",
+	"UpdatesInterval": "Updates interval",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Load media thumbnails",

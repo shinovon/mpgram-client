@@ -206,6 +206,7 @@
 	"ChatTextField": "Camp de text a xat",
 	"BuiltinImageViewer": "Visualitzador d'imatges integrat",
 	"LargeMusicCover": "Coberta de reproductor gran", // Untranslated
+	"LegacyUI": "Legacy UI", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Espera que pàgina es carregui",
@@ -220,6 +221,8 @@
 	"NetworkAccess": "Accés a xarxa",
 	"MobileData": "Dades",
 	"WiFi": "Wi-Fi",
+	"Longpoll": "Longpoll", // Untranslated
+	"UpdatesInterval": "Updates interval", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "Carrega miniatures mèdia",
@@ -301,6 +304,7 @@
 	"Geo": "Geo: ",
 	"Photo": "Photo", // Untranslated
 	"Video": "Video", // Untranslated
+	"VoiceMessage": "Voice message", // Untranslated
 	
 	// Chat actions
 	"PinnedMessage_Action": " fixar missatge",

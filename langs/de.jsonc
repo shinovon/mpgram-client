@@ -206,6 +206,7 @@
 	"ChatTextField": "Text Feld im Chat",
 	"BuiltinImageViewer": "Built-in image viewer", // Untranslated
 	"LargeMusicCover": "Large player cover", // Untranslated
+	"LegacyUI": "Legacy UI", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Warte bis Seite geladen",
@@ -220,6 +221,8 @@
 	"NetworkAccess": "Network access", // Untranslated
 	"MobileData": "Data", // Untranslated
 	"WiFi": "Wi-Fi", // Untranslated
+	"Longpoll": "Longpoll", // Untranslated
+	"UpdatesInterval": "Updates interval", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "Lade Medien-Miniaturansichten",
@@ -301,6 +304,7 @@
 	"Geo": "Geo: ",
 	"Photo": "Photo", // Untranslated
 	"Video": "Video", // Untranslated
+	"VoiceMessage": "Voice message", // Untranslated
 	
 	// Chat actions
 	"PinnedMessage_Action": " anghängte Nachricht",
