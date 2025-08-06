@@ -865,9 +865,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
 					if (canWrite) {
 	//					if (attachIcon != null) g.drawImage(attachIcon, 8, by + ((bottom - 24) >> 1), 0);
-						if (keyboard != null && keyboard.isVisible()) {
+						if (keyboard != null) {
 							keyboard.drawTextBox(g, 10, by, w - 40, bottom);
-							keyboard.drawOverlay(g);
+							if (keyboard.isVisible()) keyboard.drawOverlay(g);
 							g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
 						} else if (text == null || text.length() == 0) {
 							g.setFont(MP.medPlainFont);
@@ -1080,7 +1080,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		int game = mapGameAction(key);
 		key = mapKey(key);
 		boolean repaint = false;
-		if (key == -7 || (MP.blackberry && (key == 'p' || key == 'P'))) {
+		if (keyboard != null && keyboard.isVisible() && (repeat ? keyboard.keyRepeated(key) : keyboard.keyPressed(key))) {
+			// keyboard grabbed event
+		} else if (key == -7 || (MP.blackberry && (key == 'p' || key == 'P'))) {
 			if (repeat) return;
 			// back
 			if (menuFocused) {
@@ -1101,7 +1103,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				fieldAnimTarget = MP.smallBoldFontHeight + 4;
 			}
 			repaint = true;
-		} else if (keyboard != null && keyboard.isVisible() && (repeat ? keyboard.keyRepeated(key) : keyboard.keyPressed(key))) {
 		} else if (key == -6 || (MP.blackberry && (key == 'q' || key == 'Q'))) {
 			if (repeat) return;
 			// menu
@@ -1731,6 +1732,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 
 	void showMenu(UIItem item, int[] menu) {
+		if (keyboard != null && keyboard.isVisible()) onKeyboardCancel();
 		kineticScroll = 0;
 		this.menuItem = item;
 		this.menu = menu;
@@ -1833,6 +1835,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 //			fieldFocused = true;
 			MP.display(MP.writeForm(id, null, item.origText, Integer.toString(item.id), null, null));
 		}
+		if (keyboard != null) {
+			keyboard.setText(text);
+		}
 		queueRepaint();
 	}
 	
@@ -1852,6 +1857,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		replyMsgId = 0;
 		editMsgId = 0;
 		file = null;
+		if (keyboard != null) {
+			keyboard.clear();
+		}
 	}
 	
 	private void updateColors() {
@@ -2127,15 +2135,19 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	public void onKeyboardTextUpdated() {
 		text = keyboard.getText();
+		queueRepaint();
 	}
 	
 	public void onKeyboardDone() {
-		// send
+		skipRender = false;
 		keyboard.hide();
+		queueRepaint();
 	}
 	
 	public void onKeyboardCancel() {
+		skipRender = false;
 		keyboard.hide();
+		queueRepaint();
 	}
 	
 	public void onKeyboardRepaintRequested() {
@@ -2144,6 +2156,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	public void onTextBoxRepaintRequested() {
 		queueRepaint();
+	}
+	
+	public boolean requestLanguageChange() {
+		// TODO
+		return false;
 	}
 	
 	//

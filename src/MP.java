@@ -1334,7 +1334,7 @@ public class MP extends MIDlet
 					((MPChat) current).sent();
 				}
 				
-				if (reopenChat || !((MPChat) current).update() || !((MPChat) current).endReached()) {
+				if (reopenChat || !longpoll || !((MPChat) current).update() || !((MPChat) current).endReached()) {
 					// load latest messages
 					commandAction(latestCmd, current);
 				} else if (display.getCurrent() != current) {
@@ -1796,7 +1796,7 @@ public class MP extends MIDlet
 					} else throw e;
 				}
 
-				if (reopenChat || !form.update() || !form.endReached()) {
+				if (reopenChat || !longpoll || !form.update() || !form.endReached()) {
 					// see ChatForm#postLoad() for answer handling
 					form.setBotAnswer(j);
 					commandAction(latestCmd, current);
@@ -1839,7 +1839,7 @@ public class MP extends MIDlet
 				String[] s = (String[]) param;
 				MP.api("pinMessage&peer=".concat(s[0].concat("&id=").concat(s[1])));
 				
-				if (reopenChat || !((MPChat) current).update() || !((MPChat) current).endReached()) {
+				if (reopenChat || !longpoll || !((MPChat) current).update() || !((MPChat) current).endReached()) {
 					// load latest messages
 					commandAction(latestCmd, current);
 				} else if (display.getCurrent() != current) {
@@ -1862,7 +1862,7 @@ public class MP extends MIDlet
 				MP.api(sb.toString());
 				
 				goBackTo((Displayable) form.chatForm);
-				if (reopenChat || !((MPChat) current).update() || !((MPChat) current).endReached()) {
+				if (reopenChat || !longpoll || !((MPChat) current).update() || !((MPChat) current).endReached()) {
 					// load latest messages
 					commandAction(latestCmd, (Displayable) form.chatForm);
 				}
@@ -2795,7 +2795,7 @@ public class MP extends MIDlet
 				sending = true;
 
 				display(loadingAlert(L[Sending]), d);
-				if (reopenChat && MP.updatesThread != null) {
+				if ((reopenChat || !longpoll) && MP.updatesThread != null) {
 					MP.cancel(MP.updatesThread, true);
 				}
 				start(RUN_SEND_MESSAGE, new Object[] { t, writeTo, replyTo, edit, sendFile, sendChoice, fwdPeer, fwdMsg });
@@ -3221,7 +3221,7 @@ public class MP extends MIDlet
 				if (sending || p == null) return;
 				sending = true;
 
-				if (reopenChat) {
+				if (reopenChat || !longpoll) {
 					display(loadingAlert(L[Sending]), current);
 					if (MP.updatesThread != null) {
 						MP.cancel(MP.updatesThread, true);
@@ -3243,7 +3243,7 @@ public class MP extends MIDlet
 				if (s == null) return;
 
 				display(loadingAlert(L[Loading]), current);
-				if (reopenChat && MP.updatesThread != null) {
+				if ((reopenChat || !longpoll) && MP.updatesThread != null) {
 					MP.cancel(MP.updatesThread, true);
 				}
 				start(RUN_PIN_MESSAGE, s);
@@ -3274,7 +3274,7 @@ public class MP extends MIDlet
 			sending = true;
 
 			display(loadingAlert(L[Sending]), current);
-			if (reopenChat && MP.updatesThread != null) {
+			if ((reopenChat || !longpoll) && MP.updatesThread != null) {
 				MP.cancel(MP.updatesThread, true);
 			}
 			start(RUN_SEND_MESSAGE, new Object[] { t, ((ChatForm) current).id, null, null, null, null, null, null });
@@ -3285,7 +3285,7 @@ public class MP extends MIDlet
 			JSONObject s = (JSONObject) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 			
-			if (reopenChat && MP.updatesThread != null) {
+			if ((reopenChat ||!longpoll) && MP.updatesThread != null) {
 				MP.cancel(MP.updatesThread, true);
 			}
 			imagesToLoad.removeAllElements();

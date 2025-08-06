@@ -345,6 +345,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 		text = "";
 		caretPosition = 0;
 		updateText = true;
+		selectionStart = selectionEnd = -1;
 	}
 	
 	/**
@@ -358,6 +359,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 			currentLayout = langsIdx[lang = 0];
 		}
 		updateText = true;
+		selectionStart = selectionEnd = -1;
 	}
 
 	
@@ -579,7 +581,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 					if(lw < 0) {
 						lw = textFont.stringWidth(ls);
 					}
-					int ly = textY - yo + (th * i);
+					int ly = textY + (th * i);
 					g.setColor(caretColor);
 					g.fillRect(x + 2 + lx, ly, lw, th);
 					g.setColor(~caretColor);
@@ -1311,6 +1313,9 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 	private void langKey() {
 		shifted = false;
 		int l = langs.length;
+		if (l > 2 && listener != null && listener.requestLanguageChange()) {
+			return;
+		}
 		lang++;
 		if(lang >= l) {
 			lang = 0;
@@ -1349,6 +1354,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 
 	private void textUpdated() {
 		if(caretPosition > text.length()) caretPosition = text.length();
+		updateText = true;
 		if(listener != null) listener.onKeyboardTextUpdated();
 		_requestRepaint();
 	}
