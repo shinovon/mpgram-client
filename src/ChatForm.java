@@ -659,6 +659,10 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 						if (media.has("audio")) {
 							JSONObject audio = media.getObject("audio");
 							if (audio.getBoolean("voice", false)) {
+								int time = audio.getInt("time");
+								sb.append(MP.L[VoiceMessage]).append('\n')
+								.append(time / 60).append(':').append(MP.n(time % 60));
+								nameSet = true;
 								voice = true;
 							} else {
 								if ((t = audio.getString("artist", null)) != null && t.length() != 0) {
@@ -677,7 +681,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 							}
 						}
 						sb.append('\n');
-						if (!media.isNull("size")) {
+						if (!voice && !media.isNull("size")) {
 							long size = media.getLong("size");
 							if (size >= 1024 * 1024) {
 								size = (size * 100) / (1024 * 1024);
