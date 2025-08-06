@@ -213,7 +213,7 @@ public class MP extends MIDlet
 	static boolean chatUpdates = true;
 	static boolean chatStatus = false;
 	static boolean focusNewMessages = false;
-	static long updatesDelay = 3000L;
+	static long updatesDelay = 1000L;
 	static int updatesTimeout = 30;
 	static boolean sendTyping = true;
 	static int chatsListFontSize = 0; // 0: default, 1: small, 2: medium
