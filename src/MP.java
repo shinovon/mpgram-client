@@ -243,6 +243,7 @@ public class MP extends MIDlet
 	static boolean forceKeyUI;
 	static int downloadMethod; // TODO decide
 	static String downloadPath;
+	static boolean longpoll = true;
 	
 	// platform
 	static boolean symbianJrt;
@@ -652,6 +653,7 @@ public class MP extends MIDlet
 //#endif
 		
 		reopenChat = s40;
+		longpoll = !s40;
 		
 		// load settings
 		try {
@@ -712,6 +714,7 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 			downloadPath = j.getString("downloadPath", downloadPath);
 //#endif
+			longpoll = j.getBoolean("longpoll", longpoll);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -1451,8 +1454,11 @@ public class MP extends MIDlet
 						sb.setLength(0);
 						sb.append("updates&media=1&read=1&peer=").append(form.id())
 						.append("&offset=").append(offset)
-						.append("&timeout=").append(updatesTimeout)
+						.append("&timeout=").append(longpoll ? updatesTimeout : 1)
 						.append("&message=").append(form.firstMsgId());
+						if (!longpoll) {
+							sb.append("&longpoll=0");
+						}
 						if (form.topMsgId() != 0) {
 							sb.append("&top_msg=").append(form.topMsgId());
 						}
@@ -1488,6 +1494,9 @@ public class MP extends MIDlet
 							}
 						}
 						
+						if (!longpoll) {
+							Thread.sleep(updatesTimeout * 1000);
+						}
 					} catch (Exception e) {
 						if (e.toString().indexOf("Interrupted") != -1 || e == cancelException) {
 							form.setUpdate(false);
@@ -2482,8 +2491,9 @@ public class MP extends MIDlet
 							L[KeepSessionAlive],
 							L[UseUnicode],
 //#ifndef NO_ZIP
-							L[UseCompression]
+							L[UseCompression],
 //#endif
+							"Longpoll" // TODO: unlocalized
 					}, null);
 					behChoice.setSelectedIndex(i = 0, useLoadingForm);
 					behChoice.setSelectedIndex(++i, jsonStream);
@@ -2495,6 +2505,7 @@ public class MP extends MIDlet
 //#ifndef NO_ZIP
 					behChoice.setSelectedIndex(++i, compress);
 //#endif
+					behChoice.setSelectedIndex(++i, longpoll);
 					behChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(behChoice);
 					
@@ -2644,6 +2655,7 @@ public class MP extends MIDlet
 //#ifndef NO_ZIP
 				compress = behChoice.isSelected(++i);
 //#endif
+				longpoll = behChoice.isSelected(++i);
 				
 				if ((updatesTimeout = updateTimeoutGauge.getValue() * 5) < 5) {
 					updateTimeoutGauge.setValue((updatesTimeout = 5) / 5);
@@ -2724,6 +2736,7 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 					j.put("downloadPath", downloadPath);
 //#endif
+					j.put("longpoll", longpoll);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
