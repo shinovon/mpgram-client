@@ -1082,6 +1082,20 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 	}
 	
+	private int[] subMenu(int focus) {
+		switch (focus) {
+		case FOCUS_MEDIA:
+			if (mediaPlayable) {
+				return new int[] { Play_Item, Download };
+			} else if (photo) {
+				return new int[] { ViewImage, Download };
+			} else if (mediaDownload) {
+				return new int[] { Download };
+			}
+		}
+		return null;
+	}
+	
 	int[] menu() {
 		if (selected) {
 			return null;
@@ -1092,17 +1106,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		int[] item = focusChild != null ? focusChild.menu() : null;
 		
 		if (item == null && subFocusCurrent != -1 && subFocusLength != 0) {
-			switch (subFocus[subFocusCurrent]) {
-			case FOCUS_MEDIA:
-				if (mediaPlayable) {
-					item = new int[] { Play_Item, Download };
-				} else if (photo) {
-					item = new int[] { ViewImage, Download };
-				} else if (mediaDownload) {
-					item = new int[] { Download };
-				}
-				break;
-			}
+			item = subMenu(subFocus[subFocusCurrent]);
 		}
 		
 		int[] general = new int[10];
@@ -1157,11 +1161,6 @@ public class UIMessage extends UIItem implements LangConstants {
 			x -= w - cw;
 		}
 		x -= (out && w < 900 ? MARGIN_SIDE : 0);
-		if (longTap) {
-			selected = true;
-			((ChatCanvas) container).selected(this);
-			return true;
-		}
 		if (text != null && text.focusable && y > text.y && y < text.y + text.contentHeight) {
 			focusChild = text;
 			if (text.tap(x - PADDING_WIDTH - MARGIN_WIDTH, y - text.y, longTap))
@@ -1171,7 +1170,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			menuAction(GoTo);
 			return true;
 		}
-		if (x < contentWidth) {
+		if (x > 0 && x < contentWidth) {
 			for (int i = 0; i < touchZones.length && touchZones[i] != Integer.MIN_VALUE; i += 5) {
 				if (x >= touchZones[i] && y >= touchZones[i + 1] && x <= touchZones[i + 2] && y <= touchZones[i + 3]) {
 					int focus = touchZones[i + 4];
@@ -1180,6 +1179,11 @@ public class UIMessage extends UIItem implements LangConstants {
 							subFocus(subFocusCurrent = j);
 							break;
 						}
+					}
+					int[] menu;
+					if (longTap && (menu = subMenu(focus)) != null) {
+						((ChatCanvas) container).showMenu(this, menu);
+						return true;
 					}
 					if (!longTap && action(focus)) {
 						return true;
