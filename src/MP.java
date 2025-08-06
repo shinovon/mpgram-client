@@ -3014,7 +3014,8 @@ public class MP extends MIDlet
 //#endif
 			return;
 		}
-		if (c == cancelCmd && (d instanceof List) && !(d instanceof ChatsList)) { // go back to write form from file picker
+		if (c == cancelCmd && (d instanceof List) && !(d instanceof ChatsList) && fileMode) {
+			// go back to write form from file picker
 			goBackTo(writeForm);
 			return;
 		}
