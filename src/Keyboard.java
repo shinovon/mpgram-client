@@ -548,7 +548,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 				ty += th;
 			}
 			int cx = x + 2 + caretX;
-			int cy = textY + (th * caretRow);
+			int cy = textY - yo + (th * caretRow);
 			if(selectionEnd != -1) {
 				int strow = startRow;
 				int endrow = endRow;
@@ -581,7 +581,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 					if(lw < 0) {
 						lw = textFont.stringWidth(ls);
 					}
-					int ly = textY + (th * i);
+					int ly = textY - yo + (th * i);
 					g.setColor(caretColor);
 					g.fillRect(x + 2 + lx, ly, lw, th);
 					g.setColor(~caretColor);
