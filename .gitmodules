@@ -1,0 +1,3 @@
+[submodule "j2mekeyboard"]
+	path = j2mekeyboard
+	url = https://github.com/shinovon/j2mekeyboard-library

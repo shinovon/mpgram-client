@@ -546,7 +546,7 @@ public class UIMessage extends UIItem implements LangConstants {
 					g.fillRect(x, y + 1, photoRenderWidth, photoRenderHeight);
 				} else {
 					int clipX = g.getClipX(), clipY = g.getClipY(), clipW = g.getClipWidth(), clipH = g.getClipHeight();
-					g.setClip/*clipRect*/(x, y + 1, photoRenderWidth, photoRenderHeight);
+					g.clipRect(x, y + 1, photoRenderWidth, photoRenderHeight);
 					g.drawImage(mediaImage, x, y + 1, 0);
 					g.setClip(clipX, clipY, clipW, clipH);
 				}

@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="res"/>
+	<classpathentry kind="src" path="j2mekeyboard/res"/>
 	<classpathentry kind="con" path="org.elipse.mtj.JavaMEContainer/KEmulator nnmod/KEmulator"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
