@@ -264,6 +264,7 @@ public class MP extends MIDlet
 	static boolean sending;
 	static boolean updatesRunning;
 	static Object updatesLock = new Object();
+	static boolean downloading;
 	
 	private static final Object imagesLoadLock = new Object();
 	private static final Vector imagesToLoad = new Vector(); // TODO hashtable?
@@ -1745,16 +1746,18 @@ public class MP extends MIDlet
 			break;
 		}
 		case RUN_CANCEL_UPDATES: {
-			try {
-				api("cancelUpdates");
-			} catch (Exception ignored) {}
-			try {
-				Thread.sleep(100);
-			} catch (Exception e) {
-				break;
+			if (!longpoll) {
+				try {
+					api("cancelUpdates");
+				} catch (Exception ignored) {}
+				try {
+					Thread.sleep(100);
+				} catch (Exception e) {
+					break;
+				}
+				if (!closingConnections.contains(param))
+					break;
 			}
-			if (!closingConnections.contains(param))
-				break;
 			// continue
 		}
 		case RUN_CLOSE_CONNECTION: {
@@ -2008,9 +2011,13 @@ public class MP extends MIDlet
 		if (thread == null) return;
 		if (updates) updatesThread = null;
 		Connection c = (Connection) threadConnections.get(thread);
-		if (c == null || closingConnections.contains(c)) {
+		if (c == null) {
+			if (updates && longpoll) {
+				thread.interrupt();
+			}
 			return;
 		}
+		if (closingConnections.contains(c)) return;
 		midlet.start(updates ? RUN_CANCEL_UPDATES : RUN_CLOSE_CONNECTION, c);
 	}
 
@@ -2518,20 +2525,18 @@ public class MP extends MIDlet
 							L[LoadMediaThumbnails],
 //#ifndef NO_AVATARS
 							L[LoadAvatars],
+							L[RoundAvatars],
 //#endif
 							L[MultiThreadedLoading],
 //#ifndef NO_AVATARS
-							L[RoundAvatars]
 //#endif
 					}, null);
 					imagesChoice.setSelectedIndex(i = 0, loadThumbs);
 //#ifndef NO_AVATARS
 					imagesChoice.setSelectedIndex(++i, loadAvatars);
-//#endif
-					imagesChoice.setSelectedIndex(++i, threadedImages);
-//#ifndef NO_AVATARS
 					imagesChoice.setSelectedIndex(++i, roundAvatars);
 //#endif
+					imagesChoice.setSelectedIndex(++i, threadedImages);
 					imagesChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(imagesChoice);
 					
@@ -2667,11 +2672,9 @@ public class MP extends MIDlet
 				loadThumbs = imagesChoice.isSelected(i = 0);
 //#ifndef NO_AVATARS
 				loadAvatars = imagesChoice.isSelected(++i);
-//#endif
-				threadedImages = imagesChoice.isSelected(++i);
-//#ifndef NO_AVATARS
 				roundAvatars = imagesChoice.isSelected(++i);
 //#endif
+				threadedImages = imagesChoice.isSelected(++i);
 				
 //#ifndef NO_AVATARS
 				avatarsCache = avaCacheChoice.getSelectedIndex();
@@ -3005,7 +3008,7 @@ public class MP extends MIDlet
 					downloadPathField.setString(path);
 					goBackTo(settingsForm);
 				} else {
-					// TODO
+					// TODO download
 				}
 			}
 //#endif
