@@ -81,6 +81,7 @@
 	// Settings commands
 	"Logout": "Ausloggen",
 	"ClearCache": "Cache löschen",
+	"Locate": "Locate", // Untranslated
 	
 	// Chats list commands
 	"Folders": "Ordner",
@@ -113,6 +114,8 @@
 	"Call": "Anruf",
 	"Download": "Download",
 	"Play_Item": "Play", // Untranslated
+	"RunBotAction": "Run", // Untranslated
+	"SaveHere": "Save here", // Untranslated
 	
 	// Chat form commands
 	"WriteMessage": "Schreibe Nachricht",
@@ -181,6 +184,7 @@
 	"APIDisabled_Alert": "This instance does not support API!", // Untranslated
 	"ClientOutdated_Alert": "Client outdated!", // Untranslated
 	"InvalidInstancePassword_Alert": "Invalid instance password!", // Untranslated
+	"InvalidSessionCode_Alert": "Invalid session code!", // Untranslated
 	"Retry": "Retry", // Untranslated
 	
 	// Settings sections
@@ -279,6 +283,8 @@
 	"StickersAdded_Alert": "Stickers added", // Untranslated
 	"ChooseNetwork_Alert": "Choose network access point", // Untranslated
 	"FailedToLoadImage": "Failed to load image", // unwrapped, should be short // Untranslated
+	"TextCopied_Alert": "Text copied", // Untranslated
+	"NotEnoughMemory_Alert": "Not enough memory", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Mediem",

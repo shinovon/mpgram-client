@@ -70,7 +70,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 			try {
 				Thread.sleep(100);
 			} catch (Exception ignored) {}
-			MP.display(new Alert("Error", "Not enough memory to continue viewing.", null, AlertType.ERROR)); // TODO unlocalized
+			MP.display(MP.errorAlert(MP.L[NotEnoughMemory_Alert]), this);
 			return;
 		}
 	}

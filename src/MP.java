@@ -763,7 +763,7 @@ public class MP extends MIDlet
 		
 		logoutCmd = new Command(L[Logout], Command.ITEM, 1);
 		clearCacheCmd = new Command(L[ClearCache], Command.ITEM, 1);
-		downloadPathCmd = new Command("Locate", Command.ITEM, 1); // TODO unlocalized
+		downloadPathCmd = new Command(L[Locate], Command.ITEM, 1);
 
 		foldersCmd = new Command(L[Folders], Command.SCREEN, 4);
 		refreshCmd = new Command(L[Refresh], Command.SCREEN, 5);
@@ -781,7 +781,7 @@ public class MP extends MIDlet
 		deleteMsgCmd = new Command(L[Delete], Command.ITEM, 8);
 		editMsgCmd = new Command(L[Edit], Command.ITEM, 9);
 		gotoMsgCmd = new Command(L[GoTo], Command.ITEM, 1);
-		botCallbackCmd = new Command("", Command.ITEM, 1); // TODO unlocalized
+		botCallbackCmd = new Command(L[RunBotAction], Command.ITEM, 1);
 		banMemberCmd = new Command(L[BanMember], Command.ITEM, 11);
 		pinMsgCmd = new Command(L[Pin], Command.ITEM, 10);
 		postCommentsCmd = new Command(L[Comments], Command.ITEM, 1); 
@@ -2237,7 +2237,7 @@ public class MP extends MIDlet
 					// user code
 					user = ((TextBox) d).getString().trim();
 					if (user.length() < 32) {
-						display(errorAlert(""), null); // TODO unlocalized
+						display(errorAlert(L[InvalidSessionCode_Alert]), null);
 						return;
 					}
 					writeAuth();
@@ -3086,7 +3086,7 @@ public class MP extends MIDlet
 			try {
 				if (checkClass("com.nokia.mid.ui.Clipboard")) {
 					NokiaAPI.copy(((TextBox) d).getString());
-					display(infoAlert("Text copied"), current); // TODO unlocalized
+					display(infoAlert(L[TextCopied_Alert]), current);
 					return;
 				}
 			} catch (Throwable ignored) {}
@@ -3845,8 +3845,7 @@ public class MP extends MIDlet
 				}
 			} else {
 				if (!file) {
-					// FIXME unlocalized
-					list.append("Save here", null);
+					list.append(L[SaveHere], null);
 				}
 				FileConnection fc = (FileConnection) Connector.open("file:///".concat(path));
 				try {

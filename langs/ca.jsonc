@@ -81,6 +81,7 @@
 	// Settings commands
 	"Logout": "Tanca sessió",
 	"ClearCache": "Esborra memòria cau",
+	"Locate": "Locate", // Untranslated
 	
 	// Chats list commands
 	"Folders": "Carpetes",
@@ -113,6 +114,8 @@
 	"Call": "Truca",
 	"Download": "Baixa",
 	"Play_Item": "Reprodueix",
+	"RunBotAction": "Run", // Untranslated
+	"SaveHere": "Save here", // Untranslated
 	
 	// Chat form commands
 	"WriteMessage": "Escriu missatge",
@@ -181,6 +184,7 @@
 	"APIDisabled_Alert": "Aquesta instància no admet API!",
 	"ClientOutdated_Alert": "Client obsolet!",
 	"InvalidInstancePassword_Alert": "Mot de pas d'instància no vàlid!",
+	"InvalidSessionCode_Alert": "Invalid session code!", // Untranslated
 	"Retry": "Reintenta",
 	
 	// Settings sections
@@ -279,6 +283,8 @@
 	"StickersAdded_Alert": "Adhesius afegits",
 	"ChooseNetwork_Alert": "Selecciona punt d'accés a xarxa",
 	"FailedToLoadImage": "No s'ha pogut carregar imatge",
+	"TextCopied_Alert": "Text copied", // Untranslated
+	"NotEnoughMemory_Alert": "Not enough memory", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Mèdia",

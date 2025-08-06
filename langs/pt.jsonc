@@ -81,6 +81,7 @@
 	// Settings commands
 	"Logout": "Sair da conta",
 	"ClearCache": "Limpar cache",
+	"Locate": "Locate", // Untranslated
 
 	// Chats list commands
 	"Folders": "Pastas",
@@ -113,6 +114,8 @@
 	"Call": "Ligar",
 	"Download": "Baixar",
 	"Play_Item": "Reproduzir", 
+	"RunBotAction": "Run", // Untranslated
+	"SaveHere": "Save here", // Untranslated
 	
 	// Chat form commands
 	"WriteMessage": "Escrever mensagem",
@@ -181,6 +184,7 @@
 	"APIDisabled_Alert": "Esta instância não suporta API!",
 	"ClientOutdated_Alert": "Cliente desatualizado!",
 	"InvalidInstancePassword_Alert": "Senha da instância inválida!",
+	"InvalidSessionCode_Alert": "Invalid session code!", // Untranslated
 	"Retry": "Tentar novamente",
 	
 	// Settings sections
@@ -279,6 +283,8 @@
 	"StickersAdded_Alert": "Figurinhas adicionadas",
 	"ChooseNetwork_Alert": "Escolher rede",
 	"FailedToLoadImage": "Erro ao carregar imagem",
+	"TextCopied_Alert": "Text copied", // Untranslated
+	"NotEnoughMemory_Alert": "Not enough memory", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Mídia",

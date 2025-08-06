@@ -81,6 +81,7 @@
 	// Settings commands
 	"Logout": "Logout",
 	"ClearCache": "Clear cache",
+	"Locate": "Locate",
 	
 	// Chats list commands
 	"Folders": "Folders",
@@ -113,6 +114,8 @@
 	"Call": "Call",
 	"Download": "Download",
 	"Play_Item": "Play",
+	"RunBotAction": "Run",
+	"SaveHere": "Save here",
 	
 	// Chat form commands
 	"WriteMessage": "Write message",
@@ -181,6 +184,7 @@
 	"APIDisabled_Alert": "This instance does not support API!",
 	"ClientOutdated_Alert": "Client outdated!",
 	"InvalidInstancePassword_Alert": "Invalid instance password!",
+	"InvalidSessionCode_Alert": "Invalid session code!",
 	"Retry": "Retry",
 	
 	// Settings sections
@@ -279,6 +283,8 @@
 	"StickersAdded_Alert": "Stickers added",
 	"ChooseNetwork_Alert": "Choose network access point",
 	"FailedToLoadImage": "Failed to load image", // unwrapped, should be short
+	"TextCopied_Alert": "Text copied",
+	"NotEnoughMemory_Alert": "Not enough memory",
 	
 	// Chat form
 	"ChatMedia_Title": "Media",

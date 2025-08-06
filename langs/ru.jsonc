@@ -81,6 +81,7 @@
 	// Settings commands
 	"Logout": "Выйти",
 	"ClearCache": "Очистить кэш",
+	"Locate": "Указать путь",
 	
 	// Chats list commands
 	"Folders": "Папки",
@@ -113,6 +114,8 @@
 	"Call": "Позвонить",
 	"Download": "Скачать",
 	"Play_Item": "Воспроизвести",
+	"RunBotAction": "Выполнить",
+	"SaveHere": "Сохранить здесь",
 	
 	// Chat form commands
 	"WriteMessage": "Написать сообщение",
@@ -181,6 +184,7 @@
 	"APIDisabled_Alert": "Этот инстанс не поддерживает API!",
 	"ClientOutdated_Alert": "Клиент устарел!",
 	"InvalidInstancePassword_Alert": "Неправильный пароль инстанса!",
+	"InvalidSessionCode_Alert": "Неправильный код сессии!",
 	"Retry": "Повторить",
 	
 	// Settings sections
@@ -279,6 +283,8 @@
 	"StickersAdded_Alert": "Стикеры добавлены",
 	"ChooseNetwork_Alert": "Выберите точку доступа",
 	"FailedToLoadImage": "Не удалось загр. изобр.", // unwrapped, should be short
+	"TextCopied_Alert": "Текст скопирован",
+	"NotEnoughMemory_Alert": "Недостаточно памяти",
 	
 	// Chat form
 	"ChatMedia_Title": "Медиафайлы",

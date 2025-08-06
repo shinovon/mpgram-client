@@ -81,6 +81,7 @@
 	// Settings commands
 	"Logout": "Kirjaudu ulos",
 	"ClearCache": "Tyhjennä välimuisti",
+	"Locate": "Locate", // Untranslated
 	
 	// Chats list commands
 	"Folders": "Kansiot",
@@ -113,6 +114,8 @@
 	"Call": "Soita",
 	"Download": "Lataa",
 	"Play_Item": "Soita",
+	"RunBotAction": "Run", // Untranslated
+	"SaveHere": "Save here", // Untranslated
 	
 	// Chat form commands
 	"WriteMessage": "Kirjoita viesti",
@@ -181,6 +184,7 @@
 	"APIDisabled_Alert": "Palvelin ei tue rajapintaa!",
 	"ClientOutdated_Alert": "Vanhentunut sovellus!",
 	"InvalidInstancePassword_Alert": "Väärä palvelimen salasana!",
+	"InvalidSessionCode_Alert": "Invalid session code!", // Untranslated
 	"Retry": "Uudell.",
 	
 	// Settings sections
@@ -279,6 +283,8 @@
 	"StickersAdded_Alert": "Tarrat lisätty",
 	"ChooseNetwork_Alert": "Valitse yhteystapa",
 	"FailedToLoadImage": "Kuvan lataus epäonnistui", // unwrapped, should be short
+	"TextCopied_Alert": "Text copied", // Untranslated
+	"NotEnoughMemory_Alert": "Not enough memory", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Media",

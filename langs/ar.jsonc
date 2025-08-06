@@ -81,6 +81,7 @@
 	// Settings commands
 	"Logout": "تسجيل خروج",
 	"ClearCache": "تفريغ التخزين المؤقت",
+	"Locate": "Locate", // Untranslated
 	
 	// Chats list commands
 	"Folders": "مجلدات",
@@ -113,6 +114,8 @@
 	"Call": "اتصال",
 	"Download": "تحميل",
 	"Play_Item": "تشغيل", 
+	"RunBotAction": "Run", // Untranslated
+	"SaveHere": "Save here", // Untranslated
 	
 	// Chat form commands
 	"WriteMessage": "كتابة رسالة",
@@ -181,6 +184,7 @@
 	"APIDisabled_Alert": "هذا النموذج لا يدعم واجهة برمجة التطبيقات (API)!",
 	"ClientOutdated_Alert": "العميل منتهي الصلاحية !",
 	"InvalidInstancePassword_Alert": "كلمة مرور النموذج غير صالحة!",
+	"InvalidSessionCode_Alert": "Invalid session code!", // Untranslated
 	"Retry": "إعادة المحاولة",
 	
 	// Settings sections
@@ -279,6 +283,8 @@
 	"StickersAdded_Alert": "تم اضافة ملصق",
 	"ChooseNetwork_Alert": "اختيار نقطة وصول الشبكة",
 	"FailedToLoadImage": "فشل تحميل الصورة",
+	"TextCopied_Alert": "Text copied", // Untranslated
+	"NotEnoughMemory_Alert": "Not enough memory", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "الوسائط",

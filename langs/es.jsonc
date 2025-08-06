@@ -81,6 +81,7 @@
 	// Settings commands
 	"Logout": "Cerrar sesion",
 	"ClearCache": "Liberar datos",
+	"Locate": "Locate", // Untranslated
 	
 	// Chats list commands
 	"Folders": "Carpetas",
@@ -113,6 +114,8 @@
 	"Call": "Llamar",
 	"Download": "Descargar",
 	"Play_Item": "Reproducir",
+	"RunBotAction": "Run", // Untranslated
+	"SaveHere": "Save here", // Untranslated
 	
 	// Chat form commands
 	"WriteMessage": "Escribir mensaje",
@@ -181,6 +184,7 @@
 	"APIDisabled_Alert": "¡Esta instancia no admite API!",
 	"ClientOutdated_Alert": "¡Cliente desactualizado!",
 	"InvalidInstancePassword_Alert": "Contraseña de instancia no válida!",
+	"InvalidSessionCode_Alert": "Invalid session code!", // Untranslated
 	"Retry": "Reintentar",
 	
 	// Settings sections
@@ -279,6 +283,8 @@
 	"StickersAdded_Alert": "Pegatinas agregadas",
 	"ChooseNetwork_Alert": "Elija el punto de acceso a la red",
 	"FailedToLoadImage": "Error al cargar la imagen",
+	"TextCopied_Alert": "Text copied", // Untranslated
+	"NotEnoughMemory_Alert": "Not enough memory", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Archivos",
