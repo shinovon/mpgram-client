@@ -159,6 +159,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	int selected;
 	
 	boolean arrowShown;
+	boolean skipRender;
 	
 	// input
 	boolean hasInput;
@@ -612,20 +613,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			contentHeight = this.contentHeight;
 		}
 		
-		// focus
-		
 		if (nextFocusItem != null) {
 			focusItem(nextFocusItem, 0);
 			if (!isVisible(nextFocusItem)) scrollTo(nextFocusItem);
 			nextFocusItem = null;
-		}
-		
-		if (!touch && scrollTarget == -1) {
-			if (focusedItem == null && scrollCurrentItem == null && scrollTargetItem == null) {
-				focusItem(getFirstFocusableItemOnScreen(null, 1, clipHeight / 8), 1);
-			} else if (focusedItem != null && scrollCurrentItem == null && !isVisible(focusedItem)) {
-				scrollTo(focusedItem);
-			}
 		}
 		
 		// key scroll
@@ -650,6 +641,20 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					scrollTarget = -1;
 					animate = false;
 				}
+			}
+		}
+		
+		if (!touch && scrollTarget == -1) {
+			if (focusedItem == null && scrollCurrentItem == null && scrollTargetItem == null) {
+				int d = lastScrollDir;
+				if (d == 0) d = 1;
+				UIItem item = getItemAt(height >> 1);
+				if (item == null || !item.focusable) {
+					item = getFirstFocusableItemOnScreen(null, d, clipHeight / 4);
+				}
+				if (item != null) focusItem(item, d);
+			} else if (focusedItem != null && scrollCurrentItem == null && !isVisible(focusedItem)) {
+				scrollTo(focusedItem);
 			}
 		}
 		
@@ -683,189 +688,194 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		else if (contentHeight <= clipHeight) this.scroll = scroll = 0;
 		else if (scroll > contentHeight - clipHeight) this.scroll = scroll = contentHeight - clipHeight;
 		
-		// background
-		g.setColor(colors[COLOR_CHAT_BG]);
-		g.fillRect(0, 0, w, h);
-		g.setColor(colors[COLOR_CHAT_FG]);
-		
-		// render items
-		
-		UIItem item = firstItem;
-		if (item != null) {
-			int x = 0;
-			if (pressed && draggingHorizontally && selected == 0) {
-				int d = pointerX - pressX;
-				if (d > 0) {
-					x = d;
-				} else if (pointedItem instanceof UIMessage) {
-					x = Math.max(-100, Math.min(0, d));
-				}
-			}
+		if (!skipRender || !menuFocused) {
+			// background
+			g.setColor(colors[COLOR_CHAT_BG]);
+			g.fillRect(0, 0, w, h);
+			g.setColor(colors[COLOR_CHAT_FG]);
 			
-			g.setClip(0, top, w, clipHeight);
-			if (reverse) {
-				clipHeight += top;
-				int y = h - bottom + scroll;
-				do {
-					if (y < 0) break;
-					y -= item.contentHeight;
-					if (y > clipHeight) continue;
-					item.paint(g, pointedItem == item || x > 0 ? x : 0, y, w);
-				} while ((item = item.next) != null);
-			} else {
-				int y = top - scroll;
-				clipHeight += top;
-				do {
-					int ih = item.contentHeight;
-					if (y < -ih) {
-						y += ih;
-						continue;
+			// render items
+			
+			UIItem item = firstItem;
+			if (item != null) {
+				int x = 0;
+				if (pressed && draggingHorizontally && selected == 0) {
+					int d = pointerX - pressX;
+					if (d > 0) {
+						x = d;
+					} else if (pointedItem instanceof UIMessage) {
+						x = Math.max(-100, Math.min(0, d));
 					}
-					item.paint(g, pointedItem == item || x > 0 ? x : 0, y, w);
-					if ((y += ih) > clipHeight) break;
-				} while ((item = item.next) != null);
-			}
-		}
-		
-		g.setClip(0, 0, w, h);
-		
-		// top panel
-		if (top != 0) {
-			int th = top;
-			g.setColor(colors[COLOR_CHAT_PANEL_BG]);
-			g.fillRect(0, 0, w, th);
-			g.setColor(colors[COLOR_CHAT_PANEL_BORDER]);
-			g.drawLine(0, th, w, th);
-			
-			int tx = 4;
-			int tw = w - 8;
-			if (touch) {
-				g.setColor(colors[COLOR_CHAT_PANEL_FG]);
-				tx = 40;
-				tw = w - 80;
-				int bty = (th - 2) >> 1;
-				if (selected != 0) g.setColor(colors[COLOR_CHAT_FG]);
-				// back button
-				g.drawLine(12, bty, 28, bty);
-				g.drawLine(12, bty, 20, bty-8);
-				g.drawLine(12, bty, 20, bty+8);
+				}
 				
-				if (selected != 0) {
-					// selected messages options
-					
-					// delete
-					g.drawLine(w - 29, bty - 8, w - 13, bty + 8);
-					g.drawLine(w - 29, bty + 8, w - 13, bty - 8);
-					
-					// forward
-					g.drawLine(w - 52, bty, w - 68, bty);
-					g.drawLine(w - 68, bty, w - 68, bty + 6);
-					g.drawLine(w - 58, bty - 6, w - 52, bty);
-					g.drawLine(w - 58, bty + 6, w - 52, bty);
-					
-				} else if (query == null && mediaFilter == null) {
-					// menu button
-					g.fillRect(w - 22, bty - 6, 3, 3);
-					g.fillRect(w - 22, bty, 3, 3);
-					g.fillRect(w - 22, bty + 6, 3, 3);
+				g.setClip(0, top, w, clipHeight);
+				if (reverse) {
+					clipHeight += top;
+					int y = h - bottom + scroll;
+					do {
+						if (y < 0) break;
+						y -= item.contentHeight;
+						if (y > clipHeight) continue;
+						item.paint(g, pointedItem == item || x > 0 ? x : 0, y, w);
+					} while ((item = item.next) != null);
+				} else {
+					int y = top - scroll;
+					clipHeight += top;
+					do {
+						int ih = item.contentHeight;
+						if (y < -ih) {
+							y += ih;
+							continue;
+						}
+						item.paint(g, pointedItem == item || x > 0 ? x : 0, y, w);
+						if ((y += ih) > clipHeight) break;
+					} while ((item = item.next) != null);
 				}
 			}
-			boolean medfont = (MP.chatStatus && mediaFilter == null) || touch;
-			if (selected != 0 || mediaFilter != null) {
-				g.setFont(medfont ? MP.medPlainFont : MP.smallPlainFont);
-				g.setColor(colors[COLOR_CHAT_FG]);
-				g.drawString(selected != 0 ? Integer.toString(selected) : mediaFilter /* TODO unlocalized */, tx, medfont ? ((th - MP.medPlainFontHeight) >> 1) : 2, 0);
-			} else {
-				boolean hideStatus = medfont && (selfChat || postId != null || query != null);
-				if (title != null) {
-					Font font = hideStatus ? MP.medPlainFont : MP.smallBoldFont;
-					if (titleRender == null) {
-						titleRender = UILabel.ellipsis(title, font, tw - 4);
+			
+			g.setClip(0, 0, w, h);
+			
+			// top panel
+			if (top != 0) {
+				int th = top;
+				g.setColor(colors[COLOR_CHAT_PANEL_BG]);
+				g.fillRect(0, 0, w, th);
+				g.setColor(colors[COLOR_CHAT_PANEL_BORDER]);
+				g.drawLine(0, th, w, th);
+				
+				int tx = 4;
+				int tw = w - 8;
+				if (touch) {
+					g.setColor(colors[COLOR_CHAT_PANEL_FG]);
+					tx = 40;
+					tw = w - 80;
+					int bty = (th - 2) >> 1;
+					if (selected != 0) g.setColor(colors[COLOR_CHAT_FG]);
+					// back button
+					g.drawLine(12, bty, 28, bty);
+					g.drawLine(12, bty, 20, bty-8);
+					g.drawLine(12, bty, 20, bty+8);
+					
+					if (selected != 0) {
+						// selected messages options
+						
+						// delete
+						g.drawLine(w - 29, bty - 8, w - 13, bty + 8);
+						g.drawLine(w - 29, bty + 8, w - 13, bty - 8);
+						
+						// forward
+						g.drawLine(w - 52, bty, w - 68, bty);
+						g.drawLine(w - 68, bty, w - 68, bty + 6);
+						g.drawLine(w - 58, bty - 6, w - 52, bty);
+						g.drawLine(w - 58, bty + 6, w - 52, bty);
+						
+					} else if (query == null && mediaFilter == null) {
+						// menu button
+						g.fillRect(w - 22, bty - 6, 3, 3);
+						g.fillRect(w - 22, bty, 3, 3);
+						g.fillRect(w - 22, bty + 6, 3, 3);
 					}
+				}
+				boolean medfont = (MP.chatStatus && mediaFilter == null) || touch;
+				if (selected != 0 || mediaFilter != null) {
+					g.setFont(medfont ? MP.medPlainFont : MP.smallPlainFont);
 					g.setColor(colors[COLOR_CHAT_FG]);
-					g.setFont(font);
-					g.drawString(titleRender, tx, medfont ? (hideStatus ? (th - MP.medPlainFontHeight) >> 1 : 4) : 2, 0);
-				}
-				// TODO status ellipsis
-				if (medfont && !hideStatus) {
-					g.setColor(colors[typing != 0 ? COLOR_CHAT_STATUS_HIGHLIGHT_FG : COLOR_CHAT_STATUS_FG]);
-					g.setFont(MP.smallPlainFont);
-					String status = this.status;
-					if (status == null) {
-						status = this.defaultStatus;
-					}
-					if (status != null) {
-						g.drawString(status, tx, 4 + MP.smallBoldFontHeight, 0);
-					}
-				}
-			}
-		}
-		
-		// bottom panel
-		if (bottom != 0) {
-			g.setFont(MP.smallBoldFont);
-			g.setColor(colors[COLOR_CHAT_PANEL_BG]);
-			int by = h - bottom;
-			g.fillRect(0, by, w, bottom);
-			g.setColor(colors[COLOR_CHAT_PANEL_BORDER]);
-			g.drawLine(0, by, w, by);
-			g.setColor(colors[COLOR_CHAT_PANEL_FG]);
-			if (selected != 0) {
-				
-			} else if (fieldFocused) {
-				// TODO
-				by += 1;
-				g.drawString(MP.L[Chat], 2, by, Graphics.TOP | Graphics.LEFT);
-				g.drawString(MP.L[Back], w - 2, by, Graphics.TOP | Graphics.RIGHT);
-				if (hasInput && canWrite)
-					g.drawString(MP.L[Write], w >> 1, by, Graphics.TOP | Graphics.HCENTER);
-			} else if (keyGuide) {
-				animate = true;
-				g.drawString(MP.L[Menu], 2, by + 1, Graphics.TOP | Graphics.LEFT);
-				g.drawString(MP.L[Chat], w - 2, by + 1, Graphics.TOP | Graphics.RIGHT);
-				if (keyGuideTime == 0) {
-					keyGuideTime = now;
-				} else if (now - keyGuideTime > 3000) {
-					fieldAnimTarget = 0;
-					keyGuide = false;
-				}
-			} else if (touch) {
-				// TODO
-				g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
-				if (canWrite) {
-//					if (attachIcon != null) g.drawImage(attachIcon, 8, by + ((bottom - 24) >> 1), 0);
-					if (text == null || text.length() == 0) {
-						g.setFont(MP.medPlainFont);
-						g.drawString(MP.L[TextField_Hint], 10, by + ((bottom - MP.medPlainFontHeight) >> 1), 0);
-					} else {
-						g.setFont(MP.smallPlainFont);
+					g.drawString(selected != 0 ? Integer.toString(selected) : mediaFilter /* TODO unlocalized */, tx, medfont ? ((th - MP.medPlainFontHeight) >> 1) : 2, 0);
+				} else {
+					boolean hideStatus = medfont && (selfChat || postId != null || query != null);
+					if (title != null) {
+						Font font = hideStatus ? MP.medPlainFont : MP.smallBoldFont;
+						if (titleRender == null) {
+							titleRender = UILabel.ellipsis(title, font, tw - 4);
+						}
 						g.setColor(colors[COLOR_CHAT_FG]);
-						g.drawString(text, 10, by + ((bottom - MP.smallPlainFontHeight) >> 1), 0);
+						g.setFont(font);
+						g.drawString(titleRender, tx, medfont ? (hideStatus ? (th - MP.medPlainFontHeight) >> 1 : 4) : 2, 0);
 					}
-						
-					if ((text != null && text.length() != 0) || file != null) {
-						// send icon
-						int ty = by + ((bottom - 20) >> 1);
-						
-						g.setColor(colors[COLOR_CHAT_SEND_ICON]);
-						g.fillTriangle(w - 8 - 20, ty, w - 8, ty + 10, w - 8 - 20, ty + 20);
-						g.setColor(colors[COLOR_CHAT_PANEL_BG]);
-						g.fillTriangle(w - 8 - 20, ty, w - 8 - 18, ty + 10, w - 8 - 20, ty + 20);
-						g.drawLine(w - 8 - 20, ty + 10, w - 8 - 10, ty + 10);
-					} else {
-						// attach icon
-						int ty = by + ((bottom - 24) >> 1);
-						g.fillRect(w - 40 + 12, ty + 12, 17, 1);
-						g.fillRect(w - 40 + 20, ty + 4, 1, 17);
+					// TODO status ellipsis
+					if (medfont && !hideStatus) {
+						g.setColor(colors[typing != 0 ? COLOR_CHAT_STATUS_HIGHLIGHT_FG : COLOR_CHAT_STATUS_FG]);
+						g.setFont(MP.smallPlainFont);
+						String status = this.status;
+						if (status == null) {
+							status = this.defaultStatus;
+						}
+						if (status != null) {
+							g.drawString(status, tx, 4 + MP.smallBoldFontHeight, 0);
+						}
 					}
-				} else if (left) {
-					g.drawString(MP.L[JoinGroup], w >> 1, by + ((bottom - MP.medPlainFontHeight) >> 1), Graphics.TOP | Graphics.HCENTER);
 				}
 			}
+			
+			// bottom panel
+			if (bottom != 0) {
+				g.setFont(MP.smallBoldFont);
+				g.setColor(colors[COLOR_CHAT_PANEL_BG]);
+				int by = h - bottom;
+				g.fillRect(0, by, w, bottom);
+				g.setColor(colors[COLOR_CHAT_PANEL_BORDER]);
+				g.drawLine(0, by, w, by);
+				g.setColor(colors[COLOR_CHAT_PANEL_FG]);
+				if (selected != 0) {
+					
+				} else if (fieldFocused) {
+					// TODO
+					by += 1;
+					g.drawString(MP.L[Chat], 2, by, Graphics.TOP | Graphics.LEFT);
+					g.drawString(MP.L[Back], w - 2, by, Graphics.TOP | Graphics.RIGHT);
+					if (hasInput && canWrite)
+						g.drawString(MP.L[Write], w >> 1, by, Graphics.TOP | Graphics.HCENTER);
+				} else if (keyGuide) {
+					animate = true;
+					g.drawString(MP.L[Menu], 2, by + 1, Graphics.TOP | Graphics.LEFT);
+					g.drawString(MP.L[Chat], w - 2, by + 1, Graphics.TOP | Graphics.RIGHT);
+					if (keyGuideTime == 0) {
+						keyGuideTime = now;
+					} else if (now - keyGuideTime > 3000) {
+						fieldAnimTarget = 0;
+						keyGuide = false;
+					}
+				} else if (touch) {
+					// TODO
+					g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
+					if (canWrite) {
+	//					if (attachIcon != null) g.drawImage(attachIcon, 8, by + ((bottom - 24) >> 1), 0);
+						if (text == null || text.length() == 0) {
+							g.setFont(MP.medPlainFont);
+							g.drawString(MP.L[TextField_Hint], 10, by + ((bottom - MP.medPlainFontHeight) >> 1), 0);
+						} else {
+							g.setFont(MP.smallPlainFont);
+							g.setColor(colors[COLOR_CHAT_FG]);
+							g.drawString(text, 10, by + ((bottom - MP.smallPlainFontHeight) >> 1), 0);
+						}
+							
+						if ((text != null && text.length() != 0) || file != null) {
+							// send icon
+							int ty = by + ((bottom - 20) >> 1);
+							
+							g.setColor(colors[COLOR_CHAT_SEND_ICON]);
+							g.fillTriangle(w - 8 - 20, ty, w - 8, ty + 10, w - 8 - 20, ty + 20);
+							g.setColor(colors[COLOR_CHAT_PANEL_BG]);
+							g.fillTriangle(w - 8 - 20, ty, w - 8 - 18, ty + 10, w - 8 - 20, ty + 20);
+							g.drawLine(w - 8 - 20, ty + 10, w - 8 - 10, ty + 10);
+						} else {
+							// attach icon
+							int ty = by + ((bottom - 24) >> 1);
+							g.fillRect(w - 40 + 12, ty + 12, 17, 1);
+							g.fillRect(w - 40 + 20, ty + 4, 1, 17);
+						}
+					} else if (left) {
+						g.drawString(MP.L[JoinGroup], w >> 1, by + ((bottom - MP.medPlainFontHeight) >> 1), Graphics.TOP | Graphics.HCENTER);
+					}
+				}
+			}
+		} else {
+			g.setClip(0, 0, w, h);
 		}
 		
 		// popup menu
 		if (menuAnimProgress != 0) {
+			skipRender = true;
 			int my = h - (int)menuAnimProgress;
 			g.setColor(colors[COLOR_CHAT_MENU_BG]);
 			g.fillRect(0, my, w, (int)menuAnimProgress);
@@ -886,6 +896,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				}
 			}
 		} else {
+			skipRender = false;
 			if (touch && (scroll >= clipHeight || (!endReached && hasOffset))) {
 				g.setColor(colors[COLOR_CHAT_PANEL_FG]);
 				int tx = width - 40, ty = reverse ? height - bottom - 40 : top + 40;
@@ -1210,7 +1221,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				// not touching arrow icon
 				!(arrowShown && x > width - 40
 					&& (reverse ? (y > height - bottom - 40) : (y < top + 40)))) {
-			pointedItem = getItemAt(x, y);
+			pointedItem = getItemAt(y);
 			contentPressed = true;
 		} else {
 			pointedItem = null;
@@ -1229,7 +1240,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					startSelectDir = d;
 				}
 				if (heldItem instanceof UIMessage) {
-					UIItem item = getItemAt(x, y);
+					UIItem item = getItemAt(y);
 					if (item instanceof UIMessage && (item != pointedItem)) {
 						if (d == startSelectDir) {
 							if (((UIMessage) heldItem).selected) {
@@ -1462,6 +1473,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 
 	protected void sizeChanged(int width, int height) {
+		skipRender = false;
 		queueRepaint();
 	}
 	
@@ -1640,19 +1652,20 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 	
 	private UIItem getFirstFocusableItemOnScreen(UIItem offset, int dir, int offsetHeight) {
-		if (offset == null) offset = firstItem;
+		offset = offset == null ? (dir == 1 ? firstItem : lastItem) : (dir == -1 ? offset.prev : offset.next);
 		UIItem res = null;
-		for (offset = (dir == -1 ? offset.prev : offset.next); offset != null; offset = (dir == -1 ? offset.prev : offset.next)) {
+		while (offset != null) {
 			UIItem t = offset;
 			if (t.focusable && isVisible(t, offsetHeight)) {
 				res = t;
 				break;
 			}
+			offset = (dir == -1 ? offset.prev : offset.next);
 		}
 		return res;
 	}
 	
-	private UIItem getItemAt(int x, int y) {
+	private UIItem getItemAt(int y) {
 		if (reverse) {
 			y = height + scroll - bottom - y;
 		} else {
@@ -1678,6 +1691,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		this.menu = menu;
 		menuCurrent = touch ? -1 : 0;
 		menuFocused = true;
+		skipRender = false;
 		int len = menu.length;
 		for (int i = 0; i < len; i++) {
 			if (menu[i] == Integer.MIN_VALUE) {
@@ -1709,6 +1723,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			colors[i] = colorsCopy[i];
 		}
 		updateColors();
+		skipRender = false;
 		queueRepaint();
 	}
 	
