@@ -113,6 +113,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 	// текстбокс
 	int textBoxX;
 	int textBoxY;
+	int textBoxYOffset;
 	private int textBoxWidth;
 	private int textBoxHeight;
 	private int removedTextWidth;
@@ -523,7 +524,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 		this.textBoxWidth = width;
 		this.textBoxHeight = height;
 		g.setFont(textFont);
-		int textY = multiLine ? y : y + ((height - textFont.getHeight()) >> 1);
+		int textY = y;
 		String s = "";
 		boolean hint = text.length() == 0;
 		if(!hint) {
@@ -536,10 +537,11 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 		int th = textFont.getHeight() + 2;
 		if(multiLine && !hint) {
 			String[] arr = getTextArray();
-			int yo = 0;
+			int yo = -(height - textFont.getHeight()) >> 1;
 			while(th * arr.length > height + yo) {
 				yo += th;
 			}
+			textBoxYOffset = -yo;
 			int ty = -yo;
 			for(int i = 0; i < arr.length; i++) {
 				if(ty >= 0) {
@@ -590,6 +592,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 			}
 			drawCaret(g, cx, cy);
 		} else {
+			textY += (height - textFont.getHeight()) >> 1;
 			if(!hint) {
 				int ww = 0;
 				while(textFont.stringWidth(s) >= width - 4) {
@@ -660,7 +663,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 			px = x;
 			py = y;
 			textBoxPressed = true;
-			_setCaretPosition(x - textBoxX, y - textBoxY);
+			_setCaretPosition(x - textBoxX, y - textBoxY - textBoxYOffset);
 			selectionEnd = -1;
 			selectionStart = caretPosition;
 			startX = caretX;
@@ -679,7 +682,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 	public boolean pointerReleased(int x, int y) {
 		if(pressed) {
 			if(textBoxPressed) {
-				_setCaretPosition(x - textBoxX, y - textBoxY);
+				_setCaretPosition(x - textBoxX, y - textBoxY - textBoxYOffset);
 				if(dragged) {
 					selectionEnd = caretPosition;
 					endX = caretX;
@@ -1971,7 +1974,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 				if(pressed) {
 					if(textBoxPressed) {
 						if(dragged) {
-							_setCaretPosition(px - textBoxX, py - textBoxY);
+							_setCaretPosition(px - textBoxX, py - textBoxY - textBoxYOffset);
 							selectionEnd = caretPosition;
 							endX = caretX;
 							endRow = caretRow;
