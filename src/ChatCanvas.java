@@ -213,9 +213,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		
 		if (touch) {
 			top = MP.smallBoldFontHeight + MP.smallPlainFontHeight + 8;
-//			if (attachIcon == null) {
-//				attachIcon = loadRLE("/attach.rle", colors[COLOR_CHAT_INPUT_ICON]);
-//			}
 		} else {
 			top = MP.smallBoldFontHeight + 4 + (MP.chatStatus && mediaFilter == null ? MP.smallPlainFontHeight + 4 : 0);
 		}
@@ -861,10 +858,17 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						keyGuide = false;
 					}
 				} else if (touch) {
-					// TODO
-					g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
 					if (canWrite) {
-	//					if (attachIcon != null) g.drawImage(attachIcon, 8, by + ((bottom - 24) >> 1), 0);
+						// TODO
+						g.setFont(MP.smallBoldFont);
+						g.setColor(colors[COLOR_CHAT_SEND_ICON]);
+						if (replyMsgId != 0) {
+							g.drawString(MP.L[Reply], 2, by - MP.smallBoldFontHeight, 0);
+						}
+						if (editMsgId != 0) {
+							g.drawString(MP.L[Edit], 2, by - MP.smallBoldFontHeight, 0);
+						}
+						g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
 						if (keyboard != null) {
 							keyboard.drawTextBox(g, 10, by, w - 40, bottom);
 							if (keyboard.isVisible()) keyboard.drawOverlay(g);
@@ -894,6 +898,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							g.fillRect(w - 40 + 20, ty + 4, 1, 17);
 						}
 					} else if (left) {
+						g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
 						g.drawString(MP.L[JoinGroup], w >> 1, by + ((bottom - MP.medPlainFontHeight) >> 1), Graphics.TOP | Graphics.HCENTER);
 					}
 				}
