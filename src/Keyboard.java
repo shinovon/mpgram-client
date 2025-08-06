@@ -1726,7 +1726,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 				String type = j.getNullableString("type");
 				layoutTypes[i] = type == null ? 0 : type.equals("special") ? 1 : 0;
 				if(type != null) {
-					if(type.equals("qwerty")) {
+					if(type.equals("qwerty") || type.equals("qwertz") || type.equals("azerty") || type.equals("national")) {
 						String lng = j.getNullableString("lang");
 						if(lng != null) {
 							for(int k = 0; k < supportedLanguages.length; k++) {
@@ -1807,7 +1807,11 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 		positions = new int[layouts.length][4][];
 		offsets = new int[layouts.length][4];
 		for(int l = 0; l < layouts.length; l++) {
-			double dw = (double) screenWidth / (double)layouts[l][0].length;
+			int m = 0;
+			for (int j = 0; j < layouts[l].length; j++) {
+				if (layouts[l][j].length > layouts[l][m].length) m = j;
+			}
+			double dw = (double) screenWidth / (double)layouts[l][m].length;
 			int w = (int) dw;
 			int fz = layouts[l][2].length-2;
 			int fw = ((int) (screenWidth - dw * fz)) >> 1;
