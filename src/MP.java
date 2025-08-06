@@ -2776,7 +2776,7 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 			if (c == downloadPathCmd) {
 				downloadMessage = null;
-				openFilePicker(downloadPath, false);
+				openFilePicker("", false);
 				return;
 			}
 //#endif
