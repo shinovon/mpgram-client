@@ -32,7 +32,7 @@ public class StickerPackForm extends MPForm {
 	MPChat chatForm;
 	
 	public StickerPackForm(MPChat chatForm, JSONObject json) {
-		super(json.getString("title", json.getString("short_name", MP.L[Stickers_Title])));
+		super(json.getString("title", json.getString("short_name", MP.L[LStickers_Title])));
 		this.id = json.getString("id");
 		this.accessHash = json.getString("access_hash");
 		this.chatForm = chatForm;

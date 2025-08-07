@@ -223,7 +223,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			keyboard.setTextColor(colors[COLOR_CHAT_FG]);
 			keyboard.setTextHintColor(colors[COLOR_CHAT_INPUT_ICON]);
 			keyboard.setCaretColor(colors[COLOR_CHAT_FG]);
-			keyboard.setTextHint(MP.L[TextField_Hint]);
+			keyboard.setTextHint(MP.L[LTextField_Hint]);
 		} else {
 			keyboard.setListener(this);
 			keyboard.reset();
@@ -281,7 +281,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			if ((MP.reopenChat || (query == null && mediaFilter == null))
 					&& MP.chatUpdates
 					&& (MP.updatesThread != null || MP.updatesRunning)) {
-				MP.display(MP.loadingAlert(MP.L[WaitingForPrevChat]), this);
+				MP.display(MP.loadingAlert(MP.L[LWaitingForPrevChat]), this);
 				
 				MP.cancel(MP.updatesThreadCopy, true);
 				while (MP.updatesThread != null || MP.updatesRunning) {
@@ -360,7 +360,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						
 						if (full != null && full.has("participants_count")) {
 							defaultStatus = MP.localizePlural(full.getInt("participants_count"),
-									broadcast ? _subscriber : _member);
+									broadcast ? L_subscriber : L_member);
 						}
 					} else {
 						user = true;
@@ -387,11 +387,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			this.reverse = MP.reverseChat && mediaFilter == null;
 			
 			if (query != null) {
-				title = MP.L[Search];
+				title = MP.L[LSearch];
 			} else if (selfChat) {
-				title = MP.L[SavedMessages];
+				title = MP.L[LSavedMessages];
 			} else if (postId != null || topMsgId != 0) {
-				title = MP.L[Comments];
+				title = MP.L[LComments];
 			}
 			
 			if (startBot != null) {
@@ -417,11 +417,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				sb.append("searchMessages");
 				if (mediaFilter != null) {
 					sb.append("&filter=").append(mediaFilter);
-					setTitle(MP.L[ChatMedia_Title]);
+					setTitle(MP.L[LChatMedia_Title]);
 				}
 				if (query != null) {
 					if (mediaFilter == null) {
-						setTitle(MP.L[Search_TitlePrefix].concat(title));
+						setTitle(MP.L[LSearch_TitlePrefix].concat(title));
 					}
 					MP.appendUrl(sb.append("&q="), query);
 				}
@@ -589,7 +589,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			g.fillRect(0, 0, w, h);
 			g.setColor(colors[COLOR_CHAT_FG]);
 			g.setFont(MP.medPlainFont);
-			g.drawString(MP.L[Loading], w >> 1, h >> 1, Graphics.TOP | Graphics.HCENTER);
+			g.drawString(MP.L[LLoading], w >> 1, h >> 1, Graphics.TOP | Graphics.HCENTER);
 			return;
 		}
 		
@@ -843,14 +843,14 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				} else if (fieldFocused) {
 					// TODO
 					by += 1;
-					g.drawString(MP.L[Chat], 2, by, Graphics.TOP | Graphics.LEFT);
-					g.drawString(MP.L[Back], w - 2, by, Graphics.TOP | Graphics.RIGHT);
+					g.drawString(MP.L[LChat], 2, by, Graphics.TOP | Graphics.LEFT);
+					g.drawString(MP.L[LBack], w - 2, by, Graphics.TOP | Graphics.RIGHT);
 					if (hasInput && canWrite)
-						g.drawString(MP.L[Write], w >> 1, by, Graphics.TOP | Graphics.HCENTER);
+						g.drawString(MP.L[LWrite], w >> 1, by, Graphics.TOP | Graphics.HCENTER);
 				} else if (keyGuide) {
 					animate = true;
-					g.drawString(MP.L[Menu], 2, by + 1, Graphics.TOP | Graphics.LEFT);
-					g.drawString(MP.L[Chat], w - 2, by + 1, Graphics.TOP | Graphics.RIGHT);
+					g.drawString(MP.L[LMenu], 2, by + 1, Graphics.TOP | Graphics.LEFT);
+					g.drawString(MP.L[LChat], w - 2, by + 1, Graphics.TOP | Graphics.RIGHT);
 					if (keyGuideTime == 0) {
 						keyGuideTime = now;
 					} else if (now - keyGuideTime > 3000) {
@@ -863,10 +863,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						g.setFont(MP.smallBoldFont);
 						g.setColor(colors[COLOR_CHAT_SEND_ICON]);
 						if (replyMsgId != 0) {
-							g.drawString(MP.L[Reply], 2, by - MP.smallBoldFontHeight, 0);
+							g.drawString(MP.L[LReply], 2, by - MP.smallBoldFontHeight, 0);
 						}
 						if (editMsgId != 0) {
-							g.drawString(MP.L[Edit], 2, by - MP.smallBoldFontHeight, 0);
+							g.drawString(MP.L[LEdit], 2, by - MP.smallBoldFontHeight, 0);
 						}
 						g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
 						if (keyboard != null) {
@@ -875,7 +875,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
 						} else if (text == null || text.length() == 0) {
 							g.setFont(MP.medPlainFont);
-							g.drawString(MP.L[TextField_Hint], 10, by + ((bottom - MP.medPlainFontHeight) >> 1), 0);
+							g.drawString(MP.L[LTextField_Hint], 10, by + ((bottom - MP.medPlainFontHeight) >> 1), 0);
 						} else {
 							g.setFont(MP.smallPlainFont);
 							g.setColor(colors[COLOR_CHAT_FG]);
@@ -899,7 +899,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						}
 					} else if (left) {
 						g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
-						g.drawString(MP.L[JoinGroup], w >> 1, by + ((bottom - MP.medPlainFontHeight) >> 1), Graphics.TOP | Graphics.HCENTER);
+						g.drawString(MP.L[LJoinGroup], w >> 1, by + ((bottom - MP.medPlainFontHeight) >> 1), Graphics.TOP | Graphics.HCENTER);
 					}
 				}
 			}
@@ -1115,9 +1115,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				closeMenu();
 			} else if (selected != 0) {
 				// TODO
-				showMenu(null, new int[] { Delete, Forward });
+				showMenu(null, new int[] { LDelete, LForward });
 			} else if (fieldFocused) {
-				showMenu(null, canWrite && hasInput ? new int[] { Refresh, ChatInfo, SearchMessages, SendSticker } : new int[] { Refresh, ChatInfo, SearchMessages });
+				showMenu(null, canWrite && hasInput ? new int[] { LRefresh, LChatInfo, LSearchMessages, LSendSticker } : new int[] { LRefresh, LChatInfo, LSearchMessages });
 			} else {
 				if (focusedItem != null && focusedItem.focusable) {
 					int[] menu = focusedItem.menu();
@@ -1417,7 +1417,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					}
 				} else if (x > width - 48) {
 					if (query == null && mediaFilter == null)
-						showMenu(null, new int[] { Refresh, SearchMessages });
+						showMenu(null, new int[] { LRefresh, LSearchMessages });
 				} else if (!selfChat && postId == null) {
 					openProfile();
 				}
@@ -1441,7 +1441,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 										});
 							}
 						} else {
-							showMenu(null, new int[] { SendSticker, WriteMessage });
+							showMenu(null, new int[] { LSendSticker, LWriteMessage });
 						}
 					} else { 
 //						MP.midlet.commandAction(MP.writeCmd, this);
@@ -1486,19 +1486,19 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (i < menu.length) {
 			if (menuItem == null) {
 				switch (menu[i]) {
-				case Refresh:
+				case LRefresh:
 					MP.midlet.commandAction(MP.latestCmd, this);
 					break;
-				case ChatInfo:
+				case LChatInfo:
 					openProfile();
 					break;
-				case SearchMessages:
+				case LSearchMessages:
 					MP.midlet.commandAction(MP.searchMsgCmd, this);
 					break;
-				case SendSticker:
+				case LSendSticker:
 					MP.midlet.commandAction(MP.sendStickerCmd, this);
 					break;
-				case WriteMessage:
+				case LWriteMessage:
 					if (replyMsgId != 0 || editMsgId != 0) {
 						MP.display(MP.writeForm(id, Integer.toString(Math.max(replyMsgId, topMsgId)), text, editMsgId == 0 ? null : Integer.toString(editMsgId), null, null));
 						resetInput();
@@ -1506,11 +1506,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					}
 					MP.midlet.commandAction(MP.writeCmd, this);
 					break;
-				case Delete: {
+				case LDelete: {
 					deleteSelected();
 					break;
 				}
-				case Forward: {
+				case LForward: {
 					forwardSelected();
 					break;
 				}
@@ -2176,11 +2176,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			this.status = null;
 			if (MP.chatStatus) {
 				if (wasOnline == 1) {
-					s = MP.L[Online];
+					s = MP.L[LOnline];
 				} else if (wasOnline == 2) {
-					s = MP.L[Offline];
+					s = MP.L[LOffline];
 				} else if (wasOnline != 0) {
-					s = MP.L[LastSeen] + MP.localizeDate(wasOnline, 4);
+					s = MP.L[LLastSeen] + MP.localizeDate(wasOnline, 4);
 				} else {
 					s = null;
 				}
@@ -2193,11 +2193,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		}
 		if ("userStatusOnline".equals(status.getString("_"))) {
 			wasOnline = 1;
-			s = MP.L[Online];
+			s = MP.L[LOnline];
 		} else if ((wasOnline = status.getInt("was_online", 0)) != 0) {
-			s = MP.L[LastSeen] + MP.localizeDate(wasOnline, 4);
+			s = MP.L[LLastSeen] + MP.localizeDate(wasOnline, 4);
 		} else {
-			s = MP.L[Offline];
+			s = MP.L[LOffline];
 			wasOnline = 2;
 		}
 		this.status = s;

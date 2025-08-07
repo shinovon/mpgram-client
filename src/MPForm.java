@@ -45,7 +45,7 @@ public abstract class MPForm extends Form implements LangConstants {
 		canceled = finished = false;
 
 		Ticker ticker;
-		setTicker(ticker = new Ticker(MP.L[Loading]));
+		setTicker(ticker = new Ticker(MP.L[LLoading]));
 		if (MP.useLoadingForm) {
 			MP.display(MP.loadingForm);
 		}

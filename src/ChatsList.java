@@ -71,7 +71,7 @@ public class ChatsList extends MPList {
 	
 	// forward message mode
 	public ChatsList(String peerId, String msgId) {
-		super(MP.L[Forward]);
+		super(MP.L[LForward]);
 		this.folder = 0;
 		this.peerId = peerId;
 		this.msgId = msgId;
@@ -83,7 +83,7 @@ public class ChatsList extends MPList {
 //#ifndef NO_CHAT_CANVAS
 	// forward messages
 	public ChatsList(String peerId, UIMessage[] msgs) {
-		super(MP.L[Forward]);
+		super(MP.L[LForward]);
 		this.folder = 0;
 		this.peerId = peerId;
 		this.msgId = "";
@@ -137,19 +137,19 @@ public class ChatsList extends MPList {
 				MP.appendOneLine(sb, MP.getName(user, false));
 				
 				if (user.getBoolean("b", false)) { // bot
-					sb.append('\n').append(MP.L[Bot]);
+					sb.append('\n').append(MP.L[LBot]);
 				} else if (user.has("s")) { // status
 					long wasOnline;
 					if (user.getBoolean("s")) {
-						sb.append('\n').append(MP.L[Online]);
+						sb.append('\n').append(MP.L[LOnline]);
 					} else if ((wasOnline = user.getLong("w")) != 0) {
-						sb.append('\n').append(MP.L[LastSeen]).append(MP.localizeDate(wasOnline, 4));
+						sb.append('\n').append(MP.L[LLastSeen]).append(MP.localizeDate(wasOnline, 4));
 					} else {
-						sb.append('\n').append(MP.L[Offline]);
+						sb.append('\n').append(MP.L[LOffline]);
 					}
 				}
 				if (user.getBoolean("a", false)) { // admin
-					sb.append(" (").append(MP.L[Admin]).append(')');
+					sb.append(" (").append(MP.L[LAdmin]).append(')');
 				}
 				
 				int itemIdx = safeAppend(thread, sb.toString(), null);

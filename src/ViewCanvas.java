@@ -70,7 +70,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 			try {
 				Thread.sleep(100);
 			} catch (Exception ignored) {}
-			MP.display(MP.errorAlert(MP.L[NotEnoughMemory_Alert]), this);
+			MP.display(MP.errorAlert(MP.L[LNotEnoughMemory_Alert]), this);
 			return;
 		}
 	}
@@ -137,9 +137,9 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 				if (error) {
 					g.setGrayScale(0);
 					g.fillRect(0, 0, w, h);
-					info = MP.L[FailedToLoadImage];
+					info = MP.L[LFailedToLoadImage];
 				} else {
-					info = MP.L[Loading];
+					info = MP.L[LLoading];
 				}
 				g.setGrayScale(0);
 				int tw = f.stringWidth(info);
@@ -230,7 +230,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 		}
 	}
 
-	String[] touchCaps = new String[] { "x1", "x2", "x3", MP.L[Back] };
+	String[] touchCaps = new String[] { "x1", "x2", "x3", MP.L[LBack] };
 
 	boolean touchCtrlShown = true;
 

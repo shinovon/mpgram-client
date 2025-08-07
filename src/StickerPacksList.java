@@ -25,7 +25,7 @@ public class StickerPacksList extends MPList {
 	MPChat chatForm;
 
 	public StickerPacksList(MPChat form) {
-		super(MP.L[Stickers_Title]);
+		super(MP.L[LStickers_Title]);
 		this.chatForm = form;
 		addCommand(MP.backCmd);
 	}

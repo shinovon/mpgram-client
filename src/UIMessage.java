@@ -120,7 +120,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		out = (!chat.broadcast && chat.mediaFilter == null) && (message.getBoolean("out", false) || fromId.equals(MP.selfId));
 		hideName = chat.selfChat || chat.user || out || chat.mediaFilter != null;
 		space = chat.broadcast;
-		name = out && !chat.broadcast ? MP.L[You] : MP.getName(fromId, true).trim();
+		name = out && !chat.broadcast ? MP.L[LYou] : MP.getName(fromId, true).trim();
 		dateRender = MP.localizeDate(date, 0);
 		dateWidth = MP.smallBoldFont.stringWidth(dateRender);
 		edited = message.has("edit") && chat.mediaFilter == null;
@@ -142,35 +142,35 @@ public class UIMessage extends UIItem implements LangConstants {
 			String t = null;
 			l: {
 				if ("ChatCreate".equals(type)) {
-					t = MP.L[GroupCreated_Action];
+					t = MP.L[LGroupCreated_Action];
 				} else if ("ChannelCreate".equals(type)) {
-					t = MP.L[ChannelCreated_Action];
+					t = MP.L[LChannelCreated_Action];
 				} else if ("ChatEditPhoto".equals(type)) {
-					t = MP.L[PhotoUpdated_Action];
+					t = MP.L[LPhotoUpdated_Action];
 				} else if ("HistoryClear".equals(type)) {
-					t = MP.L[ChatHistoryCleared_Action];
+					t = MP.L[LChatHistoryCleared_Action];
 				} else if ("ChatEditTitle".equals(type)) {
-					t = MP.L[NameChanged_Action].concat(act.getString("t", ""));
+					t = MP.L[LNameChanged_Action].concat(act.getString("t", ""));
 				} else {
 					label.append(name, MP.smallBoldFont, "t.me/".concat(fromId));
 					if ("PinMessage".equals(type)) {
-						t = MP.L[PinnedMessage_Action];
+						t = MP.L[LPinnedMessage_Action];
 					} else if ("ChatJoinedByLink".equals(type)) {
-						t = MP.L[JoinedByLink_Action];
+						t = MP.L[LJoinedByLink_Action];
 					} else if ("ChatJoinedByRequest".equals(type)) {
-						t = MP.L[JoinedByRequest_Action];
+						t = MP.L[LJoinedByRequest_Action];
 					} else {
 						if ("ChatAddUser".equals(type) || "ChatDeleteUser".equals(type)) {
 							if (fromId.equals(user)) {
-								t = MP.L["ChatAddUser".equals(type) ? Joined_Action : Left_Action];
+								t = MP.L["ChatAddUser".equals(type) ? LJoined_Action : LLeft_Action];
 							} else {
-								label.append(MP.L["ChatAddUser".equals(type) ? Added_Action : Removed_Action], MP.smallPlainFont, null);
+								label.append(MP.L["ChatAddUser".equals(type) ? LAdded_Action : LRemoved_Action], MP.smallPlainFont, null);
 								label.append(" ", MP.smallPlainFont, null);
 								label.append(MP.getName(user, false), MP.smallBoldFont, "t.me/".concat(user));
 								break l;
 							}
 						} else {
-							label.append(MP.L[Action], MP.smallPlainFont, null);
+							label.append(MP.L[LAction], MP.smallPlainFont, null);
 							break l;
 						}
 					}
@@ -218,7 +218,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				}
 				if (t != null) t = t.trim();
 				forwardName = t;
-				forwardedFromWidth = chat.selfChat ? 0 : MP.smallPlainFont.stringWidth(MP.L[ForwardedFrom]);
+				forwardedFromWidth = chat.selfChat ? 0 : MP.smallPlainFont.stringWidth(MP.L[LForwardedFrom]);
 				if (fwd.has("peer") && fwd.has("msg")) {
 					fwdPeer = fwd.getString("peer");
 					fwdMsgId = fwd.getInt("msg");
@@ -244,16 +244,16 @@ public class UIMessage extends UIItem implements LangConstants {
 								t = MP.getName(replyFwd.getString("from_id", null), true);
 							}
 						}
-						replyName = t == null && chat.user ? (chat.selfChat ? MP.L[You] : chat.title) : t;
+						replyName = t == null && chat.user ? (chat.selfChat ? MP.L[LYou] : chat.title) : t;
 						if (replyMsg.has("media")) {
 							String type = replyMsg.getObject("media").getString("type", null);
-							t = MP.L[Media];
+							t = MP.L[LMedia];
 							if (type != null) {
 								if ("photo".equals(type)) {
-									t = MP.L[Photo];
+									t = MP.L[LPhoto];
 								} else if ("document".equals(type)) {
-//									t = MP.L[Video];
-									t = MP.L[File];
+//									t = MP.L[LVideo];
+									t = MP.L[LFile];
 								}
 							}
 							replyPrefix = t;
@@ -280,12 +280,12 @@ public class UIMessage extends UIItem implements LangConstants {
 			JSONObject media = message.getObject("media");
 			if (!MP.showMedia || message.isNull("media")) {
 				this.media = true;
-				mediaTitle = MP.L[Media];
+				mediaTitle = MP.L[LMedia];
 			} else {
 				String t;
 				String type = media.getString("type");
 				if (type.equals("undefined")) {
-					mediaTitle = MP.L[Media];
+					mediaTitle = MP.L[LMedia];
 				} else if (type.equals("webpage")) {
 					if ((t = media.getString("name", null)) != null && t.length() != 0) {
 						mediaTitle = t;
@@ -300,7 +300,7 @@ public class UIMessage extends UIItem implements LangConstants {
 						if (MP.loadThumbs) {
 							MP.queueImage(this, this);
 						} else {
-							mediaTitle = MP.L[Sticker];
+							mediaTitle = MP.L[LSticker];
 						}
 					} else {
 						mediaDownload = true;
@@ -353,15 +353,15 @@ public class UIMessage extends UIItem implements LangConstants {
 						photoRawHeight = media.getInt("h", 0);
 						MP.queueImage(this, this);
 					} else {
-						mediaTitle = MP.L[Photo];
+						mediaTitle = MP.L[LPhoto];
 					}
 				} else if (type.equals("poll")) {
-					mediaTitle = MP.L[Poll];
+					mediaTitle = MP.L[LPoll];
 				} else if (type.equals("geo")) {
-					mediaTitle = MP.L[Geo];
+					mediaTitle = MP.L[LGeo];
 					mediaSubtitle = media.get("lat") + ", " + media.get("long");
 				} else {
-					mediaTitle = MP.L[Media];
+					mediaTitle = MP.L[LMedia];
 				}
 				this.media = true;
 				if (!sticker) subFocus[order++] = FOCUS_MEDIA;
@@ -393,7 +393,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			// comments
 			if (message.has("comments")) {
 				JSONObject comments = message.getObject("comments");
-				commentsText = MP.localizePlural(comments.getInt("count"), _comment);
+				commentsText = MP.localizePlural(comments.getInt("count"), L_comment);
 				commentPeer = comments.getString("peer");
 				commentRead = comments.getInt("read", 0);
 				subFocus[order++] = FOCUS_COMMENT;
@@ -489,7 +489,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_SENDER]);
 			if (forwardedFromWidth != 0) {
 				g.setFont(MP.smallPlainFont);
-				g.drawString(MP.L[ForwardedFrom], x, y, 0);
+				g.drawString(MP.L[LForwardedFrom], x, y, 0);
 			}
 
 			if (forwardRender != null) {
@@ -616,7 +616,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		g.setFont(MP.smallPlainFont);
 		g.drawString(time, rx + rw - TIME_PADDING_WIDTH, y + PADDING_HEIGHT - TIME_PADDING_HEIGHT, Graphics.BOTTOM | Graphics.RIGHT);
 		if (edited) {
-			g.drawString(MP.L[Edited], rx + rw - timeWidth - MP.smallPlainFontSpaceWidth - TIME_PADDING_WIDTH, y + PADDING_HEIGHT - TIME_PADDING_HEIGHT, Graphics.BOTTOM | Graphics.RIGHT);
+			g.drawString(MP.L[LEdited], rx + rw - timeWidth - MP.smallPlainFontSpaceWidth - TIME_PADDING_WIDTH, y + PADDING_HEIGHT - TIME_PADDING_HEIGHT, Graphics.BOTTOM | Graphics.RIGHT);
 		}
 		
 		y += PADDING_HEIGHT;
@@ -769,7 +769,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		int timeWidth = this.timeWidth + TIME_PADDING_WIDTH;
 		boolean timeBreak = false;
 		if (edited) {
-			timeWidth += MP.smallPlainFontSpaceWidth + MP.smallPlainFont.stringWidth(MP.L[Edited]);
+			timeWidth += MP.smallPlainFontSpaceWidth + MP.smallPlainFont.stringWidth(MP.L[LEdited]);
 		}
 		
 		// media
@@ -917,7 +917,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			return 0;
 		}
 		if (dir == Canvas.LEFT && ((ChatCanvas) container).canWrite) {
-			menuAction(Reply);
+			menuAction(LReply);
 			return Integer.MAX_VALUE;
 		}
 		if (focusChild != null) {
@@ -1003,11 +1003,11 @@ public class UIMessage extends UIItem implements LangConstants {
 			return true;
 		case FOCUS_MEDIA:
 			if (mediaPlayable) {
-				menuAction(Play_Item);
+				menuAction(LPlay_Item);
 			} else if (photo) {
-				menuAction(ViewImage);
+				menuAction(LViewImage);
 			} else if (mediaDownload) {
-				menuAction(Download);
+				menuAction(LDownload);
 			} else if (mediaUrl != null) {
 				MP.midlet.browse(mediaUrl);
 			}
@@ -1022,21 +1022,21 @@ public class UIMessage extends UIItem implements LangConstants {
 	void menuAction(int option) {
 		String idStr = Integer.toString(this.id);
 		switch (option) {
-		case Reply:
+		case LReply:
 //			MP.display(MP.writeForm(peerId, idStr, "", null, null, null));
 			((ChatCanvas) container).startReply(this);
 			break;
-		case Edit:
+		case LEdit:
 			((ChatCanvas) container).startEdit(this);
 			break;
-		case Pin:
-			MP.display(MP.loadingAlert(MP.L[Loading]), MP.current);
+		case LPin:
+			MP.display(MP.loadingAlert(MP.L[LLoading]), MP.current);
 			if (MP.reopenChat && MP.updatesThread != null) {
 				MP.cancel(MP.updatesThread, true);
 			}
 			MP.midlet.start(MP.RUN_PIN_MESSAGE, new String[] { peerId, idStr });
 			break;
-		case CopyMessage:
+		case LCopyMessage:
 //			if (text != null) {
 //				StringBuffer sb = new StringBuffer();
 //				int l = text.parsed.size();
@@ -1047,34 +1047,34 @@ public class UIMessage extends UIItem implements LangConstants {
 //			}
 			MP.copy("", origText);
 			break;
-		case CopyMessageLink:
+		case LCopyMessageLink:
 			MP.copyMessageLink(peerId, idStr);
 			break;
-		case Forward:
+		case LForward:
 			MP.openLoad(new ChatsList(peerId, idStr));
 			break;
-		case Delete:
-			MP.display(MP.loadingAlert(MP.L[Loading]), MP.current);
+		case LDelete:
+			MP.display(MP.loadingAlert(MP.L[LLoading]), MP.current);
 			MP.midlet.start(MP.RUN_DELETE_MESSAGE, new String[] { peerId, idStr });
 			break;
-		case ViewImage:
+		case LViewImage:
 			if (MP.useView) {
 				MP.display(new ViewCanvas(peerId, idStr));
 				break;
 			}
-		case Download:
+		case LDownload:
 			MP.midlet.downloadDocument(peerId, idStr, mediaFileName);
 			break;
-		case Play_Item:
-			MP.display(MP.loadingAlert(MP.L[Loading]), MP.current);
+		case LPlay_Item:
+			MP.display(MP.loadingAlert(MP.L[LLoading]), MP.current);
 			MP.midlet.start(MP.RUN_LOAD_PLAYLIST, new String[] {peerId, "3", idStr});
 			break;
-		case GoTo:
+		case LGoTo:
 			// TODO close chat info
 			((ChatCanvas) container).reset();
 			((ChatCanvas) container).openMessage(idStr, -1);
 			break;
-		case Select:
+		case LSelect:
 			if (selected) break;
 			selected = true;
 			((ChatCanvas) container).selected(this);
@@ -1086,11 +1086,11 @@ public class UIMessage extends UIItem implements LangConstants {
 		switch (focus) {
 		case FOCUS_MEDIA:
 			if (mediaPlayable) {
-				return new int[] { Play_Item, Download };
+				return new int[] { LPlay_Item, LDownload };
 			} else if (photo) {
-				return new int[] { ViewImage, Download };
+				return new int[] { LViewImage, LDownload };
 			} else if (mediaDownload) {
-				return new int[] { Download };
+				return new int[] { LDownload };
 			}
 		}
 		return null;
@@ -1113,22 +1113,22 @@ public class UIMessage extends UIItem implements LangConstants {
 		int count = 0;
 		ChatCanvas chat = (ChatCanvas) container;
 		if (chat.query != null || chat.mediaFilter != null) {
-			general[count++] = GoTo;
-			general[count++] = Forward;
+			general[count++] = LGoTo;
+			general[count++] = LForward;
 		} else if (action) {
-			if (chat.canWrite) general[count++] = Reply;
-			if (!chat.selfChat && !chat.user) general[count++] = CopyMessageLink;
-			if (chat.canDelete) general[count++] = Delete;
+			if (chat.canWrite) general[count++] = LReply;
+			if (!chat.selfChat && !chat.user) general[count++] = LCopyMessageLink;
+			if (chat.canDelete) general[count++] = LDelete;
 		} else {
-			if (chat.canWrite) general[count++] = Reply;
-			if (out) general[count++] = Edit;
-			if (chat.canPin) general[count++] = Pin;
-			if (origText != null && origText.length() != 0) general[count++] = CopyMessage;
-			if (!chat.selfChat && !chat.user) general[count++] = CopyMessageLink;
-			general[count++] = Forward;
-			if (chat.canDelete || out) general[count++] = Delete;
+			if (chat.canWrite) general[count++] = LReply;
+			if (out) general[count++] = LEdit;
+			if (chat.canPin) general[count++] = LPin;
+			if (origText != null && origText.length() != 0) general[count++] = LCopyMessage;
+			if (!chat.selfChat && !chat.user) general[count++] = LCopyMessageLink;
+			general[count++] = LForward;
+			if (chat.canDelete || out) general[count++] = LDelete;
 		}
-		general[count++] = Select;
+		general[count++] = LSelect;
 		general[count] = Integer.MIN_VALUE;
 		if (item == null) {
 			return general;
@@ -1167,7 +1167,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				return true;
 		}
 		if (!longTap && (((ChatCanvas) container).query != null || ((ChatCanvas) container).mediaFilter != null)) {
-			menuAction(GoTo);
+			menuAction(LGoTo);
 			return true;
 		}
 		if (x > 0 && x < contentWidth) {
