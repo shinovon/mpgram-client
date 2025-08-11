@@ -67,6 +67,7 @@ import javax.microedition.lcdui.Ticker;
 import javax.microedition.media.Manager;
 import javax.microedition.media.Player;
 import javax.microedition.media.PlayerListener;
+import javax.microedition.media.control.VolumeControl;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.rms.RecordStore;
 
@@ -1725,6 +1726,9 @@ public class MP extends MIDlet
 										notificationPlayer.prefetch();
 									}
 									notificationPlayer.stop();
+									try { 
+										((VolumeControl) notificationPlayer.getControl("VolumeControl")).setLevel(100);
+									} catch (Throwable ignored) {}
 									notificationPlayer.setMediaTime(0);
 									notificationPlayer.start();
 								} catch (Exception e) {
