@@ -4236,7 +4236,7 @@ public class MP extends MIDlet
 				}
 				if ("c".equals(s[0]) && s.length > 1) {
 //					privat = true;
-					domain = s[1];
+					domain = "-".concat(s[1]); // FIXME handle -100 prefix
 					if (s.length == 3) {
 						messageId = s[2];
 					} else if (s.length == 4) {
