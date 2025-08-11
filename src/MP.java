@@ -1721,7 +1721,7 @@ public class MP extends MIDlet
 							if (notified && notifySound) {
 								try {
 									if (notificationPlayer == null) {
-										notificationPlayer = Manager.createPlayer(getClass().getResourceAsStream("/msg.mp3"), "audio/mpeg");
+										notificationPlayer = Manager.createPlayer(getClass().getResourceAsStream("/msg.mid"), "audio/midi");
 										notificationPlayer.realize();
 										notificationPlayer.prefetch();
 									}
