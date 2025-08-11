@@ -3972,6 +3972,7 @@ public class MP extends MIDlet
 		String username = ((MPChat) current).username();
 		if (peerId.charAt(0) == '-' && username == null) {
 			sb.append("c/");
+			peerId = peerId.substring(peerId.startsWith("-100") ? 4 : 1);
 		}
 		sb.append(username != null ? username : peerId).append('/').append(msgId);
 		copy("", sb.toString());
