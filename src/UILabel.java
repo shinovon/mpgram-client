@@ -64,7 +64,7 @@ public class UILabel extends UIItem {
 		for (int i = 0; i < l; ++i) {
 			Object[] obj = (Object[]) render.elementAt(i);
 			int[] pos = (int[]) obj[3];
-			if (!isVisible(pos)) continue;
+			if (getVisibility(pos) != 0) continue;
 			Font font = (Font) obj[1];
 			String text = (String) obj[0];
 			int tx = x + pos[0], ty = y + pos[1];
@@ -190,12 +190,10 @@ public class UILabel extends UIItem {
 	boolean grabFocus(int dir) {
 		if (!focusable) return false;
 		focus = true;
-		if (selectedParts == null) {
-			if (dir != 0) {
-				focusIndex = dir == -1 ? urls.size() - 1 : 0;
-			}
-			focusLink(focusIndex);
+		if (dir != 0) {
+			focusIndex = dir == -1 ? urls.size() - 1 : 0;
 		}
+		focusLink(focusIndex);
 		return true;
 	}
 	
@@ -205,28 +203,47 @@ public class UILabel extends UIItem {
 		selectedParts = (Vector) o[1];
 	}
 	
-	int traverse(int dir, int height, int scrollY) {
+	int traverse(int dir) {
 		if (!focusable || urls.size() == 0) return 0;
 		
-		// TODO scroll
+		int next;
 		
 		if (dir == Canvas.UP) {
 			if (focusIndex <= 0) {
 				focusLink(focusIndex = 0);
-				return 0;
+				if (getVisibility(getLinkPos(0, 0)) == 1) {
+					return 0;
+				}
+				return Integer.MIN_VALUE;
 			}
 			
-			focusLink(--focusIndex);
-			return Integer.MAX_VALUE;
+			next = -1;
 		} else if (dir == Canvas.DOWN) {
 			if (focusIndex >= urls.size() - 1) {
 				focusLink(focusIndex = urls.size() - 1);
-				return 0;
+				if (getVisibility(getLinkPos(focusIndex, selectedParts.size() - 1)) == 1) {
+					return 0;
+				}
+				return Integer.MIN_VALUE;
 			}
-			focusLink(++focusIndex);
-			return Integer.MAX_VALUE;
+
+			next = 1;
+		} else {
+			return Integer.MIN_VALUE;
 		}
-		return 0;
+		
+		int[] pos = getLinkPos(focusIndex, next == 1 ? selectedParts.size() - 1 : 0);
+		if (getVisibility(pos) == -next) {
+			return 0;
+		}
+
+		focusLink(focusIndex = focusIndex + next);
+		
+		pos = getLinkPos(focusIndex, next == 1 ? selectedParts.size() - 1 : 0);
+		if (getVisibility(pos) == -next) {
+			return 0;
+		}
+		return Integer.MAX_VALUE;
 	}
 	
 	boolean action() {
@@ -261,6 +278,20 @@ public class UILabel extends UIItem {
 			}
 		}
 		return -1;
+	}
+	
+	int[] getLinkPos(int idx, int partIdx) {
+		return (int[]) ((Object[]) ((Vector) ((Object[]) urls.elementAt(idx))[1]).elementAt(partIdx))[3];
+	}
+	
+	private int getVisibility(int[] pos) {
+		UIItem root = (UIItem) container;
+		ChatCanvas chat = (ChatCanvas) root.container;
+		int y = this.y + root.y;
+		int screenTop = !chat.reverse ? chat.top - chat.scroll + y + pos[1]
+				: chat.height - chat.bottom + chat.scroll - (root.y + root.contentHeight) + (y - root.y) + pos[1];
+
+		return (screenTop + pos[3]) <= chat.top ? 1 : screenTop >= chat.height - chat.bottom ? -1 : 0;
 	}
 	
 	static String ellipsis(String text, Font font, int width) {
@@ -349,16 +380,6 @@ public class UILabel extends UIItem {
 			} else break;
 		}
 		return x;
-	}
-	
-	private boolean isVisible(int[] pos) {
-		UIItem root = (UIItem) container;
-		ChatCanvas chat = (ChatCanvas) root.container;
-		int y = this.y + root.y;
-		int screenTop = !chat.reverse ? chat.top - chat.scroll + y + pos[1]
-				: chat.height - chat.bottom + chat.scroll - (root.y + root.contentHeight) + (y - root.y) + pos[1];
-
-		return (screenTop + pos[3]) > chat.top && screenTop < chat.height - chat.bottom;
 	}
 	
 }

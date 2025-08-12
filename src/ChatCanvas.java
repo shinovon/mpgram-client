@@ -1185,16 +1185,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					}
 				}
 				if (focusedItem != null) {
-					int t = focusedItem.traverse(game, clipHeight, scroll);
+					int t = focusedItem.traverse(game);
 					repaint = true;
-					if (t != 0) {
+					if (t != Integer.MIN_VALUE) {
 						repaint = true;
 						if (t != Integer.MAX_VALUE) {
-							if (dir == 1) {
-								scrollTo(Math.min(scroll + scrollAmount, t));
-							} else {
-								scrollTo(Math.max(scroll - scrollAmount, t));
-							}
+							scrollTo(scroll + scrollAmount * dir);
 						}
 						break scroll;
 					}
@@ -1239,7 +1235,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			}
 		} else if (game == Canvas.LEFT || game == Canvas.RIGHT) {
 			if (focusedItem != null) {
-				focusedItem.traverse(game, clipHeight, scroll);
+				focusedItem.traverse(game);
 			}
 		}
 		if (repaint) {

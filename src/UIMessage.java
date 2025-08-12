@@ -914,17 +914,17 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 	}
 	
-	int traverse(int dir, int height, int scrollY) {
+	int traverse(int dir) {
 		if (((ChatCanvas) container).selected != 0) {
-			return 0;
+			return Integer.MIN_VALUE;
 		}
 		if (dir == Canvas.LEFT && ((ChatCanvas) container).canWrite) {
 			menuAction(LReply);
 			return Integer.MAX_VALUE;
 		}
 		if (focusChild != null) {
-			int t = focusChild.traverse(dir, height, scrollY);
-			if (t != 0) {
+			int t = focusChild.traverse(dir);
+			if (t != Integer.MIN_VALUE) {
 				return t;
 			}
 			focusChild.lostFocus();
@@ -942,9 +942,9 @@ public class UIMessage extends UIItem implements LangConstants {
 				}
 				if (dir == Canvas.UP) {
 					if (subFocusCurrent == 0)
-						return 0;
+						return Integer.MIN_VALUE;
 					if (subFocusCurrent == 1 && subFocus[0] == FOCUS_SENDER && hideName)
-						return 0;
+						return Integer.MIN_VALUE;
 					subFocus(--subFocusCurrent);
 					if (focusChild != null) {
 						if (!focusChild.grabFocus(dir)) focusChild = null;
@@ -952,7 +952,7 @@ public class UIMessage extends UIItem implements LangConstants {
 					return Integer.MAX_VALUE;
 				} else if (dir == Canvas.DOWN) {
 					if (subFocusCurrent == subFocusLength - 1)
-						return 0;
+						return Integer.MIN_VALUE;
 					subFocus(++subFocusCurrent);
 					if (focusChild != null) {
 						if (!focusChild.grabFocus(dir)) focusChild = null;
@@ -961,7 +961,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				}
 			}
 		}
-		return 0;
+		return Integer.MIN_VALUE;
 	}
 	
 	boolean action() {

@@ -68,14 +68,12 @@ public class UIItem {
 	
 	/**
 	 * @param dir Direction: Canvas.UP or Canvas.DOWN
-	 * @param height Screen height
-	 * @param scrollY Scrolled amount
 	 * @return
-	 * 0: not grabbed, Integer.MAX_VALUE: grabbed in screen visible area <br>
+	 * Integer.MIN_VALUE: not grabbed, Integer.MAX_VALUE: grabbed in screen visible area <br>
 	 * other values: request scroll to this value
 	 */
-	int traverse(int dir, int height, int scrollY) {
-		return 0;
+	int traverse(int dir) {
+		return Integer.MIN_VALUE;
 	}
 	
 	/**
