@@ -135,9 +135,9 @@ public class UIMessage extends UIItem implements LangConstants {
 			label.color = ChatCanvas.colors[COLOR_MESSAGE_FG];
 			label.linkColor = ChatCanvas.colors[COLOR_MESSAGE_FG];
 			label.bgColor = ChatCanvas.colors[COLOR_ACTION_BG];
+			label.focusColor = ChatCanvas.colors[COLOR_MESSAGE_LINK_FOCUS];
 			label.background = true;
 			label.center = true;
-			label.focusColor = ChatCanvas.colors[COLOR_MESSAGE_LINK_FOCUS];
 			
 			String t = null;
 			l: {
@@ -437,7 +437,8 @@ public class UIMessage extends UIItem implements LangConstants {
 				if (updateColors) {
 					updateColors = false;
 					text.color = ChatCanvas.colors[COLOR_MESSAGE_FG];
-					text.linkColor = ChatCanvas.colors[COLOR_MESSAGE_LINK];
+					text.linkColor = ChatCanvas.colors[COLOR_MESSAGE_FG];
+					text.bgColor = ChatCanvas.colors[COLOR_ACTION_BG];
 					text.focusColor = ChatCanvas.colors[COLOR_MESSAGE_LINK_FOCUS];
 				}
 				text.paint(g, x, y + PADDING_HEIGHT, w);

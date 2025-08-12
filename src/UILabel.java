@@ -341,7 +341,7 @@ public class UILabel extends UIItem {
 									}
 									res.addElement(new Object[] { t, font, url, new int[] {x, y + dy, tw, fh} });
 									mw = Math.max(mw, x + tw);
-									x = 0; y += fh; dy = 0; idx ++;
+									x = 0; y += fh; idx ++;
 									
 									i = ch = j;
 									break w;
@@ -355,7 +355,7 @@ public class UILabel extends UIItem {
 							}
 							res.addElement(new Object[] { t, font, url, new int[] {x, y + dy, tw, fh} });
 							mw = Math.max(mw, x + tw);
-							x = 0; y += fh; dy = 0; idx ++;
+							x = 0; y += fh; idx ++;
 							ch = i;
 						}
 					}
