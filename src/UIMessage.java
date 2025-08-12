@@ -180,6 +180,7 @@ public class UIMessage extends UIItem implements LangConstants {
 					label.append(t, MP.smallPlainFont, null);
 				}
 			}
+			label.container = this;
 			this.text = label;
 			subFocusCurrent = 0;
 			subFocus[0] = FOCUS_TEXT;
@@ -382,6 +383,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				label.linkColor = ChatCanvas.colors[COLOR_MESSAGE_LINK];
 				label.focusColor = ChatCanvas.colors[COLOR_MESSAGE_LINK_FOCUS];
 				if (label.focusable) subFocus[order++] = FOCUS_TEXT;
+				label.container = this;
 				this.text = label;
 			}
 			

@@ -64,6 +64,7 @@ public class UILabel extends UIItem {
 		for (int i = 0; i < l; ++i) {
 			Object[] obj = (Object[]) render.elementAt(i);
 			int[] pos = (int[]) obj[3];
+			if (!isVisible(pos)) continue;
 			Font font = (Font) obj[1];
 			String text = (String) obj[0];
 			int tx = x + pos[0], ty = y + pos[1];
@@ -348,6 +349,16 @@ public class UILabel extends UIItem {
 			} else break;
 		}
 		return x;
+	}
+	
+	private boolean isVisible(int[] pos) {
+		UIItem root = (UIItem) container;
+		ChatCanvas chat = (ChatCanvas) root.container;
+		int y = this.y + root.y;
+		int screenTop = !chat.reverse ? chat.top - chat.scroll + y + pos[1]
+				: chat.height - chat.bottom + chat.scroll - (root.y + root.contentHeight) + (y - root.y) + pos[1];
+
+		return (screenTop + pos[3]) > chat.top && screenTop < chat.height - chat.bottom;
 	}
 	
 }
