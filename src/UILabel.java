@@ -311,18 +311,20 @@ public class UILabel extends UIItem {
 	}
 	
 	private static void split(String text, Font font, String url, int width, int x, int y, int idx, int mw, int ch, int sl, int fh, Vector res, boolean center, int[] out) {
-		int ay = 0;
+		int dy = 0;
 		if (res.size() != 0 && x != 0) {
-			Object[] l = (Object[]) res.elementAt(res.size() - 1);
-			int lfh = ((int[]) l[3])[3];
-			if (lfh != fh) {
-				ay = fh - lfh + ((Font) l[1]).getBaselinePosition() - font.getBaselinePosition();
+			Font f = font;
+			for (int i = res.size() - 1; i >= 0; --i) {
+				int[] bounds = (int[]) ((Object[]) res.elementAt(i))[3];
+				if (bounds[1] != y) break;
+				f = (Font) ((Object[]) res.elementAt(i))[1];
 			}
+			dy = f.getBaselinePosition() - font.getBaselinePosition();
 		}
 		if (ch != sl) {
 			int ew = font.substringWidth(text, ch, sl - ch);
 			if (x + ew < width) {
-				res.addElement(new Object[] { text.substring(ch, sl), font, url, new int[] {x, y + ay, ew, fh} });
+				res.addElement(new Object[] { text.substring(ch, sl), font, url, new int[] {x, y + dy, ew, fh} });
 				x += ew; idx ++;
 				mw = Math.max(mw, x);
 			} else {
@@ -337,9 +339,9 @@ public class UILabel extends UIItem {
 									if (center) {
 										x = centerRow(width, tw, x, y, res);
 									}
-									res.addElement(new Object[] { t, font, url, new int[] {x, y + ay, tw, fh} });
+									res.addElement(new Object[] { t, font, url, new int[] {x, y + dy, tw, fh} });
 									mw = Math.max(mw, x + tw);
-									x = 0; y += fh; ay = 0; idx ++;
+									x = 0; y += fh; dy = 0; idx ++;
 									
 									i = ch = j;
 									break w;
@@ -351,9 +353,9 @@ public class UILabel extends UIItem {
 							if (center) {
 								x = centerRow(width, tw, x, y, res);
 							}
-							res.addElement(new Object[] { t, font, url, new int[] {x, y + ay, tw, fh} });
+							res.addElement(new Object[] { t, font, url, new int[] {x, y + dy, tw, fh} });
 							mw = Math.max(mw, x + tw);
-							x = 0; y += fh; ay = 0; idx ++;
+							x = 0; y += fh; dy = 0; idx ++;
 							ch = i;
 						}
 					}
@@ -361,7 +363,7 @@ public class UILabel extends UIItem {
 				if (ch != sl) {
 					String s = text.substring(ch, sl);
 					int tw = font.stringWidth(s);
-					res.addElement(new Object[] { s, font, url, new int[] {x, y + ay, tw, fh} });
+					res.addElement(new Object[] { s, font, url, new int[] {x, y + dy, tw, fh} });
 					x += tw; idx ++;
 					mw = Math.max(mw, x);
 				}
