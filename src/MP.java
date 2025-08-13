@@ -2799,7 +2799,7 @@ public class MP extends MIDlet
 				sending = true;
 
 				display(loadingAlert(L[LSending]), d);
-				if ((reopenChat || !longpoll) && MP.updatesThread != null) {
+				if ((reopenChat || !longpoll || sendFile != null) && MP.updatesThread != null) {
 					MP.cancel(MP.updatesThread, true);
 				}
 				start(RUN_SEND_MESSAGE, new Object[] { t, writeTo, replyTo, edit, sendFile, sendChoice, fwdPeer, fwdMsg });
