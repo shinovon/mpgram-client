@@ -227,6 +227,7 @@
 	"WiFi": "Wi-Fi",
 	"Longpoll": "Лонгполл",
 	"UpdatesInterval": "Интервал обновлений",
+	"DownloadPath": "Download path", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "Загружать медиа",

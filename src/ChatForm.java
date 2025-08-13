@@ -428,8 +428,8 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 		String fromId = message.has("from_id") ? message.getString("from_id") : this.id;
 		boolean out = message.getBoolean("out", false);
 		String text = message.getString("text", null);
-		// 0: peer id, 1: message id, 2: from id/discussion peer, 3: image quality, 4: file name
-		String[] key = new String[] { this.id, idString, fromId, null, null };
+		// 0: peer id, 1: message id, 2: from id/discussion peer, 3: image quality, 4: file name, 5: file size
+		String[] key = new String[] { this.id, idString, fromId, null, null, null };
 		
 		loadedMsgs.addElement(idString);
 
@@ -681,14 +681,17 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 							}
 						}
 						sb.append('\n');
-						if (!voice && !media.isNull("size")) {
-							long size = media.getLong("size");
-							if (size >= 1024 * 1024) {
-								size = (size * 100) / (1024 * 1024);
-								sb.append(size / 100).append('.').append(size % 100).append(" MB");
-							} else {
-								size = (size * 100) / 1024;
-								sb.append(size / 100).append('.').append(size % 100).append(" KB");
+						if (!media.isNull("size")) {
+							long size;
+							key[5] = Long.toString(size = media.getLong("size"));
+							if (!voice) {
+								if (size >= 1024 * 1024) {
+									size = (size * 100) / (1024 * 1024);
+									sb.append(size / 100).append('.').append(size % 100).append(" MB");
+								} else {
+									size = (size * 100) / 1024;
+									sb.append(size / 100).append('.').append(size % 100).append(" KB");
+								}
 							}
 						}
 						

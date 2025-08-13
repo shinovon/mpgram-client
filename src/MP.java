@@ -228,7 +228,6 @@ public class MP extends MIDlet
 	static boolean fileRewrite;
 	static int blackberryNetwork = -1; // -1: undefined, 0: data, 1: wifi
 	static int playerHttpMethod = 1; // 0 - pass url, 1 - pass connection stream
-	static String musicCachePath; // TODO
 	static boolean reopenChat;
 	static boolean fullPlayerCover;
 	static boolean notifications;
@@ -242,7 +241,7 @@ public class MP extends MIDlet
 	static boolean legacyChatUI;
 	static boolean fastScrolling; // disable animations
 	static boolean forceKeyUI;
-	static int downloadMethod; // TODO decide
+	static int downloadMethod; // 0 - always ask, 1 - in app, 2 - browser
 	static String downloadPath;
 	static boolean longpoll = true;
 	
@@ -355,6 +354,9 @@ public class MP extends MIDlet
 	static Command cancelCmd;
 	static Command goCmd;
 	static Command copyCmd;
+	static Command downloadInappCmd;
+	static Command downloadBrowserCmd;
+	static Command cancelDownloadCmd;
 	
 	static Command nextPageCmd;
 	static Command prevPageCmd;
@@ -405,6 +407,7 @@ public class MP extends MIDlet
 	private static Gauge pushIntervalGauge;
 	private static Gauge pushBgIntervalGauge;
 //#endif
+	private static ChoiceGroup downloadMethodChoice;
 	private static TextField downloadPathField;
 	
 	// write items
@@ -826,6 +829,9 @@ public class MP extends MIDlet
 		cancelCmd = new Command(L[LCancel], Command.CANCEL, 20);
 		goCmd = new Command(L[LOk], Command.OK, 1);
 		copyCmd = new Command(L[LCopy], Command.OK, 1);
+		downloadInappCmd = new Command("в приложении", Command.OK, 0); // FIXME
+		downloadBrowserCmd = new Command("браузером", Command.CANCEL, 1);
+		cancelDownloadCmd = new Command(L[LCancel], Command.CANCEL, 1);
 
 		nextPageCmd = new Command(L[LNextPage], Command.SCREEN, 6);
 		prevPageCmd = new Command(L[LPrevPage], Command.SCREEN, 7);
@@ -1990,8 +1996,92 @@ public class MP extends MIDlet
 		}
 		case RUN_DOWNLOAD_DOCUMENT: {
 			// TODO
+			downloading = true;
+			String downloadPath = (String) param;
+			String[] msg = downloadMessage;
+			
 			Alert alert = new Alert("");
+			alert.setIndicator(new Gauge(null, false, Gauge.INDEFINITE, Gauge.CONTINUOUS_RUNNING));
+			alert.addCommand(cancelDownloadCmd);
+			alert.setCommandListener(this);
 			display(alert, current);
+			
+			String error;
+			try {
+				if (!downloadPath.endsWith("/")) downloadPath = downloadPath.concat("/");
+				int size = msg[3] == null ? 0 : Integer.parseInt(msg[3]);
+				
+				FileConnection fc = (FileConnection) Connector.open("file:///".concat(downloadPath).concat(msg[2]));
+				if (!fc.exists()) fc.create();
+				try {
+					OutputStream out = fc.openOutputStream();
+					try {
+						if (!downloading) throw cancelException;
+						HttpConnection hc = (HttpConnection) openHttpConnection(instanceUrl + FILE_URL + "?c=" + msg[0] + "&m=" + msg[1]);
+						try {
+							InputStream in = openInputStream(hc);
+							try {
+								Gauge gauge = null;
+								if (size != 0) {
+									alert.setIndicator(gauge = new Gauge(null, false, 100, 0));
+								}
+								
+								byte[] buf = new byte[16384];
+								int readTotal = 0;
+								int read;
+								while ((read = in.read(buf)) != -1) {
+									out.write(buf, 0, read);
+									if (gauge != null) {
+										gauge.setValue((int) ((readTotal * 100) / size));
+									}
+									if (!downloading) throw cancelException;
+									readTotal += read;
+								}
+								
+								// done
+								alert.setIndicator(null);
+								alert.setString("Скачано в " + downloadPath);
+								alert.removeCommand(cancelCmd);
+								alert.addCommand(backCmd);
+//								display(current);
+								break;
+							} finally {
+								try {
+									in.close();
+								} catch (Exception ignored) {}
+							}
+						} finally {
+							try {
+								hc.close();
+							} catch (Exception ignored) {}
+						}
+					} catch (Exception e) {
+						if (e == cancelException) throw e;
+						// network error
+						e.printStackTrace();
+						error = e.toString();
+					} finally {
+						try {
+							out.close();
+						} catch (Exception ignored) {}
+					}
+				} finally {
+					downloading = false;
+					try {
+						fc.close();
+					} catch (Exception ignored) {} // TODO: should I left it ignored?
+				}
+			} catch (Exception e) {
+				if (e == cancelException) {
+					display(alert(null, "загрузка отменена", AlertType.WARNING), current);
+					break;
+				}
+				// failed to open file
+				e.printStackTrace();
+				error = e.toString();
+			}
+			
+			display(errorAlert(error), current);
 			break;
 		}
 		}
@@ -2575,7 +2665,16 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 					// downloads TODO
 					
-					downloadPathField = new TextField("Default download path" /*L[LDownloadPath]*/, downloadPath, 500, TextField.ANY);
+					downloadMethodChoice = new ChoiceGroup("Download method", Choice.POPUP, new String[] {
+							"Always ask",
+							"In app",
+							"Browser"
+					}, null);
+					downloadMethodChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					downloadMethodChoice.setSelectedIndex(downloadMethod, true);
+					f.append(downloadMethodChoice);
+					
+					downloadPathField = new TextField(L[LDownloadPath], downloadPath, 500, TextField.ANY);
 					downloadPathField.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(downloadPathField);
 					
@@ -2687,6 +2786,7 @@ public class MP extends MIDlet
 				peersCacheThreshold = profileCacheGauge.getValue() * 10;
 
 //#ifndef NO_FILE
+				downloadMethod = downloadMethodChoice.getSelectedIndex();
 				downloadPath = downloadPathField.getString();
 //#endif
 				
@@ -3011,8 +3111,9 @@ public class MP extends MIDlet
 					// default download path selected in settings
 					downloadPathField.setString(path);
 					goBackTo(settingsForm);
-				} else {
-					// TODO download
+				} else if (!downloading) {
+					// download
+					start(RUN_DOWNLOAD_DOCUMENT, path);
 				}
 			}
 //#endif
@@ -3101,6 +3202,20 @@ public class MP extends MIDlet
 			return;
 		}
 //#endif
+		{ // download dialog
+			if (c == downloadInappCmd) {
+				downloadContinue(1);
+				return;
+			}
+			if (c == downloadBrowserCmd) {
+				downloadContinue(2);
+				return;
+			}
+			if (c == cancelDownloadCmd) {
+				downloading = false;
+				return;
+			}
+		}
 		if (c == backCmd || c == cancelCmd) {
 			// cancel ota update dialog
 			updateUrl = null;
@@ -3192,7 +3307,7 @@ public class MP extends MIDlet
 			if (c == documentCmd) {
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
-				downloadDocument(s[0], s[1], s[4]);
+				downloadDocument(s[0], s[1], s[4], s[5]);
 				return;
 			}
 			if (c == editMsgCmd) {
@@ -3978,12 +4093,39 @@ public class MP extends MIDlet
 		copy("", sb.toString());
 	}
 	
-	void downloadDocument(String peerId, String msgId, String fileName) {
-		// TODO
-		if (fileName != null && !fileName.endsWith(".jar") && !fileName.endsWith(".jad") && downloadMethod != 0) {
-			downloadMessage = new String[] { peerId, msgId, fileName };
-			
+	void downloadDocument(String peerId, String msgId, String fileName, String size) {
+		if (downloading) return;
+		if (fileName != null && downloadMethod != 2 && !fileName.endsWith(".jar")) {
+			downloadMessage = new String[] { peerId, msgId, fileName, size };
+			if (downloadMethod == 0) {
+				Alert a = new Alert("");
+				a.setString("как скачать"); // FIXME
+				a.addCommand(downloadInappCmd);
+				a.addCommand(downloadBrowserCmd);
+				a.setCommandListener(this);
+				display(a, current);
+				return;
+			}
+			downloadContinue(1);
+			return;
 		}
+		downloadContinue(2);
+	}
+	
+	void downloadContinue(int state) {
+		if (downloading) return;
+		if (state == 1) {
+			if (downloadPath == null || downloadPath.trim().length() == 0) {
+				openFilePicker("", false);
+				return;
+			} else {
+				start(RUN_DOWNLOAD_DOCUMENT, downloadPath);
+				return;
+			}
+		}
+		String peerId = downloadMessage[0];
+		String msgId = downloadMessage[1];
+		String fileName = downloadMessage[2];
 		if (fileRewrite && fileName != null) {
 			browse(instanceUrl + "file/" + url(fileName) + "?c=" + peerId + "&m=" + msgId + "&user=" + user);
 		} else {
@@ -4034,7 +4176,7 @@ public class MP extends MIDlet
 			sb.append(" \nStack trace: \n").append(stackTrace);
 		}
 		
-		Alert a = new Alert("");
+		Alert a = new Alert(L[Lmpgram]);
 		a.setType(AlertType.ERROR);
 		a.setString(sb.toString());
 		a.setTimeout(4000);
@@ -4042,23 +4184,23 @@ public class MP extends MIDlet
 	}
 
 	static Alert errorAlert(String text) {
-		Alert a = new Alert("");
-		a.setType(AlertType.ERROR);
-		a.setString(text);
-		a.setTimeout(3000);
-		return a;
+		return alert(null, text, AlertType.ERROR);
 	}
 
 	static Alert infoAlert(String text) {
-		Alert a = new Alert("");
-		a.setType(AlertType.CONFIRMATION);
+		return alert(null, text, AlertType.CONFIRMATION);
+	}
+
+	static Alert alert(String title, String text, AlertType type) {
+		Alert a = new Alert(title == null ? L[Lmpgram] : title);
+		a.setType(type);
 		a.setString(text);
-		a.setTimeout(1500);
+		a.setTimeout(type == AlertType.ERROR ? 3000 : 1500);
 		return a;
 	}
 
 	static Alert loadingAlert(String s) {
-		Alert a = new Alert("", s == null ? L[LLoading] : s, null, null);
+		Alert a = new Alert(L[Lmpgram], s == null ? L[LLoading] : s, null, null);
 		a.setCommandListener(midlet);
 		a.addCommand(Alert.DISMISS_COMMAND);
 		a.setIndicator(new Gauge(null, false, Gauge.INDEFINITE, Gauge.CONTINUOUS_RUNNING));

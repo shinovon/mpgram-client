@@ -97,6 +97,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	String replyPeer;
 	int replyMsgId;
 	int photoRawWidth, photoRawHeight;
+	long fileSize;
 	
 	String time, nameRender, dateRender;
 	String replyNameRender, replyTextRender, forwardRender;
@@ -330,7 +331,7 @@ public class UIMessage extends UIItem implements LangConstants {
 						
 						if (!media.isNull("size")) {
 							sb.setLength(0);
-							long size = media.getLong("size");
+							long size = fileSize = media.getLong("size");
 							if (size >= 1024 * 1024) {
 								size = (size * 100) / (1024 * 1024);
 								sb.append(size / 100).append('.').append(size % 100).append(" MB");
@@ -1066,7 +1067,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				break;
 			}
 		case LDownload:
-			MP.midlet.downloadDocument(peerId, idStr, mediaFileName);
+			MP.midlet.downloadDocument(peerId, idStr, mediaFileName, Long.toString(fileSize));
 			break;
 		case LPlay_Item:
 			MP.display(MP.loadingAlert(MP.L[LLoading]), MP.current);

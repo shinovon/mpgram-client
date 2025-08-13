@@ -227,6 +227,7 @@
 	"WiFi": "Wi-Fi",
 	"Longpoll": "Longpoll",
 	"UpdatesInterval": "Updates interval",
+	"DownloadPath": "Download path",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Load media thumbnails",
