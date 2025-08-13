@@ -228,7 +228,7 @@ public class MP extends MIDlet
 	static boolean fileRewrite;
 	static int blackberryNetwork = -1; // -1: undefined, 0: data, 1: wifi
 	static int playerHttpMethod = 1; // 0 - pass url, 1 - pass connection stream
-	static boolean reopenChat;
+	static boolean reopenChat; // s40
 	static boolean fullPlayerCover;
 	static boolean notifications;
 //#ifndef NO_NOTIFY
@@ -357,6 +357,7 @@ public class MP extends MIDlet
 	static Command downloadInappCmd;
 	static Command downloadBrowserCmd;
 	static Command cancelDownloadCmd;
+	static Command okDownloadCmd;
 	
 	static Command nextPageCmd;
 	static Command prevPageCmd;
@@ -472,6 +473,7 @@ public class MP extends MIDlet
 			Notifier.close();
 		} catch (Throwable ignored) {}
 //#endif
+		notifyDestroyed();
 	}
 
 	protected void pauseApp() {
@@ -832,6 +834,7 @@ public class MP extends MIDlet
 		downloadInappCmd = new Command("в приложении", Command.OK, 0); // FIXME
 		downloadBrowserCmd = new Command("браузером", Command.CANCEL, 1);
 		cancelDownloadCmd = new Command(L[LCancel], Command.CANCEL, 1);
+		okDownloadCmd = new Command(L[LOk], Command.OK, 1);
 
 		nextPageCmd = new Command(L[LNextPage], Command.SCREEN, 6);
 		prevPageCmd = new Command(L[LPrevPage], Command.SCREEN, 7);
@@ -910,6 +913,13 @@ public class MP extends MIDlet
 		s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 		f.append(s);
 		
+//#ifndef NO_NOTIFY
+		// init notifications api wrapper
+		try {
+			Notifier.init();
+		} catch (Throwable ignored) {}
+//#endif
+		
 		authForm = f;
 		// load main form
 		if (user == null || userState < 3) {
@@ -920,23 +930,11 @@ public class MP extends MIDlet
 				display(infoAlert(L[LChooseNetwork_Alert]), current);
 				return;
 			}
-		} else {
-			run = RUN_VALIDATE_AUTH;
-			run();
-			
-			if (selfId != null) {
-				openLoad(mainDisplayable = mainChatsList());
-			}
-			
-//#ifndef NO_NOTIFY
-			// init notifications api wrapper
-			try {
-				Notifier.init();
-			} catch (Throwable ignored) {}
-//#endif
+			start(RUN_CHECK_OTA, null);
+			return;
 		}
 		
-		start(RUN_CHECK_OTA, null);
+		start(RUN_VALIDATE_AUTH, null);
 	}
 	
 	// endregion
@@ -967,9 +965,11 @@ public class MP extends MIDlet
 				selfId = ((JSONObject) api("me&status=1")).getString("id");
 				userState = 4;
 
+				openLoad(mainDisplayable = mainChatsList());
 				if (param != null) {
-					openLoad(mainDisplayable = mainChatsList());
 					writeAuth();
+				} else {
+					start(RUN_CHECK_OTA, null);
 				}
 				
 				if (keepAlive || notifications || updateChatsList)
@@ -977,6 +977,9 @@ public class MP extends MIDlet
 				break;
 			} catch (APIException e) {
 				if (e.code == 401) {
+					if (param == null) {
+						mainDisplayable = returnTo;
+					}
 					userState = 0;
 					user = null;
 					display(errorAlert(e), returnTo);
@@ -2004,15 +2007,23 @@ public class MP extends MIDlet
 			alert.setIndicator(new Gauge(null, false, Gauge.INDEFINITE, Gauge.CONTINUOUS_RUNNING));
 			alert.addCommand(cancelDownloadCmd);
 			alert.setCommandListener(this);
+			alert.setTimeout(Alert.FOREVER);
 			display(alert, current);
+			
+			if (reopenChat && updatesThread != null) {
+				MP.cancel(MP.updatesThread, true);
+			}
 			
 			String error;
 			try {
 				if (!downloadPath.endsWith("/")) downloadPath = downloadPath.concat("/");
 				int size = msg[3] == null ? 0 : Integer.parseInt(msg[3]);
 				
-				FileConnection fc = (FileConnection) Connector.open("file:///".concat(downloadPath).concat(msg[2]));
+				FileConnection fc = (FileConnection) Connector.open("file:///".concat(downloadPath = downloadPath.concat(msg[2])));
 				if (!fc.exists()) fc.create();
+				else {
+					// TODO ask rewrite permission
+				}
 				try {
 					OutputStream out = fc.openOutputStream();
 					try {
@@ -2025,8 +2036,9 @@ public class MP extends MIDlet
 								if (size != 0) {
 									alert.setIndicator(gauge = new Gauge(null, false, 100, 0));
 								}
+								alert.setString("Скачивание");
 								
-								byte[] buf = new byte[16384];
+								byte[] buf = new byte[4096];
 								int readTotal = 0;
 								int read;
 								while ((read = in.read(buf)) != -1) {
@@ -2041,9 +2053,9 @@ public class MP extends MIDlet
 								// done
 								alert.setIndicator(null);
 								alert.setString("Скачано в " + downloadPath);
-								alert.removeCommand(cancelCmd);
-								alert.addCommand(backCmd);
-//								display(current);
+								alert.removeCommand(cancelDownloadCmd);
+								alert.addCommand(okDownloadCmd);
+								display(alert, current);
 								break;
 							} finally {
 								try {
@@ -2066,7 +2078,6 @@ public class MP extends MIDlet
 						} catch (Exception ignored) {}
 					}
 				} finally {
-					downloading = false;
 					try {
 						fc.close();
 					} catch (Exception ignored) {} // TODO: should I left it ignored?
@@ -2079,6 +2090,8 @@ public class MP extends MIDlet
 				// failed to open file
 				e.printStackTrace();
 				error = e.toString();
+			} finally {
+				downloading = false;
 			}
 			
 			display(errorAlert(error), current);
@@ -3215,6 +3228,13 @@ public class MP extends MIDlet
 				downloading = false;
 				return;
 			}
+			if (c == okDownloadCmd) {
+				display(current);
+				if (current instanceof List) {
+					commandAction(backCmd, current);
+				}
+				return;
+			}
 		}
 		if (c == backCmd || c == cancelCmd) {
 			// cancel ota update dialog
@@ -3242,7 +3262,6 @@ public class MP extends MIDlet
 		}
 		if (c == exitCmd) {
 			destroyApp(true);
-			notifyDestroyed();
 		}
 	}
 
@@ -4095,7 +4114,8 @@ public class MP extends MIDlet
 	
 	void downloadDocument(String peerId, String msgId, String fileName, String size) {
 		if (downloading) return;
-		if (fileName != null && downloadMethod != 2 && !fileName.endsWith(".jar")) {
+		if (fileName != null && downloadMethod != 2
+				&& (!reopenChat || (!fileName.endsWith(".jar") && !fileName.endsWith(".jad")))) {
 			downloadMessage = new String[] { peerId, msgId, fileName, size };
 			if (downloadMethod == 0) {
 				Alert a = new Alert("");
@@ -4330,14 +4350,14 @@ public class MP extends MIDlet
 			if (url.indexOf(':') == -1) {
 				url = "http://".concat(url);
 			}
-			if (platformRequest(url)) notifyDestroyed();
+			if (platformRequest(url)) destroyApp(true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
 	static void openUrl(String url) {
-		if (!handleDeepLink(url)) {
+		if (selfId == null || !handleDeepLink(url)) {
 			midlet.browse(url);
 		}
 	}

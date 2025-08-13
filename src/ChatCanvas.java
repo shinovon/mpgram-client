@@ -627,80 +627,82 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		
 		int clipHeight = this.clipHeight = h - top - bottom;
 		
-		// layout
-		if (layoutStart != null) {
-			UIItem idx = layoutStart;
-			layoutStart = null;
-			layout(idx, w, clipHeight);
-			contentHeight = this.contentHeight;
-		}
-		
-		if (nextFocusItem != null) {
-			focusItem(nextFocusItem, 0);
-			if (!isVisible(nextFocusItem)) scrollTo(nextFocusItem);
-			nextFocusItem = null;
-		}
-		
-		// key scroll
-		
-		if (scrollTarget != -1) {
-			if (contentHeight <= clipHeight) {
-				scroll = 0;
-				scrollTarget = -1;
-			} else {
-				if (slide(0, scroll, scrollTarget, deltaTime)) {
-					animate = true;
-				} else {
-					scroll = scrollTarget;
-					scrollTarget = -1;
-				}
-				if (scroll <= 0) {
+		if (!loading) {
+			// layout
+			if (layoutStart != null) {
+				UIItem idx = layoutStart;
+				layoutStart = null;
+				layout(idx, w, clipHeight);
+				contentHeight = this.contentHeight;
+			}
+			
+			if (nextFocusItem != null) {
+				focusItem(nextFocusItem, 0);
+				if (!isVisible(nextFocusItem)) scrollTo(nextFocusItem);
+				nextFocusItem = null;
+			}
+			
+			// key scroll
+			
+			if (scrollTarget != -1) {
+				if (contentHeight <= clipHeight) {
 					scroll = 0;
 					scrollTarget = -1;
-					animate = false;
-				} else if (scroll >= contentHeight - clipHeight) {
-					scroll = contentHeight - clipHeight;
-					scrollTarget = -1;
-					animate = false;
-				}
-			}
-		}
-		
-		if (!touch && scrollTarget == -1) {
-			if (focusedItem == null && scrollCurrentItem == null && scrollTargetItem == null) {
-				int d = lastScrollDir;
-				if (d == 0) d = 1;
-				UIItem item = getItemAt(height >> 1);
-				if (item == null || !item.focusable) {
-					item = getFirstFocusableItemOnScreen(null, d, clipHeight / 4);
-				}
-				if (item != null) focusItem(item, d);
-			} else if (focusedItem != null && scrollCurrentItem == null && !isVisible(focusedItem)) {
-				scrollTo(focusedItem);
-			}
-		}
-		
-		// touch scroll
-		
-		if (kineticScroll != 0) {
-			if ((kineticScroll > -1 && kineticScroll < 1)
-					|| contentHeight <= clipHeight
-					|| scroll <= 0
-					|| scroll >= contentHeight - clipHeight) {
-				kineticScroll = 0;
-			} else {
-				float mul = pressed && !dragging ? 0.5f : 0.965f;
-				scroll += (int) kineticScroll;
-				kineticScroll *= mul;
-				float f;
-				if ((f = deltaTime > 33 && animating ? deltaTime / 33f : 1f) >= 2) {
-					int j = (int) f - 1;
-					for (int i = 0; i < j; i++) {
-						scroll += (int) kineticScroll;
-						kineticScroll *= mul;
+				} else {
+					if (slide(0, scroll, scrollTarget, deltaTime)) {
+						animate = true;
+					} else {
+						scroll = scrollTarget;
+						scrollTarget = -1;
+					}
+					if (scroll <= 0) {
+						scroll = 0;
+						scrollTarget = -1;
+						animate = false;
+					} else if (scroll >= contentHeight - clipHeight) {
+						scroll = contentHeight - clipHeight;
+						scrollTarget = -1;
+						animate = false;
 					}
 				}
-				animate = true;
+			}
+			
+			if (!touch && scrollTarget == -1) {
+				if (focusedItem == null && scrollCurrentItem == null && scrollTargetItem == null) {
+					int d = lastScrollDir;
+					if (d == 0) d = 1;
+					UIItem item = getItemAt(height >> 1);
+					if (item == null || !item.focusable) {
+						item = getFirstFocusableItemOnScreen(null, d, clipHeight / 4);
+					}
+					if (item != null) focusItem(item, d);
+				} else if (focusedItem != null && scrollCurrentItem == null && !isVisible(focusedItem)) {
+					scrollTo(focusedItem);
+				}
+			}
+			
+			// touch scroll
+			
+			if (kineticScroll != 0) {
+				if ((kineticScroll > -1 && kineticScroll < 1)
+						|| contentHeight <= clipHeight
+						|| scroll <= 0
+						|| scroll >= contentHeight - clipHeight) {
+					kineticScroll = 0;
+				} else {
+					float mul = pressed && !dragging ? 0.5f : 0.965f;
+					scroll += (int) kineticScroll;
+					kineticScroll *= mul;
+					float f;
+					if ((f = deltaTime > 33 && animating ? deltaTime / 33f : 1f) >= 2) {
+						int j = (int) f - 1;
+						for (int i = 0; i < j; i++) {
+							scroll += (int) kineticScroll;
+							kineticScroll *= mul;
+						}
+					}
+					animate = true;
+				}
 			}
 		}
 		
@@ -719,7 +721,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			// render items
 			
 			UIItem item = firstItem;
-			if (item != null) {
+			if (item != null && !loading) {
 				int x = 0;
 				if (pressed && draggingHorizontally && selected == 0) {
 					int d = pointerX - pressX;
@@ -839,8 +841,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				g.setColor(colors[COLOR_CHAT_PANEL_BORDER]);
 				g.drawLine(0, by, w, by);
 				g.setColor(colors[COLOR_CHAT_PANEL_FG]);
-				if (selected != 0) {
-					
+				if (selected != 0 || loading) {
+					if (!loading)
+						g.drawString(MP.L[LMenu], 2, by + 1, Graphics.TOP | Graphics.LEFT);
+					g.drawString(MP.L[LCancel], w - 2, by, Graphics.TOP | Graphics.RIGHT);
 				} else if (fieldFocused) {
 					// TODO
 					by += 1;
