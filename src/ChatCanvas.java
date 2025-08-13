@@ -1093,7 +1093,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			} else if (keyboard != null && keyboard.isVisible()) {
 				onKeyboardCancel();
 				return;
-			} else if (touch || query != null || mediaFilter != null || selected != 0) {
+			} else if (touch || query != null || mediaFilter != null || selected != 0 || loading) {
 				back();
 				return;
 			} else if (fieldFocused) {
