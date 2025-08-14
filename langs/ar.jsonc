@@ -312,6 +312,7 @@
 	"_comment": "تعليق", 
 	"_comments": " تعليقات",
 	"_comments2": "",
+	"ReplyTo": "Reply to ", // Untranslated
 	
 	// Message media
 	"Media": "وسائط",

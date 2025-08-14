@@ -547,7 +547,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 							}
 						}
 						if (t != null) {
-							sb.append("Reply to ").append(t);
+							sb.append(MP.L[LReplyTo]).append(t);
 						}
 						
 						sb.append("\n> ");

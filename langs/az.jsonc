@@ -312,6 +312,7 @@
 	"_comment": " comment", // Untranslated
 	"_comments": " comments", // Untranslated
 	"_comments2": "",
+	"ReplyTo": "Reply to ", // Untranslated
 	
 	// Message media
 	"Media": "Media",

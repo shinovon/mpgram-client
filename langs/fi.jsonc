@@ -312,6 +312,7 @@
 	"_comment": " kommentti",
 	"_comments": " kommenttia",
 	"_comments2": "",
+	"ReplyTo": "Reply to ", // Untranslated
 	
 	// Message media
 	"Media": "Media",
