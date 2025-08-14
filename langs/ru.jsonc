@@ -158,6 +158,7 @@
 	"WaitingForServerResponse": "Ожидание ответа сервера...",
 	"Sending": "Отправка...",
 	"WaitingForPrevChat": "Отключение от предыдущего чата...",
+	"Downloading": "Скачивание",
 	
 	// Authorization process
 	"Auth_Title": "Авторизация",
@@ -210,7 +211,7 @@
 	"ChatTextField": "Текстовое поле в чате",
 	"BuiltinImageViewer": "Встроен. просмотр изображений",
 	"LargeMusicCover": "Большая обложка в плеере",
-	"LegacyUI": "Legacy UI", // Untranslated
+	"LegacyUI": "Простой интерфейс",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Ждать полной загрузки",
@@ -227,7 +228,11 @@
 	"WiFi": "Wi-Fi",
 	"Longpoll": "Лонгполл",
 	"UpdatesInterval": "Интервал обновлений",
-	"DownloadPath": "Download path", // Untranslated
+	"DownloadPath": "Путь скачивания",
+	"DownloadMethod": "Способ скачивания",
+	"AlwaysAsk": "Всегда спрашивать",
+	"InApp": "В приложении",
+	"WithBrowser": "В браузере",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Загружать медиа",
@@ -286,6 +291,9 @@
 	"FailedToLoadImage": "Не удалось загр. изобр.", // unwrapped, should be short
 	"TextCopied_Alert": "Текст скопирован",
 	"NotEnoughMemory_Alert": "Недостаточно памяти",
+	"DownloadCanceled_Alert": "Скачивание отменено",
+	"DownloadedTo": "Скачано в ",
+	"ChooseDownloadMethod_Alert": "Выберите способ скачивания",
 	
 	// Chat form
 	"ChatMedia_Title": "Медиафайлы",
@@ -365,7 +373,7 @@
 	"UserInfo": "Пользователь",
 	"GroupInfo": "Группа",
 	"ChannelInfo": "Канал",
-	"TopicInfo": "Topic Info", // Untranslated
+	"TopicInfo": "Тема",
 	
 	"_member": " участник",
 	"_members": " участника",

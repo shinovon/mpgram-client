@@ -831,8 +831,8 @@ public class MP extends MIDlet
 		cancelCmd = new Command(L[LCancel], Command.CANCEL, 20);
 		goCmd = new Command(L[LOk], Command.OK, 1);
 		copyCmd = new Command(L[LCopy], Command.OK, 1);
-		downloadInappCmd = new Command("в приложении", Command.OK, 0); // FIXME
-		downloadBrowserCmd = new Command("браузером", Command.CANCEL, 1);
+		downloadInappCmd = new Command(L[LInApp], Command.OK, 0);
+		downloadBrowserCmd = new Command(L[LWithBrowser], Command.CANCEL, 1);
 		cancelDownloadCmd = new Command(L[LCancel], Command.CANCEL, 1);
 		okDownloadCmd = new Command(L[LOk], Command.OK, 1);
 
@@ -2036,7 +2036,7 @@ public class MP extends MIDlet
 								if (size != 0) {
 									alert.setIndicator(gauge = new Gauge(null, false, 100, 0));
 								}
-								alert.setString("Скачивание");
+								alert.setString(L[LDownloading]);
 								
 								byte[] buf = new byte[4096];
 								int readTotal = 0;
@@ -2052,7 +2052,7 @@ public class MP extends MIDlet
 								
 								// done
 								alert.setIndicator(null);
-								alert.setString("Скачано в " + downloadPath);
+								alert.setString(L[LDownloadedTo] + downloadPath);
 								alert.removeCommand(cancelDownloadCmd);
 								alert.addCommand(okDownloadCmd);
 								display(alert, current);
@@ -2084,7 +2084,7 @@ public class MP extends MIDlet
 				}
 			} catch (Exception e) {
 				if (e == cancelException) {
-					display(alert(null, "загрузка отменена", AlertType.WARNING), current);
+					display(alert(null, L[LDownloadCanceled_Alert], AlertType.WARNING), current);
 					break;
 				}
 				// failed to open file
@@ -2676,12 +2676,12 @@ public class MP extends MIDlet
 					f.append(s);
 					
 //#ifndef NO_FILE
-					// downloads TODO
+					// downloads
 					
-					downloadMethodChoice = new ChoiceGroup("Download method", Choice.POPUP, new String[] {
-							"Always ask",
-							"In app",
-							"Browser"
+					downloadMethodChoice = new ChoiceGroup(L[LDownloadMethod], Choice.POPUP, new String[] {
+							L[LAlwaysAsk],
+							L[LInApp],
+							L[LWithBrowser]
 					}, null);
 					downloadMethodChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					downloadMethodChoice.setSelectedIndex(downloadMethod, true);
@@ -4119,7 +4119,7 @@ public class MP extends MIDlet
 			downloadMessage = new String[] { peerId, msgId, fileName, size };
 			if (downloadMethod == 0) {
 				Alert a = new Alert("");
-				a.setString("как скачать"); // FIXME
+				a.setString(L[LChooseDownloadMethod_Alert]);
 				a.addCommand(downloadInappCmd);
 				a.addCommand(downloadBrowserCmd);
 				a.setCommandListener(this);

@@ -158,6 +158,7 @@
 	"WaitingForServerResponse": "Waiting for server response...",
 	"Sending": "Sending...",
 	"WaitingForPrevChat": "Waiting for previous chat to disconnect...",
+	"Downloading": "Downloading",
 	
 	// Authorization process
 	"Auth_Title": "Auth",
@@ -228,6 +229,10 @@
 	"Longpoll": "Longpoll",
 	"UpdatesInterval": "Updates interval",
 	"DownloadPath": "Download path",
+	"DownloadMethod": "Download method",
+	"AlwaysAsk": "Always ask",
+	"InApp": "In app",
+	"WithBrowser": "With browser",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Load media thumbnails",
@@ -286,6 +291,9 @@
 	"FailedToLoadImage": "Failed to load image", // unwrapped, should be short
 	"TextCopied_Alert": "Text copied",
 	"NotEnoughMemory_Alert": "Not enough memory",
+	"DownloadCanceled_Alert": "Download canceled",
+	"DownloadedTo": "Downloaded to ",
+	"ChooseDownloadMethod_Alert": "Choose download method",
 	
 	// Chat form
 	"ChatMedia_Title": "Media",

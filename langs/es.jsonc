@@ -158,6 +158,7 @@
 	"WaitingForServerResponse": "Esperando respuesta del servidor...",
 	"Sending": "Enviando",
 	"WaitingForPrevChat": "Esperando a que se desconecte el chat anterior...",
+	"Downloading": "Downloading", // Untranslated
 	
 	// Authorization process
 	"Auth_Title": "Autorizacion",
@@ -228,6 +229,10 @@
 	"Longpoll": "Longpoll", // Untranslated
 	"UpdatesInterval": "Updates interval", // Untranslated
 	"DownloadPath": "Download path", // Untranslated
+	"DownloadMethod": "Download method", // Untranslated
+	"AlwaysAsk": "Always ask", // Untranslated
+	"InApp": "In app", // Untranslated
+	"WithBrowser": "With browser", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "Cargar miniaturas de medios",
@@ -286,6 +291,9 @@
 	"FailedToLoadImage": "Error al cargar la imagen",
 	"TextCopied_Alert": "Text copied", // Untranslated
 	"NotEnoughMemory_Alert": "Not enough memory", // Untranslated
+	"DownloadCanceled_Alert": "Download canceled", // Untranslated
+	"DownloadedTo": "Downloaded to ", // Untranslated
+	"ChooseDownloadMethod_Alert": "Choose download method", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Archivos",

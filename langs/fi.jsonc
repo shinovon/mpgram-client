@@ -158,6 +158,7 @@
 	"WaitingForServerResponse": "Odotetaan palvelimen vastausta...",
 	"Sending": "Lähetetään",
 	"WaitingForPrevChat": "Odotetaan yhteyden sulkeutumista...",
+	"Downloading": "Downloading", // Untranslated
 	
 	// Authorization process
 	"Auth_Title": "Kirjaudu",
@@ -228,6 +229,10 @@
 	"Longpoll": "Longpoll", // Untranslated
 	"UpdatesInterval": "Updates interval", // Untranslated
 	"DownloadPath": "Download path", // Untranslated
+	"DownloadMethod": "Download method", // Untranslated
+	"AlwaysAsk": "Always ask", // Untranslated
+	"InApp": "In app", // Untranslated
+	"WithBrowser": "With browser", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "Kuvien esikatselu",
@@ -286,6 +291,9 @@
 	"FailedToLoadImage": "Kuvan lataus epäonnistui", // unwrapped, should be short
 	"TextCopied_Alert": "Text copied", // Untranslated
 	"NotEnoughMemory_Alert": "Not enough memory", // Untranslated
+	"DownloadCanceled_Alert": "Download canceled", // Untranslated
+	"DownloadedTo": "Downloaded to ", // Untranslated
+	"ChooseDownloadMethod_Alert": "Choose download method", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Media",
