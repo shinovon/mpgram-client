@@ -240,7 +240,7 @@ public class MP extends MIDlet
 	static boolean updateChatsList;
 	static boolean legacyChatUI;
 	static boolean fastScrolling; // disable animations
-	static boolean forceKeyUI;
+	static final boolean forceKeyUI = false;
 	static int downloadMethod; // 0 - always ask, 1 - in app, 2 - browser
 	static String downloadPath;
 	static boolean longpoll = true;
@@ -1998,12 +1998,12 @@ public class MP extends MIDlet
 			break;
 		}
 		case RUN_DOWNLOAD_DOCUMENT: {
-			// TODO
 			downloading = true;
 			String downloadPath = (String) param;
 			String[] msg = downloadMessage;
+			String name;
 			
-			Alert alert = new Alert("");
+			Alert alert = new Alert(name = msg[2]);
 			alert.setIndicator(new Gauge(null, false, Gauge.INDEFINITE, Gauge.CONTINUOUS_RUNNING));
 			alert.addCommand(cancelDownloadCmd);
 			alert.setCommandListener(this);
@@ -2018,8 +2018,11 @@ public class MP extends MIDlet
 			try {
 				if (!downloadPath.endsWith("/")) downloadPath = downloadPath.concat("/");
 				int size = msg[3] == null ? 0 : Integer.parseInt(msg[3]);
+				if (name == null) {
+					name = msg[0] + '_' + msg[1];
+				}
 				
-				FileConnection fc = (FileConnection) Connector.open("file:///".concat(downloadPath = downloadPath.concat(msg[2])));
+				FileConnection fc = (FileConnection) Connector.open("file:///".concat(downloadPath = downloadPath.concat(name)));
 				if (!fc.exists()) fc.create();
 				else {
 					// TODO ask rewrite permission
@@ -3326,7 +3329,7 @@ public class MP extends MIDlet
 			if (c == documentCmd) {
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
-				downloadDocument(s[0], s[1], s[4], s[5]);
+				downloadDocument(s[0], s[1], s[4] == null ? s[0] + '_' + s[1] + ".jpg" : s[4], s[5]);
 				return;
 			}
 			if (c == editMsgCmd) {
@@ -4106,6 +4109,7 @@ public class MP extends MIDlet
 		String username = ((MPChat) current).username();
 		if (peerId.charAt(0) == '-' && username == null) {
 			sb.append("c/");
+			 // FIXME handle channel offset properly
 			peerId = peerId.substring(peerId.startsWith("-100") ? 4 : 1);
 		}
 		sb.append(username != null ? username : peerId).append('/').append(msgId);
@@ -4323,10 +4327,8 @@ public class MP extends MIDlet
 		} else if (p instanceof MPChat) {
 			((MPChat) p).closed(back);
 		}
-		if (back) {
-			if (p instanceof MPForm || p instanceof MPList) {
-				imagesToLoad.removeAllElements();
-			}
+		if (back && (p instanceof MPForm || p instanceof MPList || p instanceof MPChat)) {
+			imagesToLoad.removeAllElements();
 		}
 		
 		if (d instanceof MPForm) {
@@ -4398,7 +4400,8 @@ public class MP extends MIDlet
 				}
 				if ("c".equals(s[0]) && s.length > 1) {
 //					privat = true;
-					domain = "-".concat(s[1]); // FIXME handle -100 prefix
+					// FIXME handle channel offset (-100...)
+					domain = "-".concat(s[1]);
 					if (s.length == 3) {
 						messageId = s[2];
 					} else if (s.length == 4) {

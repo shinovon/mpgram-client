@@ -358,6 +358,7 @@ public class UIMessage extends UIItem implements LangConstants {
 						mediaTitle = MP.L[LPhoto];
 					}
 				} else if (type.equals("poll")) {
+					// TODO
 					mediaTitle = MP.L[LPoll];
 				} else if (type.equals("geo")) {
 					mediaTitle = MP.L[LGeo];
@@ -1067,7 +1068,11 @@ public class UIMessage extends UIItem implements LangConstants {
 				break;
 			}
 		case LDownload:
-			MP.midlet.downloadDocument(peerId, idStr, mediaFileName, Long.toString(fileSize));
+			String name = mediaFileName;
+			if (name == null && photo) {
+				name = peerId + '_' + id + ".jpg";
+			}
+			MP.midlet.downloadDocument(peerId, idStr, name, Long.toString(fileSize));
 			break;
 		case LPlay_Item:
 			MP.display(MP.loadingAlert(MP.L[LLoading]), MP.current);
