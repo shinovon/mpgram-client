@@ -661,6 +661,7 @@ public class MP extends MIDlet
 		
 		reopenChat = s40;
 		longpoll = !s40;
+		parseRichtext = !s40;
 		
 		// load settings
 		try {
@@ -1881,6 +1882,8 @@ public class MP extends MIDlet
 				}
 			} catch (Exception e) {
 				display(errorAlert(e), current);
+			} finally {
+				sending = false;
 			}
 			break;
 		}
@@ -2004,6 +2007,7 @@ public class MP extends MIDlet
 			String name;
 			
 			Alert alert = new Alert(name = msg[2]);
+			alert.setString(L[LLoading]);
 			alert.setIndicator(new Gauge(null, false, Gauge.INDEFINITE, Gauge.CONTINUOUS_RUNNING));
 			alert.addCommand(cancelDownloadCmd);
 			alert.setCommandListener(this);
@@ -2054,10 +2058,11 @@ public class MP extends MIDlet
 								}
 								
 								// done
+								display(current);
+								alert.addCommand(okDownloadCmd);
+								alert.removeCommand(cancelDownloadCmd);
 								alert.setIndicator(null);
 								alert.setString(L[LDownloadedTo] + downloadPath);
-								alert.removeCommand(cancelDownloadCmd);
-								alert.addCommand(okDownloadCmd);
 								display(alert, current);
 								break;
 							} finally {
@@ -2107,7 +2112,7 @@ public class MP extends MIDlet
 	Thread start(int i, Object param) {
 		Thread t = null;
 		try {
-			synchronized(this) {
+			synchronized (this) {
 				run = i;
 				runParam = param;
 				(t = new Thread(this)).start();
@@ -2911,8 +2916,10 @@ public class MP extends MIDlet
 					return;
 				}
 
-				if (sending) return;
-				sending = true;
+				synchronized (this) {
+					if (sending) return;
+					sending = true;
+				}
 
 				display(loadingAlert(L[LSending]), d);
 				if ((reopenChat || !longpoll || sendFile != null) && MP.updatesThread != null) {
@@ -3224,6 +3231,7 @@ public class MP extends MIDlet
 				return;
 			}
 			if (c == downloadBrowserCmd) {
+				display(current);
 				downloadContinue(2);
 				return;
 			}
@@ -3360,8 +3368,12 @@ public class MP extends MIDlet
 			}
 			if (c == botCallbackCmd) {
 				String[] p = (String[]) ((MPForm) current).urls.get(item);
-				if (sending || p == null) return;
-				sending = true;
+				if (p == null) return;
+				
+				synchronized (this) {
+					if (sending) return;
+					sending = true;
+				}
 
 				if (reopenChat || !longpoll) {
 					display(loadingAlert(L[LSending]), current);
@@ -3412,8 +3424,10 @@ public class MP extends MIDlet
 			if ((t = ((TextField) item).getString().trim()).length() == 0)
 				return;
 			
-			if (sending) return;
-			sending = true;
+			synchronized (this) {
+				if (sending) return;
+				sending = true;
+			}
 
 			display(loadingAlert(L[LSending]), current);
 			if ((reopenChat || !longpoll) && MP.updatesThread != null) {
@@ -3427,12 +3441,17 @@ public class MP extends MIDlet
 			JSONObject s = (JSONObject) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 			
+			synchronized (this) {
+				if (sending) return;
+				sending = true;
+			}
+
+			display(loadingAlert(L[LSending]), current);
 			if ((reopenChat ||!longpoll) && MP.updatesThread != null) {
 				MP.cancel(MP.updatesThread, true);
 			}
 			imagesToLoad.removeAllElements();
 			
-			display(loadingAlert(L[LSending]), current);
 			start(RUN_SEND_STICKER, s);
 			return;
 		}
@@ -4122,7 +4141,7 @@ public class MP extends MIDlet
 				&& (!reopenChat || (!fileName.endsWith(".jar") && !fileName.endsWith(".jad")))) {
 			downloadMessage = new String[] { peerId, msgId, fileName, size };
 			if (downloadMethod == 0) {
-				Alert a = new Alert("");
+				Alert a = new Alert(fileName);
 				a.setString(L[LChooseDownloadMethod_Alert]);
 				a.addCommand(downloadInappCmd);
 				a.addCommand(downloadBrowserCmd);
