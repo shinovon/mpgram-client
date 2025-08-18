@@ -1453,9 +1453,12 @@ public class MP extends MIDlet
 				boolean check = true;
 				while (form.update() && updatesThread == thread) {
 					try {
-						Thread.sleep(updatesDelay);
 						if (!form.update() || updatesThread != thread) break;
-						if (!form.isShown()) continue;
+						if (!form.isShown()) {
+							Thread.sleep(updatesDelay);
+							continue;
+						}
+						Thread.sleep(10);
 						if (check) {
 							sb.setLength(0);
 							sb.append("getLastUpdate&peer=").append(form.id());
