@@ -168,7 +168,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	int editMsgId;
 	String file;
 	static Keyboard keyboard;
-	static Object nokiaEditor;
+	Object nokiaEditor;
 	boolean updateEditor;
 	
 	ChatCanvas() {
@@ -225,9 +225,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		case 1: // nokiaui
 //#ifndef NO_NOKIAUI
 			try {
-				if (nokiaEditor == null) {
-					nokiaEditor = NokiaAPI.createTextEditor(500, TextField.ANY, 40, 40);
-				}
+				nokiaEditor = NokiaAPI.createTextEditor(500, TextField.ANY, 40, 40);
 				if (nokiaEditor != null) {
 					NokiaAPI.TextEditor_setParent(nokiaEditor, this);
 					NokiaAPI.TextEditor_setContent(nokiaEditor, "");
@@ -570,7 +568,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			NokiaAPI.TextEditor_setFocus(nokiaEditor, false);
 			NokiaAPI.TextEditor_setVisible(nokiaEditor, false);
 			NokiaAPI.TextEditor_setParent(nokiaEditor, null);
-			nokiaEditor = null;
 		}
 //#endif
 		if (keyboard != null && keyboard.isVisible()) {
@@ -590,6 +587,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			if (typingThread == null) {
 				(typingThread = new Thread(this)).start();
 			}
+		}
+		if (nokiaEditor != null) {
+			NokiaAPI.TextEditor_setParent(nokiaEditor, this);
 		}
 		if (keyboard != null) {
 			keyboard.setListener(this);
