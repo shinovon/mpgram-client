@@ -123,7 +123,6 @@ public class UIMessage extends UIItem implements LangConstants {
 		space = chat.broadcast;
 		name = out && !chat.broadcast ? MP.L[LYou] : MP.getName(fromId, true).trim();
 		dateRender = MP.localizeDate(date, 0);
-		dateWidth = MP.smallBoldFont.stringWidth(dateRender);
 		edited = message.has("edit") && chat.mediaFilter == null;
 		peerId = chat.id;
 		
@@ -195,7 +194,6 @@ public class UIMessage extends UIItem implements LangConstants {
 		StringBuffer sb = new StringBuffer();
 		sb.setLength(0);
 		time = MP.appendTime(sb, date).toString();
-		timeWidth = MP.smallPlainFont.stringWidth(time);
 	}
 	
 	private void init(JSONObject message, ChatCanvas chat) {
@@ -417,6 +415,10 @@ public class UIMessage extends UIItem implements LangConstants {
 			if (((ChatCanvas) container).reverse) y += SPACE_HEIGHT;
 			h -= SPACE_HEIGHT;
 		}
+
+		if (dateRender != null) dateWidth = MP.smallBoldFont.stringWidth(dateRender);
+		if (time != null) timeWidth = MP.smallPlainFont.stringWidth(time);
+		
 		// date
 		if (showDate) {
 			if (((ChatCanvas) container).reverse) {
@@ -447,6 +449,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			}
 			return;
 		}
+		
 		int cw = contentWidth;
 		if (out && w < 900) {
 			x += w - cw;

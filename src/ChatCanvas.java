@@ -1521,6 +1521,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 
 	protected void sizeChanged(int width, int height) {
 		skipRender = false;
+		MP.smallPlainFontHeight = MP.smallPlainFont.getHeight();
+		MP.smallPlainFontSpaceWidth = MP.smallPlainFont.charWidth(' ');
+		MP.smallBoldFontHeight = MP.smallBoldFont.getHeight();
+		MP.medPlainFontHeight = MP.medPlainFont.getHeight();
+		MP.medBoldFontHeight = MP.medBoldFont.getHeight();
 		queueRepaint();
 	}
 	
