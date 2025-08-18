@@ -3525,17 +3525,20 @@ public class MP extends MIDlet
 				commandAction(sendCmd, item);
 				return;
 			}
-			// typing state timer
-			if (!sendTyping) return;
-			long l = System.currentTimeMillis();
-			if (l - lastType < 5000L) return;
-			
-			lastType = l;
-			start(RUN_SET_TYPING, ((TextField) item).getString().length() == 0 ? "Cancel" : null);
+			sendTyping(((TextField) item).getString().trim().length() == 0);
 		}
 		// TODO update updateTimeoutGauge label when longpoll is changed
 //		if (item == behChoice) {
 //		}
+	}
+	
+	public void sendTyping(boolean cancel) {
+		if (!sendTyping) return;
+		long l = System.currentTimeMillis();
+		if (l - lastType < 5000L) return;
+		
+		lastType = l;
+		start(RUN_SET_TYPING, cancel ? "Cancel" : null);
 	}
 	
 	// endregion

@@ -2217,6 +2217,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	public void onKeyboardTextUpdated() {
 		text = keyboard.getText();
+		MP.midlet.sendTyping(text.trim().length() != 0);
 		queueRepaint();
 	}
 	
@@ -2252,6 +2253,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		// TODO
 		if ((actions & NokiaAPI.ACTION_CONTENT_CHANGE) != 0) {
 			text = NokiaAPI.TextEditor_getContent(nokiaEditor);
+			MP.midlet.sendTyping(text.trim().length() != 0);
 			queueRepaint();
 		} else if ((actions & NokiaAPI.ACTION_PAINT_REQUEST) != 0) {
 			queueRepaint();
