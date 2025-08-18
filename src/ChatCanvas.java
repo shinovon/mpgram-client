@@ -1478,7 +1478,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				} else if (x > width - 48) {
 					if (query == null && mediaFilter == null)
 						showMenu(null, new int[] { LRefresh, LSearchMessages });
-				} else if (!selfChat && postId == null) {
+				} else if (postId == null) {
 					openProfile();
 				}
 			} else if (y > height - bottom) {
@@ -2220,7 +2220,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	public void onKeyboardTextUpdated() {
 		text = keyboard.getText();
-		MP.midlet.sendTyping(text.trim().length() != 0);
+		MP.midlet.sendTyping(text.trim().length() == 0);
 		queueRepaint();
 	}
 	

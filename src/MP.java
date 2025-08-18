@@ -263,6 +263,7 @@ public class MP extends MIDlet
 	static Vector closingConnections = new Vector();
 	static boolean sending;
 	static boolean updatesRunning;
+	static boolean updatesSleeping;
 	static Object updatesLock = new Object();
 //#ifndef NO_FILE
 	static boolean downloading;
@@ -1455,7 +1456,9 @@ public class MP extends MIDlet
 					try {
 						if (!form.update() || updatesThread != thread) break;
 						if (!form.isShown()) {
+							updatesSleeping = true;
 							Thread.sleep(updatesDelay);
+							updatesSleeping = false;
 							continue;
 						}
 						Thread.sleep(10);
@@ -1522,7 +1525,9 @@ public class MP extends MIDlet
 						}
 						
 						if (!longpoll) {
+							updatesSleeping = true;
 							Thread.sleep(updatesTimeout * 1000);
+							updatesSleeping = false;
 						}
 					} catch (Exception e) {
 						if (e.toString().indexOf("Interrupted") != -1 || e == cancelException) {
@@ -1539,6 +1544,9 @@ public class MP extends MIDlet
 							}
 							break;
 						}
+						updatesSleeping = true;
+						Thread.sleep(updatesDelay);
+						updatesSleeping = false;
 					}
 				}
 			} catch (Exception e) {
@@ -1547,6 +1555,7 @@ public class MP extends MIDlet
 				if (updatesThread == thread)
 					updatesThread = null;
 				updatesRunning = false;
+				updatesSleeping = false;
 			}
 			break;
 		}
@@ -1775,7 +1784,7 @@ public class MP extends MIDlet
 			break;
 		}
 		case RUN_CANCEL_UPDATES: {
-			if (!longpoll) {
+			if (longpoll) {
 				try {
 					api("cancelUpdates");
 				} catch (Exception ignored) {}
@@ -2144,7 +2153,7 @@ public class MP extends MIDlet
 		if (updates) updatesThread = null;
 		Connection c = (Connection) threadConnections.get(thread);
 		if (c == null) {
-			if (updates && longpoll) {
+			if (updates && updatesSleeping) {
 				thread.interrupt();
 			}
 			return;
