@@ -460,21 +460,21 @@ public class UIMessage extends UIItem implements LangConstants {
 		y += MARGIN_TOP;
 		cw -= MARGIN_WIDTH * 2 + MARGIN_SIDE;
 		h -= MARGIN_TOP;
-		if (!selected || true) {
-			g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_BG : COLOR_MESSAGE_BG]);
-			g.fillRect(x, y, cw, h);
-			if (focus && focusChild == null && subFocusCurrent == -1) {
-				g.setColor(ChatCanvas.colors[COLOR_MESSAGE_FOCUS_BORDER]);
-				g.drawRect(x, y, cw - 1, h - 1);
-			} else {
-				// fake rounding
-				g.setColor(ChatCanvas.colors[ChatCanvas.COLOR_CHAT_BG]);
-				g.drawLine(x, y, x, y);
-				g.drawLine(x + cw - 1, y, x + cw - 1, y);
-				if (out) g.drawLine(x, y + h - 1, x, y + h - 1);
-				else g.drawLine(x + cw - 1, y + h - 1, x + cw - 1, y + h - 1);
-			}
+		
+		g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_BG : COLOR_MESSAGE_BG]);
+		g.fillRect(x, y, cw, h);
+		if (focus && focusChild == null && subFocusCurrent == -1 && !((ChatCanvas) container).touch) {
+			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_FOCUS_BORDER]);
+			g.drawRect(x, y, cw - 1, h - 1);
+		} else {
+			// fake rounding
+			g.setColor(ChatCanvas.colors[ChatCanvas.COLOR_CHAT_BG]);
+			g.drawLine(x, y, x, y);
+			g.drawLine(x + cw - 1, y, x + cw - 1, y);
+			if (out) g.drawLine(x, y + h - 1, x, y + h - 1);
+			else g.drawLine(x + cw - 1, y + h - 1, x + cw - 1, y + h - 1);
 		}
+		
 		int rw = cw;
 		cw -= PADDING_WIDTH * 2;
 		int rx = x;
