@@ -1481,7 +1481,8 @@ public class MP extends MIDlet
 						sb.append("updates&media=1&read=1&peer=").append(form.id())
 						.append("&offset=").append(offset)
 						.append("&timeout=").append(longpoll ? updatesTimeout : 1)
-						.append("&message=").append(form.firstMsgId());
+						.append("&message=").append(form.firstMsgId())
+						.append("&limit=200");
 						if (!longpoll) {
 							sb.append("&longpoll=0");
 						}
