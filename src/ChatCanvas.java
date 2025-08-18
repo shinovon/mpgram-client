@@ -1558,7 +1558,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					break;
 				case LWriteMessage:
 					if (replyMsgId != 0 || editMsgId != 0) {
-						MP.display(MP.writeForm(id, Integer.toString(Math.max(replyMsgId, topMsgId)), text, editMsgId == 0 ? null : Integer.toString(editMsgId), null, null));
+						int r = Math.max(replyMsgId, topMsgId);
+						MP.display(MP.writeForm(id, r == 0 ? null : Integer.toString(r), text, editMsgId == 0 ? null : Integer.toString(editMsgId), null, null));
 						resetInput();
 						break;
 					}
