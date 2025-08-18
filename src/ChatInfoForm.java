@@ -29,12 +29,12 @@ public class ChatInfoForm extends MPForm {
 	String id;
 	String phone;
 	String invite;
-	ChatForm chatForm;
+	MPChat chatForm;
 	int mode; // 0 - chat info or profile by id, 1 - phone, 2 - invite peek, 3 - invite
 	int pinnedMessageId;
 	boolean canBan;
 	
-	public ChatInfoForm(String id, ChatForm chatForm, int mode) {
+	public ChatInfoForm(String id, MPChat chatForm, int mode) {
 		super(id);
 		this.id = id;
 		this.chatForm = chatForm;
@@ -73,7 +73,7 @@ public class ChatInfoForm extends MPForm {
 		}
 		
 		boolean isUser = id.charAt(0) != '-';
-		boolean topic = mode == 0 && chatForm != null && chatForm.forum;
+		boolean topic = mode == 0 && chatForm != null && chatForm.forum();
 		StringItem s;
 		
 		if (topic) {
@@ -105,7 +105,7 @@ public class ChatInfoForm extends MPForm {
 			full = fullInfo.getObject("full");
 			rawPeer = fullInfo.getObject(isUser ? "User" : "Chat");
 			
-			setTitle(MP.L[isUser ? UserInfo : broadcast ? ChannelInfo : topic ? TopicInfo : GroupInfo]);
+			setTitle(MP.L[isUser ? LUserInfo : broadcast ? LChannelInfo : topic ? LTopicInfo : LGroupInfo]);
 		}
 		
 		if (isUser) {
@@ -113,12 +113,12 @@ public class ChatInfoForm extends MPForm {
 				sb.setLength(0);
 				JSONObject status = rawPeer.getObject("status");
 				if ("userStatusOnline".equals(status.getString("_"))) {
-					sb.append(MP.L[Online]);
-				} else if(status.has("was_online")) {
-					sb.append(MP.L[LastSeen]);
+					sb.append(MP.L[LOnline]);
+				} else if (status.has("was_online")) {
+					sb.append(MP.L[LLastSeen]);
 					sb.append(MP.localizeDate(status.getInt("was_online"), 3));
 				} else {
-					sb.append(MP.L[Offline]);
+					sb.append(MP.L[LOffline]);
 				}
 				
 				s = new StringItem(null, sb.toString());
@@ -132,7 +132,7 @@ public class ChatInfoForm extends MPForm {
 				phone = "+".concat(rawPeer.getString("phone"));
 				addCommand(MP.callCmd);
 				
-				s = new StringItem(MP.L[Mobile], phone);
+				s = new StringItem(MP.L[LMobile], phone);
 				s.setFont(MP.medPlainFont);
 				s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 				s.addCommand(MP.callItemCmd);
@@ -141,7 +141,7 @@ public class ChatInfoForm extends MPForm {
 			}
 			
 			if (full.has("about")) {
-				s = new StringItem(MP.L[About_User], full.getString("about"));
+				s = new StringItem(MP.L[LAbout_User], full.getString("about"));
 				s.setFont(MP.medPlainFont);
 				s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 				s.setItemCommandListener(MP.midlet);
@@ -149,7 +149,7 @@ public class ChatInfoForm extends MPForm {
 			}
 			
 			if (rawPeer.has("username")) {
-				s = new StringItem(MP.L[Username], "@".concat(rawPeer.getString("username")));
+				s = new StringItem(MP.L[LUsername], "@".concat(rawPeer.getString("username")));
 				s.setFont(MP.medPlainFont);
 				s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 				s.setItemCommandListener(MP.midlet);
@@ -167,7 +167,7 @@ public class ChatInfoForm extends MPForm {
 				
 				if (full.has("participants_count")) {
 					s = new StringItem(null, MP.localizePlural(full.getInt("participants_count"),
-							rawPeer.getBoolean("broadcast", false) ? _subscriber : _member));
+							rawPeer.getBoolean("broadcast", false) ? L_subscriber : L_member));
 					s.setFont(MP.medPlainFont);
 					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					s.setItemCommandListener(MP.midlet);
@@ -178,7 +178,7 @@ public class ChatInfoForm extends MPForm {
 					// TODO
 				} else {
 					if (full.has("about")) {
-						s = new StringItem(MP.L[About_Chat], full.getString("about"));
+						s = new StringItem(MP.L[LAbout_Chat], full.getString("about"));
 						s.setFont(MP.medPlainFont);
 						s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 						s.setItemCommandListener(MP.midlet);
@@ -188,7 +188,7 @@ public class ChatInfoForm extends MPForm {
 				
 				if (rawPeer.has("username")) {
 					String t = "t.me/".concat(rawPeer.getString("username"));
-					s = new StringItem(MP.L[Link], topic ? t.concat("/").concat(Integer.toString(chatForm.topMsgId)) : t);
+					s = new StringItem(MP.L[LLink], topic ? t.concat("/").concat(Integer.toString(chatForm.topMsgId())) : t);
 					s.setFont(MP.medPlainFont);
 					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					s.setItemCommandListener(MP.midlet);
@@ -197,7 +197,7 @@ public class ChatInfoForm extends MPForm {
 			}
 			
 			if (mode != 0) {
-				s = new StringItem(null, mode == 2 ? MP.L[ViewGroup] : MP.L[JoinGroup], Item.BUTTON);
+				s = new StringItem(null, mode == 2 ? MP.L[LViewGroup] : MP.L[LJoinGroup], Item.BUTTON);
 				s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 				s.setDefaultCommand(mode == 2 ? MP.openChatCmd : MP.acceptInviteCmd);
 				s.setItemCommandListener(MP.midlet);
@@ -209,7 +209,7 @@ public class ChatInfoForm extends MPForm {
 		if (!topic && full.has("pinned_msg_id")) {
 			this.pinnedMessageId = full.getInt("pinned_msg_id");
 			
-			s = new StringItem(null, MP.L[GoToPinnedMessage]);
+			s = new StringItem(null, MP.L[LGoToPinnedMessage]);
 			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			s.setDefaultCommand(MP.gotoPinnedMsgCmd);
 			s.setItemCommandListener(MP.midlet);
@@ -219,31 +219,31 @@ public class ChatInfoForm extends MPForm {
 		}
 		
 		if (chatForm != null) {
-			s = new StringItem(null, MP.L[SearchMessages], Item.BUTTON);
+			s = new StringItem(null, MP.L[LSearchMessages], Item.BUTTON);
 			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			s.setDefaultCommand(MP.searchMsgCmd);
 			s.setItemCommandListener(MP.midlet);
 			append(s);
 			
-			s = new StringItem(null, MP.L[Photos], Item.BUTTON);
+			s = new StringItem(null, MP.L[LPhotos], Item.BUTTON);
 			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			s.setDefaultCommand(MP.chatPhotosCmd);
 			s.setItemCommandListener(MP.midlet);
 			append(s);
 			
-			s = new StringItem(null, MP.L[Videos], Item.BUTTON);
+			s = new StringItem(null, MP.L[LVideos], Item.BUTTON);
 			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			s.setDefaultCommand(MP.chatVideosCmd);
 			s.setItemCommandListener(MP.midlet);
 			append(s);
 			
-			s = new StringItem(null, MP.L[Files], Item.BUTTON);
+			s = new StringItem(null, MP.L[LFiles], Item.BUTTON);
 			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			s.setDefaultCommand(MP.chatFilesCmd);
 			s.setItemCommandListener(MP.midlet);
 			append(s);
 			
-			s = new StringItem(null, MP.L[AudioFiles], Item.BUTTON);
+			s = new StringItem(null, MP.L[LAudioFiles], Item.BUTTON);
 			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			s.setDefaultCommand(MP.chatMusicCmd);
 			s.setItemCommandListener(MP.midlet);
@@ -252,7 +252,7 @@ public class ChatInfoForm extends MPForm {
 		
 		if (!isUser && !topic) {
 			boolean left = rawPeer.getBoolean("left", false);
-			s = new StringItem(null, left ? MP.L[JoinGroup] : MP.L[LeaveGroup], Item.BUTTON);
+			s = new StringItem(null, left ? MP.L[LJoinGroup] : MP.L[LLeaveGroup], Item.BUTTON);
 			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			s.setDefaultCommand(left ? MP.joinChatCmd : MP.leaveChatCmd);
 			s.setItemCommandListener(MP.midlet);

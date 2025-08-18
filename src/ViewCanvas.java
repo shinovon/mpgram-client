@@ -70,7 +70,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 			try {
 				Thread.sleep(100);
 			} catch (Exception ignored) {}
-			MP.display(new Alert("Error", "Not enough memory to continue viewing.", null, AlertType.ERROR)); // TODO unlocalized
+			MP.display(MP.errorAlert(MP.L[LNotEnoughMemory_Alert]), this);
 			return;
 		}
 	}
@@ -91,8 +91,8 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 			int l = -1;
 			byte[] b;
 			try {
-				b = MP.get(MP.instanceUrl + MP.FILE_URL + "?a&c=" + peer + "&m=" + id + "&p=rprev&s="
-						+ (Math.min(getWidth(), getHeight()) * zoom));
+				b = MP.get(MP.instanceUrl + MP.FILE_URL + "?a&c=" + peer + "&m=" + id + "&p=rview&s="
+						+ (Math.min(getWidth(), getHeight()) * zoom) + "&tw=" + (getWidth() * zoom) + "&th=" + (getHeight() * zoom));
 				l = b.length;
 				origImg = Image.createImage(b, 0, b.length);
 				b = null;
@@ -137,9 +137,9 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 				if (error) {
 					g.setGrayScale(0);
 					g.fillRect(0, 0, w, h);
-					info = MP.L[FailedToLoadImage];
+					info = MP.L[LFailedToLoadImage];
 				} else {
-					info = MP.L[Loading];
+					info = MP.L[LLoading];
 				}
 				g.setGrayScale(0);
 				int tw = f.stringWidth(info);
@@ -230,7 +230,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 		}
 	}
 
-	String[] touchCaps = new String[] { "x1", "x2", "x3", MP.L[Back] };
+	String[] touchCaps = new String[] { "x1", "x2", "x3", MP.L[LBack] };
 
 	boolean touchCtrlShown = true;
 
@@ -448,11 +448,11 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 	 * @param c2 Bottom color.
 	 */
 	public static void fillGrad(Graphics g, int x, int y, int w, int h, int c1, int c2) {
+		final int c2_RB = c2 & 0x00FF00FF;
+		final int c2_AG_org = c2 & 0xFF00FF00;
 		for (int i = 0; i < h; i++) {
 //			g.setColor(blend(c2, c1, i * 255 / h));
 			int v = (i * 255 / h) & 0xFF;
-			final int c2_RB = c2 & 0x00FF00FF;
-			final int c2_AG_org = c2 & 0xFF00FF00;
 			g.setColor((((c2_AG_org) + ((((c1 >>> 8) & 0x00FF00FF) - ((c2_AG_org) >>> 8)) * v)) & 0xFF00FF00)
 					| ((c2_RB + ((((c1 & 0x00FF00FF) - c2_RB) * v) >> 8)) & 0x00FF00FF));
 			g.drawLine(x, y + i, x + w, y + i);

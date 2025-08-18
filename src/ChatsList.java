@@ -30,7 +30,7 @@ public class ChatsList extends MPList {
 //	long firstMsgDate, lastMsgDate;
 //	long offsetDate;
 	int offset;
-	Vector ids;
+	Vector/*<String>*/ ids;
 	String url;
 	String arrayName;
 	boolean users;
@@ -38,6 +38,9 @@ public class ChatsList extends MPList {
 	boolean canBan;
 	String peerId, msgId;
 	int pinnedCount;
+//#ifndef NO_CHAT_CANVAS
+	UIMessage[] msgs;
+//#endif
 
 	// main mode
 	public ChatsList(String title, int folder) {
@@ -68,7 +71,7 @@ public class ChatsList extends MPList {
 	
 	// forward message mode
 	public ChatsList(String peerId, String msgId) {
-		super(MP.L[Forward]);
+		super(MP.L[LForward]);
 		this.folder = 0;
 		this.peerId = peerId;
 		this.msgId = msgId;
@@ -76,6 +79,19 @@ public class ChatsList extends MPList {
 		addCommand(MP.cancelCmd);
 //		setFitPolicy(List.TEXT_WRAP_ON);
 	}
+	
+//#ifndef NO_CHAT_CANVAS
+	// forward messages
+	public ChatsList(String peerId, UIMessage[] msgs) {
+		super(MP.L[LForward]);
+		this.folder = 0;
+		this.peerId = peerId;
+		this.msgId = "";
+		this.msgs = msgs;
+		addCommand(MP.archiveCmd);
+		addCommand(MP.cancelCmd);
+	}
+//#endif
 
 	void loadInternal(Thread thread) throws Exception {
 		deleteAll();
@@ -121,19 +137,19 @@ public class ChatsList extends MPList {
 				MP.appendOneLine(sb, MP.getName(user, false));
 				
 				if (user.getBoolean("b", false)) { // bot
-					sb.append('\n').append(MP.L[Bot]);
+					sb.append('\n').append(MP.L[LBot]);
 				} else if (user.has("s")) { // status
 					long wasOnline;
 					if (user.getBoolean("s")) {
-						sb.append('\n').append(MP.L[Online]);
+						sb.append('\n').append(MP.L[LOnline]);
 					} else if ((wasOnline = user.getLong("w")) != 0) {
-						sb.append('\n').append(MP.L[LastSeen]).append(MP.localizeDate(wasOnline, 4));
+						sb.append('\n').append(MP.L[LLastSeen]).append(MP.localizeDate(wasOnline, 4));
 					} else {
-						sb.append('\n').append(MP.L[Offline]);
+						sb.append('\n').append(MP.L[LOffline]);
 					}
 				}
 				if (user.getBoolean("a", false)) { // admin
-					sb.append(" (").append(MP.L[Admin]).append(')');
+					sb.append(" (").append(MP.L[LAdmin]).append(')');
 				}
 				
 				int itemIdx = safeAppend(thread, sb.toString(), null);
@@ -207,6 +223,14 @@ public class ChatsList extends MPList {
 		if (msgId != null) {
 			// forward
 			MP.deleteFromHistory(this);
+//#ifndef NO_CHAT_CANVAS
+			if (msgs != null) {
+				// TODO
+				
+				return;
+			}
+//#endif
+			
 			MP.display(new ChatForm(id, null, 0, 0));
 			MP.display(MP.writeForm(id, null, "", null, peerId, msgId));
 			return;

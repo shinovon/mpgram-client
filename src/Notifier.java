@@ -46,12 +46,14 @@ public class Notifier implements SoftNotificationListener {
 	public static boolean init() {
 		try {
 			Class.forName("com.nokia.mid.ui.SoftNotification");
+			if (inst != null) return true;
 			inst = new Notifier();
 			icon = Image.createImage("/m.png");
 		} catch (Exception ignored) {}
 		
 		try {
 			Class.forName("org.pigler.api.PiglerAPI");
+			if (piglerApi != null) return true;
 			piglerListener = new PiglerListener();
 			piglerApi = new PiglerAPI();
 			((PiglerAPI) piglerApi).init();

@@ -42,7 +42,7 @@ public abstract class MPList extends List implements LangConstants {
 		loaded = true;
 		canceled = finished = false;
 
-		setTicker(new Ticker(MP.L[Loading]));
+		setTicker(new Ticker(MP.L[LLoading]));
 		if (MP.useLoadingForm) {
 			MP.display(MP.loadingForm);
 		}

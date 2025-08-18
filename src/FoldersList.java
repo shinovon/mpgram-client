@@ -26,7 +26,7 @@ public class FoldersList extends MPList {
 	JSONArray folders;
 
 	public FoldersList() {
-		super(MP.L[Folders]);
+		super(MP.L[LFolders]);
 		addCommand(MP.backCmd);
 	}
 
@@ -37,13 +37,13 @@ public class FoldersList extends MPList {
 			this.folders = folders;
 			int l = folders.size();
 			for (int i = 0; i < l; ++i) {
-				safeAppend(thread, folders.getObject(i).getString("t", MP.L[AllChats]), null);
+				safeAppend(thread, folders.getObject(i).getString("t", MP.L[LAllChats]), null);
 			}
 		} else {
-			safeAppend(thread, MP.L[AllChats], null);
+			safeAppend(thread, MP.L[LAllChats], null);
 		}
 		if (hasArchive = j.getBoolean("archive", false)) {
-			safeAppend(thread, MP.L[Archive], null);
+			safeAppend(thread, MP.L[LArchive], null);
 		}
 	}
 

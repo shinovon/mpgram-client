@@ -30,7 +30,7 @@ public class CaptchaForm extends MPForm {
 	String id;
 
 	public CaptchaForm() {
-		super(MP.L[Captcha]);
+		super(MP.L[LCaptcha]);
 		addCommand(MP.backCmd);
 		addCommand(MP.authNextCmd);
 	}
@@ -49,7 +49,7 @@ public class CaptchaForm extends MPForm {
 		field = new TextField("", "", 20, TextField.NON_PREDICTIVE);
 		append(field);
 		
-		StringItem s = new StringItem(null, MP.L[Next], StringItem.BUTTON);
+		StringItem s = new StringItem(null, MP.L[LNext], StringItem.BUTTON);
 		s.setDefaultCommand(MP.authNextCmd);
 		s.setItemCommandListener(MP.midlet);
 		append(s);

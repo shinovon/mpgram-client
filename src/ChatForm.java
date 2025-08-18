@@ -34,15 +34,9 @@ import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 import javax.microedition.lcdui.Ticker;
 
-public class ChatForm extends MPForm implements Runnable {
+public class ChatForm extends MPForm implements MPChat, Runnable {
 	
 	private static final int SPACER_HEIGHT = 8;
-	
-	static final int UPDATE_USER_STATUS = 1;
-	static final int UPDATE_USER_TYPING = 2;
-	static final int UPDATE_NEW_MESSAGE = 3;
-	static final int UPDATE_DELETE_MESSAGES = 4;
-	static final int UPDATE_EDIT_MESSAGE = 5;
 
 	String id;
 	String username;
@@ -82,7 +76,7 @@ public class ChatForm extends MPForm implements Runnable {
 	long wasOnline;
 	
 	TextField textField;
-	ChatForm parent;
+	MPChat parent;
 
 	JSONObject botAnswer;
 	
@@ -135,12 +129,10 @@ public class ChatForm extends MPForm implements Runnable {
 	}
 
 	void loadInternal(Thread thread) throws Exception {
-		deleteAll();
-		
 		if ((MP.reopenChat || (query == null && mediaFilter == null))
 				&& MP.chatUpdates
 				&& (MP.updatesThread != null || MP.updatesRunning)) {
-			MP.display(MP.loadingAlert(MP.L[WaitingForPrevChat]), this);
+			MP.display(MP.loadingAlert(MP.L[LWaitingForPrevChat]), this);
 			
 			MP.cancel(MP.updatesThreadCopy, true);
 			while (MP.updatesThread != null || MP.updatesRunning) {
@@ -217,6 +209,7 @@ public class ChatForm extends MPForm implements Runnable {
 					}
 				} else {
 					canPin = true;
+					canDelete = true;
 					if (MP.chatStatus && info.getObject("User").has("status")) {
 						setStatus(info.getObject("User").getObject("status"));
 					}
@@ -270,11 +263,11 @@ public class ChatForm extends MPForm implements Runnable {
 			sb.append("searchMessages");
 			if (mediaFilter != null) {
 				sb.append("&filter=").append(mediaFilter);
-				setTitle(MP.L[ChatMedia_Title]);
+				setTitle(MP.L[LChatMedia_Title]);
 			}
 			if (query != null) {
 				if (mediaFilter == null) {
-					setTitle(MP.L[Search_TitlePrefix].concat(title));
+					setTitle(MP.L[LSearch_TitlePrefix].concat(title));
 				}
 				MP.appendUrl(sb.append("&q="), query);
 			}
@@ -333,7 +326,7 @@ public class ChatForm extends MPForm implements Runnable {
 		int top = size();
 		
 		if (l == limit && j.has("count")) {
-			s = new StringItem(null, MP.L[OlderMessages], Item.BUTTON);
+			s = new StringItem(null, MP.L[LOlderMessages], Item.BUTTON);
 			s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			s.setDefaultCommand(MP.olderMessagesCmd);
 			s.setItemCommandListener(MP.midlet);
@@ -342,7 +335,7 @@ public class ChatForm extends MPForm implements Runnable {
 		}
 		
 		if (!endReached && hasOffset) {
-			s = new StringItem(null, MP.L[NewerMessages], Item.BUTTON);
+			s = new StringItem(null, MP.L[LNewerMessages], Item.BUTTON);
 			s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			s.setDefaultCommand(MP.newerMessagesCmd);
 			s.setItemCommandListener(MP.midlet);
@@ -408,7 +401,7 @@ public class ChatForm extends MPForm implements Runnable {
 //#endif
 	}
 
-	void handleBotAnswer(JSONObject j) {
+	public void handleBotAnswer(JSONObject j) {
 		if (j == null) return;
 		
 		if (j.has("message")) {
@@ -435,8 +428,8 @@ public class ChatForm extends MPForm implements Runnable {
 		String fromId = message.has("from_id") ? message.getString("from_id") : this.id;
 		boolean out = message.getBoolean("out", false);
 		String text = message.getString("text", null);
-		// 0: peer id, 1: message id, 2: from id/discussion peer, 3: image quality, 4: file name
-		String[] key = new String[] { this.id, idString, fromId, null, null };
+		// 0: peer id, 1: message id, 2: from id/discussion peer, 3: image quality, 4: file name, 5: file size
+		String[] key = new String[] { this.id, idString, fromId, null, null, null };
 		
 		loadedMsgs.addElement(idString);
 
@@ -454,10 +447,10 @@ public class ChatForm extends MPForm implements Runnable {
 		}
 		
 		sb.setLength(0);
-		sb.append(out && !broadcast ? MP.L[You] : MP.getName(fromId, true));
+		sb.append(out && !broadcast ? MP.L[LYou] : MP.getName(fromId, true));
 		MP.appendTime(sb.append(' '), /*lastDate = */message.getLong("date"));
 		if (message.has("edit")) {
-			sb.append(" (").append(MP.L[Edited]).append(')');
+			sb.append(" (").append(MP.L[LEdited]).append(')');
 		}
 
 		// author and time label
@@ -524,7 +517,7 @@ public class ChatForm extends MPForm implements Runnable {
 				if ((t = fwd.getString("from_name", null)) == null) {
 					t = MP.getName(fwd.getString("from_id", null), true);
 				}
-				sb.append(MP.L[ForwardedFrom]).append(t);
+				sb.append(MP.L[LForwardedFrom]).append(t);
 				
 				s = new StringItem(null, sb.toString());
 				s.setFont(MP.smallItalicFont);
@@ -554,7 +547,7 @@ public class ChatForm extends MPForm implements Runnable {
 							}
 						}
 						if (t != null) {
-							sb.append("Reply to ").append(t);
+							sb.append(MP.L[LReplyTo]).append(t);
 						}
 						
 						sb.append("\n> ");
@@ -564,7 +557,7 @@ public class ChatForm extends MPForm implements Runnable {
 							if ((t = replyMsg.getString("text", null)) != null) {
 								MP.appendOneLine(sb, t);
 							} else if (replyMsg.has("media")) {
-								sb.append(MP.L[Media]);
+								sb.append(MP.L[LMedia]);
 							}
 						}
 						
@@ -596,9 +589,9 @@ public class ChatForm extends MPForm implements Runnable {
 		
 		// media
 		if (message.has("media")) {
-			if (!MP.showMedia || message.isNull("media")) {
+			if (!MP.showMedia || message.isNull("media") || message.getObject("media").has("hide")) {
 				// media is disabled
-				s = new StringItem(null, MP.L[Media]);
+				s = new StringItem(null, MP.L[LMedia]);
 				s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 				safeInsert(thread, insert++, lastItem = s);
 			} else {
@@ -607,7 +600,7 @@ public class ChatForm extends MPForm implements Runnable {
 				String type = media.getString("type");
 				if (type.equals("undefined")) {
 					// server doesn't know this media type
-					s = new StringItem(null, MP.L[Media]);
+					s = new StringItem(null, MP.L[LMedia]);
 					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					safeInsert(thread, insert++, lastItem = s);
 					
@@ -650,7 +643,7 @@ public class ChatForm extends MPForm implements Runnable {
 						if (MP.loadThumbs) {
 							MP.queueImage(key, img);
 						} else {
-							img.setLabel(MP.L[Sticker]);
+							img.setLabel(MP.L[LSticker]);
 						}
 
 						if (msgItem == null) msgItem = img;
@@ -660,16 +653,25 @@ public class ChatForm extends MPForm implements Runnable {
 								&& ("audio/mpeg".equals(t = media.getString("mime", null))
 										|| "audio/aac".equals(t)
 										|| "audio/m4a".equals(t));
+						boolean voice = false;
 						
 						key[4] = media.getString("name", null);
 						if (media.has("audio")) {
 							JSONObject audio = media.getObject("audio");
-							if ((t = audio.getString("artist", null)) != null && t.length() != 0) {
-								sb.append(t).append(" - ");
-							}
-							if ((t = audio.getString("title", null)) != null && t.length() != 0) {
-								sb.append(t);
+							if (audio.getBoolean("voice", false)) {
+								int time = audio.getInt("time");
+								sb.append(MP.L[LVoiceMessage]).append('\n')
+								.append(time / 60).append(':').append(MP.n(time % 60));
 								nameSet = true;
+								voice = true;
+							} else {
+								if ((t = audio.getString("artist", null)) != null && t.length() != 0) {
+									sb.append(t).append(" - ");
+								}
+								if ((t = audio.getString("title", null)) != null && t.length() != 0) {
+									sb.append(t);
+									nameSet = true;
+								}
 							}
 						}
 						
@@ -680,13 +682,16 @@ public class ChatForm extends MPForm implements Runnable {
 						}
 						sb.append('\n');
 						if (!media.isNull("size")) {
-							long size = media.getLong("size");
-							if (size >= 1024 * 1024) {
-								size = (size * 100) / (1024 * 1024);
-								sb.append(size / 100).append('.').append(size % 100).append(" MB");
-							} else {
-								size = (size * 100) / 1024;
-								sb.append(size / 100).append('.').append(size % 100).append(" KB");
+							long size;
+							key[5] = Long.toString(size = media.getLong("size"));
+							if (!voice) {
+								if (size >= 1024 * 1024) {
+									size = (size * 100) / (1024 * 1024);
+									sb.append(size / 100).append('.').append(size % 100).append(" MB");
+								} else {
+									size = (size * 100) / 1024;
+									sb.append(size / 100).append('.').append(size % 100).append(" KB");
+								}
 							}
 						}
 						
@@ -713,7 +718,10 @@ public class ChatForm extends MPForm implements Runnable {
 							s = new StringItem(null, sb.toString());
 							s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 							s.setFont(MP.smallItalicFont);
-							if (playable) {
+							if (voice) {
+								s.addCommand(MP.documentCmd);
+								s.setDefaultCommand(MP.playVoiceCmd);
+							} else if (playable) {
 								s.addCommand(MP.documentCmd);
 								s.setDefaultCommand(MP.playItemCmd);
 							} else {
@@ -748,14 +756,14 @@ public class ChatForm extends MPForm implements Runnable {
 					if (MP.loadThumbs) {
 						MP.queueImage(key, img);
 					} else {
-						img.setLabel(MP.L[Media]);
+						img.setLabel(MP.L[LMedia]);
 					}
 
 					if (msgItem == null) msgItem = img;
 				} else if (type.equals("poll")) {
 					// TODO poll
 					sb.setLength(0);
-					sb.append(MP.L[Poll]);
+					sb.append(MP.L[LPoll]);
 					s = new StringItem(null, sb.toString());
 					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					safeInsert(thread, insert++, lastItem = s);
@@ -765,7 +773,7 @@ public class ChatForm extends MPForm implements Runnable {
 				} else if (type.equals("geo")) {
 					// geo
 					sb.setLength(0);
-					sb.append(MP.L[Geo])
+					sb.append(MP.L[LGeo]).append('\n')
 					.append(media.get("lat")).append(", ").append(media.get("long"));
 					s = new StringItem(null, sb.toString());
 					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -793,15 +801,15 @@ public class ChatForm extends MPForm implements Runnable {
 			t = null;
 			l: {
 				if ("ChatCreate".equals(type)) {
-					t = MP.L[GroupCreated_Action];
+					t = MP.L[LGroupCreated_Action];
 				} else if ("ChannelCreate".equals(type)) {
-					t = MP.L[ChannelCreated_Action];
+					t = MP.L[LChannelCreated_Action];
 				} else if ("ChatEditPhoto".equals(type)) {
-					t = MP.L[PhotoUpdated_Action];
+					t = MP.L[LPhotoUpdated_Action];
 				} else if ("HistoryClear".equals(type)) {
-					t = MP.L[ChatHistoryCleared_Action];
+					t = MP.L[LChatHistoryCleared_Action];
 				} else if ("ChatEditTitle".equals(type)) {
-					t = MP.L[NameChanged_Action].concat(act.getString("t", ""));
+					t = MP.L[LNameChanged_Action].concat(act.getString("t", ""));
 				} else {
 					s = new StringItem(null, MP.getName(fromId, false));
 					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE);
@@ -820,17 +828,17 @@ public class ChatForm extends MPForm implements Runnable {
 					if (msgItem == null) msgItem = s;
 					
 					if ("PinMessage".equals(type)) {
-						t = MP.L[PinnedMessage_Action];
+						t = MP.L[LPinnedMessage_Action];
 					} else if ("ChatJoinedByLink".equals(type)) {
-						t = MP.L[JoinedByLink_Action];
+						t = MP.L[LJoinedByLink_Action];
 					} else if ("ChatJoinedByRequest".equals(type)) {
-						t = MP.L[JoinedByRequest_Action];
+						t = MP.L[LJoinedByRequest_Action];
 					} else {
 						if ("ChatAddUser".equals(type) || "ChatDeleteUser".equals(type)) {
 							if (fromId.equals(user)) {
-								t = MP.L["ChatAddUser".equals(type) ? Joined_Action : Left_Action];
+								t = MP.L["ChatAddUser".equals(type) ? LJoined_Action : LLeft_Action];
 							} else {
-								s = new StringItem(null, MP.L["ChatAddUser".equals(type) ? Added_Action : Removed_Action]);
+								s = new StringItem(null, MP.L["ChatAddUser".equals(type) ? LAdded_Action : LRemoved_Action]);
 								s.setLayout(Item.LAYOUT_CENTER);
 								s.setFont(MP.medPlainFont);
 								safeInsert(thread, insert++, s);
@@ -850,7 +858,7 @@ public class ChatForm extends MPForm implements Runnable {
 							// undefined action
 							System.out.println(act);
 							
-							s = new StringItem(null, MP.L[Action]);
+							s = new StringItem(null, MP.L[LAction]);
 							s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 							s.setFont(MP.medPlainFont);
 							safeInsert(thread, insert++, lastItem = s);
@@ -907,7 +915,7 @@ public class ChatForm extends MPForm implements Runnable {
 		
 		if (message.has("comments")) {
 			JSONObject comments = message.getObject("comments");
-			s = new StringItem(null, MP.localizePlural(comments.getInt("count"), _comment));
+			s = new StringItem(null, MP.localizePlural(comments.getInt("count"), L_comment));
 			s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			s.setDefaultCommand(MP.postCommentsCmd);
 			s.setItemCommandListener(MP.midlet);
@@ -958,7 +966,7 @@ public class ChatForm extends MPForm implements Runnable {
 		MP.openLoad(this);
 	}
 	
-	void paginate(int dir) {
+	public void paginate(int dir) {
 		this.dir = dir;
 		cancel();
 		messageId = 0;
@@ -975,16 +983,17 @@ public class ChatForm extends MPForm implements Runnable {
 			offsetId = firstMsgId;
 			addOffset = limit - 1;
 		}
-		load();
+		MP.openLoad(this);
 	}
 	
-	void reset() {
+	public void reset() {
 		cancel();
 		dir = 0;
 		messageId = 0;
 		addOffset = 0;
 		offsetId = 0;
 		typing = 0;
+		query = null;
 		loadedMsgs.removeAllElements();
 		if (urls != null) urls.clear();
 		switched = false;
@@ -1024,7 +1033,7 @@ public class ChatForm extends MPForm implements Runnable {
 		}
 	}
 	
-	void handleUpdate(int type, JSONObject update) {
+	public void handleUpdate(int type, JSONObject update) {
 		if (!this.update) return;
 //		System.out.println("update: " + type);
 		switch (type) {
@@ -1143,11 +1152,11 @@ public class ChatForm extends MPForm implements Runnable {
 			setTicker(null);
 			if (MP.chatStatus) {
 				if (wasOnline == 1) {
-					s = MP.L[Online];
+					s = MP.L[LOnline];
 				} else if (wasOnline == 2) {
-					s = MP.L[Offline];
+					s = MP.L[LOffline];
 				} else if (wasOnline != 0) {
-					s = /*MP.L[LastSeen] + */MP.localizeDate(wasOnline, 4);
+					s = /*MP.L[LLastSeen] + */MP.localizeDate(wasOnline, 4);
 				} else {
 					s = null;
 				}
@@ -1160,11 +1169,11 @@ public class ChatForm extends MPForm implements Runnable {
 		}
 		if ("userStatusOnline".equals(status.getString("_"))) {
 			wasOnline = 1;
-			s = MP.L[Online];
+			s = MP.L[LOnline];
 		} else if ((wasOnline = status.getInt("was_online", 0)) != 0) {
-			s = /*MP.L[LastSeen] + */MP.localizeDate(wasOnline, 4);
+			s = /*MP.L[LLastSeen] + */MP.localizeDate(wasOnline, 4);
 		} else {
-			s = MP.L[Offline];
+			s = MP.L[LOffline];
 			wasOnline = 2;
 		}
 		setTicker(new Ticker(s));
@@ -1192,5 +1201,94 @@ public class ChatForm extends MPForm implements Runnable {
 			typing = 0;
 		} catch (Exception e) {}
 	}
+	
+	// interface getters
+	public String id() {
+		return id;
+	}
+	
+	public String postId() {
+		return postId;
+	}
+	
+	public String query() {
+		return query;
+	}
+	
+	public String mediaFilter() {
+		return mediaFilter;
+	}
+	
+	public String username() {
+		return username;
+	}
+	
+	public boolean update() {
+		return update;
+	}
+	
+	public boolean endReached() {
+		return endReached;
+	}
+	
+	public boolean forum() {
+		return forum;
+	}
+	
+	public boolean switched() {
+		return switched;
+	}
+	
+	public int topMsgId() {
+		return topMsgId;
+	}
+	
+	public int firstMsgId() {
+		return firstMsgId;
+	}
+	
+	public JSONArray topics() {
+		return topics;
+	}
 
+	public MPChat parent() {
+		return parent;
+	}
+	
+	// interface setters
+	
+	public void setParent(MPChat parent) {
+		this.parent = parent;
+	}
+	
+	public void setQuery(String s) {
+		query = s;
+		switched = true;
+	}
+	
+	public void setUpdate(boolean b) {
+		update = b;
+	}
+	
+	public void setBotAnswer(JSONObject j) {
+		botAnswer = j;
+	}
+	
+	public void setStartBot(String s) {
+		this.startBot = s;
+	}
+	
+	
+	public void sent() {
+		if (textField != null) {
+			textField.setString("");
+		}
+	}
+	
+	public void openTopic(int topMsgId, boolean canWrite, String title) {
+		this.topMsgId = topMsgId;
+		this.canWrite = canWrite;
+		setTitle(this.title = title);
+	}
+	
 }

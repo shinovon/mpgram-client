@@ -67,6 +67,7 @@ import javax.microedition.lcdui.Ticker;
 import javax.microedition.media.Manager;
 import javax.microedition.media.Player;
 import javax.microedition.media.PlayerListener;
+import javax.microedition.media.control.VolumeControl;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.rms.RecordStore;
 
@@ -105,18 +106,22 @@ public class MP extends MIDlet
 	static final int RUN_INSTALL_STICKER_SET = 22;
 	static final int RUN_LOAD_PLAYLIST = 23;
 	static final int RUN_PLAYER_LOOP = 24;
+	static final int RUN_CANCEL_UPDATES = 25;
+	static final int RUN_DOWNLOAD_DOCUMENT = 26;
 	
+	// RMS
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
 	private static final String AVATAR_RECORD_PREFIX = "mcA";
 	
+	// URLs
 	private static final String DEFAULT_INSTANCE_URL = "http://mp.nnchan.ru/";
 	static final String API_URL = "api.php";
 	static final String AVA_URL = "ava.php";
 	static final String FILE_URL = "file.php";
 	static final String OTA_URL = "http://nnproject.cc/mp/upd.php";
 	
-	static final String API_VERSION = "8";
+	static final String API_VERSION = "9";
 	
 	static final String[][] LANGS = {
 		{
@@ -152,6 +157,7 @@ public class MP extends MIDlet
 //#endif
 	// endregion
 	
+	// Fonts
 	static final Font largePlainFont = Font.getFont(0, 0, Font.SIZE_LARGE);
 	static final Font medPlainFont = Font.getFont(0, 0, Font.SIZE_MEDIUM);
 	static final Font medBoldFont = Font.getFont(0, Font.STYLE_BOLD, Font.SIZE_MEDIUM);
@@ -160,6 +166,12 @@ public class MP extends MIDlet
 	static final Font smallPlainFont = Font.getFont(0, 0, Font.SIZE_SMALL);
 	static final Font smallBoldFont = Font.getFont(0, Font.STYLE_BOLD, Font.SIZE_SMALL);
 	static final Font smallItalicFont = Font.getFont(0, Font.STYLE_ITALIC, Font.SIZE_SMALL);
+	
+	static int smallPlainFontHeight = smallPlainFont.getHeight();
+	static int smallPlainFontSpaceWidth = smallPlainFont.charWidth(' ');
+	static int smallBoldFontHeight = smallBoldFont.getHeight();
+	static int medPlainFontHeight = medPlainFont.getHeight();
+	static int medBoldFontHeight = medBoldFont.getHeight();
 
 	static final IllegalStateException cancelException = new IllegalStateException("cancel");
 	
@@ -182,7 +194,7 @@ public class MP extends MIDlet
 	private static int tzOffset;
 	static boolean useLoadingForm;
 	private static int avatarSize;
-	private static int photoSize = 120;
+	static int photoSize = 120;
 	static boolean loadAvatars = true;
 	static boolean loadThumbs = true;
 	static boolean reverseChat;
@@ -201,7 +213,7 @@ public class MP extends MIDlet
 	static boolean chatUpdates = true;
 	static boolean chatStatus = false;
 	static boolean focusNewMessages = false;
-	static long updatesDelay = 3000L;
+	static long updatesDelay = 1000L;
 	static int updatesTimeout = 30;
 	static boolean sendTyping = true;
 	static int chatsListFontSize = 0; // 0: default, 1: small, 2: medium
@@ -215,8 +227,7 @@ public class MP extends MIDlet
 	static boolean fileRewrite;
 	static int blackberryNetwork = -1; // -1: undefined, 0: data, 1: wifi
 	static int playerHttpMethod = 1; // 0 - pass url, 1 - pass connection stream
-	static String musicCachePath; // TODO
-	static boolean reopenChat;
+	static boolean reopenChat; // s40
 	static boolean fullPlayerCover;
 	static boolean notifications;
 //#ifndef NO_NOTIFY
@@ -226,6 +237,13 @@ public class MP extends MIDlet
 	static boolean notifyAvas = true;
 //#endif
 	static boolean updateChatsList;
+	static boolean legacyChatUI;
+	static boolean fastScrolling; // disable animations
+	static final boolean forceKeyUI = false;
+	static int downloadMethod; // 0 - always ask, 1 - in app, 2 - browser
+	static String downloadPath;
+	static boolean longpoll = true;
+	static int textMethod; // 0 - auto, 1 - nokiaui, 2 - j2mekeyboard, 3 - fullscreen textbox
 	
 	// platform
 	static boolean symbianJrt;
@@ -243,9 +261,12 @@ public class MP extends MIDlet
 	static Thread updatesThread, updatesThreadCopy;
 	static Hashtable threadConnections = new Hashtable();
 	static Vector closingConnections = new Vector();
-	private static boolean sending;
+	static boolean sending;
 	static boolean updatesRunning;
 	static Object updatesLock = new Object();
+//#ifndef NO_FILE
+	static boolean downloading;
+//#endif
 	
 	private static final Object imagesLoadLock = new Object();
 	private static final Vector imagesToLoad = new Vector(); // TODO hashtable?
@@ -274,6 +295,7 @@ public class MP extends MIDlet
 	
 	private static Command logoutCmd;
 	private static Command clearCacheCmd;
+	private static Command downloadPathCmd;
 
 	static Command refreshCmd;
 	static Command archiveCmd;
@@ -301,6 +323,7 @@ public class MP extends MIDlet
 	static Command callItemCmd;
 	static Command documentCmd;
 	static Command playItemCmd;
+	static Command playVoiceCmd;
 
 	static Command writeCmd;
 	static Command chatInfoCmd;
@@ -332,6 +355,11 @@ public class MP extends MIDlet
 	static Command okCmd;
 	static Command cancelCmd;
 	static Command goCmd;
+	static Command copyCmd;
+	static Command downloadInappCmd;
+	static Command downloadBrowserCmd;
+	static Command cancelDownloadCmd;
+	static Command okDownloadCmd;
 	
 	static Command nextPageCmd;
 	static Command prevPageCmd;
@@ -382,6 +410,13 @@ public class MP extends MIDlet
 	private static Gauge pushIntervalGauge;
 	private static Gauge pushBgIntervalGauge;
 //#endif
+//#ifndef NO_FILE
+	private static ChoiceGroup downloadMethodChoice;
+	private static TextField downloadPathField;
+//#endif
+//#ifndef NO_CHAT_CANVAS
+	private static ChoiceGroup textMethodChoice;
+//#endif
 	
 	// write items
 	private static TextField messageField;
@@ -412,6 +447,7 @@ public class MP extends MIDlet
 	private static String writeTo, replyTo, sendFile, edit, fwdPeer, fwdMsg;
 	private static String updateUrl;
 	private static long lastType;
+	private static String[] downloadMessage;
 	
 //#ifndef NO_FILE
 	// file picker
@@ -430,7 +466,11 @@ public class MP extends MIDlet
 	private static int playerState; // 1 - playing, 2 - paused, 3 - loading
 	private static Player currentPlayer;
 	
+	// notifications
+//#ifndef NO_NOTIFY
 	static Hashtable notificationMessages = new Hashtable();
+	static Player notificationPlayer;
+//#endif
 	
 	// region MIDlet
 	
@@ -440,6 +480,7 @@ public class MP extends MIDlet
 			Notifier.close();
 		} catch (Throwable ignored) {}
 //#endif
+		notifyDestroyed();
 	}
 
 	protected void pauseApp() {
@@ -462,15 +503,15 @@ public class MP extends MIDlet
 		f.append("Loading");
 		display.setCurrent(mainDisplayable = f);
 //#ifndef NO_J2ME_LOADER_CHECK
-		try {
-			// check for j2me loader
-			Class.forName("javax.microedition.shell.MicroActivity");
-			f.deleteAll();
-			f.addCommand(exitCmd = new Command("Exit", Command.EXIT, 1));
-			f.setCommandListener(midlet);
-			f.append("J2ME Loader is not supported.");
-			return;
-		} catch (Exception ignored) {}
+//		try {
+//			// check for j2me loader
+//			Class.forName("javax.microedition.shell.MicroActivity");
+//			f.deleteAll();
+//			f.addCommand(exitCmd = new Command("Exit", Command.EXIT, 1));
+//			f.setCommandListener(midlet);
+//			f.append("J2ME Loader is not supported.");
+//			return;
+//		} catch (Exception ignored) {}
 //#endif	
 		// get device name
 		String p, v, d;
@@ -570,25 +611,21 @@ public class MP extends MIDlet
 		// Test UTF-8 support
 		byte[] b = new byte[] { (byte) 0xF0, (byte) 0x9F, (byte) 0x98, (byte) 0x83 };
 		try {
-			encoding = "UTF-8";
-			new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
+			new InputStreamReader(new ByteArrayInputStream(b), encoding = "UTF-8").read();
 			if (new String(b, encoding).length() != 2) throw new Exception();
 		} catch (Exception e) {
 			try {
-				encoding = "UTF8";
-				new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
+				new InputStreamReader(new ByteArrayInputStream(b), encoding = "UTF8").read();
 				if (new String(b, encoding).length() != 2) throw new Exception();
 			} catch (Exception e2) {
 				utf = false;
 				b = new byte[] { (byte) 0xD0, (byte) 0xB2, (byte) 0xD1, (byte) 0x8B, (byte) 0xD1, (byte) 0x84 };
 				try {
-					encoding = "UTF-8";
-					new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
+					new InputStreamReader(new ByteArrayInputStream(b), encoding = "UTF-8").read();
 					if (new String(b, encoding).length() != 3) throw new Exception();
 				} catch (Exception e3) {
 					try {
-						encoding = "UTF8";
-						new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
+						new InputStreamReader(new ByteArrayInputStream(b), encoding = "UTF8").read();
 						if (new String(b, encoding).length() != 3) throw new Exception();
 					} catch (Exception e4) {
 						encoding = "ISO-8859-1";
@@ -630,6 +667,11 @@ public class MP extends MIDlet
 //#endif
 		
 		reopenChat = s40;
+		longpoll = !s40;
+		parseRichtext = !s40;
+		if (blackberry) {
+			textMethod = 3;
+		}
 		
 		// load settings
 		try {
@@ -638,14 +680,18 @@ public class MP extends MIDlet
 			r.closeRecordStore();
 			
 			reverseChat = j.getBoolean("reverseChat", reverseChat);
+//#ifndef NO_AVATARS
 			loadAvatars = j.getBoolean("loadAvatars", loadAvatars);
 			avatarSize = j.getInt("avatarSize", avatarSize);
+//#endif
 			showMedia = j.getBoolean("showMedia", showMedia);
 			photoSize = j.getInt("photoSize", photoSize);
 			loadThumbs = j.getBoolean("loadThumbs", loadThumbs);
 			threadedImages = j.getBoolean("threadedImages", threadedImages);
+//#ifndef NO_AVATARS
 			avatarsCache = j.getInt("avatarsCache", avatarsCache);
 			avatarsCacheThreshold = j.getInt("avatarsCacheThreshold", avatarsCacheThreshold);
+//#endif
 			useLoadingForm = j.getBoolean("useLoadingForm", useLoadingForm);
 			chatsLimit = j.getInt("chatsLimit", chatsLimit);
 			messagesLimit = j.getInt("messagesLimit", messagesLimit);
@@ -663,9 +709,13 @@ public class MP extends MIDlet
 			chatsListFontSize = j.getInt("chatsListFontSize", chatsListFontSize);
 			keepAlive = j.getBoolean("keepAlive", keepAlive);
 			chatField = j.getBoolean("chatField", chatField);
+//#ifndef NO_AVATARS
 			roundAvatars = j.getBoolean("roundAvatars", roundAvatars);
+//#endif
 			utf = j.getBoolean("utf", utf);
+//#ifndef NO_ZIP
 			compress = j.getBoolean("compress", compress);
+//#endif
 			useView = j.getBoolean("useView", useView);
 			blackberryNetwork = j.getInt("blackberryNetwork", blackberryNetwork);
 			fullPlayerCover = j.getBoolean("fullPlayerCover", fullPlayerCover);
@@ -676,6 +726,14 @@ public class MP extends MIDlet
 			pushBgInterval = j.getLong("pushBgInterval", pushBgInterval);
 			notifyMethod = j.getInt("notifyMethod", notifyMethod);
 //#endif
+//#ifndef NO_CHAT_CANVAS
+			legacyChatUI = j.getBoolean("legacyChatUI", legacyChatUI);
+			textMethod = j.getInt("textMethod", textMethod);
+//#endif
+//#ifndef NO_FILE
+			downloadPath = j.getString("downloadPath", downloadPath);
+//#endif
+			longpoll = j.getBoolean("longpoll", longpoll);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -693,7 +751,7 @@ public class MP extends MIDlet
 	
 		
 		// load locale
-		(L = new String[LocaleStrings + 2])[0] = "MPGram";
+		(L = new String[LLocaleStrings + 2])[Lmpgram] = "MPGram";
 		try {
 			loadLocale(lang);
 		} catch (Exception e) {
@@ -708,100 +766,107 @@ public class MP extends MIDlet
 		
 		// commands
 		
-		exitCmd = new Command(L[Exit], Command.EXIT, 25);
-		backCmd = new Command(L[Back], Command.BACK, 25);
+		exitCmd = new Command(L[LExit], Command.EXIT, 25);
+		backCmd = new Command(L[LBack], Command.BACK, 25);
 		
-		settingsCmd = new Command(L[Settings], Command.SCREEN, 20);
-		aboutCmd = new Command(L[About], Command.SCREEN, 21);
+		settingsCmd = new Command(L[LSettings], Command.SCREEN, 20);
+		aboutCmd = new Command(L[LAbout], Command.SCREEN, 21);
 		
-		authCmd = new Command(L[Auth], Command.ITEM, 1);
-		authNextCmd = new Command(L[Next], Command.OK, 1);
-		authCodeCmd = new Command(L[Next], Command.OK, 1);
-		authPasswordCmd = new Command(L[Next], Command.OK, 1);
-		authNewSessionCmd = new Command(L[NewSession], Command.SCREEN, 1);
-		authImportSessionCmd = new Command(L[ImportSession], Command.SCREEN, 2);
-		authRetryCmd = new Command(L[Retry], Command.OK, 1);
+		authCmd = new Command(L[LAuth], Command.ITEM, 1);
+		authNextCmd = new Command(L[LNext], Command.OK, 1);
+		authCodeCmd = new Command(L[LNext], Command.OK, 1);
+		authPasswordCmd = new Command(L[LNext], Command.OK, 1);
+		authNewSessionCmd = new Command(L[LNewSession], Command.SCREEN, 1);
+		authImportSessionCmd = new Command(L[LImportSession], Command.SCREEN, 2);
+		authRetryCmd = new Command(L[LRetry], Command.OK, 1);
 		
-		logoutCmd = new Command(L[Logout], Command.ITEM, 1);
-		clearCacheCmd = new Command(L[ClearCache], Command.ITEM, 1);
+		logoutCmd = new Command(L[LLogout], Command.ITEM, 1);
+		clearCacheCmd = new Command(L[LClearCache], Command.ITEM, 1);
+		downloadPathCmd = new Command(L[LLocate], Command.ITEM, 1);
 
-		foldersCmd = new Command(L[Folders], Command.SCREEN, 4);
-		refreshCmd = new Command(L[Refresh], Command.SCREEN, 5);
-		archiveCmd = new Command(L[ArchivedChats], Command.SCREEN, 8);
-		contactsCmd = new Command(L[Contacts], Command.SCREEN, 9);
-		searchChatsCmd = new Command(L[Search], Command.SCREEN, 10);
-		openLinkCmd = new Command(L[OpenByLink], Command.SCREEN, 11);
+		foldersCmd = new Command(L[LFolders], Command.SCREEN, 4);
+		refreshCmd = new Command(L[LRefresh], Command.SCREEN, 5);
+		archiveCmd = new Command(L[LArchivedChats], Command.SCREEN, 8);
+		contactsCmd = new Command(L[LContacts], Command.SCREEN, 9);
+		searchChatsCmd = new Command(L[LSearch], Command.SCREEN, 10);
+		openLinkCmd = new Command(L[LOpenByLink], Command.SCREEN, 11);
 		
-		itemChatCmd = new Command(L[OpenChat], Command.ITEM, 1);
-		itemChatInfoCmd = new Command(L[Profile], Command.ITEM, 2);
-		replyMsgCmd = new Command(L[Reply], Command.ITEM, 3);
-		forwardMsgCmd = new Command(L[Forward], Command.ITEM, 4);
-		copyMsgCmd = new Command(L[CopyMessage], Command.ITEM, 5);
-		messageLinkCmd = new Command(L[CopyMessageLink], Command.ITEM, 7);
-		deleteMsgCmd = new Command(L[Delete], Command.ITEM, 8);
-		editMsgCmd = new Command(L[Edit], Command.ITEM, 9);
-		gotoMsgCmd = new Command(L[GoTo], Command.ITEM, 1);
-		botCallbackCmd = new Command("", Command.ITEM, 1); // TODO unlocalized
-		banMemberCmd = new Command(L[BanMember], Command.ITEM, 11);
-		pinMsgCmd = new Command(L[Pin], Command.ITEM, 10);
-		postCommentsCmd = new Command(L[Comments], Command.ITEM, 1); 
+		itemChatCmd = new Command(L[LOpenChat], Command.ITEM, 1);
+		itemChatInfoCmd = new Command(L[LProfile], Command.ITEM, 2);
+		replyMsgCmd = new Command(L[LReply], Command.ITEM, 3);
+		forwardMsgCmd = new Command(L[LForward], Command.ITEM, 4);
+		copyMsgCmd = new Command(L[LCopyMessage], Command.ITEM, 5);
+		messageLinkCmd = new Command(L[LCopyMessageLink], Command.ITEM, 7);
+		deleteMsgCmd = new Command(L[LDelete], Command.ITEM, 8);
+		editMsgCmd = new Command(L[LEdit], Command.ITEM, 9);
+		gotoMsgCmd = new Command(L[LGoTo], Command.ITEM, 1);
+		botCallbackCmd = new Command(L[LRunBotAction], Command.ITEM, 1);
+		banMemberCmd = new Command(L[LBanMember], Command.ITEM, 11);
+		pinMsgCmd = new Command(L[LPin], Command.ITEM, 10);
+		postCommentsCmd = new Command(L[LComments], Command.ITEM, 1); 
 		
-		richTextLinkCmd = new Command(L[Link_Cmd], Command.ITEM, 1);
-		openImageCmd = new Command(L[ViewImage], Command.ITEM, 1);
-		callItemCmd = new Command(L[Call], Command.ITEM, 1);
-		documentCmd = new Command(L[Download], Command.ITEM, 2);
-		playItemCmd = new Command(L[Play_Item], Command.ITEM, 1);
+		richTextLinkCmd = new Command(L[LLink_Cmd], Command.ITEM, 1);
+		openImageCmd = new Command(L[LViewImage], Command.ITEM, 1);
+		callItemCmd = new Command(L[LCall], Command.ITEM, 1);
+		documentCmd = new Command(L[LDownload], Command.ITEM, 2);
+		playItemCmd = new Command(L[LPlay_Item], Command.ITEM, 1);
+		playVoiceCmd = new Command(L[LPlay_Item], Command.ITEM, 1);
 		
-		writeCmd = new Command(L[WriteMessage], Command.SCREEN, 5);
-		latestCmd = new Command(L[LatestMessages_Cmd], Command.SCREEN, 7);
-		chatInfoCmd = new Command(L[ChatInfo], Command.SCREEN, 8);
-		olderMessagesCmd = new Command(L[Older], Command.ITEM, 1);
-		newerMessagesCmd = new Command(L[Newer], Command.ITEM, 1);
-		searchMsgCmd = new Command(L[Search], Command.SCREEN, 10);
-		sendStickerCmd = new Command(L[SendSticker], Command.SCREEN, 6);
+		writeCmd = new Command(L[LWriteMessage], Command.SCREEN, 5);
+		latestCmd = new Command(L[LLatestMessages_Cmd], Command.SCREEN, 7);
+		chatInfoCmd = new Command(L[LChatInfo], Command.SCREEN, 8);
+		olderMessagesCmd = new Command(L[LOlder], Command.ITEM, 1);
+		newerMessagesCmd = new Command(L[LNewer], Command.ITEM, 1);
+		searchMsgCmd = new Command(L[LSearch], Command.SCREEN, 10);
+		sendStickerCmd = new Command(L[LSendSticker], Command.SCREEN, 6);
 		
-		sendCmd = new Command(L[Send], Command.OK, 1);
-		openTextBoxCmd = new Command(L[OpenTextBox], Command.ITEM, 1);
-		chooseFileCmd = new Command(L[ChooseFile], Command.ITEM, 1);
+		sendCmd = new Command(L[LSend], Command.OK, 1);
+		openTextBoxCmd = new Command(L[LOpenTextBox], Command.ITEM, 1);
+		chooseFileCmd = new Command(L[LChooseFile], Command.ITEM, 1);
 		
-		callCmd = new Command(L[Call], Command.SCREEN, 5);
-		openChatCmd = new Command(L[OpenChat], Command.SCREEN, 1);
-		acceptInviteCmd = new Command(L[Join], Command.ITEM, 1);
-		joinChatCmd = new Command(L[JoinGroup], Command.SCREEN, 1);
-		leaveChatCmd = new Command(L[LeaveGroup], Command.ITEM, 1);
-		chatPhotosCmd = new Command(L[Photos], Command.ITEM, 1);
-		chatVideosCmd = new Command(L[Videos], Command.ITEM, 1);
-		chatFilesCmd = new Command(L[Files], Command.ITEM, 1);
-		chatMusicCmd = new Command(L[AudioFiles], Command.ITEM, 1);
-		gotoPinnedMsgCmd = new Command(L[GoTo], Command.ITEM, 1);
-		chatMembersCmd = new Command(L[Members], Command.SCREEN, 6);
+		callCmd = new Command(L[LCall], Command.SCREEN, 5);
+		openChatCmd = new Command(L[LOpenChat], Command.SCREEN, 1);
+		acceptInviteCmd = new Command(L[LJoin], Command.ITEM, 1);
+		joinChatCmd = new Command(L[LJoinGroup], Command.SCREEN, 1);
+		leaveChatCmd = new Command(L[LLeaveGroup], Command.ITEM, 1);
+		chatPhotosCmd = new Command(L[LPhotos], Command.ITEM, 1);
+		chatVideosCmd = new Command(L[LVideos], Command.ITEM, 1);
+		chatFilesCmd = new Command(L[LFiles], Command.ITEM, 1);
+		chatMusicCmd = new Command(L[LAudioFiles], Command.ITEM, 1);
+		gotoPinnedMsgCmd = new Command(L[LGoTo], Command.ITEM, 1);
+		chatMembersCmd = new Command(L[LMembers], Command.SCREEN, 6);
 		
-		stickerItemCmd = new Command(L[Sticker], Command.ITEM, 1);
-		addStickerPackCmd = new Command(L[AddStickers], Command.OK, 2);
+		stickerItemCmd = new Command(L[LSticker], Command.ITEM, 1);
+		addStickerPackCmd = new Command(L[LAddStickers], Command.OK, 2);
 		
-		okCmd = new Command(L[Ok], Command.OK, 1);
-		cancelCmd = new Command(L[Cancel], Command.CANCEL, 20);
-		goCmd = new Command(L[Ok], Command.OK, 1);
+		okCmd = new Command(L[LOk], Command.OK, 1);
+		cancelCmd = new Command(L[LCancel], Command.CANCEL, 20);
+		goCmd = new Command(L[LOk], Command.OK, 1);
+		copyCmd = new Command(L[LCopy], Command.OK, 1);
+		downloadInappCmd = new Command(L[LInApp], Command.OK, 0);
+		downloadBrowserCmd = new Command(L[LWithBrowser], Command.CANCEL, 1);
+		cancelDownloadCmd = new Command(L[LCancel], Command.CANCEL, 1);
+		okDownloadCmd = new Command(L[LOk], Command.OK, 1);
 
-		nextPageCmd = new Command(L[NextPage], Command.SCREEN, 6);
-		prevPageCmd = new Command(L[PrevPage], Command.SCREEN, 7);
+		nextPageCmd = new Command(L[LNextPage], Command.SCREEN, 6);
+		prevPageCmd = new Command(L[LPrevPage], Command.SCREEN, 7);
 		
-		updateCmd = new Command(L[Download], Command.OK, 1);
+		updateCmd = new Command(L[LDownload], Command.OK, 1);
 		
-		playlistPlayCmd = new Command(L[Play_Player], Command.ITEM, 1);
-		playlistPauseCmd = new Command(L[Pause_Player], Command.ITEM, 1);
-		playlistNextCmd = new Command(L[Next_Player], Command.ITEM, 1);
-		playlistPrevCmd = new Command(L[Prev_Player], Command.ITEM, 1);
-		playlistCmd = new Command(L[OpenPlaylist], Command.SCREEN, 2);
-		playerCmd = new Command(L[OpenPlayer], Command.SCREEN, 20);
+		playlistPlayCmd = new Command(L[LPlay_Player], Command.ITEM, 1);
+		playlistPauseCmd = new Command(L[LPause_Player], Command.ITEM, 1);
+		playlistNextCmd = new Command(L[LNext_Player], Command.ITEM, 1);
+		playlistPrevCmd = new Command(L[LPrev_Player], Command.ITEM, 1);
+		playlistCmd = new Command(L[LOpenPlaylist], Command.SCREEN, 2);
+		playerCmd = new Command(L[LOpenPlayer], Command.SCREEN, 20);
 		
-		loadingForm = new Form(L[mpgram]);
-		loadingForm.append(L[Loading]);
+		loadingForm = new Form(L[Lmpgram]);
+		loadingForm.append(L[LLoading]);
 		loadingForm.addCommand(cancelCmd);
 		loadingForm.setCommandListener(this);
 		
-		// load resources
-		
+		// load resources	
+//#ifndef NO_AVATARS
 		if (loadAvatars) {
 			try {
 				userDefaultImg = resize(Image.createImage("/us.png"), avatarSize, avatarSize);
@@ -812,6 +877,7 @@ public class MP extends MIDlet
 				}
 			} catch (Throwable ignored) {}
 		}
+//#endif
 		
 		// start image loader threads
 
@@ -824,69 +890,63 @@ public class MP extends MIDlet
 		
 		// create auth form
 		
-		f = new Form(L[Auth_Title]);
+		f = new Form(L[LAuth_Title]);
 		f.addCommand(exitCmd);
 		f.addCommand(aboutCmd);
 		f.addCommand(settingsCmd);
 		f.setCommandListener(midlet);
 		
-		TextField t = new TextField(L[InstanceURL], instanceUrl, 200, TextField.URL);
+		TextField t = new TextField(L[LInstanceURL], instanceUrl, 200, TextField.URL);
 		t.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 		instanceField = t;
 		f.append(t);
 		
-		t = new TextField(L[InstancePassword], instancePassword, 200, TextField.NON_PREDICTIVE);
+		t = new TextField(L[LInstancePassword], instancePassword, 200, TextField.NON_PREDICTIVE);
 		t.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 		instancePasswordField = t;
 		f.append(t);
 		
 		StringItem s;
 		
-		s = new StringItem(null, L[Auth_Hint1]);
+		s = new StringItem(null, L[LAuth_Hint1]);
 		s.setFont(smallPlainFont);
 		s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 		f.append(s);
 		
-		s = new StringItem(null, L[CreateNewSession_Btn], StringItem.BUTTON);
+		s = new StringItem(null, L[LCreateNewSession_Btn], StringItem.BUTTON);
 		s.setDefaultCommand(authNewSessionCmd);
 		s.setItemCommandListener(midlet);
 		s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 		f.append(s);
 
-		s = new StringItem(null, L[ImportSession_Btn], StringItem.BUTTON);
+		s = new StringItem(null, L[LImportSession_Btn], StringItem.BUTTON);
 		s.setDefaultCommand(authImportSessionCmd);
 		s.setItemCommandListener(midlet);
 		s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 		f.append(s);
 		
-		authForm = f;
+//#ifndef NO_NOTIFY
+		// init notifications api wrapper
+		try {
+			Notifier.init();
+		} catch (Throwable ignored) {}
+//#endif
 		
+		authForm = f;
 		// load main form
 		if (user == null || userState < 3) {
 			display(mainDisplayable = authForm);
 			// show network access settings on blackberry
 			if (blackberry && blackberryNetwork == -1) {
 				commandAction(settingsCmd, current);
-				display(infoAlert(L[ChooseNetwork_Alert]), current);
+				display(infoAlert(L[LChooseNetwork_Alert]), current);
 				return;
 			}
-		} else {
-			run = RUN_VALIDATE_AUTH;
-			run();
-			
-			if (selfId != null) {
-				openLoad(mainDisplayable = mainChatsList());
-			}
-			
-//#ifndef NO_NOTIFY
-			// init notifications api wrapper
-			try {
-				Notifier.init();
-			} catch (Throwable ignored) {}
-//#endif
+			start(RUN_CHECK_OTA, null);
+			return;
 		}
 		
-		start(RUN_CHECK_OTA, null);
+		start(RUN_VALIDATE_AUTH, null);
 	}
 	
 	// endregion
@@ -907,7 +967,7 @@ public class MP extends MIDlet
 		switch (run) {
 		case RUN_VALIDATE_AUTH: {
 			Displayable returnTo = param == null ? authForm : current;
-			Alert alert = loadingAlert(L[Authorizing]);
+			Alert alert = loadingAlert(L[LAuthorizing]);
 			if (param == null) {
 				alert.addCommand(exitCmd);
 				alert.setCommandListener(this);
@@ -917,9 +977,11 @@ public class MP extends MIDlet
 				selfId = ((JSONObject) api("me&status=1")).getString("id");
 				userState = 4;
 
+				openLoad(mainDisplayable = mainChatsList());
 				if (param != null) {
-					openLoad(mainDisplayable = mainChatsList());
 					writeAuth();
+				} else {
+					start(RUN_CHECK_OTA, null);
 				}
 				
 				if (keepAlive || notifications || updateChatsList)
@@ -927,6 +989,9 @@ public class MP extends MIDlet
 				break;
 			} catch (APIException e) {
 				if (e.code == 401) {
+					if (param == null) {
+						mainDisplayable = returnTo;
+					}
 					userState = 0;
 					user = null;
 					display(errorAlert(e), returnTo);
@@ -975,6 +1040,7 @@ public class MP extends MIDlet
 							String url;
 							Image img = null;
 							String recordName = null;
+//#ifndef NO_AVATARS
 							if (src instanceof String) { // avatar
 								recordName = AVATAR_RECORD_PREFIX + avatarSize + "r" + (String) src;
 								url = instanceUrl + AVA_URL + "?a&c=" + ((String) src)
@@ -995,7 +1061,9 @@ public class MP extends MIDlet
 										}
 									} catch (Exception ignored) {}
 								}
-							} else if (src instanceof String[]) { // message file
+							} else
+//#endif
+							if (src instanceof String[]) { // message file
 								String peer = ((String[]) src)[0];
 								String id = ((String[]) src)[1];
 								String p = ((String[]) src)[3];
@@ -1011,12 +1079,31 @@ public class MP extends MIDlet
 							} else if (src instanceof JSONObject) { // sticker or document
 								url = instanceUrl + FILE_URL + "?a&sticker=" + ((JSONObject) src).getString("id")
 										+ "&access_hash=" + ((JSONObject) src).getString("access_hash") + "&p=rsprevs&s=32";
+//#ifndef NO_CHAT_CANVAS
+							} else if (src instanceof UIMessage) {
+								UIMessage msg = (UIMessage) src;
+								StringBuffer sb = new StringBuffer(instanceUrl);
+								sb.append(FILE_URL)
+								.append("?a&c=").append(msg.peerId)
+								.append("&m=").append(msg.id)
+								.append("&p=");
+								if (msg.photo) {
+									sb.append("rprev&s=").append(photoSize);
+								} else if (msg.sticker) {
+									sb.append("rsticker&s=").append(photoSize);
+								} else {
+									// document thumbnail
+									sb.append("thumbrsprevs&s=").append(MP.smallBoldFontHeight + MP.smallPlainFontHeight - 2);
+								}
+								url = sb.toString();
+//#endif
 							} else {
 								continue;
 							}
 							if (img == null) {
 								try {
 									byte[] b = get(url);
+//#ifndef NO_AVATARS
 									if (recordName != null) {
 										// save avatar to storage cache
 										if ((avatarsCache & 2) == 2) {
@@ -1033,9 +1120,12 @@ public class MP extends MIDlet
 											} catch (Exception ignored) {}
 										}
 									}
+//#endif
 									img = Image.createImage(b, 0, b.length);
+//#ifndef NO_AVATARS
 									if (recordName != null && roundAvatars)
 										img = roundImage(img);
+//#endif
 								} catch (Exception e) {
 									e.printStackTrace();
 									if (src instanceof String) {
@@ -1045,7 +1135,7 @@ public class MP extends MIDlet
 							}
 							
 							if (img == null) continue;
-							
+//#ifndef NO_AVATARS
 							// save avatar to hashtable cache
 							if (recordName != null && (avatarsCache & 1) == 1) {
 								if (imagesCache.size() > avatarsCacheThreshold) {
@@ -1053,6 +1143,7 @@ public class MP extends MIDlet
 								}
 								imagesCache.put(src, img);
 							}
+//#endif
 							
 							putImage(target, img);
 						} catch (Exception e) {
@@ -1066,6 +1157,14 @@ public class MP extends MIDlet
 			return;
 		}
 		case RUN_LOAD_FORM: {
+			if (param instanceof MPList) {
+				((MPList) param).load();
+				break;
+			}
+			if (param instanceof MPChat) {
+				((MPChat) param).load();
+				break;
+			}
 			((MPForm) param).load();
 			break;
 		}
@@ -1093,13 +1192,13 @@ public class MP extends MIDlet
 //						phoneCodeHash = j.getString("phone_code_hash");
 //					}
 					if (res.indexOf("captcha") != -1) {
-						display(errorAlert(L[InvalidCaptcha_Alert]), null);
+						display(errorAlert(L[LInvalidCaptcha_Alert]), null);
 						((CaptchaForm) param).load();
 						break;
 					}
 					if (!"code_sent".equals(res)) {
 						if ("phone_number_invalid".equals(res)) {
-							display(errorAlert(L[InvalidPhoneNumber_Alert]), null);
+							display(errorAlert(L[LInvalidPhoneNumber_Alert]), null);
 						} else {
 							display(errorAlert(res), null);
 						}
@@ -1108,7 +1207,7 @@ public class MP extends MIDlet
 					}
 
 					writeAuth();
-					TextBox t = new TextBox(L[Code], "", 5, TextField.NUMERIC);
+					TextBox t = new TextBox(L[LCode], "", 5, TextField.NUMERIC);
 					t.addCommand(authCodeCmd);
 					t.setCommandListener(this);
 					display(t);
@@ -1127,7 +1226,7 @@ public class MP extends MIDlet
 							
 							if (!"1".equals(res)) {
 								if ("password_hash_invalid".equals(res)) {
-									display(errorAlert(L[InvalidPassword_Alert]), null);
+									display(errorAlert(L[LInvalidPassword_Alert]), null);
 									break;
 								}
 								display(errorAlert(res), null);
@@ -1150,7 +1249,7 @@ public class MP extends MIDlet
 						if ("password".equals(res)) {
 							userState = 2;
 							writeAuth();
-							TextBox t = new TextBox(L[CloudPassword], "", 100, TextField.NON_PREDICTIVE);
+							TextBox t = new TextBox(L[LCloudPassword], "", 100, TextField.NON_PREDICTIVE);
 							t.addCommand(authPasswordCmd);
 							t.setCommandListener(this);
 							display(t);
@@ -1176,12 +1275,27 @@ public class MP extends MIDlet
 		}
 		case RUN_DELETE_MESSAGE: {
 			try {
+//#ifndef NO_CHAT_CANVAS
+				if (param instanceof UIMessage[]) {
+					UIMessage[] msgs = (UIMessage[]) param;
+					StringBuffer sb = new StringBuffer("deleteMessage&id=");
+					for (int i = 0; i < msgs.length; ++i) {
+						sb.append(msgs[i].id).append(',');
+					}
+					sb.setLength(sb.length() - 1);
+					sb.append("&peer=").append(msgs[0].peerId);
+					MP.api(sb.toString());
+					
+					commandAction(refreshCmd, current);
+					break;
+				}
+//#endif
 				String[] s = (String[]) param;
 				MP.api("deleteMessage&peer=".concat(s[0].concat("&id=").concat(s[1])));
 
 				// refresh chat after deleting
 				commandAction(refreshCmd, current);
-//				display(infoAlert(L[MessageDeleted_Alert]), current);
+//				display(infoAlert(L[LMessageDeleted_Alert]), current);
 			} catch (Exception e) {
 				display(errorAlert(e), current);
 			}
@@ -1236,19 +1350,19 @@ public class MP extends MIDlet
 //#endif
 				
 				// go back to chat screen
-				if (!(current instanceof ChatForm)) {
+				if (!(current instanceof MPChat)) {
 					commandAction(backCmd, current);
-				} else if (((ChatForm) current).textField != null) {
-					((ChatForm) current).textField.setString("");
+				} else {
+					((MPChat) current).sent();
 				}
 				
-				if (reopenChat || !((ChatForm) current).update || !((ChatForm) current).endReached) {
+				if (reopenChat || !longpoll || !((MPChat) current).update() || !((MPChat) current).endReached()) {
 					// load latest messages
 					commandAction(latestCmd, current);
 				} else if (display.getCurrent() != current) {
 					display(current);
 				}
-//				display(infoAlert(L[MessageSent_Alert]), current);
+//				display(infoAlert(L[LMessageSent_Alert]), current);
 			} catch (Exception e) {
 				e.printStackTrace();
 				display(errorAlert(e), current);
@@ -1293,8 +1407,12 @@ public class MP extends MIDlet
 				MP.api((run == RUN_JOIN_CHANNEL ? "join" : "leave").concat("Channel&id=").concat((String) param));
 				
 				if (run == RUN_JOIN_CHANNEL) {
-					commandAction(backCmd, current);
-					openChat((String) param, 0);
+					if (current instanceof MPChat) {
+						commandAction(latestCmd, current);
+					} else {
+						commandAction(backCmd, current);
+						openChat((String) param, 0);
+					}
 				} else {
 					commandAction(refreshCmd, current);
 				}
@@ -1305,12 +1423,14 @@ public class MP extends MIDlet
 		}
 		case RUN_CHECK_OTA: { // check for client updates
 			try {
-				JSONObject j = parseObject(new String(get(OTA_URL + "?v=" + version + "&l=" + lang + (MINI_BUILD ? "&m=1" : "")), encoding));
+				JSONObject j = parseObject(new String(get(OTA_URL + "?v=" + version + "&l=" + lang
+						+ (MINI_BUILD ? "&m=1" : "")
+						+ (blackberry ? "&bb=1" : "")), encoding));
 				if (j.getBoolean("update_available", false) && checkUpdates) {
 					updateUrl = j.getString("download_url");
 					Alert a = new Alert("", "", null, AlertType.INFO);
 					a.setTimeout(-2);
-					a.setString(j.getString("message", L[UpdateAvailable_Alert]));
+					a.setString(j.getString("message", L[LUpdateAvailable_Alert]));
 					a.addCommand(cancelCmd);
 					a.addCommand(updateCmd);
 					a.setCommandListener(this);
@@ -1325,22 +1445,22 @@ public class MP extends MIDlet
 			updatesRunning = true;
 			try {
 				StringBuffer sb = new StringBuffer();
-				ChatForm form = (ChatForm) param;
+				MPChat form = (MPChat) param;
 				JSONObject j;
 				
 				int offset = 0;
 				int fails = 0;
 				boolean check = true;
-				while (form.update && updatesThread == thread) {
+				while (form.update() && updatesThread == thread) {
 					try {
 						Thread.sleep(updatesDelay);
-						if (!form.update || updatesThread != thread) break;
+						if (!form.update() || updatesThread != thread) break;
 						if (!form.isShown()) continue;
 						if (check) {
 							sb.setLength(0);
-							sb.append("getLastUpdate&peer=").append(form.id);
+							sb.append("getLastUpdate&peer=").append(form.id());
 							if (offset <= 0) {
-								sb.append("&id=").append(form.firstMsgId);
+								sb.append("&id=").append(form.firstMsgId());
 							}
 							try {
 								j = ((JSONObject) api(sb.toString())).getObject("res");
@@ -1352,17 +1472,25 @@ public class MP extends MIDlet
 							} catch (Exception ignored) {}
 							check = false;
 						}
-						if (!form.update || updatesThread != thread) break;
+						if (!form.update() || updatesThread != thread) break;
 						
 						sb.setLength(0);
-						sb.append("updates&media=1&read=1&peer=").append(form.id)
+						sb.append("updates&media=1&read=1&peer=").append(form.id())
 						.append("&offset=").append(offset)
-						.append("&timeout=").append(updatesTimeout);
-						if (form.topMsgId != 0) {
-							sb.append("&top_msg=").append(form.topMsgId);
+						.append("&timeout=").append(longpoll ? updatesTimeout : 1)
+						.append("&message=").append(form.firstMsgId());
+						if (!longpoll) {
+							sb.append("&longpoll=0");
+						}
+						if (form.topMsgId() != 0) {
+							sb.append("&top_msg=").append(form.topMsgId());
 						}
 						
 						j = (JSONObject) api(sb.toString());
+						
+						if (j.has("cancel")) {
+							throw cancelException;
+						}
 						
 						JSONArray updates = j.getArray("res");
 						int l = updates.size();
@@ -1373,33 +1501,38 @@ public class MP extends MIDlet
 							update = update.getObject("update");
 							String type = update.getString("_");
 							if ("updateUserStatus".equals(type)) {
-								form.handleUpdate(ChatForm.UPDATE_USER_STATUS, update);
+								form.handleUpdate(MPChat.UPDATE_USER_STATUS, update);
 							} else if ("updateUserTyping".equals(type)
 									|| "updateChatUserTyping".equals(type)
 									|| "updateChannelUserTyping".equals(type)) {
-								form.handleUpdate(ChatForm.UPDATE_USER_TYPING, update);
+								form.handleUpdate(MPChat.UPDATE_USER_TYPING, update);
 							} else if ("updateNewMessage".equals(type)
 									|| "updateNewChannelMessage".equals(type)) {
-								form.handleUpdate(ChatForm.UPDATE_NEW_MESSAGE, update);
+								form.handleUpdate(MPChat.UPDATE_NEW_MESSAGE, update);
 							} else if ("updateDeleteChannelMessages".equals(type)) {
-								form.handleUpdate(ChatForm.UPDATE_DELETE_MESSAGES, update);
+								form.handleUpdate(MPChat.UPDATE_DELETE_MESSAGES, update);
 							} else if ("updateEditMessage".equals(type)
 									|| "updateEditChannelMessage".equals(type)) {
-								form.handleUpdate(ChatForm.UPDATE_EDIT_MESSAGE, update);
+								form.handleUpdate(MPChat.UPDATE_EDIT_MESSAGE, update);
 							}
 						}
 						
+						if (!longpoll) {
+							Thread.sleep(updatesTimeout * 1000);
+						}
 					} catch (Exception e) {
-						if (e.toString().indexOf("Interrupted") != -1) {
-							form.update = false;
+						if (e.toString().indexOf("Interrupted") != -1 || e == cancelException) {
+							form.setUpdate(false);
 							break;
 						}
 						e.printStackTrace();
 						fails++;
 						check = true;
-						if (fails >= 5 && form.update) {
-							form.update = false;
-							display(errorAlert("Updates thread died!\n".concat(e.toString())), null);
+						if (fails >= 5 && form.update()) {
+							form.setUpdate(false);
+							if (form.isShown()) {
+								display(errorAlert("Updates thread died!\n".concat(e.toString())), null);
+							}
 							break;
 						}
 					}
@@ -1416,8 +1549,8 @@ public class MP extends MIDlet
 		case RUN_SET_TYPING: {
 			try {
 				String peer = writeTo;
-				if (current instanceof ChatForm) {
-					peer = ((ChatForm) current).id;
+				if (current instanceof MPChat) {
+					peer = ((MPChat) current).id();
 				}
 				if (peer == null) return;
 				api("setTyping&action=" + (param == null ? "Typing" : (String) param)
@@ -1576,7 +1709,7 @@ public class MP extends MIDlet
 								}
 								String title = sb.toString();
 								
-								if (!paused && current instanceof ChatForm && current.isShown() && peerId.equals(((ChatForm) current).id)) {
+								if (!paused && current instanceof MPChat && current.isShown() && peerId.equals(((MPChat) current).id())) {
 									try {
 										Notifier.remove(peerId);
 									} catch (Throwable ignored) {}
@@ -1607,7 +1740,21 @@ public class MP extends MIDlet
 							}
 							
 							if (notified && notifySound) {
-								AlertType.ALARM.playSound(display);	
+								try {
+									if (notificationPlayer == null) {
+										notificationPlayer = Manager.createPlayer(getClass().getResourceAsStream("/msg.mid"), "audio/midi");
+										notificationPlayer.realize();
+										notificationPlayer.prefetch();
+									}
+									notificationPlayer.stop();
+									try { 
+										((VolumeControl) notificationPlayer.getControl("VolumeControl")).setLevel(100);
+									} catch (Throwable ignored) {}
+									notificationPlayer.setMediaTime(0);
+									notificationPlayer.start();
+								} catch (Exception e) {
+									AlertType.ALARM.playSound(display);
+								}
 							}
 						}
 						
@@ -1623,6 +1770,21 @@ public class MP extends MIDlet
 			} catch (Exception ignored) {}
 			break;
 		}
+		case RUN_CANCEL_UPDATES: {
+			if (!longpoll) {
+				try {
+					api("cancelUpdates");
+				} catch (Exception ignored) {}
+				try {
+					Thread.sleep(100);
+				} catch (Exception e) {
+					break;
+				}
+				if (!closingConnections.contains(param))
+					break;
+			}
+			// continue
+		}
 		case RUN_CLOSE_CONNECTION: {
 			try {
 				closingConnections.addElement(param);
@@ -1637,9 +1799,9 @@ public class MP extends MIDlet
 			break;
 		}
 		case RUN_BOT_CALLBACK: {
-			ChatForm form = (ChatForm) current;
+			MPChat form = (MPChat) current;
 			Ticker ticker;
-			form.setTicker(ticker = new Ticker(MP.L[Sending]));
+			form.setTicker(ticker = new Ticker(MP.L[LSending]));
 			
 			try {
 				StringBuffer sb = new StringBuffer("botCallback&timeout=1");
@@ -1659,13 +1821,13 @@ public class MP extends MIDlet
 					} else throw e;
 				}
 
-				if (reopenChat || !form.update || !form.endReached) {
+				if (reopenChat || !longpoll || !form.update() || !form.endReached()) {
 					// see ChatForm#postLoad() for answer handling
-					form.botAnswer = j;
+					form.setBotAnswer(j);
 					commandAction(latestCmd, current);
 				} else if (display.getCurrent() != current) {
 					display(current);
-					((ChatForm) current).handleBotAnswer(j);
+					((MPChat) current).handleBotAnswer(j);
 				}
 			} catch (Exception e) {
 				display(errorAlert(e), current);
@@ -1682,7 +1844,7 @@ public class MP extends MIDlet
 				String[] s = (String[]) param;
 				MP.api("banMember&peer=".concat(s[0].concat("&id=").concat(s[2])));
 
-				display(infoAlert(L[MemberBanned_Alert]), current);
+				display(infoAlert(L[LMemberBanned_Alert]), current);
 			} catch (Exception e) {
 				display(errorAlert(e), current);
 			}
@@ -1702,7 +1864,7 @@ public class MP extends MIDlet
 				String[] s = (String[]) param;
 				MP.api("pinMessage&peer=".concat(s[0].concat("&id=").concat(s[1])));
 				
-				if (reopenChat || !((ChatForm) current).update || !((ChatForm) current).endReached) {
+				if (reopenChat || !longpoll || !((MPChat) current).update() || !((MPChat) current).endReached()) {
 					// load latest messages
 					commandAction(latestCmd, current);
 				} else if (display.getCurrent() != current) {
@@ -1718,19 +1880,21 @@ public class MP extends MIDlet
 				JSONObject s = (JSONObject) param;
 				StickerPackForm form = (StickerPackForm) current;
 				
-				StringBuffer sb = new StringBuffer("sendMedia&peer=").append(form.chatForm.id);
+				StringBuffer sb = new StringBuffer("sendMedia&peer=").append(form.chatForm.id());
 				sb.append("&doc_id=").append(s.getString("id"))
 				.append("&doc_access_hash=").append(s.getString("access_hash"));
 				
 				MP.api(sb.toString());
 				
-				goBackTo(form.chatForm);
-				if (reopenChat || !((ChatForm) current).update || !((ChatForm) current).endReached) {
+				goBackTo((Displayable) form.chatForm);
+				if (reopenChat || !longpoll || !((MPChat) current).update() || !((MPChat) current).endReached()) {
 					// load latest messages
-					commandAction(latestCmd, form.chatForm);
+					commandAction(latestCmd, (Displayable) form.chatForm);
 				}
 			} catch (Exception e) {
 				display(errorAlert(e), current);
+			} finally {
+				sending = false;
 			}
 			break;
 		}
@@ -1741,7 +1905,7 @@ public class MP extends MIDlet
 				
 //				s.removeCommand(addStickerPackCmd);
 				commandAction(backCmd, s);
-				display(infoAlert(L[StickersAdded_Alert]), current);
+				display(infoAlert(L[LStickersAdded_Alert]), current);
 			} catch (Exception e) {
 				display(errorAlert(e), current);
 			}
@@ -1775,7 +1939,7 @@ public class MP extends MIDlet
 				}
 				
 				if (playlistList == null) {
-					List list = new List(L[Playlist_Title], List.IMPLICIT);
+					List list = new List(L[LPlaylist_Title], List.IMPLICIT);
 					list.addCommand(backCmd);
 					list.addCommand(List.SELECT_COMMAND);
 					list.setCommandListener(midlet);
@@ -1847,6 +2011,113 @@ public class MP extends MIDlet
 			} catch (Exception ignored) {}
 			break;
 		}
+//#ifndef NO_FILE
+		case RUN_DOWNLOAD_DOCUMENT: {
+			downloading = true;
+			String downloadPath = (String) param;
+			String[] msg = downloadMessage;
+			String name;
+			
+			Alert alert = new Alert(name = msg[2]);
+			alert.setString(L[LLoading]);
+			alert.setIndicator(new Gauge(null, false, Gauge.INDEFINITE, Gauge.CONTINUOUS_RUNNING));
+			alert.addCommand(cancelDownloadCmd);
+			alert.setCommandListener(this);
+			alert.setTimeout(Alert.FOREVER);
+			display(alert, current);
+			
+			if (reopenChat && updatesThread != null) {
+				MP.cancel(MP.updatesThread, true);
+			}
+			
+			String error;
+			try {
+				if (!downloadPath.endsWith("/")) downloadPath = downloadPath.concat("/");
+				int size = msg[3] == null ? 0 : Integer.parseInt(msg[3]);
+				if (name == null) {
+					name = msg[0] + '_' + msg[1];
+				}
+				
+				FileConnection fc = (FileConnection) Connector.open("file:///".concat(downloadPath = downloadPath.concat(name)));
+				if (!fc.exists()) fc.create();
+				else {
+					// TODO ask rewrite permission
+				}
+				try {
+					OutputStream out = fc.openOutputStream();
+					try {
+						if (!downloading) throw cancelException;
+						HttpConnection hc = (HttpConnection) openHttpConnection(instanceUrl + FILE_URL + "?c=" + msg[0] + "&m=" + msg[1]);
+						try {
+							InputStream in = openInputStream(hc);
+							try {
+								Gauge gauge = null;
+								if (size != 0) {
+									alert.setIndicator(gauge = new Gauge(null, false, 100, 0));
+								}
+								alert.setString(L[LDownloading]);
+								
+								byte[] buf = new byte[4096];
+								int readTotal = 0;
+								int read;
+								while ((read = in.read(buf)) != -1) {
+									out.write(buf, 0, read);
+									if (gauge != null) {
+										gauge.setValue((int) ((readTotal * 100) / size));
+									}
+									if (!downloading) throw cancelException;
+									readTotal += read;
+								}
+								
+								// done
+								display(current);
+								alert.addCommand(okDownloadCmd);
+								alert.removeCommand(cancelDownloadCmd);
+								alert.setIndicator(null);
+								alert.setString(L[LDownloadedTo] + downloadPath);
+								display(alert, current);
+								break;
+							} finally {
+								try {
+									in.close();
+								} catch (Exception ignored) {}
+							}
+						} finally {
+							try {
+								hc.close();
+							} catch (Exception ignored) {}
+						}
+					} catch (Exception e) {
+						if (e == cancelException) throw e;
+						// network error
+						e.printStackTrace();
+						error = e.toString();
+					} finally {
+						try {
+							out.close();
+						} catch (Exception ignored) {}
+					}
+				} finally {
+					try {
+						fc.close();
+					} catch (Exception ignored) {} // TODO: should I left it ignored?
+				}
+			} catch (Exception e) {
+				if (e == cancelException) {
+					display(alert(null, L[LDownloadCanceled_Alert], AlertType.WARNING), current);
+					break;
+				}
+				// failed to open file
+				e.printStackTrace();
+				error = e.toString();
+			} finally {
+				downloading = false;
+			}
+			
+			display(errorAlert(error), current);
+			break;
+		}
+//#endif
 		}
 //		running--;
 	}
@@ -1854,7 +2125,7 @@ public class MP extends MIDlet
 	Thread start(int i, Object param) {
 		Thread t = null;
 		try {
-			synchronized(this) {
+			synchronized (this) {
 				run = i;
 				runParam = param;
 				(t = new Thread(this)).start();
@@ -1867,16 +2138,15 @@ public class MP extends MIDlet
 	static void cancel(Thread thread, boolean updates) {
 		if (thread == null) return;
 		if (updates) updatesThread = null;
-		if (symbianJrt) {
-			thread.interrupt();
-			return;
-		}
 		Connection c = (Connection) threadConnections.get(thread);
-		if (c == null || closingConnections.contains(c)) {
-			thread.interrupt();
+		if (c == null) {
+			if (updates && longpoll) {
+				thread.interrupt();
+			}
 			return;
 		}
-		midlet.start(RUN_CLOSE_CONNECTION, c);
+		if (closingConnections.contains(c)) return;
+		midlet.start(updates ? RUN_CANCEL_UPDATES : RUN_CLOSE_CONNECTION, c);
 	}
 
 	// endregion
@@ -1886,7 +2156,7 @@ public class MP extends MIDlet
 	public void commandAction(Command c, Displayable d) {
 		if (d instanceof ChatsList) { // chats list commands
 			if (c == archiveCmd) {
-				((ChatsList) d).changeFolder(1, L[Archive]);
+				((ChatsList) d).changeFolder(1, L[LArchive]);
 				return;
 			}
 			if (c == foldersCmd) {
@@ -1900,7 +2170,7 @@ public class MP extends MIDlet
 				return;
 			}
 			if (c == contactsCmd) {
-				openLoad(new ChatsList(L[Contacts], "getContacts&fields=status", null, null, false));
+				openLoad(new ChatsList(L[LContacts], "getContacts&fields=status", null, null, false));
 				return;
 			}
 			if (c == nextPageCmd) {
@@ -1921,7 +2191,7 @@ public class MP extends MIDlet
 				return;
 			}
 			if (c == searchChatsCmd) {
-				TextBox t = new TextBox(L[Search], "", 200, TextField.ANY);
+				TextBox t = new TextBox(L[LSearch], "", 200, TextField.ANY);
 				t.addCommand(cancelCmd);
 				t.addCommand(searchChatsCmd);
 				t.setCommandListener(this);
@@ -1936,31 +2206,31 @@ public class MP extends MIDlet
 				String id = (String) ((ChatsList) d).ids.elementAt(i);
 				if (id == null) return;
 
-				display(loadingAlert(L[Loading]), current);
+				display(loadingAlert(L[LLoading]), current);
 				start(RUN_BAN_MEMBER, new String[] {((ChatsList) d).peerId, null, id});
 				return;
 			}
 		}
-		if (d instanceof ChatForm) { // chat form commands
+		if (d instanceof MPChat) { // chat form commands
 			if (c == latestCmd) {
-				((ChatForm) d).reset();
+				((MPChat) d).reset();
 				start(RUN_LOAD_FORM, d);
 				return;
 			}
 			if (c == olderMessagesCmd || c == newerMessagesCmd) {
-				((ChatForm) d).paginate(c == olderMessagesCmd ? -1 : 1);
+				((MPChat) d).paginate(c == olderMessagesCmd ? -1 : 1);
 				return;
 			}
 			if (c == chatInfoCmd) {
-				openProfile(((ChatForm) d).id, (ChatForm) d, 0);
+				openProfile(((MPChat) d).id(), (MPChat) d, 0);
 				return;
 			}
 			if (c == writeCmd) {
-				display(writeForm(((ChatForm) d).id, Integer.toString(((ChatForm) d).topMsgId), "", null, null, null));
+				display(writeForm(((MPChat) d).id(), Integer.toString(((MPChat) d).topMsgId()), "", null, null, null));
 				return;
 			}
 			if (c == searchMsgCmd) {
-				TextBox t = new TextBox(L[Search], "", 200, TextField.ANY);
+				TextBox t = new TextBox(L[LSearch], "", 200, TextField.ANY);
 				t.addCommand(cancelCmd);
 				t.addCommand(searchMsgCmd);
 				t.setCommandListener(this);
@@ -1969,34 +2239,43 @@ public class MP extends MIDlet
 				return;
 			}
 			if (c == sendStickerCmd) {
-				openLoad(new StickerPacksList((ChatForm) d));
+				openLoad(new StickerPacksList((MPChat) d));
 				return;
 			}
-			if (c == backCmd && ((ChatForm) d).query != null && ((ChatForm) d).switched) {
+			if (c == backCmd && ((MPChat) d).query() != null && ((MPChat) d).switched()) {
 				// close search
-				((ChatForm) current).reset();
+				((MPChat) current).reset();
 				start(RUN_LOAD_FORM, current);
 				return;
 			}
 		}
 		if (d instanceof TextBox && c == searchMsgCmd) {
 			commandAction(backCmd, d);
-			if (current instanceof ChatForm) {
-				((ChatForm) current).reset();
-				((ChatForm) current).query = ((TextBox) d).getString();
-				((ChatForm) current).switched = true;
+			if (current instanceof MPChat) {
+				((MPChat) current).reset();
+				((MPChat) current).setQuery(((TextBox) d).getString());
 				start(RUN_LOAD_FORM, current);
 				return;
 			}
 			
-			ChatForm form = new ChatForm(((ChatInfoForm) current).id, ((TextBox) d).getString(), 0, ((ChatInfoForm) current).chatForm.topMsgId);
-			form.parent = ((ChatInfoForm) current).chatForm;
-			openLoad(form);
+			MPChat form;
+			
+//#ifndef NO_CHAT_CANVAS
+			if (!legacyChatUI) {
+				form = new ChatCanvas(((ChatInfoForm) current).id, ((TextBox) d).getString(), 0, ((ChatInfoForm) current).chatForm.topMsgId());
+			} else
+//#endif
+			{
+				form = new ChatForm(((ChatInfoForm) current).id, ((TextBox) d).getString(), 0, ((ChatInfoForm) current).chatForm.topMsgId());
+			}
+			
+			form.setParent(((ChatInfoForm) current).chatForm);
+			openLoad((Displayable) form);
 			return;
 		}
 		if (d instanceof TextBox && c == searchChatsCmd) {
 			commandAction(backCmd, d);
-			openLoad(new ChatsList(L[Search],
+			openLoad(new ChatsList(L[LSearch],
 					appendUrl(new StringBuffer("searchChats&q="), ((TextBox) d).getString()).toString(),
 					"results", null, false));
 			return;
@@ -2023,7 +2302,7 @@ public class MP extends MIDlet
 				return;
 			}
 			if (c == searchMsgCmd) {
-				TextBox t = new TextBox(L[Search], "", 200, TextField.ANY);
+				TextBox t = new TextBox(L[LSearch], "", 200, TextField.ANY);
 				t.addCommand(cancelCmd);
 				t.addCommand(searchMsgCmd);
 				t.setCommandListener(this);
@@ -2032,34 +2311,48 @@ public class MP extends MIDlet
 				return;
 			}
 			// Chat media categories
-			if (c == chatPhotosCmd) {
-				openLoad(new ChatForm(((ChatInfoForm) current).id, "Photos", ((ChatInfoForm) current).chatForm.topMsgId));
-				return;
-			}
-			if (c == chatVideosCmd) {
-				openLoad(new ChatForm(((ChatInfoForm) current).id, "Video", ((ChatInfoForm) current).chatForm.topMsgId));
-				return;
-			}
-			if (c == chatFilesCmd) {
-				openLoad(new ChatForm(((ChatInfoForm) current).id, "Document", ((ChatInfoForm) current).chatForm.topMsgId));
-				return;
-			}
-			if (c == chatMusicCmd) {
-				openLoad(new ChatForm(((ChatInfoForm) current).id, "Music", ((ChatInfoForm) current).chatForm.topMsgId));
+			if (c == chatPhotosCmd || c == chatVideosCmd || c == chatFilesCmd || c == chatMusicCmd) {
+				String mediaFilter;
+				switch (c.getPriority()) {
+				case 1:
+					mediaFilter = "Photos";
+					break;
+				case 2:
+					mediaFilter = "Video";
+					break;
+				case 3:
+					mediaFilter = "Document";
+					break;
+				case 4:
+					mediaFilter = "Music";
+					break;
+				default:
+					return;
+				}
+				Displayable form;
+//#ifndef NO_CHAT_CANVAS
+				if (!legacyChatUI) {
+					form = new ChatCanvas(((ChatInfoForm) current).id, mediaFilter, ((ChatInfoForm) current).chatForm.topMsgId());
+				} else
+//#endif
+				{
+					form = new ChatForm(((ChatInfoForm) current).id, mediaFilter, ((ChatInfoForm) current).chatForm.topMsgId());
+				}
+				openLoad(form);
 				return;
 			}
 			if (c == gotoPinnedMsgCmd) {
 				int id = ((ChatInfoForm) current).pinnedMessageId;
 				if (((ChatInfoForm) d).chatForm != null) {
 					commandAction(backCmd, d);
-					((ChatInfoForm) d).chatForm.openMessage(Integer.toString(id), 0);
+					((ChatInfoForm) d).chatForm.openMessage(Integer.toString(id), -1);
 				} else {
-					openLoad(new ChatForm(((ChatInfoForm) current).id, null, id, 0));
+					openChat(((ChatInfoForm) current).id, id);
 				}
 				return;
 			}
 			if (c == chatMembersCmd) {
-				openLoad(new ChatsList(L[Members],
+				openLoad(new ChatsList(L[LMembers],
 						"getParticipants&peer=" + ((ChatInfoForm) current).id + "&fields=status",
 						null,
 						((ChatInfoForm) d).id, ((ChatInfoForm) d).canBan));
@@ -2068,8 +2361,8 @@ public class MP extends MIDlet
 		}
 		if (d instanceof ChatTopicsList) {
 			if (c == chatInfoCmd) {
-				ChatForm f = ((ChatTopicsList) d).chatForm;
-				openProfile(f.id, /* f */ null, 0);
+				MPChat f = ((ChatTopicsList) d).chatForm;
+				openProfile(f.id(), /* f */ null, 0);
 				return;
 			}
 		}
@@ -2079,12 +2372,12 @@ public class MP extends MIDlet
 					// user code
 					user = ((TextBox) d).getString().trim();
 					if (user.length() < 32) {
-						display(errorAlert(""), null); // TODO unlocalized
+						display(errorAlert(L[LInvalidSessionCode_Alert]), null);
 						return;
 					}
 					writeAuth();
 					
-					display(loadingAlert(L[WaitingForServerResponse]), null);
+					display(loadingAlert(L[LWaitingForServerResponse]), null);
 					start(RUN_VALIDATE_AUTH, user);
 					return;
 				}
@@ -2094,12 +2387,12 @@ public class MP extends MIDlet
 //				}
 //				
 //				if (instanceUrl == null || instanceUrl.length() < 6 || !instanceUrl.startsWith("http")) {
-//					display(errorAlert(L[InvalidInstance_Alert]), null);
+//					display(errorAlert(L[LInvalidInstance_Alert]), null);
 //					return;
 //				}
 //				writeAuth();
 //				
-//				Alert a = new Alert("", L[ChooseAuthMethod], null, null);
+//				Alert a = new Alert("", L[LChooseAuthMethod], null, null);
 //				a.addCommand(authImportSessionCmd);
 //				a.addCommand(authNewSessionCmd);
 //				a.setCommandListener(this);
@@ -2116,14 +2409,14 @@ public class MP extends MIDlet
 				// set and check instance url
 				if ((instanceUrl = instanceField.getString()) == null
 						|| instanceUrl.length() < 6 || !instanceUrl.startsWith("http")) {
-					display(errorAlert(L[InvalidInstance_Alert]), null);
+					display(errorAlert(L[LInvalidInstance_Alert]), null);
 					return;
 				}
 				writeAuth();
 				
 				if (c == authImportSessionCmd) {
 					// import session
-					TextBox t = new TextBox(L[SessionCode], user == null ? "" : user, 200, TextField.NON_PREDICTIVE);
+					TextBox t = new TextBox(L[LSessionCode], user == null ? "" : user, 200, TextField.NON_PREDICTIVE);
 					t.addCommand(cancelCmd);
 					t.addCommand(authCmd);
 					t.setCommandListener(this);
@@ -2136,7 +2429,7 @@ public class MP extends MIDlet
 				user = null;
 				userState = 0;
 				
-				TextBox t = new TextBox(L[PhoneNumber], phone == null ? "" : phone, 30, TextField.PHONENUMBER);
+				TextBox t = new TextBox(L[LPhoneNumber], phone == null ? "" : phone, 30, TextField.PHONENUMBER);
 				t.addCommand(cancelCmd);
 				t.addCommand(authNextCmd);
 				t.setCommandListener(this);
@@ -2149,12 +2442,12 @@ public class MP extends MIDlet
 					// phone number entered
 					phone = ((TextBox) d).getString();
 					if (phone.length() < 10 && !phone.startsWith("+")) {
-						display(errorAlert(L[InvalidPhoneNumber_Alert]), null);
+						display(errorAlert(L[LInvalidPhoneNumber_Alert]), null);
 						return;
 					}
 					writeAuth();
 
-					display(loadingAlert(L[WaitingForServerResponse]), null);
+					display(loadingAlert(L[LWaitingForServerResponse]), null);
 					openLoad(new CaptchaForm());
 					return;
 				}
@@ -2162,10 +2455,10 @@ public class MP extends MIDlet
 					// captcha entered
 					String key = ((CaptchaForm) d).field.getString();
 					if (key.length() < 4) {
-						display(errorAlert(L[InvalidCaptcha_Alert]), null);
+						display(errorAlert(L[LInvalidCaptcha_Alert]), null);
 						return;
 					}
-					display(loadingAlert(L[WaitingForServerResponse]), null);
+					display(loadingAlert(L[LWaitingForServerResponse]), null);
 					start(RUN_AUTH, d);
 					return;
 				}
@@ -2175,11 +2468,11 @@ public class MP extends MIDlet
 				// code entered
 				String code = ((TextBox) d).getString();
 				if (code.length() < 5) {
-					display(errorAlert(L[InvalidCode_Alert]), null);
+					display(errorAlert(L[LInvalidCode_Alert]), null);
 					return;
 				}
 
-				display(loadingAlert(L[WaitingForServerResponse]), null);
+				display(loadingAlert(L[LWaitingForServerResponse]), null);
 				start(RUN_AUTH, code);
 				return;
 			}
@@ -2187,11 +2480,11 @@ public class MP extends MIDlet
 				// password entered
 				String pass = ((TextBox) d).getString();
 				if (pass.length() == 0) {
-					display(errorAlert(L[CloudPasswordEmpty_Alert]), null);
+					display(errorAlert(L[LCloudPasswordEmpty_Alert]), null);
 					return;
 				}
 
-				display(loadingAlert(L[WaitingForServerResponse]), null);
+				display(loadingAlert(L[LWaitingForServerResponse]), null);
 				start(RUN_AUTH, pass);
 				return;
 			}
@@ -2203,20 +2496,22 @@ public class MP extends MIDlet
 		{ // settings
 			if (c == settingsCmd) {
 				if (settingsForm == null) {
-					Form f = new Form(L[Settings]);
+					Form f = new Form(L[LSettings]);
 					f.addCommand(backCmd);
 					f.setCommandListener(this);
+//					f.setItemStateListener(this);
 					StringItem s;
+					int i;
 					
 					// ui
 					
-					s = new StringItem(null, L[UI]);
+					s = new StringItem(null, L[LUI]);
 					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					s.setFont(largePlainFont);
 					f.append(s);
 					
-					langChoice = new ChoiceGroup(L[Language], Choice.POPUP, LANGS[1], null);
-					for (int i = 0; i < LANGS[0].length; ++i) {
+					langChoice = new ChoiceGroup(L[LLanguage], Choice.POPUP, LANGS[1], null);
+					for (i = 0; i < LANGS[0].length; ++i) {
 						if (lang.equals(LANGS[0][i])) {
 							langChoice.setSelectedIndex(i, true);
 							break;
@@ -2226,40 +2521,58 @@ public class MP extends MIDlet
 					f.append(langChoice);
 					
 					uiChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
-							L[ReversedChat],
-							L[ShowMedia],
-							L[ShowChatStatus],
-							L[FocusNewMessages],
-							L[ChatTextField],
-							L[BuiltinImageViewer],
-							L[LargeMusicCover]
+							L[LReversedChat],
+							L[LShowMedia],
+							L[LShowChatStatus],
+							L[LFocusNewMessages],
+							L[LChatTextField],
+							L[LBuiltinImageViewer],
+							L[LLargeMusicCover],
+//#ifndef NO_CHAT_CANVAS
+							L[LLegacyUI],
+//#endif
 					}, null);
-					uiChoice.setSelectedIndex(0, reverseChat);
-					uiChoice.setSelectedIndex(1, showMedia);
-					uiChoice.setSelectedIndex(2, chatStatus);
-					uiChoice.setSelectedIndex(3, focusNewMessages);
-					uiChoice.setSelectedIndex(4, chatField);
-					uiChoice.setSelectedIndex(5, useView);
-					uiChoice.setSelectedIndex(6, fullPlayerCover);
+					uiChoice.setSelectedIndex(i = 0, reverseChat);
+					uiChoice.setSelectedIndex(++i, showMedia);
+					uiChoice.setSelectedIndex(++i, chatStatus);
+					uiChoice.setSelectedIndex(++i, focusNewMessages);
+					uiChoice.setSelectedIndex(++i, chatField);
+					uiChoice.setSelectedIndex(++i, useView);
+					uiChoice.setSelectedIndex(++i, fullPlayerCover);
+//#ifndef NO_CHAT_CANVAS
+					uiChoice.setSelectedIndex(++i, legacyChatUI);
+//#endif
 					uiChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(uiChoice);
 					
-					photoSizeGauge = new Gauge(L[ThumbnailsSize], true, 64, Math.min(64, photoSize / 8));
+//#ifndef NO_CHAT_CANVAS
+					textMethodChoice = new ChoiceGroup(L[LKeyboard], Choice.POPUP, new String[] {
+							L[LAuto],
+							"Nokia UI",
+							"j2mekeyboard",
+							L[LFullscreenTextBox]
+					}, null);
+					textMethodChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					textMethodChoice.setSelectedIndex(textMethod, true);
+					f.append(textMethodChoice);
+//#endif
+					
+					photoSizeGauge = new Gauge(L[LThumbnailsSize], true, 64, Math.min(64, photoSize / 8));
 					photoSizeGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(photoSizeGauge);
 					
-					chatsGauge = new Gauge(L[ChatsCount], true, 50, chatsLimit);
+					chatsGauge = new Gauge(L[LChatsCount], true, 50, chatsLimit);
 					chatsGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(chatsGauge);
 					
-					msgsGauge = new Gauge(L[MessagesCount], true, 50, messagesLimit);
+					msgsGauge = new Gauge(L[LMessagesCount], true, 50, messagesLimit);
 					msgsGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(msgsGauge);
 					
-					chatsFontSizeCoice = new ChoiceGroup(L[ChatsListFontSize], Choice.POPUP, new String[] {
-						L[Default],
-						L[Small],
-						L[Medium]
+					chatsFontSizeCoice = new ChoiceGroup(L[LChatsListFontSize], Choice.POPUP, new String[] {
+						L[LDefault],
+						L[LSmall],
+						L[LMedium]
 					}, null);
 					chatsFontSizeCoice.setSelectedIndex(chatsListFontSize, true);
 					f.append(chatsFontSizeCoice);
@@ -2267,23 +2580,23 @@ public class MP extends MIDlet
 //#ifndef NO_NOTIFY
 					// notifications
 					
-					s = new StringItem(null, L[Notifications]);
+					s = new StringItem(null, L[LNotifications]);
 					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					s.setFont(largePlainFont);
 					f.append(s);
 					
 					notifyChoice = new ChoiceGroup("", ChoiceGroup.MULTIPLE, new String[] {
-							L[EnableNotifications],
-							L[EnableSound]
+							L[LEnableNotifications],
+							L[LEnableSound]
 					}, null);
 					notifyChoice.setSelectedIndex(0, notifications);
 					notifyChoice.setSelectedIndex(1, notifySound);
 					notifyChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(notifyChoice);
 					
-					notifyMethodChoice = new ChoiceGroup(L[NotificationMethod], ChoiceGroup.POPUP, new String[] {
-							L[Off],
-							L[AlertWindow],
+					notifyMethodChoice = new ChoiceGroup(L[LNotificationMethod], ChoiceGroup.POPUP, new String[] {
+							L[LOff],
+							L[LAlertWindow],
 							"Nokia UI",
 							"Pigler API"
 					}, null);
@@ -2291,26 +2604,26 @@ public class MP extends MIDlet
 					notifyMethodChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(notifyMethodChoice);
 					
-					pushIntervalGauge = new Gauge(L[PushInterval], true, 120, (int) (pushInterval / 1000));
+					pushIntervalGauge = new Gauge(L[LPushInterval], true, 120, (int) (pushInterval / 1000));
 					pushIntervalGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(pushIntervalGauge);
 					
-					pushBgIntervalGauge = new Gauge(L[PushBackgroundInterval], true, 120, (int) (pushBgInterval / 1000));
+					pushBgIntervalGauge = new Gauge(L[LPushBackgroundInterval], true, 120, (int) (pushBgInterval / 1000));
 					pushBgIntervalGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(pushBgIntervalGauge);
 //#endif
 					
 					// behaviour
 					
-					s = new StringItem(null, L[Behaviour]);
+					s = new StringItem(null, L[LBehaviour]);
 					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					s.setFont(largePlainFont);
 					f.append(s);
 					
 					if (blackberry) {
-						networkChoice = new ChoiceGroup(L[NetworkAccess], Choice.POPUP, new String[] {
-								L[MobileData],
-								L[WiFi]
+						networkChoice = new ChoiceGroup(L[LNetworkAccess], Choice.POPUP, new String[] {
+								L[LMobileData],
+								L[LWiFi]
 						}, null);
 						networkChoice.setSelectedIndex(blackberryNetwork == -1 ? 0 : blackberryNetwork, true);
 						networkChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -2318,83 +2631,122 @@ public class MP extends MIDlet
 					}
 					
 					behChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
-							L[WaitForPageToLoad],
-							L[UseJSONStream],
-							L[FormatText],
-							L[ParseLinks],
-							L[ChatAutoUpdate],
-							L[KeepSessionAlive],
-							L[UseUnicode],
-							L[UseCompression]
+							L[LWaitForPageToLoad],
+							L[LUseJSONStream],
+							L[LFormatText],
+							L[LParseLinks],
+							L[LChatAutoUpdate],
+							L[LKeepSessionAlive],
+							L[LUseUnicode],
+//#ifndef NO_ZIP
+							L[LUseCompression],
+//#endif
+							L[LLongpoll]
 					}, null);
-					behChoice.setSelectedIndex(0, useLoadingForm);
-					behChoice.setSelectedIndex(1, jsonStream);
-					behChoice.setSelectedIndex(2, parseRichtext);
-					behChoice.setSelectedIndex(3, parseLinks);
-					behChoice.setSelectedIndex(4, chatUpdates);
-					behChoice.setSelectedIndex(5, keepAlive);
-					behChoice.setSelectedIndex(6, utf);
-					behChoice.setSelectedIndex(7, compress);
+					behChoice.setSelectedIndex(i = 0, useLoadingForm);
+					behChoice.setSelectedIndex(++i, jsonStream);
+					behChoice.setSelectedIndex(++i, parseRichtext);
+					behChoice.setSelectedIndex(++i, parseLinks);
+					behChoice.setSelectedIndex(++i, chatUpdates);
+					behChoice.setSelectedIndex(++i, keepAlive);
+					behChoice.setSelectedIndex(++i, utf);
+//#ifndef NO_ZIP
+					behChoice.setSelectedIndex(++i, compress);
+//#endif
+					behChoice.setSelectedIndex(++i, longpoll);
 					behChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(behChoice);
 					
-					updateTimeoutGauge = new Gauge(L[UpdatesTimeout], true, 20, updatesTimeout / 5);
+					updateTimeoutGauge = new Gauge(L[longpoll ? LUpdatesTimeout : LUpdatesInterval], true, 20, updatesTimeout / 5);
 					updateTimeoutGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(updateTimeoutGauge);
 					
-					imagesChoice = new ChoiceGroup(L[Images], Choice.MULTIPLE, new String[] {
-							L[LoadMediaThumbnails],
-							L[LoadAvatars],
-							L[MultiThreadedLoading],
-							L[RoundAvatars]
+					imagesChoice = new ChoiceGroup(L[LImages], Choice.MULTIPLE, new String[] {
+							L[LLoadMediaThumbnails],
+//#ifndef NO_AVATARS
+							L[LLoadAvatars],
+							L[LRoundAvatars],
+//#endif
+							L[LMultiThreadedLoading],
+//#ifndef NO_AVATARS
+//#endif
 					}, null);
-					imagesChoice.setSelectedIndex(0, loadThumbs);
-					imagesChoice.setSelectedIndex(1, loadAvatars);
-					imagesChoice.setSelectedIndex(2, threadedImages);
-					imagesChoice.setSelectedIndex(3, roundAvatars);
+					imagesChoice.setSelectedIndex(i = 0, loadThumbs);
+//#ifndef NO_AVATARS
+					imagesChoice.setSelectedIndex(++i, loadAvatars);
+					imagesChoice.setSelectedIndex(++i, roundAvatars);
+//#endif
+					imagesChoice.setSelectedIndex(++i, threadedImages);
 					imagesChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(imagesChoice);
 					
 					// cache
 
-					avaCacheChoice = new ChoiceGroup(L[AvatarsCaching], Choice.POPUP, new String[] {
-							L[Disabled],
-							L[HoldInRAM],
-							L[Store],
-							L[HoldInRAMandStore]
+//#ifndef NO_AVATARS
+					avaCacheChoice = new ChoiceGroup(L[LAvatarsCaching], Choice.POPUP, new String[] {
+							L[LDisabled],
+							L[LHoldInRAM],
+							L[LStore],
+							L[LHoldInRAMandStore]
 					}, null);
 					avaCacheChoice.setSelectedIndex(avatarsCache, true);
 					avaCacheChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(avaCacheChoice);
 					
-					avaCacheGauge = new Gauge(L[AvatarsCacheThreshold], true, 20, avatarsCacheThreshold / 5);
+					avaCacheGauge = new Gauge(L[LAvatarsCacheThreshold], true, 20, avatarsCacheThreshold / 5);
 					avaCacheGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(avaCacheGauge);
+//#endif
 					
-					profileCacheGauge = new Gauge(L[ProfilesCacheThreshold], true, 30, peersCacheThreshold / 10);
+					profileCacheGauge = new Gauge(L[LProfilesCacheThreshold], true, 30, peersCacheThreshold / 10);
 					profileCacheGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(profileCacheGauge);
 					
-					s = new StringItem(null, L[ClearCache], Item.BUTTON);
+					s = new StringItem(null, L[LClearCache], Item.BUTTON);
 					s.setDefaultCommand(clearCacheCmd);
 					s.setItemCommandListener(this);
 					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(s);
 					
+//#ifndef NO_FILE
+					// downloads
+					
+					downloadMethodChoice = new ChoiceGroup(L[LDownloadMethod], Choice.POPUP, new String[] {
+							L[LAlwaysAsk],
+							L[LInApp],
+							L[LWithBrowser]
+					}, null);
+					downloadMethodChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					downloadMethodChoice.setSelectedIndex(downloadMethod, true);
+					f.append(downloadMethodChoice);
+					
+					downloadPathField = new TextField(L[LDownloadPath], downloadPath, 500, TextField.ANY);
+					downloadPathField.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(downloadPathField);
+					
+					s = new StringItem(null, "...", Item.BUTTON);
+					s.setDefaultCommand(downloadPathCmd);
+					s.setItemCommandListener(this);
+					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(s);
+//#endif
+					
 					// authorization
 					
-					s = new StringItem(null, L[Authorization]);
+					s = new StringItem(null, L[LAuthorization]);
 					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					s.setFont(largePlainFont);
 					f.append(s);
 					
-					s = new StringItem(null, L[Logout], Item.BUTTON);
+					s = new StringItem(null, L[LLogout], Item.BUTTON);
 					s.setDefaultCommand(logoutCmd);
 					s.setItemCommandListener(this);
 					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(s);
 					
 					settingsForm = f;
+				} else {
+					updateTimeoutGauge.setLabel(L[longpoll ? LUpdatesTimeout : LUpdatesInterval]);
 				}
 				
 				display(settingsForm);
@@ -2407,15 +2759,21 @@ public class MP extends MIDlet
 			}
 			if (c == backCmd && d == settingsForm) {
 				// apply and save settings
+				int i;
 				lang = LANGS[0][langChoice.getSelectedIndex()];
 				
-				reverseChat = uiChoice.isSelected(0);
-				showMedia = uiChoice.isSelected(1);
-				chatStatus = uiChoice.isSelected(2);
-				focusNewMessages = uiChoice.isSelected(3);
-				chatField = uiChoice.isSelected(4);
-				useView = uiChoice.isSelected(5);
-				fullPlayerCover = uiChoice.isSelected(6);
+				reverseChat = uiChoice.isSelected(i = 0);
+				showMedia = uiChoice.isSelected(++i);
+				chatStatus = uiChoice.isSelected(++i);
+				focusNewMessages = uiChoice.isSelected(++i);
+				chatField = uiChoice.isSelected(++i);
+				useView = uiChoice.isSelected(++i);
+				fullPlayerCover = uiChoice.isSelected(++i);
+//#ifndef NO_CHAT_CANVAS
+				legacyChatUI = uiChoice.isSelected(++i);
+				
+				textMethod = textMethodChoice.getSelectedIndex();
+//#endif
 				
 				if ((photoSize = (photoSizeGauge.getValue() * 8)) < 16) {
 					photoSizeGauge.setValue((photoSize = 16) / 8);
@@ -2446,27 +2804,39 @@ public class MP extends MIDlet
 				if (networkChoice != null)
 					blackberryNetwork = networkChoice.getSelectedIndex();
 				
-				useLoadingForm = behChoice.isSelected(0);
-				jsonStream = behChoice.isSelected(1);
-				parseRichtext = behChoice.isSelected(2);
-				parseLinks = behChoice.isSelected(3);
-				chatUpdates = behChoice.isSelected(4);
-				keepAlive = behChoice.isSelected(5);
-				utf = behChoice.isSelected(6);
-				compress = behChoice.isSelected(7);
+				useLoadingForm = behChoice.isSelected(i = 0);
+				jsonStream = behChoice.isSelected(++i);
+				parseRichtext = behChoice.isSelected(++i);
+				parseLinks = behChoice.isSelected(++i);
+				chatUpdates = behChoice.isSelected(++i);
+				keepAlive = behChoice.isSelected(++i);
+				utf = behChoice.isSelected(++i);
+//#ifndef NO_ZIP
+				compress = behChoice.isSelected(++i);
+//#endif
+				longpoll = behChoice.isSelected(++i);
 				
 				if ((updatesTimeout = updateTimeoutGauge.getValue() * 5) < 5) {
 					updateTimeoutGauge.setValue((updatesTimeout = 5) / 5);
 				}
 				
-				loadThumbs = imagesChoice.isSelected(0);
-				loadAvatars = imagesChoice.isSelected(1);
-				threadedImages = imagesChoice.isSelected(2);
-				roundAvatars = imagesChoice.isSelected(3);
+				loadThumbs = imagesChoice.isSelected(i = 0);
+//#ifndef NO_AVATARS
+				loadAvatars = imagesChoice.isSelected(++i);
+				roundAvatars = imagesChoice.isSelected(++i);
+//#endif
+				threadedImages = imagesChoice.isSelected(++i);
 				
+//#ifndef NO_AVATARS
 				avatarsCache = avaCacheChoice.getSelectedIndex();
 				avatarsCacheThreshold = avaCacheGauge.getValue() * 5;
+//#endif
 				peersCacheThreshold = profileCacheGauge.getValue() * 10;
+
+//#ifndef NO_FILE
+				downloadMethod = downloadMethodChoice.getSelectedIndex();
+				downloadPath = downloadPathField.getString();
+//#endif
 				
 				try {
 					RecordStore.deleteRecordStore(SETTINGS_RECORD_NAME);
@@ -2474,14 +2844,18 @@ public class MP extends MIDlet
 				try {
 					JSONObject j = new JSONObject();
 					j.put("reverseChat", reverseChat);
+//#ifndef NO_AVATARS
 					j.put("loadAvatars", loadAvatars);
 					j.put("avatarSize", avatarSize);
+//#endif
 					j.put("showMedia", showMedia);
 					j.put("photoSize", photoSize);
 					j.put("loadThumbs", loadThumbs);
 					j.put("threadedImages", threadedImages);
+//#ifndef NO_AVATARS
 					j.put("avatarsCache", avatarsCache);
 					j.put("avatarsCacheThreshold", avatarsCacheThreshold);
+//#endif
 					j.put("useLoadingForm", useLoadingForm);
 					j.put("chatsLimit", chatsLimit);
 					j.put("messagesLimit", messagesLimit);
@@ -2501,7 +2875,9 @@ public class MP extends MIDlet
 					j.put("chatField", chatField);
 					j.put("roundAvatars", roundAvatars);
 					j.put("utf", utf);
+//#ifndef NO_ZIP
 					j.put("compress", compress);
+//#endif
 					j.put("useView", useView);
 					j.put("blackberryNetwork", blackberryNetwork);
 					j.put("fullPlayerCover", fullPlayerCover);
@@ -2512,6 +2888,14 @@ public class MP extends MIDlet
 					j.put("pushBgInterval", pushBgInterval);
 					j.put("notifyMethod", notifyMethod);
 //#endif
+//#ifndef NO_CHAT_CANVAS
+					j.put("legacyChatUI", legacyChatUI);
+					j.put("textMethod", textMethod);
+//#endif
+//#ifndef NO_FILE
+					j.put("downloadPath", downloadPath);
+//#endif
+					j.put("longpoll", longpoll);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
@@ -2545,6 +2929,13 @@ public class MP extends MIDlet
 				commandAction(backCmd, d);
 				return;
 			}
+//#ifndef NO_FILE
+			if (c == downloadPathCmd) {
+				downloadMessage = null;
+				openFilePicker("", false);
+				return;
+			}
+//#endif
 		}
 		{ // write form commands
 			if (c == sendCmd) {
@@ -2553,18 +2944,20 @@ public class MP extends MIDlet
 					return;
 				}
 
-				if (sending) return;
-				sending = true;
+				synchronized (this) {
+					if (sending) return;
+					sending = true;
+				}
 
-				display(loadingAlert(L[Sending]), d);
-				if (reopenChat && MP.updatesThread != null) {
+				display(loadingAlert(L[LSending]), d);
+				if ((reopenChat || !longpoll || sendFile != null) && MP.updatesThread != null) {
 					MP.cancel(MP.updatesThread, true);
 				}
 				start(RUN_SEND_MESSAGE, new Object[] { t, writeTo, replyTo, edit, sendFile, sendChoice, fwdPeer, fwdMsg });
 				return;
 			}
 			if (c == openTextBoxCmd) {
-				TextBox t = new TextBox(L[Message], messageField.getString(), 500, TextField.ANY);
+				TextBox t = new TextBox(L[LMessage], messageField.getString(), 500, TextField.ANY);
 				t.addCommand(okCmd);
 				t.addCommand(cancelCmd);
 				t.setCommandListener(this);
@@ -2579,20 +2972,28 @@ public class MP extends MIDlet
 //#endif
 			if (c == okCmd) {
 				// full texbox finished
-				messageField.setString(((TextBox) d).getString());
+//#ifndef NO_CHAT_CANVAS
+				if (!legacyChatUI) {
+					commandAction(backCmd, d);
+					((ChatCanvas) current).text = ((TextBox) d).getString();
+					((ChatCanvas) current).queueRepaint();
+					return;
+				}
+//#endif
 				
+				messageField.setString(((TextBox) d).getString());
 				c = backCmd;
 			}
 		}
 		// stickers
 		if (c == addStickerPackCmd) {
-			display(loadingAlert(L[Loading]), current);
+			display(loadingAlert(L[LLoading]), current);
 			start(RUN_INSTALL_STICKER_SET, d);
 			return;
 		}
 		if (c == aboutCmd) {
 			// about form
-			Form f = new Form(L[About]);
+			Form f = new Form(L[LAbout]);
 			f.addCommand(backCmd);
 			f.setCommandListener(this);
 			
@@ -2606,31 +3007,31 @@ public class MP extends MIDlet
 			s.setLayout(Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_VCENTER | Item.LAYOUT_LEFT);
 			f.append(s);
 			
-			s = new StringItem(null, L[AboutText]);
+			s = new StringItem(null, L[LAboutText].concat("\n"));
 			s.setFont(Font.getDefaultFont());
 			s.setLayout(Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_NEWLINE_BEFORE);
 			f.append(s);
 			
 			f.append(new Spacer(2, 2));
 
-			s = new StringItem(null, L[Developer]);
+			s = new StringItem(null, L[LDeveloper].concat("\n"));
 			s.setFont(smallPlainFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 
-			s = new StringItem(null, "shinovon");
+			s = new StringItem(null, "shinovon\n");
 			s.setFont(medBoldFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 			
 			f.append(new Spacer(2, 2));
 
-			s = new StringItem(null, L[Author]);
+			s = new StringItem(null, L[LAuthor].concat("\n"));
 			s.setFont(smallPlainFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 
-			s = new StringItem(null, "twsparkle");
+			s = new StringItem(null, "twsparkle\n");
 			s.setFont(medBoldFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setItemCommandListener(this);
@@ -2638,12 +3039,12 @@ public class MP extends MIDlet
 			
 			f.append(new Spacer(2, 2));
 
-			s = new StringItem(null, "GitHub");
+			s = new StringItem(null, "GitHub\n");
 			s.setFont(smallPlainFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 
-			s = new StringItem(null, "github.com/shinovon");
+			s = new StringItem(null, "github.com/shinovon/mpgram-client\n");
 			s.setFont(medBoldFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
@@ -2652,12 +3053,12 @@ public class MP extends MIDlet
 			
 			f.append(new Spacer(2, 2));
 
-			s = new StringItem(null, "Web");
+			s = new StringItem(null, "Web\n");
 			s.setFont(smallPlainFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 
-			s = new StringItem(null, "nnproject.cc");
+			s = new StringItem(null, "nnproject.cc\n");
 			s.setFont(medBoldFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
@@ -2666,12 +3067,12 @@ public class MP extends MIDlet
 			
 			f.append(new Spacer(2, 2));
 
-			s = new StringItem(null, MP.L[Donate]);
+			s = new StringItem(null, MP.L[LDonate].concat("\n"));
 			s.setFont(smallPlainFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 
-			s = new StringItem(null, "boosty.to/nnproject/donate");
+			s = new StringItem(null, "boosty.to/nnproject/donate\n");
 			s.setFont(medBoldFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
@@ -2680,17 +3081,33 @@ public class MP extends MIDlet
 			
 			f.append(new Spacer(2, 2));
 
-			s = new StringItem(null, MP.L[Chat]);
+			s = new StringItem(null, MP.L[LChat].concat("\n"));
 			s.setFont(smallPlainFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 
-			s = new StringItem(null, "t.me/nnmidletschat");
+			s = new StringItem(null, "t.me/nnmidletschat\n");
 			s.setFont(medBoldFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
 			s.setItemCommandListener(this);
 			f.append(s);
+
+			s = new StringItem(null, "\n\nReleased under the MIT license.\n"
+					+ "Copyright (C) 2022-2025 Arman Jussupgaliyev\n\n"
+//#ifndef NO_AVATARS
+					+ "Contains parts of the TUBE42 imagelib, licensed under the LGPL.\n"
+					+ "Copyright (C) 2007 Free Software Foundation, Inc.\n\n"
+//#endif
+//#ifndef NO_ZIP
+					+ "Contains parts of GNU Classpath, licensed under the GPL v2\n"
+					+ "Copyright (C) 1999-2004 Free Software Foundation, Inc."
+//#endif
+					);
+			s.setFont(smallPlainFont);
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			f.append(s);
+			
 			display(f);
 			return;
 		}
@@ -2705,16 +3122,16 @@ public class MP extends MIDlet
 				return;
 			}
 			if (d instanceof ChatTopicsList) {
-				ChatForm form = ((ChatTopicsList) d).chatForm;
+				MPChat form = ((ChatTopicsList) d).chatForm;
 				int i = ((List) d).getSelectedIndex();
 				if (form == null || i == -1) return;
-				JSONObject topic = form.topics.getObject(i);
+				JSONObject topic = form.topics().getObject(i);
 				form.reset();
 				// TODO unread offset
-				form.topMsgId = topic.getInt("id");
-				form.canWrite = !topic.getBoolean("closed", false);
-				form.setTitle(form.title = topic.getString("title", ""));
-				openLoad(form);
+				form.openTopic(topic.getInt("id"),
+						!topic.getBoolean("closed", false),
+						topic.getString("title", ""));
+				openLoad((Displayable) form);
 				
 				return;
 			}
@@ -2738,17 +3155,28 @@ public class MP extends MIDlet
 				path = path.concat(name);
 				commandAction(cancelCmd, d);
 				sendFile = "file:///".concat(path);
-				fileLabel.setText(L[File_Prefix].concat(path));
+				fileLabel.setText(L[LFile_Prefix].concat(path));
 			} else {
-				// TODO folder selected
+				// folder selected
+				if (downloadMessage == null) {
+					// default download path selected in settings
+					downloadPathField.setString(path);
+					goBackTo(settingsForm);
+				} else if (!downloading) {
+					// download
+					start(RUN_DOWNLOAD_DOCUMENT, path);
+				}
 			}
 //#endif
 			return;
 		}
-		if (c == cancelCmd && d instanceof List) { // go back to write form
+//#ifndef NO_FILE
+		if (c == cancelCmd && (d instanceof List) && !(d instanceof ChatsList) && fileMode) {
+			// go back to write form from file picker
 			goBackTo(writeForm);
 			return;
 		}
+//#endif
 		if (c == goCmd) { // url dialog submit
 			commandAction(backCmd, d);
 			
@@ -2766,6 +3194,13 @@ public class MP extends MIDlet
 				start(RUN_LOAD_LIST, d);
 				return;
 			}
+//#ifndef NO_CHAT_CANVAS
+			if (d instanceof ChatCanvas) {
+				((ChatCanvas) d).cancel();
+				start(RUN_LOAD_FORM, d);
+				return;
+			}
+//#endif
 			return;
 		}
 		if (c == updateCmd) {
@@ -2808,6 +3243,42 @@ public class MP extends MIDlet
 				display(initPlayerForm());
 			}
 		}
+//#ifndef NO_NOKIAUI
+		if (c == copyCmd) {
+			try {
+				if (checkClass("com.nokia.mid.ui.Clipboard")) {
+					NokiaAPI.copy(((TextBox) d).getString());
+					display(infoAlert(L[LTextCopied_Alert]), current);
+					return;
+				}
+			} catch (Throwable ignored) {}
+			return;
+		}
+//#endif
+//#ifndef NO_FILE
+		{ // download dialog
+			if (c == downloadInappCmd) {
+				downloadContinue(1);
+				return;
+			}
+			if (c == downloadBrowserCmd) {
+				display(current);
+				downloadContinue(2);
+				return;
+			}
+			if (c == cancelDownloadCmd) {
+				downloading = false;
+				return;
+			}
+			if (c == okDownloadCmd) {
+				display(current);
+				if (current instanceof List) {
+					commandAction(backCmd, current);
+				}
+				return;
+			}
+		}
+//#endif
 		if (c == backCmd || c == cancelCmd) {
 			// cancel ota update dialog
 			updateUrl = null;
@@ -2834,12 +3305,12 @@ public class MP extends MIDlet
 		}
 		if (c == exitCmd) {
 			destroyApp(true);
-			notifyDestroyed();
 		}
 	}
 
 	public void commandAction(Command c, Item item) {
 		{ // message
+			// note: no need to check if canvas ui is enabled, since event came from lcdui item
 			if (c == itemChatCmd) {
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
@@ -2875,13 +3346,7 @@ public class MP extends MIDlet
 				// copy message link
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
-				StringBuffer sb = new StringBuffer("https://t.me/"); 
-				String username = ((ChatForm) current).username;
-				if (s[0].charAt(0) == '-' && username == null) {
-					sb.append("c/");
-				}
-				sb.append(username != null ? username : s[0]).append('/').append(s[1]);
-				copy("", sb.toString());
+				copyMessageLink(s[0], s[1]);
 				return;
 			}
 			if (c == openImageCmd) {
@@ -2897,19 +3362,14 @@ public class MP extends MIDlet
 			if (c == deleteMsgCmd) {
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
-				display(loadingAlert(L[Loading]), current);
+				display(loadingAlert(L[LLoading]), current);
 				start(RUN_DELETE_MESSAGE, s);
 				return;
 			}
 			if (c == documentCmd) {
-				// TODO
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
-				if (fileRewrite && s[4] != null) {
-					browse(instanceUrl + "file/" + url(s[4]) + "?c=" + s[0] + "&m=" + s[1] + "&user=" + user);
-				} else {
-					browse(instanceUrl + FILE_URL + "?c=" + s[0] + "&m=" + s[1] + "&user=" + user);
-				}
+				downloadDocument(s[0], s[1], s[4] == null ? s[0] + '_' + s[1] + ".jpg" : s[4], s[5]);
 				return;
 			}
 			if (c == editMsgCmd) {
@@ -2923,7 +3383,7 @@ public class MP extends MIDlet
 				if (s == null) return;
 				if (((ChatForm) current).parent != null) {
 					// from search
-					goBackTo(((ChatForm) current).parent);
+					goBackTo((Displayable) ((ChatForm) current).parent);
 					((ChatForm) current).openMessage(s[1], -1);
 					return;
 				}
@@ -2935,16 +3395,20 @@ public class MP extends MIDlet
 				}
 				
 				// open new chat form
-				openLoad(new ChatForm(s[0], null, Integer.parseInt(s[1]), 0));
+				openChat(s[0], Integer.parseInt(s[1]));
 				return;
 			}
 			if (c == botCallbackCmd) {
 				String[] p = (String[]) ((MPForm) current).urls.get(item);
-				if (sending || p == null) return;
-				sending = true;
+				if (p == null) return;
+				
+				synchronized (this) {
+					if (sending) return;
+					sending = true;
+				}
 
-				if (reopenChat) {
-					display(loadingAlert(L[Sending]), current);
+				if (reopenChat || !longpoll) {
+					display(loadingAlert(L[LSending]), current);
 					if (MP.updatesThread != null) {
 						MP.cancel(MP.updatesThread, true);
 					}
@@ -2956,7 +3420,7 @@ public class MP extends MIDlet
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
 
-				display(loadingAlert(L[Loading]), current);
+				display(loadingAlert(L[LLoading]), current);
 				start(RUN_BAN_MEMBER, s);
 				return;
 			}
@@ -2964,8 +3428,8 @@ public class MP extends MIDlet
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
 
-				display(loadingAlert(L[Loading]), current);
-				if (reopenChat && MP.updatesThread != null) {
+				display(loadingAlert(L[LLoading]), current);
+				if ((reopenChat || !longpoll) && MP.updatesThread != null) {
 					MP.cancel(MP.updatesThread, true);
 				}
 				start(RUN_PIN_MESSAGE, s);
@@ -2992,11 +3456,13 @@ public class MP extends MIDlet
 			if ((t = ((TextField) item).getString().trim()).length() == 0)
 				return;
 			
-			if (sending) return;
-			sending = true;
+			synchronized (this) {
+				if (sending) return;
+				sending = true;
+			}
 
-			display(loadingAlert(L[Sending]), current);
-			if (reopenChat && MP.updatesThread != null) {
+			display(loadingAlert(L[LSending]), current);
+			if ((reopenChat || !longpoll) && MP.updatesThread != null) {
 				MP.cancel(MP.updatesThread, true);
 			}
 			start(RUN_SEND_MESSAGE, new Object[] { t, ((ChatForm) current).id, null, null, null, null, null, null });
@@ -3007,12 +3473,17 @@ public class MP extends MIDlet
 			JSONObject s = (JSONObject) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 			
-			if (reopenChat && MP.updatesThread != null) {
+			synchronized (this) {
+				if (sending) return;
+				sending = true;
+			}
+
+			display(loadingAlert(L[LSending]), current);
+			if ((reopenChat ||!longpoll) && MP.updatesThread != null) {
 				MP.cancel(MP.updatesThread, true);
 			}
 			imagesToLoad.removeAllElements();
 			
-			display(loadingAlert(L[Sending]), current);
 			start(RUN_SEND_STICKER, s);
 			return;
 		}
@@ -3021,8 +3492,15 @@ public class MP extends MIDlet
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 			
-			display(loadingAlert(L[Loading]), current);
+			display(loadingAlert(L[LLoading]), current);
 			start(RUN_LOAD_PLAYLIST, new String[] {s[0], "3", s[1]});
+			return;
+		}
+		if (c == playVoiceCmd) {
+			// play voice message TODO
+			String[] s = (String[]) ((MPForm) current).urls.get(item);
+			if (s == null) return;
+			
 			return;
 		}
 		if (c == postCommentsCmd) {
@@ -3047,14 +3525,20 @@ public class MP extends MIDlet
 				commandAction(sendCmd, item);
 				return;
 			}
-			// typing state timer
-			if (!sendTyping) return;
-			long l = System.currentTimeMillis();
-			if (l - lastType < 5000L) return;
-			
-			lastType = l;
-			start(RUN_SET_TYPING, ((TextField) item).getString().length() == 0 ? "Cancel" : null);
+			sendTyping(((TextField) item).getString().trim().length() == 0);
 		}
+		// TODO update updateTimeoutGauge label when longpoll is changed
+//		if (item == behChoice) {
+//		}
+	}
+	
+	public void sendTyping(boolean cancel) {
+		if (!sendTyping) return;
+		long l = System.currentTimeMillis();
+		if (l - lastType < 5000L) return;
+		
+		lastType = l;
+		start(RUN_SET_TYPING, cancel ? "Cancel" : null);
 	}
 	
 	// endregion
@@ -3068,7 +3552,7 @@ public class MP extends MIDlet
 				playerProgress.setValue(100);
 			}
 			if (playerPlaypauseBtn != null) {
-				playerPlaypauseBtn.setText(L[Play_Player]);
+				playerPlaypauseBtn.setText(L[LPlay_Player]);
 				playerPlaypauseBtn.removeCommand(playlistPauseCmd);
 				playerPlaypauseBtn.setDefaultCommand(playlistPlayCmd);
 			}
@@ -3078,7 +3562,7 @@ public class MP extends MIDlet
 		if (PlayerListener.STARTED.equals(event)) {
 			playerState = 1;
 			if (playerPlaypauseBtn != null) {
-				playerPlaypauseBtn.setText(L[Pause_Player]);
+				playerPlaypauseBtn.setText(L[LPause_Player]);
 				playerPlaypauseBtn.removeCommand(playlistPlayCmd);
 				playerPlaypauseBtn.setDefaultCommand(playlistPauseCmd);
 			}
@@ -3086,7 +3570,7 @@ public class MP extends MIDlet
 		} else if (PlayerListener.STOPPED.equals(event) || PlayerListener.STOPPED_AT_TIME.equals(event)) {
 			playerState = 2;
 			if (playerPlaypauseBtn != null) {
-				playerPlaypauseBtn.setText(L[Play_Player]);
+				playerPlaypauseBtn.setText(L[LPlay_Player]);
 				playerPlaypauseBtn.removeCommand(playlistPauseCmd);
 				playerPlaypauseBtn.setDefaultCommand(playlistPlayCmd);
 			}
@@ -3165,7 +3649,7 @@ public class MP extends MIDlet
 			if (playerTitleLabel != null) {
 				if ((t = media.getObject("audio").getString("title", null)) == null) {
 					if ((t = name) == null) {
-						t = L[UnknownTrack];
+						t = L[LUnknownTrack];
 					}
 				}
 				playerTitleLabel.setText(t);
@@ -3242,6 +3726,7 @@ public class MP extends MIDlet
 	// region Image queue
 	
 	static void queueAvatar(String id, Object target) {
+//#ifndef NO_AVATARS
 		if (target == null || id == null || !loadAvatars) return;
 		
 		JSONObject peer = getPeer(id, false);
@@ -3258,6 +3743,7 @@ public class MP extends MIDlet
 			imagesToLoad.addElement(new Object[] { id, target });
 			imagesLoadLock.notifyAll();
 		}
+//#endif
 	}
 
 	private static void putImage(Object target, Image img) {
@@ -3265,6 +3751,7 @@ public class MP extends MIDlet
 			((ImageItem) target).setImage(img);
 			return;
 		}
+//#ifndef NO_AVATARS
 		if (target instanceof Object[]) {
 			// list item
 			if (((Object[]) target)[0] instanceof List) {
@@ -3274,6 +3761,15 @@ public class MP extends MIDlet
 				return;
 			}
 		}
+//#endif
+//#ifndef NO_CHAT_CANVAS
+		if (target instanceof UIMessage) {
+			((UIMessage) target).mediaImage = img;
+			if (((UIMessage) target).photoRenderHeight == 0) ((UIMessage) target).layoutWidth = 0;
+			((UIMessage) target).requestPaint();
+			return;
+		}
+//#endif
 //#ifndef NO_NOTIFY
 		if (target instanceof String) {
 			// notification
@@ -3447,7 +3943,7 @@ public class MP extends MIDlet
 	// region UI builders
 	
 	static ChatsList mainChatsList() {
-		ChatsList l = chatsList = new ChatsList(L[mpgram], 0);
+		ChatsList l = chatsList = new ChatsList(L[Lmpgram], 0);
 		l.removeCommand(backCmd);
 		l.addCommand(exitCmd);
 		l.addCommand(aboutCmd);
@@ -3466,17 +3962,17 @@ public class MP extends MIDlet
 		fwdPeer = fwdPeerId;
 		fwdMsg = fwdMsgId;
 		
-		Form f = new Form(fwdPeerId != null ? L[Forward_Title] :
-			editId != null ? L[Edit_Title] :
-				reply != null ? L[Reply_Title] :
-					L[Write_Title]);
+		Form f = new Form(fwdPeerId != null ? L[LForward_Title] :
+			editId != null ? L[LEdit_Title] :
+				reply != null ? L[LReply_Title] :
+					L[LWrite_Title]);
 		f.setCommandListener(midlet);
 		f.setItemStateListener(midlet);
 		f.addCommand(cancelCmd);
 		f.addCommand(sendCmd);
 		
-		TextField t = new TextField(L[Message], text, 500, TextField.ANY);
-		t.addCommand(sendCmd);
+		TextField t = new TextField(L[LMessage], text, 500, TextField.ANY);
+//		t.addCommand(sendCmd);
 		t.setItemCommandListener(midlet);
 		f.append(messageField = t);
 		
@@ -3487,11 +3983,11 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 		// file
 		
-		s = new StringItem(null, L[File_Prefix].concat(L[NotSelected]));
+		s = new StringItem(null, L[LFile_Prefix].concat(L[LNotSelected]));
 		s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 		f.append(fileLabel = s);
 		
-		s = new StringItem(null, L[ChooseFile], Item.BUTTON);
+		s = new StringItem(null, L[LChooseFile], Item.BUTTON);
 		s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 		s.setDefaultCommand(chooseFileCmd);
 		s.setItemCommandListener(midlet);
@@ -3501,8 +3997,8 @@ public class MP extends MIDlet
 //		f.append(fileField = t);
 		
 		f.append(sendChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
-				L[SendUncompressed],
-				L[HideWithSpoiler]
+				L[LSendUncompressed],
+				L[LHideWithSpoiler]
 		}, null));
 //#endif
 		
@@ -3512,8 +4008,8 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 	static void openFilePicker(String path, boolean file) {
 		fileMode = file;
-		if (path.length() == 0) path = "/";
-		display(loadingAlert(L[Loading]), current);
+		if (path == null || path.length() == 0) path = "/";
+		display(loadingAlert(L[LLoading]), current);
 		try {
 			if (fileImg == null) {
 				fileImg = Image.createImage("/file.png");
@@ -3548,8 +4044,7 @@ public class MP extends MIDlet
 				}
 			} else {
 				if (!file) {
-					// FIXME unlocalized
-					list.append("Save here", null);
+					list.append(L[LSaveHere], null);
 				}
 				FileConnection fc = (FileConnection) Connector.open("file:///".concat(path));
 				try {
@@ -3576,17 +4071,26 @@ public class MP extends MIDlet
 	
 	static void openChat(String id, int msg) {
 		Displayable d = MP.current;
-		if (d instanceof ChatForm && id.equals(((ChatForm) d).id)
-				&& ((ChatForm) d).postId == null && ((ChatForm) d).query == null
-				&& ((ChatForm) d).mediaFilter == null) {
+		if (d instanceof MPChat && id.equals(((MPChat) d).id())
+				&& ((MPChat) d).postId() == null && ((MPChat) d).query() == null
+				&& ((MPChat) d).mediaFilter() == null) {
+			if (msg > 0) {
+				((MPChat) d).openMessage(Integer.toString(msg), -1);
+			}
 			return;
 		}
+//#ifndef NO_CHAT_CANVAS
+		if (!legacyChatUI) {
+			openLoad(new ChatCanvas(id, null, msg, 0));
+			return;
+		}
+//#endif
 		openLoad(new ChatForm(id, null, msg, 0));
 	}
 	
-	static void openProfile(String id, ChatForm chatForm, int mode) {
-		if (chatForm == null && current instanceof ChatForm && id.equals(((ChatForm) current).id)) {
-			chatForm = (ChatForm) current;
+	static void openProfile(String id, MPChat chatForm, int mode) {
+		if (chatForm == null && current instanceof MPChat && id.equals(((MPChat) current).id())) {
+			chatForm = (MPChat) current;
 		}
 		openLoad(new ChatInfoForm(id, chatForm, mode));
 	}
@@ -3596,7 +4100,7 @@ public class MP extends MIDlet
 			return playerForm;
 		}
 		
-		Form f = new Form(L[Player_Title].concat(" - mpgram"));
+		Form f = new Form(L[LPlayer_Title].concat(" - mpgram"));
 		f.addCommand(backCmd);
 		f.addCommand(playlistCmd);
 		f.setCommandListener(midlet);
@@ -3610,7 +4114,7 @@ public class MP extends MIDlet
 		
 		StringItem s;
 		
-		s = new StringItem(null, L[UnknownTrack]);
+		s = new StringItem(null, L[LUnknownTrack]);
 		s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 		s.setFont(largePlainFont);
 		f.append(playerTitleLabel = s);
@@ -3623,19 +4127,19 @@ public class MP extends MIDlet
 		Gauge g = new Gauge(null, false, 100, 0);
 		f.append(playerProgress = g);
 		
-		s = new StringItem(null, L[Prev_Player], Item.BUTTON);
+		s = new StringItem(null, L[LPrev_Player], Item.BUTTON);
 		s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE);
 		s.setDefaultCommand(playlistPrevCmd);
 		s.setItemCommandListener(midlet);
 		f.append(s);
 		
-		s = new StringItem(null, L[Play_Player], Item.BUTTON);
+		s = new StringItem(null, L[LPlay_Player], Item.BUTTON);
 		s.setLayout(Item.LAYOUT_LEFT);
 		s.setDefaultCommand(playlistPlayCmd);
 		s.setItemCommandListener(midlet);
 		f.append(playerPlaypauseBtn = s);
 		
-		s = new StringItem(null, L[Next_Player], Item.BUTTON);
+		s = new StringItem(null, L[LNext_Player], Item.BUTTON);
 		s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_AFTER);
 		s.setDefaultCommand(playlistNextCmd);
 		s.setItemCommandListener(midlet);
@@ -3645,11 +4149,72 @@ public class MP extends MIDlet
 	}
 	
 	static void copy(String title, String text) {
-		// TODO use nokiaui?
-		TextBox t = new TextBox(title, text, text.length() + 1, TextField.UNEDITABLE);
+		TextBox t = new TextBox(title, text, Math.max(2000, text.length() + 1), TextField.UNEDITABLE);
 		t.addCommand(backCmd);
+//#ifndef NO_NOKIAUI
+		if (checkClass("com.nokia.mid.ui.Clipboard")) t.addCommand(copyCmd);
+//#endif
 		t.setCommandListener(midlet);
 		display(t);
+	}
+	
+	static void copyMessageLink(String peerId, String msgId) {
+		StringBuffer sb = new StringBuffer("https://t.me/"); 
+		String username = ((MPChat) current).username();
+		if (peerId.charAt(0) == '-' && username == null) {
+			sb.append("c/");
+			 // FIXME handle channel offset properly
+			peerId = peerId.substring(peerId.startsWith("-100") ? 4 : 1);
+		}
+		sb.append(username != null ? username : peerId).append('/').append(msgId);
+		copy("", sb.toString());
+	}
+	
+	void downloadDocument(String peerId, String msgId, String fileName, String size) {
+//#ifndef NO_FILE
+		if (downloading) return;
+//#endif
+		downloadMessage = new String[] { peerId, msgId, fileName, size };
+//#ifndef NO_FILE
+		if (fileName != null && downloadMethod != 2
+				&& (!reopenChat || (!fileName.endsWith(".jar") && !fileName.endsWith(".jad")))) {
+			if (downloadMethod == 0) {
+				Alert a = new Alert(fileName);
+				a.setString(L[LChooseDownloadMethod_Alert]);
+				a.addCommand(downloadInappCmd);
+				a.addCommand(downloadBrowserCmd);
+				a.setCommandListener(this);
+				display(a, current);
+				return;
+			}
+			downloadContinue(1);
+			return;
+		}
+//#endif
+		downloadContinue(2);
+	}
+	
+	void downloadContinue(int state) {
+//#ifndef NO_FILE
+		if (downloading) return;
+		if (state == 1) {
+			if (downloadPath == null || downloadPath.trim().length() == 0) {
+				openFilePicker("", false);
+				return;
+			} else {
+				start(RUN_DOWNLOAD_DOCUMENT, downloadPath);
+				return;
+			}
+		}
+//#endif
+		String peerId = downloadMessage[0];
+		String msgId = downloadMessage[1];
+		String fileName = downloadMessage[2];
+		if (fileRewrite && fileName != null) {
+			browse(instanceUrl + "file/" + url(fileName) + "?c=" + peerId + "&m=" + msgId + "&user=" + user);
+		} else {
+			browse(instanceUrl + FILE_URL + "?c=" + peerId + "&m=" + msgId + "&user=" + user);
+		}
 	}
 
 	static Alert errorAlert(Exception e) {
@@ -3669,17 +4234,17 @@ public class MP extends MIDlet
 				if (message != null) {
 					if ("Unsupported API version".equals(message)) {
 						sb.setLength(0);
-						sb.append(L[ClientOutdated_Alert]);
+						sb.append(L[LClientOutdated_Alert]);
 					} else if ("Login API is disabled".equals(message)) {
 						sb.setLength(0);
-						sb.append(L[LoginDisabled_Alert]);
+						sb.append(L[LLoginDisabled_Alert]);
 					} else if ("API is disabled".equals(message)) {
 						sb.setLength(0);
-						sb.append(L[APIDisabled_Alert]);
+						sb.append(L[LAPIDisabled_Alert]);
 					} else if ("Wrong instance password".equals(message)
 							|| "Instance password is required".equals(message)) {
 						sb.setLength(0);
-						sb.append(L[InvalidInstancePassword_Alert]);
+						sb.append(L[LInvalidInstancePassword_Alert]);
 					} else {
 						sb.setLength(0);
 						sb.append(message);
@@ -3695,7 +4260,7 @@ public class MP extends MIDlet
 			sb.append(" \nStack trace: \n").append(stackTrace);
 		}
 		
-		Alert a = new Alert("");
+		Alert a = new Alert(symbian ? L[Lmpgram] : "");
 		a.setType(AlertType.ERROR);
 		a.setString(sb.toString());
 		a.setTimeout(4000);
@@ -3703,23 +4268,23 @@ public class MP extends MIDlet
 	}
 
 	static Alert errorAlert(String text) {
-		Alert a = new Alert("");
-		a.setType(AlertType.ERROR);
-		a.setString(text);
-		a.setTimeout(3000);
-		return a;
+		return alert(null, text, AlertType.ERROR);
 	}
 
 	static Alert infoAlert(String text) {
-		Alert a = new Alert("");
-		a.setType(AlertType.CONFIRMATION);
+		return alert(null, text, AlertType.CONFIRMATION);
+	}
+
+	static Alert alert(String title, String text, AlertType type) {
+		Alert a = new Alert(title == null ? (symbian ? L[Lmpgram] : "") : title);
+		a.setType(type);
 		a.setString(text);
-		a.setTimeout(1500);
+		a.setTimeout(type == AlertType.ERROR ? 3000 : 1500);
 		return a;
 	}
 
 	static Alert loadingAlert(String s) {
-		Alert a = new Alert("", s == null ? L[Loading] : s, null, null);
+		Alert a = new Alert(symbian ? L[Lmpgram] : "", s == null ? L[LLoading] : s, null, null);
 		a.setCommandListener(midlet);
 		a.addCommand(Alert.DISMISS_COMMAND);
 		a.setIndicator(new Gauge(null, false, Gauge.INDEFINITE, Gauge.CONTINUOUS_RUNNING));
@@ -3819,11 +4384,11 @@ public class MP extends MIDlet
 			((MPForm) p).closed(back);
 		} else if (p instanceof MPList) {
 			((MPList) p).closed(back);
+		} else if (p instanceof MPChat) {
+			((MPChat) p).closed(back);
 		}
-		if (back) {
-			if (p instanceof MPForm || p instanceof MPList) {
-				imagesToLoad.removeAllElements();
-			}
+		if (back && (p instanceof MPForm || p instanceof MPList || p instanceof MPChat)) {
+			imagesToLoad.removeAllElements();
 		}
 		
 		if (d instanceof MPForm) {
@@ -3847,14 +4412,14 @@ public class MP extends MIDlet
 			if (url.indexOf(':') == -1) {
 				url = "http://".concat(url);
 			}
-			if (platformRequest(url)) notifyDestroyed();
+			if (platformRequest(url)) destroyApp(true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
 	static void openUrl(String url) {
-		if (!handleDeepLink(url)) {
+		if (selfId == null || !handleDeepLink(url)) {
 			midlet.browse(url);
 		}
 	}
@@ -3895,7 +4460,8 @@ public class MP extends MIDlet
 				}
 				if ("c".equals(s[0]) && s.length > 1) {
 //					privat = true;
-					domain = s[1];
+					// FIXME handle channel offset (-100...)
+					domain = "-".concat(s[1]);
 					if (s.length == 3) {
 						messageId = s[2];
 					} else if (s.length == 4) {
@@ -4041,16 +4607,23 @@ public class MP extends MIDlet
 								topMsg = Integer.parseInt(thread);
 							} catch (Exception ignored) {}
 						}
-						if (current instanceof ChatForm &&
-								(domain.equals(((ChatForm) current).id)
-								|| domain.equals(((ChatForm) current).username))) {
-							((ChatForm) current).openMessage(messageId, topMsg);
+						if (current instanceof MPChat &&
+								(domain.equals(((MPChat) current).id())
+								|| domain.equals(((MPChat) current).username()))) {
+							((MPChat) current).openMessage(messageId, topMsg);
 						} else {
-							ChatForm f = new ChatForm(domain, null, msg, topMsg);
-							if (start != null) {
-								f.startBot = start;
+							MPChat chat;
+//#ifndef NO_CHAT_CANVAS
+							if (!legacyChatUI) {
+								chat = new ChatCanvas(domain, null, msg, topMsg);
+							} else {
+//#endif
+								chat = new ChatForm(domain, null, msg, topMsg);
+//#ifndef NO_CHAT_CANVAS
 							}
-							openLoad(f);
+//#endif
+							if (start != null) chat.setStartBot(start);
+							openLoad((Displayable) chat);
 						}
 						return true;
 					}
@@ -4490,9 +5063,9 @@ public class MP extends MIDlet
 
 	static String localizePlural(int n, int i) {
 		String s = Integer.toString(n);
-		if (L[LocaleSlavicPlurals].length() == 0) {
+		if (L[LLocaleSlavicPlurals].length() == 0) {
 			String l = L[n == 1 ? i : i + 1];
-			if (L[LocaleCustomPlurals].length() != 0) {
+			if (L[LLocaleCustomPlurals].length() != 0) {
 				int idx;
 				if ((idx = l.indexOf('%')) != -1) {
 					return l.substring(0, idx).concat(s.concat(l.substring(idx + 1)));
@@ -4512,9 +5085,9 @@ public class MP extends MIDlet
 	
 	static StringBuffer appendLocalizedPlural(StringBuffer sb, int n, int i) {
 		sb.append(n);
-		if (L[LocaleSlavicPlurals].length() == 0) {
+		if (L[LLocaleSlavicPlurals].length() == 0) {
 			String l = L[n == 1 ? i : i + 1];
-			if (L[LocaleCustomPlurals].length() != 0) {
+			if (L[LLocaleCustomPlurals].length() != 0) {
 				int idx;
 				if ((idx = l.indexOf('%')) != -1) {
 					return sb.insert(0, l.substring(0, idx)).append(l.substring(idx + 1));
@@ -4545,17 +5118,17 @@ public class MP extends MIDlet
 		
 		if (mode == 4) {
 			if (d < 60) {
-				return L[JustNow];
+				return L[LJustNow];
 			}
 			
 			if (d < 60 * 60) {
 				d /= 60L;
-				return appendLocalizedPlural(sb, (int) d, _minuteAgo).toString();
+				return appendLocalizedPlural(sb, (int) d, L_minuteAgo).toString();
 			}
 			
 			if (d < 12 * 60 * 60) {
 				d /= 60 * 60L;
-				return appendLocalizedPlural(sb, (int) d, _hourAgo).toString();
+				return appendLocalizedPlural(sb, (int) d, L_hourAgo).toString();
 			}
 		}
 		
@@ -4565,7 +5138,7 @@ public class MP extends MIDlet
 				.append(':')
 				.append(n(c.get(Calendar.MINUTE)));
 			} else if (d < 6 * 24 * 60 * 60) {
-				sb.append(L[Sun + c.get(Calendar.DAY_OF_WEEK) - 1]);
+				sb.append(L[LSun + c.get(Calendar.DAY_OF_WEEK) - 1]);
 			} else {
 				sb.append(n(c.get(Calendar.DAY_OF_MONTH)))
 				.append('.')
@@ -4579,9 +5152,9 @@ public class MP extends MIDlet
 			if (mode == 3 || mode == 4) {
 				boolean b = true;
 				if (day == dayNow) {
-					sb.append(L[Today]);
+					sb.append(L[LToday]);
 				} else if (day == dayNow - 1) {
-					sb.append(L[Yesterday]);
+					sb.append(L[LYesterday]);
 				} else {
 					b = false;
 					sb.append(n(c.get(Calendar.DAY_OF_MONTH)))
@@ -4591,15 +5164,15 @@ public class MP extends MIDlet
 					.append(n(c.get(Calendar.YEAR)));
 				}
 				if (b || mode == 3) {
-					sb.append(L[at_Time])
+					sb.append(L[Lat_Time])
 					.append(n(c.get(Calendar.HOUR_OF_DAY)))
 					.append(':')
 					.append(n(c.get(Calendar.MINUTE)));
 				}
 			} else {
-				if (!ru) sb.append(L[Jan + c.get(Calendar.MONTH)]).append(' ');
+				if (!ru) sb.append(L[LJan + c.get(Calendar.MONTH)]).append(' ');
 				sb.append(c.get(Calendar.DAY_OF_MONTH));
-				if (ru) sb.append(' ').append(L[Jan + c.get(Calendar.MONTH)]);
+				if (ru) sb.append(' ').append(L[LJan + c.get(Calendar.MONTH)]);
 				
 				int year = c.get(Calendar.YEAR);
 				if (year != currentYear || mode == 1) {
@@ -4630,17 +5203,17 @@ public class MP extends MIDlet
 			sb.append(MP.localizeDate(message.getLong("date"), 2)).append(' ');
 			if (!peer.getBoolean("c", false)) {
 				if (message.getBoolean("out", false) && !id.equals(selfId)) {
-					sb.append(MP.L[You_Prefix]);
+					sb.append(MP.L[LYou_Prefix]);
 				} else if (id.charAt(0) == '-' && message.has("from_id")) {
 					MP.appendOneLine(sb, MP.getName(message.getString("from_id"), true)).append(": ");
 				}
 			}
 			if (message.has("media")) {
-				sb.append(MP.L[Media]);
+				sb.append(MP.L[LMedia]);
 			} else if (message.has("fwd")) {
-				sb.append(MP.L[ForwardedMessage]);
+				sb.append(MP.L[LForwardedMessage]);
 			} else  if (message.has("act")) {
-				sb.append(MP.L[Action]);
+				sb.append(MP.L[LAction]);
 			} else {
 				MP.appendOneLine(sb, message.getString("text"));
 			}
@@ -4684,6 +5257,7 @@ public class MP extends MIDlet
 		return sb;
 	}
 	
+//#ifndef NO_AVATARS
 	public static Image roundImage(Image img) {
 		if (img == null) return null;
 		try {
@@ -4706,6 +5280,7 @@ public class MP extends MIDlet
 			return img;
 		}
 	}
+//#endif
 
 	private static void writeAuth() {
 		try {
@@ -4749,11 +5324,11 @@ public class MP extends MIDlet
 			RT_SPOILER = 5,
 			RT_URL = 6;
 
-	static int wrapRichText(MPForm form, Thread thread, String text, JSONArray entities, int insert) {
+	static int wrapRichText(Object form, Thread thread, String text, JSONArray entities, int insert) {
 		return wrapRichText(form, thread, text, entities, insert, new int[8]);
 	}
 	
-	private static int wrapRichNestedText(MPForm form, Thread thread, String text, JSONObject entity, JSONArray allEntities, int insert, int[] state) {
+	private static int wrapRichNestedText(Object form, Thread thread, String text, JSONObject entity, JSONArray allEntities, int insert, int[] state) {
 		int off = entity.getInt("offset");
 		int len = entity.getInt("length");
 		JSONArray entities = new JSONArray();
@@ -4780,7 +5355,7 @@ public class MP extends MIDlet
 		return flush(form, thread, text, insert, state);
 	}
 
-	private static int wrapRichText(MPForm form, Thread thread, String text, JSONArray entities, int insert, int[] state) {
+	private static int wrapRichText(Object form, Thread thread, String text, JSONArray entities, int insert, int[] state) {
 		int len = entities.size();
 		int lastOffset = 0;
 		for (int i = 0; i < len; ++i) {
@@ -4793,9 +5368,19 @@ public class MP extends MIDlet
 			boolean skipEntity = false;
 			String entityText = text.substring(entity.getInt("offset"), entity.getInt("offset") + entity.getInt("length"));
 			String type = entity.getString("_");
-			if ("messageEntityUrl".equals(type)) {
+			if ("messageEntityUrl".equals(type) || "messageEntityMention".equals(type)) {
 				state[RT_URL] ++;
 				insert = flush(form, thread, richTextUrl = entityText, insert, state);
+				state[RT_URL] --;
+			} else if ("messageEntityMentionName".equals(type)) {
+				state[RT_URL] ++;
+				richTextUrl = "@".concat(entity.getString("user_id"));
+				insert = flush(form, thread, entityText, insert, state);
+				state[RT_URL] --;
+			} else if ("messageEntityPhone".equals(type)) {
+				state[RT_URL] ++;
+				richTextUrl = "tel:".concat(entityText);
+				insert = flush(form, thread, entityText, insert, state);
 				state[RT_URL] --;
 			} else if ("messageEntityTextUrl".equals(type)) {
 				state[RT_URL] ++;
@@ -4835,14 +5420,16 @@ public class MP extends MIDlet
 		return flush(form, thread, text.substring(lastOffset), insert, state);
 	}
 	
-	static int flush(MPForm form, Thread thread, String text, int insert, int[] state) {
+	static int flush(Object form, Thread thread, String text, int insert, int[] state) {
 		if (text.length() == 0) return insert;
 		
 		StringBuffer sb = new StringBuffer(text);
 		int space = 0;
-		while (sb.length() != 0 && sb.charAt(sb.length() - 1) == ' ') {
-			sb.setLength(sb.length() - 1);
-			space ++;
+		if (form instanceof MPForm) {
+			while (sb.length() != 0 && sb.charAt(sb.length() - 1) == ' ') {
+				sb.setLength(sb.length() - 1);
+				space ++;
+			}
 		}
 		text = sb.toString();
 		Font f = getFont(state);
@@ -4882,16 +5469,26 @@ public class MP extends MIDlet
 						}
 						if (!valid) break b;
 						
-						if (i != 0) {
-							s = new StringItem(null, text.substring(0, j));
+//#ifndef NO_CHAT_CANVAS
+						if (form instanceof UILabel) {
+							if (i != 0) {
+								((UILabel) form).append(text.substring(0, j), f, null);
+							}
+							((UILabel) form).append(text.substring(j, k), f, null);
+						} else
+//#endif
+						{
+							if (i != 0) {
+								s = new StringItem(null, text.substring(0, j));
+								s.setFont(f);
+								((MPForm) form).safeInsert(thread, insert++, s);
+							}
+							s = new StringItem(null, text.substring(j, k));
 							s.setFont(f);
-							form.safeInsert(thread, insert++, s);
+							s.setDefaultCommand(richTextLinkCmd);
+							s.setItemCommandListener(midlet);
+							((MPForm) form).safeInsert(thread, insert++, s);
 						}
-						s = new StringItem(null, text.substring(j, k));
-						s.setFont(f);
-						s.setDefaultCommand(richTextLinkCmd);
-						s.setItemCommandListener(midlet);
-						form.safeInsert(thread, insert++, s);
 						
 						text = text.substring(k);
 						d = 0;
@@ -4912,16 +5509,26 @@ public class MP extends MIDlet
 							if (!b && (c < '0' || c > '9')) break b;
 						}
 						if (k == i + 10 || k == i + 1) break b;
-						if (i != 0) {
-							s = new StringItem(null, text.substring(0, i));
+//#ifndef NO_CHAT_CANVAS
+						if (form instanceof UILabel) {
+							if (i != 0) {
+								((UILabel) form).append(text.substring(0, i), f, null);
+							}
+							((UILabel) form).append(text.substring(i, k), f, null);
+						} else
+//#endif
+						{
+							if (i != 0) {
+								s = new StringItem(null, text.substring(0, i));
+								s.setFont(f);
+								((MPForm) form).safeInsert(thread, insert++, s);
+							}
+							s = new StringItem(null, text.substring(i, k));
 							s.setFont(f);
-							form.safeInsert(thread, insert++, s);
+							s.setDefaultCommand(richTextLinkCmd);
+							s.setItemCommandListener(midlet);
+							((MPForm) form).safeInsert(thread, insert++, s);
 						}
-						s = new StringItem(null, text.substring(i, k));
-						s.setFont(f);
-						s.setDefaultCommand(richTextLinkCmd);
-						s.setItemCommandListener(midlet);
-						form.safeInsert(thread, insert++, s);
 						
 						text = text.substring(k);
 						d = 0;
@@ -4931,21 +5538,28 @@ public class MP extends MIDlet
 				}
 			}
 		}
-		
-		s = new StringItem(null, text);
-		s.setFont(f);
-		if (state != null && state[RT_URL] != 0) {
-			form.urls.put(s, richTextUrl);
-			s.setDefaultCommand(richTextLinkCmd);
-			s.setItemCommandListener(midlet);
-		}
-		
-		if (text.length() != 0) {
-			form.safeInsert(thread, insert++, s);
+
+//#ifndef NO_CHAT_CANVAS
+		if (form instanceof UILabel) {
+			((UILabel) form).append(text, f, state != null && state[RT_URL] != 0 ? richTextUrl : null);
+		} else
+//#endif
+		{
+			s = new StringItem(null, text);
+			s.setFont(f);
+			if (state != null && state[RT_URL] != 0) {
+				((MPForm) form).urls.put(s, richTextUrl);
+				s.setDefaultCommand(richTextLinkCmd);
+				s.setItemCommandListener(midlet);
+			}
+			
+			if (text.length() != 0) {
+				((MPForm) form).safeInsert(thread, insert++, s);
+			}
 		}
 
-		if (space != 0) {
-			form.safeInsert(thread, insert++, new Spacer(f.charWidth(' ') * space, f.getBaselinePosition()));
+		if (space != 0 /* && instanceof MPForm */ ) {
+			((MPForm) form).safeInsert(thread, insert++, new Spacer(f.charWidth(' ') * space, f.getBaselinePosition()));
 		}
 		
 		return insert;
@@ -5018,6 +5632,7 @@ public class MP extends MIDlet
 	
 	// endregion
 	
+//#ifndef NO_AVATARS
 	// region ImageUtils
 	
 /*
@@ -5132,6 +5747,7 @@ public class MP extends MIDlet
 	}
 	
 	// endregion
+//#endif
 	
 	// region JSON
 	
@@ -5187,7 +5803,7 @@ public class MP extends MIDlet
 		case '"': { // string
 			if (last != '"')
 				throw new RuntimeException("JSON: Unexpected end of text");
-			if(str.indexOf('\\') != -1) {
+			if (str.indexOf('\\') != -1) {
 				char[] chars = str.substring(1, length).toCharArray();
 				str = null;
 				int l = chars.length;

@@ -81,6 +81,7 @@
 	// Settings commands
 	"Logout": "Выйти",
 	"ClearCache": "Очистить кэш",
+	"Locate": "Указать путь",
 	
 	// Chats list commands
 	"Folders": "Папки",
@@ -103,6 +104,9 @@
 	"Pin": "Закрепить",
 	"BanMember": "Забанить участника",
 	"Comments": "Обсуждение",
+	"Copy": "Копировать",
+	"CopyLink": "Копировать ссылку",
+	"Select": "Выбрать",
 	
 	// Item commands
 	"Link_Cmd": "Открыть",
@@ -110,6 +114,8 @@
 	"Call": "Позвонить",
 	"Download": "Скачать",
 	"Play_Item": "Воспроизвести",
+	"RunBotAction": "Выполнить",
+	"SaveHere": "Сохранить здесь",
 	
 	// Chat form commands
 	"WriteMessage": "Написать сообщение",
@@ -118,6 +124,8 @@
 	"Older": "Старее",
 	"Newer": "Новее",
 	"SendSticker": "Отправить стикер",
+	"Menu": "Меню",
+	"Write": "Написать",
 	
 	// Message writing form commands
 	"Send": "Отправить",
@@ -150,6 +158,7 @@
 	"WaitingForServerResponse": "Ожидание ответа сервера...",
 	"Sending": "Отправка...",
 	"WaitingForPrevChat": "Отключение от предыдущего чата...",
+	"Downloading": "Скачивание",
 	
 	// Authorization process
 	"Auth_Title": "Авторизация",
@@ -176,6 +185,7 @@
 	"APIDisabled_Alert": "Этот инстанс не поддерживает API!",
 	"ClientOutdated_Alert": "Клиент устарел!",
 	"InvalidInstancePassword_Alert": "Неправильный пароль инстанса!",
+	"InvalidSessionCode_Alert": "Неправильный код сессии!",
 	"Retry": "Повторить",
 	
 	// Settings sections
@@ -201,6 +211,10 @@
 	"ChatTextField": "Текстовое поле в чате",
 	"BuiltinImageViewer": "Встроен. просмотр изображений",
 	"LargeMusicCover": "Большая обложка в плеере",
+	"LegacyUI": "Простой интерфейс",
+	"Keyboard": "Клавиатура",
+	"Auto": "Автоматически",
+	"FullscreenTextBox": "Полноэкр. ввод",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Ждать полной загрузки",
@@ -209,12 +223,19 @@
 	"ParseLinks": "Отображать ссылки",
 	"ChatAutoUpdate": "Авто-обновление чата",
 	"UpdatesTimeout": "Таймаут обновлений",
-	"KeepSessionAlive": "Удерживать сессию активной",
+	"KeepSessionAlive": "Держать сессию активной",
 	"UseUnicode": "Исп. Unicode",
 	"UseCompression": "Исп. сжатие",
 	"NetworkAccess": "Сеть",
 	"MobileData": "Мобильные данные",
 	"WiFi": "Wi-Fi",
+	"Longpoll": "Лонгполл",
+	"UpdatesInterval": "Интервал обновлений",
+	"DownloadPath": "Путь скачивания",
+	"DownloadMethod": "Способ скачивания",
+	"AlwaysAsk": "Всегда спрашивать",
+	"InApp": "В приложении",
+	"WithBrowser": "В браузере",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Загружать медиа",
@@ -261,6 +282,7 @@
 	"SendAsVoice": "Отправить как голосовое",
 	"HideWithSpoiler": "Пометить как спойлер",
 	"EnableHTMLFormatting": "HTML-форматирование",
+	"TextField_Hint": "Написать сообщение...",
 	
 	// Alert messages
 	"MessageSent_Alert": "Сообщение отправлено",
@@ -270,12 +292,20 @@
 	"StickersAdded_Alert": "Стикеры добавлены",
 	"ChooseNetwork_Alert": "Выберите точку доступа",
 	"FailedToLoadImage": "Не удалось загр. изобр.", // unwrapped, should be short
+	"TextCopied_Alert": "Текст скопирован",
+	"NotEnoughMemory_Alert": "Недостаточно памяти",
+	"DownloadCanceled_Alert": "Скачивание отменено",
+	"DownloadedTo": "Скачано в ",
+	"ChooseDownloadMethod_Alert": "Выберите способ скачивания",
 	
 	// Chat form
 	"ChatMedia_Title": "Медиафайлы",
 	"Search_TitlePrefix": "Поиск - ",
 	"OlderMessages": "Старые сообщения",
 	"NewerMessages": "Новые сообщения",
+	"SavedMessages": "Сохраненные сообщения",
+	"SomeoneIsTyping": "Кто-то печатает...",
+	"Typing": "печатает...",
 	
 	// Message
 	"ForwardedFrom": "Переслано от ",
@@ -287,11 +317,15 @@
 	"_comment": " комментарий",
 	"_comments": " комментария",
 	"_comments2": " комментариев",
+	"ReplyTo": "Ответ ",
 	
 	// Message media
 	"Media": "Медиа",
 	"Poll": "Опрос",
 	"Geo": "Геопозиция: ",
+	"Photo": "Фото",
+	"Video": "Видео",
+	"VoiceMessage": "Голосовое сообщение",
 	
 	// Chat actions
 	"PinnedMessage_Action": " закрепил(а) сообщение",
@@ -345,7 +379,7 @@
 	"UserInfo": "Пользователь",
 	"GroupInfo": "Группа",
 	"ChannelInfo": "Канал",
-	"TopicInfo": "Topic Info", // Untranslated
+	"TopicInfo": "Тема",
 	
 	"_member": " участник",
 	"_members": " участника",

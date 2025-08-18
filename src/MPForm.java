@@ -39,13 +39,13 @@ public abstract class MPForm extends Form implements LangConstants {
 		setCommandListener(MP.midlet);
 	}
 	
-	void load() {
+	public void load() {
 		if (loaded) return;
 		loaded = true;
 		canceled = finished = false;
 
 		Ticker ticker;
-		setTicker(ticker = new Ticker(MP.L[Loading]));
+		setTicker(ticker = new Ticker(MP.L[LLoading]));
 		if (MP.useLoadingForm) {
 			MP.display(MP.loadingForm);
 		}
@@ -113,7 +113,7 @@ public abstract class MPForm extends Form implements LangConstants {
 	
 	protected void postLoad(boolean success) {}
 
-	void closed(boolean destroy) {
+	public void closed(boolean destroy) {
 		if (destroy) cancel();
 	}
 	

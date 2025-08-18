@@ -19,31 +19,38 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-public class StickerPacksList extends MPList {
+//#ifndef NO_CHAT_CANVAS
+import javax.microedition.lcdui.Graphics;
+
+public class UIPageButton extends UIItem {
 	
-	JSONArray sets;
-	MPChat chatForm;
+	private int dir;
 
-	public StickerPacksList(MPChat form) {
-		super(MP.L[LStickers_Title]);
-		this.chatForm = form;
-		addCommand(MP.backCmd);
+	public UIPageButton(int dir) {
+		this.dir = dir;
+		contentHeight = MP.medBoldFontHeight + 4;
+		focusable = true;
 	}
-
-	void loadInternal(Thread thread) throws Exception {
-		JSONObject j = (JSONObject) MP.api("getStickerSets");
-		
-		JSONArray sets = this.sets = j.getArray("res");
-		int l = sets.size();
-		
-		for (int i = 0; i < l; ++i) {
-			safeAppend(thread, sets.getObject(i).getString("title"), null);
+	
+	void paint(Graphics g, int x, int y, int w) {
+		if (focus) {
+			g.setColor(ChatCanvas.colors[ChatCanvas.COLOR_CHAT_HIGHLIGHT_BG]);
+			g.fillRect(x, y, w, contentHeight);
 		}
+		g.setColor(ChatCanvas.colors[ChatCanvas.COLOR_CHAT_FG]);
+		g.setFont(MP.medBoldFont);
+		g.drawString(MP.L[dir == -1 ? LangConstants.LOlderMessages : LangConstants.LNewerMessages],
+				x + (w >> 1), y + 2, Graphics.HCENTER | Graphics.TOP);
+	}
+	
+	boolean action() {
+		((ChatCanvas) container).paginate(dir);
+		return true;
 	}
 
-	void select(int i) {
-		if (i == -1) return;
-		MP.openLoad(new StickerPackForm(chatForm, sets.getObject(i)));
+	boolean tap(int x, int y, boolean longTap) {
+		return !longTap && action();
 	}
 
 }
+//#endif

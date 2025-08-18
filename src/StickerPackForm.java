@@ -4,7 +4,7 @@ import javax.microedition.lcdui.ImageItem;
 import javax.microedition.lcdui.Item;
 
 /*
-Copyright (c) 2022-2025 Arman Jussupgaliyev
+Copyright (c) 2025 Arman Jussupgaliyev
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,10 +29,10 @@ public class StickerPackForm extends MPForm {
 	String id;
 	String accessHash;
 	String slug;
-	ChatForm chatForm;
+	MPChat chatForm;
 	
-	public StickerPackForm(ChatForm chatForm, JSONObject json) {
-		super(json.getString("title", json.getString("short_name", MP.L[Stickers_Title])));
+	public StickerPackForm(MPChat chatForm, JSONObject json) {
+		super(json.getString("title", json.getString("short_name", MP.L[LStickers_Title])));
 		this.id = json.getString("id");
 		this.accessHash = json.getString("access_hash");
 		this.chatForm = chatForm;

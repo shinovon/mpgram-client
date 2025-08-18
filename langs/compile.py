@@ -37,10 +37,10 @@ if not err:
         f.write("public interface LangConstants {\n")
         i = 1
         for s in en_json.keys():
-            f.write("\tstatic final int " + s + " = " + str(i) + ";\n")
+            f.write("\tstatic final int L" + s + " = " + str(i) + ";\n")
             i += 1
-        f.write("\tstatic final int LocaleStrings = " + str(len(en_json)) + ";\n")
-        f.write("\tstatic final int mpgram = 0;\n")
+        f.write("\tstatic final int LLocaleStrings = " + str(len(en_json)) + ";\n")
+        f.write("\tstatic final int Lmpgram = 0;\n")
         f.write("}\n")
 
     if not path.exists("../res/l/"):

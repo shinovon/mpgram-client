@@ -41,20 +41,57 @@
             <symbol name="AMMS" value="1.1"/>
             <symbol name="MIDP" value="2.1"/>
             <symbol name="Mobile_Sensor_API" value="1.0"/>
+            <symbol name="NO_CHAT_CANVAS" value="true"/>
             <symbol name="screen.height" value="320"/>
             <symbol name="JSR184" value="1.1"/>
             <symbol name="JSR82" value="1.1"/>
             <symbol name="NO_ZIP" value="true"/>
             <symbol name="MascotV3" value="1.0"/>
             <symbol name="screen.isColor" value="true"/>
+            <symbol name="NO_NOKIAUI" value="true"/>
             <symbol name="NOKIAUI" value="1.6"/>
             <symbol name="screen.bitDepth" value="16"/>
+            <symbol name="NO_AVATARS" value="true"/>
             <symbol name="NO_NOTIFY" value="true"/>
             <symbol name="SAMSUNGAPI" value="1.0"/>
             <symbol name="WMA" value="1.1"/>
             <symbol name="NO_FILE" value="true"/>
             <symbol name="rpcapi.jar" value="1.0"/>
             <symbol name="MINI" value="true"/>
+            <symbol name="JSR135" value="1.2"/>
+            <symbol name="JSR179" value="1.0"/>
+            <symbol name="filemanagerapi.jar" value="1.0"/>
+            <symbol name="notificationapi.jar" value="1.0"/>
+            <symbol name="CLDC" value="1.1"/>
+            <symbol name="JSR211" value="1.0"/>
+            <symbol name="screen.width" value="240"/>
+            <symbol name="siemensio.jar" value="1.0"/>
+            <symbol name="JSR75" value="1.0"/>
+         </symbolSet>
+      </configuration>
+      <configuration active="false" name="BlackBerry">
+         <device group="KEmulator nnmod" name="KEmulator"/>
+         <symbolSet name="KEmulator">
+            <symbol name="PiglerAPI" value="1.2"/>
+            <symbol name="SATSA-CRYPTO" value="1.0"/>
+            <symbol name="SVG" value="1.1"/>
+            <symbol name="screen.isTouch" value="true"/>
+            <symbol name="AMMS" value="1.1"/>
+            <symbol name="MIDP" value="2.1"/>
+            <symbol name="Mobile_Sensor_API" value="1.0"/>
+            <symbol name="screen.height" value="320"/>
+            <symbol name="JSR184" value="1.1"/>
+            <symbol name="JSR82" value="1.1"/>
+            <symbol name="MascotV3" value="1.0"/>
+            <symbol name="screen.isColor" value="true"/>
+            <symbol name="NO_NOKIAUI" value="true"/>
+            <symbol name="NOKIAUI" value="1.6"/>
+            <symbol name="screen.bitDepth" value="16"/>
+            <symbol name="BLACKBERRY_BUILD" value="true"/>
+            <symbol name="NO_NOTIFY" value="true"/>
+            <symbol name="SAMSUNGAPI" value="1.0"/>
+            <symbol name="WMA" value="1.1"/>
+            <symbol name="rpcapi.jar" value="1.0"/>
             <symbol name="JSR135" value="1.2"/>
             <symbol name="JSR179" value="1.0"/>
             <symbol name="filemanagerapi.jar" value="1.0"/>

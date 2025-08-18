@@ -81,6 +81,7 @@
 	// Settings commands
 	"Logout": "تسجيل خروج",
 	"ClearCache": "تفريغ التخزين المؤقت",
+	"Locate": "Locate", // Untranslated
 	
 	// Chats list commands
 	"Folders": "مجلدات",
@@ -103,6 +104,9 @@
 	"Pin": "تثبيت",
 	"BanMember": "حظر العضو",
 	"Comments": "مناقشة",
+	"Copy": "Copy", // Untranslated
+	"CopyLink": "Copy link", // Untranslated
+	"Select": "Select", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "الرابط",
@@ -110,6 +114,8 @@
 	"Call": "اتصال",
 	"Download": "تحميل",
 	"Play_Item": "تشغيل", 
+	"RunBotAction": "Run", // Untranslated
+	"SaveHere": "Save here", // Untranslated
 	
 	// Chat form commands
 	"WriteMessage": "كتابة رسالة",
@@ -118,6 +124,8 @@
 	"Older": "الاقدم",
 	"Newer": "الاحدث",
 	"SendSticker": "ارسال ملصق",
+	"Menu": "Menu", // Untranslated
+	"Write": "Write", // Untranslated
 	
 	// Message writing form commands
 	"Send": "ارسال",
@@ -150,6 +158,7 @@
 	"WaitingForServerResponse": "...في انتظار رد الخادم",
 	"Sending": "يتم الارسال",
 	"WaitingForPrevChat": "في انتظار قطع الاتصال بالمحادثة السابقة....",
+	"Downloading": "Downloading", // Untranslated
 	
 	// Authorization process
 	"Auth_Title": "التحقق",
@@ -176,6 +185,7 @@
 	"APIDisabled_Alert": "هذا النموذج لا يدعم واجهة برمجة التطبيقات (API)!",
 	"ClientOutdated_Alert": "العميل منتهي الصلاحية !",
 	"InvalidInstancePassword_Alert": "كلمة مرور النموذج غير صالحة!",
+	"InvalidSessionCode_Alert": "Invalid session code!", // Untranslated
 	"Retry": "إعادة المحاولة",
 	
 	// Settings sections
@@ -201,6 +211,10 @@
 	"ChatTextField": "حقل النص في المحادثة", 
 	"BuiltinImageViewer": "عارض الصور المدمج",
 	"LargeMusicCover": "غلاف كبير لمشغل الوسائط", 
+	"LegacyUI": "Legacy UI", // Untranslated
+	"Keyboard": "Keyboard", // Untranslated
+	"Auto": "Auto", // Untranslated
+	"FullscreenTextBox": "Fullscreen text-box", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "انتظار تحميل الصفحة",
@@ -215,6 +229,13 @@
 	"NetworkAccess": "نقطة اتصال الشبكة",
 	"MobileData": "بيانات الهاتف المحمول",
 	"WiFi": "Wi-Fi",
+	"Longpoll": "Longpoll", // Untranslated
+	"UpdatesInterval": "Updates interval", // Untranslated
+	"DownloadPath": "Download path", // Untranslated
+	"DownloadMethod": "Download method", // Untranslated
+	"AlwaysAsk": "Always ask", // Untranslated
+	"InApp": "In app", // Untranslated
+	"WithBrowser": "With browser", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "تحميل صور مصغرة للوسائط",
@@ -261,6 +282,7 @@
 	"SendAsVoice": "ارسال كرسالة صوتية", 
 	"HideWithSpoiler": "اخفاء الرسالة",
 	"EnableHTMLFormatting": "تفعيل تنسيق HTML",
+	"TextField_Hint": "Write a message...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "الرسالة مرسلة",
@@ -270,12 +292,20 @@
 	"StickersAdded_Alert": "تم اضافة ملصق",
 	"ChooseNetwork_Alert": "اختيار نقطة وصول الشبكة",
 	"FailedToLoadImage": "فشل تحميل الصورة",
+	"TextCopied_Alert": "Text copied", // Untranslated
+	"NotEnoughMemory_Alert": "Not enough memory", // Untranslated
+	"DownloadCanceled_Alert": "Download canceled", // Untranslated
+	"DownloadedTo": "Downloaded to ", // Untranslated
+	"ChooseDownloadMethod_Alert": "Choose download method", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "الوسائط",
 	"Search_TitlePrefix": "البحث - ",
 	"OlderMessages": "الرسائل الاقدم",
 	"NewerMessages": "الرسائل الاحدث",
+	"SavedMessages": "Saved messages", // Untranslated
+	"SomeoneIsTyping": "Someone is typing...", // Untranslated
+	"Typing": "typing...", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "محولة من ",
@@ -287,11 +317,15 @@
 	"_comment": "تعليق", 
 	"_comments": " تعليقات",
 	"_comments2": "",
+	"ReplyTo": "Reply to ", // Untranslated
 	
 	// Message media
 	"Media": "وسائط",
 	"Poll": "استفتاء",
 	"Geo": "موقع جعراقي: ",
+	"Photo": "Photo", // Untranslated
+	"Video": "Video", // Untranslated
+	"VoiceMessage": "Voice message", // Untranslated
 	
 	// Chat actions
 	"PinnedMessage_Action": " ثبت رسالة", 

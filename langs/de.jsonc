@@ -81,6 +81,7 @@
 	// Settings commands
 	"Logout": "Ausloggen",
 	"ClearCache": "Cache löschen",
+	"Locate": "Locate", // Untranslated
 	
 	// Chats list commands
 	"Folders": "Ordner",
@@ -103,6 +104,9 @@
 	"Pin": "Anheften",
 	"BanMember": "Mitglied Sperren",
 	"Comments": "Discussion", // Untranslated
+	"Copy": "Copy", // Untranslated
+	"CopyLink": "Copy link", // Untranslated
+	"Select": "Select", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "Link",
@@ -110,6 +114,8 @@
 	"Call": "Anruf",
 	"Download": "Download",
 	"Play_Item": "Play", // Untranslated
+	"RunBotAction": "Run", // Untranslated
+	"SaveHere": "Save here", // Untranslated
 	
 	// Chat form commands
 	"WriteMessage": "Schreibe Nachricht",
@@ -118,6 +124,8 @@
 	"Older": "Älter",
 	"Newer": "Neuer",
 	"SendSticker": "Sende Sticker",
+	"Menu": "Menu", // Untranslated
+	"Write": "Write", // Untranslated
 	
 	// Message writing form commands
 	"Send": "Sende",
@@ -150,6 +158,7 @@
 	"WaitingForServerResponse": "Warten auf Serverantwort...",
 	"Sending": "Senden...",
 	"WaitingForPrevChat": "Warten auf die Trennung des vorherigen Chats...",
+	"Downloading": "Downloading", // Untranslated
 	
 	// Authorization process
 	"Auth_Title": "Authentifizierung",
@@ -176,6 +185,7 @@
 	"APIDisabled_Alert": "This instance does not support API!", // Untranslated
 	"ClientOutdated_Alert": "Client outdated!", // Untranslated
 	"InvalidInstancePassword_Alert": "Invalid instance password!", // Untranslated
+	"InvalidSessionCode_Alert": "Invalid session code!", // Untranslated
 	"Retry": "Retry", // Untranslated
 	
 	// Settings sections
@@ -201,6 +211,10 @@
 	"ChatTextField": "Text Feld im Chat",
 	"BuiltinImageViewer": "Built-in image viewer", // Untranslated
 	"LargeMusicCover": "Large player cover", // Untranslated
+	"LegacyUI": "Legacy UI", // Untranslated
+	"Keyboard": "Keyboard", // Untranslated
+	"Auto": "Auto", // Untranslated
+	"FullscreenTextBox": "Fullscreen text-box", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Warte bis Seite geladen",
@@ -215,6 +229,13 @@
 	"NetworkAccess": "Network access", // Untranslated
 	"MobileData": "Data", // Untranslated
 	"WiFi": "Wi-Fi", // Untranslated
+	"Longpoll": "Longpoll", // Untranslated
+	"UpdatesInterval": "Updates interval", // Untranslated
+	"DownloadPath": "Download path", // Untranslated
+	"DownloadMethod": "Download method", // Untranslated
+	"AlwaysAsk": "Always ask", // Untranslated
+	"InApp": "In app", // Untranslated
+	"WithBrowser": "With browser", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "Lade Medien-Miniaturansichten",
@@ -261,6 +282,7 @@
 	"SendAsVoice": "Sprachnachricht senden",
 	"HideWithSpoiler": "Versteckt mit Spoiler",
 	"EnableHTMLFormatting": "HTML-formatting aktivieren",
+	"TextField_Hint": "Write a message...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Nachricht gesendet",
@@ -270,12 +292,20 @@
 	"StickersAdded_Alert": "Stickers added", // Untranslated
 	"ChooseNetwork_Alert": "Choose network access point", // Untranslated
 	"FailedToLoadImage": "Failed to load image", // unwrapped, should be short // Untranslated
+	"TextCopied_Alert": "Text copied", // Untranslated
+	"NotEnoughMemory_Alert": "Not enough memory", // Untranslated
+	"DownloadCanceled_Alert": "Download canceled", // Untranslated
+	"DownloadedTo": "Downloaded to ", // Untranslated
+	"ChooseDownloadMethod_Alert": "Choose download method", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Mediem",
 	"Search_TitlePrefix": "Suche - ",
 	"OlderMessages": "Ältere Nachrichten",
 	"NewerMessages": "Neuere Nachrichten",
+	"SavedMessages": "Saved messages", // Untranslated
+	"SomeoneIsTyping": "Someone is typing...", // Untranslated
+	"Typing": "typing...", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "Weitergeleitet von",
@@ -287,11 +317,15 @@
 	"_comment": " comment", // Untranslated
 	"_comments": " comments", // Untranslated
 	"_comments2": "",
+	"ReplyTo": "Reply to ", // Untranslated
 	
 	// Message media
 	"Media": "Medien",
 	"Poll": "Umfrage",
 	"Geo": "Geo: ",
+	"Photo": "Photo", // Untranslated
+	"Video": "Video", // Untranslated
+	"VoiceMessage": "Voice message", // Untranslated
 	
 	// Chat actions
 	"PinnedMessage_Action": " anghängte Nachricht",

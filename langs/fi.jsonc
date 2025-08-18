@@ -81,6 +81,7 @@
 	// Settings commands
 	"Logout": "Kirjaudu ulos",
 	"ClearCache": "Tyhjennä välimuisti",
+	"Locate": "Locate", // Untranslated
 	
 	// Chats list commands
 	"Folders": "Kansiot",
@@ -103,6 +104,9 @@
 	"Pin": "Kiinnitä",
 	"BanMember": "Estä käyttäjä",
 	"Comments": "Keskustelu",
+	"Copy": "Copy", // Untranslated
+	"CopyLink": "Copy link", // Untranslated
+	"Select": "Select", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "Linkki",
@@ -110,6 +114,8 @@
 	"Call": "Soita",
 	"Download": "Lataa",
 	"Play_Item": "Soita",
+	"RunBotAction": "Run", // Untranslated
+	"SaveHere": "Save here", // Untranslated
 	
 	// Chat form commands
 	"WriteMessage": "Kirjoita viesti",
@@ -118,6 +124,8 @@
 	"Older": "Vanhemmat",
 	"Newer": "Uudemmat",
 	"SendSticker": "Lähetä tarra",
+	"Menu": "Menu", // Untranslated
+	"Write": "Write", // Untranslated
 	
 	// Message writing form commands
 	"Send": "Lähetä",
@@ -150,6 +158,7 @@
 	"WaitingForServerResponse": "Odotetaan palvelimen vastausta...",
 	"Sending": "Lähetetään",
 	"WaitingForPrevChat": "Odotetaan yhteyden sulkeutumista...",
+	"Downloading": "Downloading", // Untranslated
 	
 	// Authorization process
 	"Auth_Title": "Kirjaudu",
@@ -176,6 +185,7 @@
 	"APIDisabled_Alert": "Palvelin ei tue rajapintaa!",
 	"ClientOutdated_Alert": "Vanhentunut sovellus!",
 	"InvalidInstancePassword_Alert": "Väärä palvelimen salasana!",
+	"InvalidSessionCode_Alert": "Invalid session code!", // Untranslated
 	"Retry": "Uudell.",
 	
 	// Settings sections
@@ -201,6 +211,10 @@
 	"ChatTextField": "Näytä tekstikenttä",
 	"BuiltinImageViewer": "Näytä kuvat sovelluksessa",
 	"LargeMusicCover": "Suuri soittimen kansikuva",
+	"LegacyUI": "Legacy UI", // Untranslated
+	"Keyboard": "Keyboard", // Untranslated
+	"Auto": "Auto", // Untranslated
+	"FullscreenTextBox": "Fullscreen text-box", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Odota sivun latausta",
@@ -215,6 +229,13 @@
 	"NetworkAccess": "Yhteystapa",
 	"MobileData": "Mobiilidata",
 	"WiFi": "Wi-Fi",
+	"Longpoll": "Longpoll", // Untranslated
+	"UpdatesInterval": "Updates interval", // Untranslated
+	"DownloadPath": "Download path", // Untranslated
+	"DownloadMethod": "Download method", // Untranslated
+	"AlwaysAsk": "Always ask", // Untranslated
+	"InApp": "In app", // Untranslated
+	"WithBrowser": "With browser", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "Kuvien esikatselu",
@@ -261,6 +282,7 @@
 	"SendAsVoice": "Lähetä ääniviestinä",
 	"HideWithSpoiler": "Piilota",
 	"EnableHTMLFormatting": "HTML-muotoilu",
+	"TextField_Hint": "Write a message...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Viesti lähetetty",
@@ -270,12 +292,20 @@
 	"StickersAdded_Alert": "Tarrat lisätty",
 	"ChooseNetwork_Alert": "Valitse yhteystapa",
 	"FailedToLoadImage": "Kuvan lataus epäonnistui", // unwrapped, should be short
+	"TextCopied_Alert": "Text copied", // Untranslated
+	"NotEnoughMemory_Alert": "Not enough memory", // Untranslated
+	"DownloadCanceled_Alert": "Download canceled", // Untranslated
+	"DownloadedTo": "Downloaded to ", // Untranslated
+	"ChooseDownloadMethod_Alert": "Choose download method", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Media",
 	"Search_TitlePrefix": "Haku - ",
 	"OlderMessages": "Vanhemmat viestit",
 	"NewerMessages": "Uudemmat viestit",
+	"SavedMessages": "Saved messages", // Untranslated
+	"SomeoneIsTyping": "Someone is typing...", // Untranslated
+	"Typing": "typing...", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "Välitetty käyttäjältä ",
@@ -287,11 +317,15 @@
 	"_comment": " kommentti",
 	"_comments": " kommenttia",
 	"_comments2": "",
+	"ReplyTo": "Reply to ", // Untranslated
 	
 	// Message media
 	"Media": "Media",
 	"Poll": "Kysely",
 	"Geo": "Sijainti: ",
+	"Photo": "Photo", // Untranslated
+	"Video": "Video", // Untranslated
+	"VoiceMessage": "Voice message", // Untranslated
 	
 	// Chat actions
 	"PinnedMessage_Action": " kiinnitti viestin",

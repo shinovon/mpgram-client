@@ -13,4 +13,9 @@ bin
 # see langs/compile.py
 src/LangConstants.java
 res/l
+
+# intellij
 .idea
+*.iml
+/META-INF/
+proguard*.cfg

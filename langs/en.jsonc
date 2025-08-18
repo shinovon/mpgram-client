@@ -81,6 +81,7 @@
 	// Settings commands
 	"Logout": "Logout",
 	"ClearCache": "Clear cache",
+	"Locate": "Locate",
 	
 	// Chats list commands
 	"Folders": "Folders",
@@ -103,6 +104,9 @@
 	"Pin": "Pin",
 	"BanMember": "Ban member",
 	"Comments": "Discussion",
+	"Copy": "Copy",
+	"CopyLink": "Copy link",
+	"Select": "Select",
 	
 	// Item commands
 	"Link_Cmd": "Link",
@@ -110,6 +114,8 @@
 	"Call": "Call",
 	"Download": "Download",
 	"Play_Item": "Play",
+	"RunBotAction": "Run",
+	"SaveHere": "Save here",
 	
 	// Chat form commands
 	"WriteMessage": "Write message",
@@ -118,6 +124,8 @@
 	"Older": "Older",
 	"Newer": "Newer",
 	"SendSticker": "Send sticker",
+	"Menu": "Menu",
+	"Write": "Write",
 	
 	// Message writing form commands
 	"Send": "Send",
@@ -150,6 +158,7 @@
 	"WaitingForServerResponse": "Waiting for server response...",
 	"Sending": "Sending...",
 	"WaitingForPrevChat": "Waiting for previous chat to disconnect...",
+	"Downloading": "Downloading",
 	
 	// Authorization process
 	"Auth_Title": "Auth",
@@ -176,6 +185,7 @@
 	"APIDisabled_Alert": "This instance does not support API!",
 	"ClientOutdated_Alert": "Client outdated!",
 	"InvalidInstancePassword_Alert": "Invalid instance password!",
+	"InvalidSessionCode_Alert": "Invalid session code!",
 	"Retry": "Retry",
 	
 	// Settings sections
@@ -201,6 +211,10 @@
 	"ChatTextField": "Text field in chat",
 	"BuiltinImageViewer": "Built-in image viewer",
 	"LargeMusicCover": "Large player cover",
+	"LegacyUI": "Legacy UI",
+	"Keyboard": "Keyboard",
+	"Auto": "Auto",
+	"FullscreenTextBox": "Fullscreen text-box",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Wait for page to load",
@@ -215,6 +229,13 @@
 	"NetworkAccess": "Network access",
 	"MobileData": "Data",
 	"WiFi": "Wi-Fi",
+	"Longpoll": "Longpoll",
+	"UpdatesInterval": "Updates interval",
+	"DownloadPath": "Download path",
+	"DownloadMethod": "Download method",
+	"AlwaysAsk": "Always ask",
+	"InApp": "In app",
+	"WithBrowser": "With browser",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Load media thumbnails",
@@ -261,6 +282,7 @@
 	"SendAsVoice": "Send as voice message",
 	"HideWithSpoiler": "Hide with spoiler",
 	"EnableHTMLFormatting": "Enable HTML-formatting",
+	"TextField_Hint": "Write a message...",
 	
 	// Alert messages
 	"MessageSent_Alert": "Message sent",
@@ -270,12 +292,20 @@
 	"StickersAdded_Alert": "Stickers added",
 	"ChooseNetwork_Alert": "Choose network access point",
 	"FailedToLoadImage": "Failed to load image", // unwrapped, should be short
+	"TextCopied_Alert": "Text copied",
+	"NotEnoughMemory_Alert": "Not enough memory",
+	"DownloadCanceled_Alert": "Download canceled",
+	"DownloadedTo": "Downloaded to ",
+	"ChooseDownloadMethod_Alert": "Choose download method",
 	
 	// Chat form
 	"ChatMedia_Title": "Media",
 	"Search_TitlePrefix": "Search - ",
 	"OlderMessages": "Older messages",
 	"NewerMessages": "Newer messages",
+	"SavedMessages": "Saved messages",
+	"SomeoneIsTyping": "Someone is typing...",
+	"Typing": "typing...",
 	
 	// Message
 	"ForwardedFrom": "Forwarded from ",
@@ -287,11 +317,15 @@
 	"_comment": " comment",
 	"_comments": " comments",
 	"_comments2": "",
+	"ReplyTo": "Reply to ",
 	
 	// Message media
 	"Media": "Media",
 	"Poll": "Poll",
 	"Geo": "Geo: ",
+	"Photo": "Photo",
+	"Video": "Video",
+	"VoiceMessage": "Voice message",
 	
 	// Chat actions
 	"PinnedMessage_Action": " pinned message",
