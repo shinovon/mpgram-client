@@ -217,7 +217,6 @@ public class ChatForm extends MPForm implements Runnable {
 					}
 				} else {
 					canPin = true;
-					canDelete = true;
 					if (MP.chatStatus && info.getObject("User").has("status")) {
 						setStatus(info.getObject("User").getObject("status"));
 					}
@@ -597,7 +596,7 @@ public class ChatForm extends MPForm implements Runnable {
 		
 		// media
 		if (message.has("media")) {
-			if (!MP.showMedia || message.isNull("media") || message.getObject("media").has("hide")) {
+			if (!MP.showMedia || message.isNull("media")) {
 				// media is disabled
 				s = new StringItem(null, MP.L[Media]);
 				s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -766,7 +765,7 @@ public class ChatForm extends MPForm implements Runnable {
 				} else if (type.equals("geo")) {
 					// geo
 					sb.setLength(0);
-					sb.append(MP.L[Geo]).append('\n')
+					sb.append(MP.L[Geo])
 					.append(media.get("lat")).append(", ").append(media.get("long"));
 					s = new StringItem(null, sb.toString());
 					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -976,7 +975,7 @@ public class ChatForm extends MPForm implements Runnable {
 			offsetId = firstMsgId;
 			addOffset = limit - 1;
 		}
-		MP.openLoad(this);
+		load();
 	}
 	
 	void reset() {
@@ -986,7 +985,6 @@ public class ChatForm extends MPForm implements Runnable {
 		addOffset = 0;
 		offsetId = 0;
 		typing = 0;
-		query = null;
 		loadedMsgs.removeAllElements();
 		if (urls != null) urls.clear();
 		switched = false;

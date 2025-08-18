@@ -105,7 +105,6 @@ public class MP extends MIDlet
 	static final int RUN_INSTALL_STICKER_SET = 22;
 	static final int RUN_LOAD_PLAYLIST = 23;
 	static final int RUN_PLAYER_LOOP = 24;
-	static final int RUN_CANCEL_UPDATES = 25;
 	
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
@@ -117,7 +116,7 @@ public class MP extends MIDlet
 	static final String FILE_URL = "file.php";
 	static final String OTA_URL = "http://nnproject.cc/mp/upd.php";
 	
-	static final String API_VERSION = "9";
+	static final String API_VERSION = "8";
 	
 	static final String[][] LANGS = {
 		{
@@ -571,21 +570,25 @@ public class MP extends MIDlet
 		// Test UTF-8 support
 		byte[] b = new byte[] { (byte) 0xF0, (byte) 0x9F, (byte) 0x98, (byte) 0x83 };
 		try {
-			new InputStreamReader(new ByteArrayInputStream(b), encoding = "UTF-8").read();
+			encoding = "UTF-8";
+			new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
 			if (new String(b, encoding).length() != 2) throw new Exception();
 		} catch (Exception e) {
 			try {
-				new InputStreamReader(new ByteArrayInputStream(b), encoding = "UTF8").read();
+				encoding = "UTF8";
+				new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
 				if (new String(b, encoding).length() != 2) throw new Exception();
 			} catch (Exception e2) {
 				utf = false;
 				b = new byte[] { (byte) 0xD0, (byte) 0xB2, (byte) 0xD1, (byte) 0x8B, (byte) 0xD1, (byte) 0x84 };
 				try {
-					new InputStreamReader(new ByteArrayInputStream(b), encoding = "UTF-8").read();
+					encoding = "UTF-8";
+					new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
 					if (new String(b, encoding).length() != 3) throw new Exception();
 				} catch (Exception e3) {
 					try {
-						new InputStreamReader(new ByteArrayInputStream(b), encoding = "UTF8").read();
+						encoding = "UTF8";
+						new InputStreamReader(new ByteArrayInputStream(b), encoding).read();
 						if (new String(b, encoding).length() != 3) throw new Exception();
 					} catch (Exception e4) {
 						encoding = "ISO-8859-1";
@@ -1354,17 +1357,12 @@ public class MP extends MIDlet
 						sb.setLength(0);
 						sb.append("updates&media=1&read=1&peer=").append(form.id)
 						.append("&offset=").append(offset)
-						.append("&timeout=").append(updatesTimeout)
-						.append("&message=").append(form.firstMsgId);
+						.append("&timeout=").append(updatesTimeout);
 						if (form.topMsgId != 0) {
 							sb.append("&top_msg=").append(form.topMsgId);
 						}
 						
 						j = (JSONObject) api(sb.toString());
-						
-						if (j.has("cancel")) {
-							throw cancelException;
-						}
 						
 						JSONArray updates = j.getArray("res");
 						int l = updates.size();
@@ -1392,7 +1390,7 @@ public class MP extends MIDlet
 						}
 						
 					} catch (Exception e) {
-						if (e.toString().indexOf("Interrupted") != -1 || e == cancelException) {
+						if (e.toString().indexOf("Interrupted") != -1) {
 							form.update = false;
 							break;
 						}
@@ -1624,19 +1622,6 @@ public class MP extends MIDlet
 				}
 			} catch (Exception ignored) {}
 			break;
-		}
-		case RUN_CANCEL_UPDATES: {
-			try {
-				api("cancelUpdates");
-			} catch (Exception ignored) {}
-			try {
-				Thread.sleep(100);
-			} catch (Exception e) {
-				break;
-			}
-			if (!closingConnections.contains(param))
-				break;
-			// continue
 		}
 		case RUN_CLOSE_CONNECTION: {
 			try {
@@ -1882,13 +1867,17 @@ public class MP extends MIDlet
 	static void cancel(Thread thread, boolean updates) {
 		if (thread == null) return;
 		if (updates) updatesThread = null;
-		Connection c = (Connection) threadConnections.get(thread);
-		if (c == null || closingConnections.contains(c)) {
+		if (symbianJrt) {
+			thread.interrupt();
 			return;
 		}
-		midlet.start(updates ? RUN_CANCEL_UPDATES : RUN_CLOSE_CONNECTION, c);
+		Connection c = (Connection) threadConnections.get(thread);
+		if (c == null || closingConnections.contains(c)) {
+			thread.interrupt();
+			return;
+		}
+		midlet.start(RUN_CLOSE_CONNECTION, c);
 	}
-
 
 	// endregion
 	
@@ -2654,7 +2643,7 @@ public class MP extends MIDlet
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 
-			s = new StringItem(null, "github.com/shinovon/mpgram-client");
+			s = new StringItem(null, "github.com/shinovon");
 			s.setFont(medBoldFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
@@ -2702,22 +2691,6 @@ public class MP extends MIDlet
 			s.setDefaultCommand(richTextLinkCmd);
 			s.setItemCommandListener(this);
 			f.append(s);
-			
-			s = new StringItem(null, "\n\nLicensed under the MIT license.\n"
-					+ "Copyright (C) 2022-2025 Arman Jussupgaliyev\n\n"
-//#ifndef NO_AVATARS
-					+ "Contains parts of the TUBE42 imagelib, released under the LGPL license.\n"
-					+ "Copyright (C) 2007 Free Software Foundation, Inc.\n\n"
-//#endif
-//#ifndef NO_ZIP
-					+ "Contains parts of GNU Classpath, released under the GPLv2 license.\n"
-					+ "Copyright (C) 1999-2004 Free Software Foundation, Inc."
-//#endif
-					);
-			s.setFont(smallPlainFont);
-			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
-			f.append(s);
-			
 			display(f);
 			return;
 		}
@@ -4820,19 +4793,9 @@ public class MP extends MIDlet
 			boolean skipEntity = false;
 			String entityText = text.substring(entity.getInt("offset"), entity.getInt("offset") + entity.getInt("length"));
 			String type = entity.getString("_");
-			if ("messageEntityUrl".equals(type) || "messageEntityMention".equals(type)) {
+			if ("messageEntityUrl".equals(type)) {
 				state[RT_URL] ++;
 				insert = flush(form, thread, richTextUrl = entityText, insert, state);
-				state[RT_URL] --;
-			} else if ("messageEntityMentionName".equals(type)) {
-				state[RT_URL] ++;
-				richTextUrl = "@".concat(entity.getString("user_id"));
-				insert = flush(form, thread, entityText, insert, state);
-				state[RT_URL] --;
-			} else if ("messageEntityPhone".equals(type)) {
-				state[RT_URL] ++;
-				richTextUrl = "tel:".concat(entityText);
-				insert = flush(form, thread, entityText, insert, state);
 				state[RT_URL] --;
 			} else if ("messageEntityTextUrl".equals(type)) {
 				state[RT_URL] ++;
