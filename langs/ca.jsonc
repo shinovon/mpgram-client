@@ -304,6 +304,8 @@
 	"OlderMessages": "Missatges més vell",
 	"NewerMessages": "Missatges més nou",
 	"SavedMessages": "Saved messages", // Untranslated
+	"SomeoneIsTyping": "Someone is typing...", // Untranslated
+	"Typing": "typing...", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "Reenviat des ",

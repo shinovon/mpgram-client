@@ -304,6 +304,8 @@
 	"OlderMessages": "الرسائل الاقدم",
 	"NewerMessages": "الرسائل الاحدث",
 	"SavedMessages": "Saved messages", // Untranslated
+	"SomeoneIsTyping": "Someone is typing...", // Untranslated
+	"Typing": "typing...", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "محولة من ",

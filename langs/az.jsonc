@@ -304,6 +304,8 @@
 	"OlderMessages": "Köhnə mesajlar",
 	"NewerMessages": "Yeni mesajlar",
 	"SavedMessages": "Saved messages", // Untranslated
+	"SomeoneIsTyping": "Someone is typing...", // Untranslated
+	"Typing": "typing...", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "Kimdən yönləndirilib",

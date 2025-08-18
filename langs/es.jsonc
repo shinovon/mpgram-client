@@ -304,6 +304,8 @@
 	"OlderMessages": "Mensajes antiguos",
 	"NewerMessages": "Mensajes mas recientes",
 	"SavedMessages": "Saved messages", // Untranslated
+	"SomeoneIsTyping": "Someone is typing...", // Untranslated
+	"Typing": "typing...", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "Reenviado desde ",

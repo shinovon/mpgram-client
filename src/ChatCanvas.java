@@ -2105,7 +2105,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			}
 			if (id.charAt(0) != '-' && update.has("top_msg_id") && topMsgId != update.getInt("top_msg_id"))
 				break;
-			this.status = "Someone is typing..."; // TODO
+			this.status = user ? MP.L[LTyping] : MP.L[LSomeoneIsTyping]; // TODO
 			typing = System.currentTimeMillis();
 			typingThread.interrupt();
 			synchronized (typingLock) {

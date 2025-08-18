@@ -304,6 +304,8 @@
 	"OlderMessages": "Vanhemmat viestit",
 	"NewerMessages": "Uudemmat viestit",
 	"SavedMessages": "Saved messages", // Untranslated
+	"SomeoneIsTyping": "Someone is typing...", // Untranslated
+	"Typing": "typing...", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "Välitetty käyttäjältä ",

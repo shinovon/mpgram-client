@@ -304,6 +304,8 @@
 	"OlderMessages": "Старые сообщения",
 	"NewerMessages": "Новые сообщения",
 	"SavedMessages": "Сохраненные сообщения",
+	"SomeoneIsTyping": "Кто-то печатает...",
+	"Typing": "печатает...",
 	
 	// Message
 	"ForwardedFrom": "Переслано от ",
