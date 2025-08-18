@@ -335,7 +335,7 @@
 	"Removed_Action": " tret",
 	"JoinedByLink_Action": " s'ha unit a grup via enllaç d'invitació",
 	"JoinedByRequest_Action": " ser acceptat a grup",
-	"ChatHistoryCleared_Action": " ser acceptat a grup",
+	"ChatHistoryCleared_Action": "Chat history was cleared", // Untranslated
 	"GroupCreated_Action": "Grup creat",
 	"ChannelCreated_Action": "Canal creat",
 	"PhotoUpdated_Action": "Foto actualitzat",
