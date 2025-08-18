@@ -590,6 +590,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		}
 		if (nokiaEditor != null) {
 			NokiaAPI.TextEditor_setParent(nokiaEditor, this);
+			updateEditor = true;
 		}
 		if (keyboard != null) {
 			keyboard.setListener(this);
@@ -918,20 +919,22 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						if (nokiaEditor != null) {
 							if (updateEditor) {
 								updateEditor = false;
-								if (menuFocused) {
-									NokiaAPI.TextEditor_setFocus(nokiaEditor, false);
-									NokiaAPI.TextEditor_setVisible(nokiaEditor, false);
-								} else {
-									NokiaAPI.TextEditor_setSize(nokiaEditor, 10, by + 8, w - 40, bottom - 8);
-									NokiaAPI.TextEditor_setIndicatorVisibility(nokiaEditor, false);
-									NokiaAPI.TextEditor_setBackgroundColor(nokiaEditor, colors[COLOR_CHAT_PANEL_BG] | 0xFF000000);
-									NokiaAPI.TextEditor_setForegroundColor(nokiaEditor, colors[COLOR_CHAT_FG] | 0xFF000000);
-									NokiaAPI.TextEditor_setFont(nokiaEditor, MP.smallPlainFont);
-									NokiaAPI.TextEditor_setVisible(nokiaEditor, true);
-									NokiaAPI.TextEditor_setFocus(nokiaEditor, true);
-									NokiaAPI.TextEditor_setTouchEnabled(nokiaEditor, true);
-									NokiaAPI.TextEditor_setIndicatorVisibility(nokiaEditor, false);
-								}
+								try {
+									if (menuFocused) {
+										NokiaAPI.TextEditor_setFocus(nokiaEditor, false);
+										NokiaAPI.TextEditor_setVisible(nokiaEditor, false);
+									} else {
+										NokiaAPI.TextEditor_setSize(nokiaEditor, 10, by + 8, w - 40, bottom - 8);
+										NokiaAPI.TextEditor_setIndicatorVisibility(nokiaEditor, false);
+										NokiaAPI.TextEditor_setBackgroundColor(nokiaEditor, colors[COLOR_CHAT_PANEL_BG] | 0xFF000000);
+										NokiaAPI.TextEditor_setForegroundColor(nokiaEditor, colors[COLOR_CHAT_FG] | 0xFF000000);
+										NokiaAPI.TextEditor_setFont(nokiaEditor, MP.smallPlainFont);
+										NokiaAPI.TextEditor_setVisible(nokiaEditor, true);
+										NokiaAPI.TextEditor_setFocus(nokiaEditor, true);
+										NokiaAPI.TextEditor_setTouchEnabled(nokiaEditor, true);
+										NokiaAPI.TextEditor_setIndicatorVisibility(nokiaEditor, false);
+									}
+								} catch (Throwable ignored) {}
 							}
 						} else
 //#endif
@@ -2257,6 +2260,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			queueRepaint();
 		} else if ((actions & NokiaAPI.ACTION_PAINT_REQUEST) != 0) {
 			queueRepaint();
+		}
+		if ((actions & NokiaAPI.ACTION_TRAVERSE_PREVIOUS) != 0) {
+			key(-1, false);
+		}
+		if ((actions & NokiaAPI.ACTION_TRAVERSE_NEXT) != 0) {
+			key(-2, false);
 		}
 	}
 //#endif
