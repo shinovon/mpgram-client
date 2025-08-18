@@ -111,6 +111,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	Image mediaImage;
 	
 	boolean updateColors;
+	int focusDir = 1;
 	
 	UIMessage(JSONObject message, ChatCanvas chat) {
 		focusable = true;
@@ -463,7 +464,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		
 		g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_BG : COLOR_MESSAGE_BG]);
 		g.fillRect(x, y, cw, h);
-		if (focus && focusChild == null && subFocusCurrent == -1 && !((ChatCanvas) container).touch) {
+		if (focus && focusChild == null && subFocusCurrent == -1 && focusDir != 0) {
 			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_FOCUS_BORDER]);
 			g.drawRect(x, y, cw - 1, h - 1);
 		} else {
@@ -882,6 +883,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	}
 	
 	boolean grabFocus(int dir) {
+		focusDir = dir;
 		focus = true;
 		if (((ChatCanvas) container).selected != 0) {
 			subFocusCurrent = -1;
