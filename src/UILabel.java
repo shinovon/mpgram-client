@@ -64,7 +64,7 @@ public class UILabel extends UIItem {
 		for (int i = 0; i < l; ++i) {
 			Object[] obj = (Object[]) render.elementAt(i);
 			int[] pos = (int[]) obj[3];
-			if (getVisibility(pos) != 0) continue;
+//			if (getVisibility(pos) != 0) continue;
 			Font font = (Font) obj[1];
 			String text = (String) obj[0];
 			int tx = x + pos[0], ty = y + pos[1];
