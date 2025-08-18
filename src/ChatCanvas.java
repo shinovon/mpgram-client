@@ -1689,12 +1689,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 	
 	private boolean isCornerVisible(UIItem item, int dir) {
-		if (dir == -1) {
+		if (dir == (reverse ? 1 : -1)) {
 			// isTopVisible
 			return item.y >= scroll && item.y < scroll + height;
 		} else {
 			// isBottomVisible
-			return item.y + item.contentHeight >= scroll && item.y + item.contentHeight < scroll + clipHeight;
+			return item.y + item.contentHeight > scroll && item.y + item.contentHeight <= scroll + clipHeight;
 		}
 	}
 	
