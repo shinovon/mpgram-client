@@ -212,6 +212,9 @@
 	"BuiltinImageViewer": "Built-in image viewer",
 	"LargeMusicCover": "Large player cover",
 	"LegacyUI": "Legacy UI",
+	"Keyboard": "Keyboard",
+	"Auto": "Auto",
+	"FullscreenTextBox": "Fullscreen text-box",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Wait for page to load",

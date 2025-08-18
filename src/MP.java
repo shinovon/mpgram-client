@@ -243,6 +243,7 @@ public class MP extends MIDlet
 	static int downloadMethod; // 0 - always ask, 1 - in app, 2 - browser
 	static String downloadPath;
 	static boolean longpoll = true;
+	static int textMethod; // 0 - auto, 1 - nokiaui, 2 - j2mekeyboard, 3 - fullscreen textbox
 	
 	// platform
 	static boolean symbianJrt;
@@ -263,7 +264,9 @@ public class MP extends MIDlet
 	static boolean sending;
 	static boolean updatesRunning;
 	static Object updatesLock = new Object();
+//#ifndef NO_FILE
 	static boolean downloading;
+//#endif
 	
 	private static final Object imagesLoadLock = new Object();
 	private static final Vector imagesToLoad = new Vector(); // TODO hashtable?
@@ -407,8 +410,13 @@ public class MP extends MIDlet
 	private static Gauge pushIntervalGauge;
 	private static Gauge pushBgIntervalGauge;
 //#endif
+//#ifndef NO_FILE
 	private static ChoiceGroup downloadMethodChoice;
 	private static TextField downloadPathField;
+//#endif
+//#ifndef NO_CHAT_CANVAS
+	private static ChoiceGroup textMethodChoice;
+//#endif
 	
 	// write items
 	private static TextField messageField;
@@ -661,6 +669,9 @@ public class MP extends MIDlet
 		reopenChat = s40;
 		longpoll = !s40;
 		parseRichtext = !s40;
+		if (blackberry) {
+			textMethod = 3;
+		}
 		
 		// load settings
 		try {
@@ -717,6 +728,7 @@ public class MP extends MIDlet
 //#endif
 //#ifndef NO_CHAT_CANVAS
 			legacyChatUI = j.getBoolean("legacyChatUI", legacyChatUI);
+			textMethod = j.getInt("textMethod", textMethod);
 //#endif
 //#ifndef NO_FILE
 			downloadPath = j.getString("downloadPath", downloadPath);
@@ -1999,6 +2011,7 @@ public class MP extends MIDlet
 			} catch (Exception ignored) {}
 			break;
 		}
+//#ifndef NO_FILE
 		case RUN_DOWNLOAD_DOCUMENT: {
 			downloading = true;
 			String downloadPath = (String) param;
@@ -2104,6 +2117,7 @@ public class MP extends MIDlet
 			display(errorAlert(error), current);
 			break;
 		}
+//#endif
 		}
 //		running--;
 	}
@@ -2531,6 +2545,18 @@ public class MP extends MIDlet
 					uiChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(uiChoice);
 					
+//#ifndef NO_CHAT_CANVAS
+					textMethodChoice = new ChoiceGroup(L[LKeyboard], Choice.POPUP, new String[] {
+							L[LAuto],
+							"Nokia UI",
+							"j2mekeyboard",
+							L[LFullscreenTextBox]
+					}, null);
+					textMethodChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					textMethodChoice.setSelectedIndex(textMethod, true);
+					f.append(textMethodChoice);
+//#endif
+					
 					photoSizeGauge = new Gauge(L[LThumbnailsSize], true, 64, Math.min(64, photoSize / 8));
 					photoSizeGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(photoSizeGauge);
@@ -2745,6 +2771,8 @@ public class MP extends MIDlet
 				fullPlayerCover = uiChoice.isSelected(++i);
 //#ifndef NO_CHAT_CANVAS
 				legacyChatUI = uiChoice.isSelected(++i);
+				
+				textMethod = textMethodChoice.getSelectedIndex();
 //#endif
 				
 				if ((photoSize = (photoSizeGauge.getValue() * 8)) < 16) {
@@ -2862,6 +2890,7 @@ public class MP extends MIDlet
 //#endif
 //#ifndef NO_CHAT_CANVAS
 					j.put("legacyChatUI", legacyChatUI);
+					j.put("textMethod", textMethod);
 //#endif
 //#ifndef NO_FILE
 					j.put("downloadPath", downloadPath);
@@ -3141,11 +3170,13 @@ public class MP extends MIDlet
 //#endif
 			return;
 		}
+//#ifndef NO_FILE
 		if (c == cancelCmd && (d instanceof List) && !(d instanceof ChatsList) && fileMode) {
 			// go back to write form from file picker
 			goBackTo(writeForm);
 			return;
 		}
+//#endif
 		if (c == goCmd) { // url dialog submit
 			commandAction(backCmd, d);
 			
@@ -3224,6 +3255,7 @@ public class MP extends MIDlet
 			return;
 		}
 //#endif
+//#ifndef NO_FILE
 		{ // download dialog
 			if (c == downloadInappCmd) {
 				downloadContinue(1);
@@ -3246,6 +3278,7 @@ public class MP extends MIDlet
 				return;
 			}
 		}
+//#endif
 		if (c == backCmd || c == cancelCmd) {
 			// cancel ota update dialog
 			updateUrl = null;
@@ -3936,7 +3969,7 @@ public class MP extends MIDlet
 		f.addCommand(sendCmd);
 		
 		TextField t = new TextField(L[LMessage], text, 500, TextField.ANY);
-		t.addCommand(sendCmd);
+//		t.addCommand(sendCmd);
 		t.setItemCommandListener(midlet);
 		f.append(messageField = t);
 		
@@ -4135,10 +4168,13 @@ public class MP extends MIDlet
 	}
 	
 	void downloadDocument(String peerId, String msgId, String fileName, String size) {
+//#ifndef NO_FILE
 		if (downloading) return;
+//#endif
+		downloadMessage = new String[] { peerId, msgId, fileName, size };
+//#ifndef NO_FILE
 		if (fileName != null && downloadMethod != 2
 				&& (!reopenChat || (!fileName.endsWith(".jar") && !fileName.endsWith(".jad")))) {
-			downloadMessage = new String[] { peerId, msgId, fileName, size };
 			if (downloadMethod == 0) {
 				Alert a = new Alert(fileName);
 				a.setString(L[LChooseDownloadMethod_Alert]);
@@ -4151,10 +4187,12 @@ public class MP extends MIDlet
 			downloadContinue(1);
 			return;
 		}
+//#endif
 		downloadContinue(2);
 	}
 	
 	void downloadContinue(int state) {
+//#ifndef NO_FILE
 		if (downloading) return;
 		if (state == 1) {
 			if (downloadPath == null || downloadPath.trim().length() == 0) {
@@ -4165,6 +4203,7 @@ public class MP extends MIDlet
 				return;
 			}
 		}
+//#endif
 		String peerId = downloadMessage[0];
 		String msgId = downloadMessage[1];
 		String fileName = downloadMessage[2];
@@ -4218,7 +4257,7 @@ public class MP extends MIDlet
 			sb.append(" \nStack trace: \n").append(stackTrace);
 		}
 		
-		Alert a = new Alert(L[Lmpgram]);
+		Alert a = new Alert(symbian ? L[Lmpgram] : "");
 		a.setType(AlertType.ERROR);
 		a.setString(sb.toString());
 		a.setTimeout(4000);
@@ -4234,7 +4273,7 @@ public class MP extends MIDlet
 	}
 
 	static Alert alert(String title, String text, AlertType type) {
-		Alert a = new Alert(title == null ? L[Lmpgram] : title);
+		Alert a = new Alert(title == null ? (symbian ? L[Lmpgram] : "") : title);
 		a.setType(type);
 		a.setString(text);
 		a.setTimeout(type == AlertType.ERROR ? 3000 : 1500);
@@ -4242,7 +4281,7 @@ public class MP extends MIDlet
 	}
 
 	static Alert loadingAlert(String s) {
-		Alert a = new Alert(L[Lmpgram], s == null ? L[LLoading] : s, null, null);
+		Alert a = new Alert(symbian ? L[Lmpgram] : "", s == null ? L[LLoading] : s, null, null);
 		a.setCommandListener(midlet);
 		a.addCommand(Alert.DISMISS_COMMAND);
 		a.setIndicator(new Gauge(null, false, Gauge.INDEFINITE, Gauge.CONTINUOUS_RUNNING));

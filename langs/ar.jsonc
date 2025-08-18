@@ -212,6 +212,9 @@
 	"BuiltinImageViewer": "عارض الصور المدمج",
 	"LargeMusicCover": "غلاف كبير لمشغل الوسائط", 
 	"LegacyUI": "Legacy UI", // Untranslated
+	"Keyboard": "Keyboard", // Untranslated
+	"Auto": "Auto", // Untranslated
+	"FullscreenTextBox": "Fullscreen text-box", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "انتظار تحميل الصفحة",

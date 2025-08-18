@@ -212,6 +212,9 @@
 	"BuiltinImageViewer": "Visualizador de imagens embutido",
 	"LargeMusicCover": "Capa grande para música", 
 	"LegacyUI": "Legacy UI", // Untranslated
+	"Keyboard": "Keyboard", // Untranslated
+	"Auto": "Auto", // Untranslated
+	"FullscreenTextBox": "Fullscreen text-box", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Aguardar carregamento da página",

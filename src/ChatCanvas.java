@@ -168,6 +168,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	int editMsgId;
 	String file;
 	static Keyboard keyboard;
+	static Object nokiaEditor;
+	boolean updateEditor;
 	
 	ChatCanvas() {
 		setFullScreenMode(true);
@@ -218,15 +220,45 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		}
 		
 		// initialize keyboard
-		if (keyboard == null) {
-			keyboard = Keyboard.getKeyboard(this, false, getWidth(), getHeight());
-			keyboard.setTextColor(colors[COLOR_CHAT_FG]);
-			keyboard.setTextHintColor(colors[COLOR_CHAT_INPUT_ICON]);
-			keyboard.setCaretColor(colors[COLOR_CHAT_FG]);
-			keyboard.setTextHint(MP.L[LTextField_Hint]);
-		} else {
-			keyboard.setListener(this);
-			keyboard.reset();
+		switch (MP.textMethod) {
+		case 0: // auto
+		case 1: // nokiaui
+//#ifndef NO_NOKIAUI
+			try {
+				if (nokiaEditor == null) {
+					nokiaEditor = NokiaAPI.createTextEditor(500, TextField.ANY, 40, 40);
+				}
+				if (nokiaEditor != null) {
+					NokiaAPI.TextEditor_setParent(nokiaEditor, this);
+					NokiaAPI.TextEditor_setContent(nokiaEditor, "");
+					NokiaAPI.TextEditor_setMultiline(nokiaEditor, true);
+				}
+			} catch (Throwable ignored) {
+				ignored.printStackTrace();
+			}
+			if (nokiaEditor != null) {
+				updateEditor = true;
+				keyboard = null;
+				break;
+			}
+//#endif
+			if (MP.textMethod == 1) break;
+		case 2: // j2mekeyboard
+			nokiaEditor = null;
+			if (keyboard == null) {
+				keyboard = Keyboard.getKeyboard(this, false, getWidth(), getHeight());
+				keyboard.setTextColor(colors[COLOR_CHAT_FG]);
+				keyboard.setTextHintColor(colors[COLOR_CHAT_INPUT_ICON]);
+				keyboard.setCaretColor(colors[COLOR_CHAT_FG]);
+				keyboard.setTextHint(MP.L[LTextField_Hint]);
+			} else {
+				keyboard.setListener(this);
+				keyboard.reset();
+			}
+			break;
+		case 3: // textbox
+			keyboard = null;
+			nokiaEditor = null;
 		}
 	}
 	
@@ -533,6 +565,14 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	public void closed(boolean destroy) {
 		if (destroy) cancel();
 		closeMenu();
+//#ifndef NO_NOKIAUI
+		if (nokiaEditor != null) {
+			NokiaAPI.TextEditor_setFocus(nokiaEditor, false);
+			NokiaAPI.TextEditor_setVisible(nokiaEditor, false);
+			NokiaAPI.TextEditor_setParent(nokiaEditor, null);
+			nokiaEditor = null;
+		}
+//#endif
 		if (keyboard != null && keyboard.isVisible()) {
 			keyboard.reset();
 			keyboard.hide();
@@ -848,7 +888,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				} else if (fieldFocused) {
 					// TODO
 					by += 1;
-					g.drawString(MP.L[LChat], 2, by, Graphics.TOP | Graphics.LEFT);
+					g.drawString(MP.L[LMenu], 2, by, Graphics.TOP | Graphics.LEFT);
 					g.drawString(MP.L[LBack], w - 2, by, Graphics.TOP | Graphics.RIGHT);
 					if (hasInput && canWrite)
 						g.drawString(MP.L[LWrite], w >> 1, by, Graphics.TOP | Graphics.HCENTER);
@@ -874,6 +914,27 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							g.drawString(MP.L[LEdit], 2, by - MP.smallBoldFontHeight, 0);
 						}
 						g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
+//#ifndef NO_NOKIAUI
+						if (nokiaEditor != null) {
+							if (updateEditor) {
+								updateEditor = false;
+								if (menuFocused) {
+									NokiaAPI.TextEditor_setFocus(nokiaEditor, false);
+									NokiaAPI.TextEditor_setVisible(nokiaEditor, false);
+								} else {
+									NokiaAPI.TextEditor_setSize(nokiaEditor, 10, by + 8, w - 40, bottom - 8);
+									NokiaAPI.TextEditor_setIndicatorVisibility(nokiaEditor, false);
+									NokiaAPI.TextEditor_setBackgroundColor(nokiaEditor, colors[COLOR_CHAT_PANEL_BG] | 0xFF000000);
+									NokiaAPI.TextEditor_setForegroundColor(nokiaEditor, colors[COLOR_CHAT_FG] | 0xFF000000);
+									NokiaAPI.TextEditor_setFont(nokiaEditor, MP.smallPlainFont);
+									NokiaAPI.TextEditor_setVisible(nokiaEditor, true);
+									NokiaAPI.TextEditor_setFocus(nokiaEditor, true);
+									NokiaAPI.TextEditor_setTouchEnabled(nokiaEditor, true);
+									NokiaAPI.TextEditor_setIndicatorVisibility(nokiaEditor, false);
+								}
+							}
+						} else
+//#endif
 						if (keyboard != null) {
 							keyboard.drawTextBox(g, 10, by, w - 40, bottom);
 							if (keyboard.isVisible()) keyboard.drawOverlay(g);
@@ -887,7 +948,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							g.drawString(text, 10, by + ((bottom - MP.smallPlainFontHeight) >> 1), 0);
 						}
 							
-						if ((text != null && text.length() != 0) || file != null) {
+						if ((text != null && text.trim().length() != 0) || file != null) {
 							// send icon
 							int ty = by + ((bottom - 20) >> 1);
 							
@@ -1424,7 +1485,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					MP.midlet.start(MP.RUN_JOIN_CHANNEL, id);
 				} else if (canWrite) {
 					if (x > width - 48) {
-						if ((text != null && text.length() != 0) || file != null) {
+						if ((text != null && text.trim().length() != 0) || file != null) {
 							// send TODO
 							if (!MP.sending) {
 								MP.sending = true;
@@ -1441,7 +1502,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						}
 					} else { 
 //						MP.midlet.commandAction(MP.writeCmd, this);
-						if (keyboard != null) {
+						if (nokiaEditor != null) {
+						} else if (keyboard != null) {
 							keyboard.show();
 						} else {
 							if (text == null) text = "";
@@ -1521,6 +1583,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 
 	protected void sizeChanged(int width, int height) {
 		skipRender = false;
+		updateEditor = true;
 		MP.smallPlainFontHeight = MP.smallPlainFont.getHeight();
 		MP.smallPlainFontSpaceWidth = MP.smallPlainFont.charWidth(' ');
 		MP.smallBoldFontHeight = MP.smallBoldFont.getHeight();
@@ -1745,6 +1808,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		menuCurrent = touch ? -1 : 0;
 		menuFocused = true;
 		skipRender = false;
+		updateEditor = true;
 		int len = menu.length;
 		for (int i = 0; i < len; i++) {
 			if (menu[i] == Integer.MIN_VALUE) {
@@ -1777,6 +1841,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		}
 		updateColors();
 		skipRender = false;
+		updateEditor = true;
 	}
 	
 	public void requestPaint(UIItem item) {
@@ -1841,6 +1906,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 //			fieldFocused = true;
 			MP.display(MP.writeForm(id, null, item.origText, Integer.toString(item.id), null, null));
 		}
+//#ifndef NO_NOKIAUI
+		if (nokiaEditor != null) {
+			NokiaAPI.TextEditor_setContent(nokiaEditor, text);
+		}
+//#endif
 		if (keyboard != null) {
 			keyboard.setText(text);
 		}
@@ -1863,6 +1933,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		replyMsgId = 0;
 		editMsgId = 0;
 		file = null;
+//#ifndef NO_NOKIAUI
+		if (nokiaEditor != null) {
+			NokiaAPI.TextEditor_setContent(nokiaEditor, "");
+		}
+//#endif
 		if (keyboard != null) {
 			keyboard.clear();
 		}
@@ -2168,6 +2243,20 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		// TODO
 		return false;
 	}
+
+//#ifndef NO_NOKIAUI
+	// TextEditorListener
+
+	public void inputAction(int actions) {
+		// TODO
+		if ((actions & NokiaAPI.ACTION_CONTENT_CHANGE) != 0) {
+			text = NokiaAPI.TextEditor_getContent(nokiaEditor);
+			queueRepaint();
+		} else if ((actions & NokiaAPI.ACTION_PAINT_REQUEST) != 0) {
+			queueRepaint();
+		}
+	}
+//#endif
 	
 	//
 	

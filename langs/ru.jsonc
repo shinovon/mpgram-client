@@ -212,6 +212,9 @@
 	"BuiltinImageViewer": "Встроен. просмотр изображений",
 	"LargeMusicCover": "Большая обложка в плеере",
 	"LegacyUI": "Простой интерфейс",
+	"Keyboard": "Клавиатура",
+	"Auto": "Автоматически",
+	"FullscreenTextBox": "Полноэкр. ввод",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Ждать полной загрузки",

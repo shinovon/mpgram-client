@@ -212,6 +212,9 @@
 	"BuiltinImageViewer": "Näytä kuvat sovelluksessa",
 	"LargeMusicCover": "Suuri soittimen kansikuva",
 	"LegacyUI": "Legacy UI", // Untranslated
+	"Keyboard": "Keyboard", // Untranslated
+	"Auto": "Auto", // Untranslated
+	"FullscreenTextBox": "Fullscreen text-box", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Odota sivun latausta",
