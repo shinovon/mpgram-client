@@ -215,6 +215,7 @@
 	"Keyboard": "Keyboard", // Untranslated
 	"Auto": "Auto", // Untranslated
 	"FullscreenTextBox": "Fullscreen text-box", // Untranslated
+	"Theme": "Theme", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "انتظار تحميل الصفحة",

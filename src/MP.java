@@ -2586,7 +2586,7 @@ public class MP extends MIDlet
 					textMethodChoice.setSelectedIndex(textMethod, true);
 					f.append(textMethodChoice);
 					
-					themeChoice = new ChoiceGroup(L[LLanguage], Choice.POPUP, THEMES[1], null);
+					themeChoice = new ChoiceGroup(L[LTheme], Choice.POPUP, THEMES[1], null);
 					for (i = 0; i < THEMES[0].length; ++i) {
 						if (theme.equals(THEMES[0][i])) {
 							themeChoice.setSelectedIndex(i, true);

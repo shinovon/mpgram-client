@@ -215,6 +215,7 @@
 	"Keyboard": "Клавиатура",
 	"Auto": "Автоматически",
 	"FullscreenTextBox": "Полноэкр. ввод",
+	"Theme": "Тема",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Ждать полной загрузки",

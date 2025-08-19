@@ -215,6 +215,7 @@
 	"Keyboard": "Keyboard",
 	"Auto": "Auto",
 	"FullscreenTextBox": "Fullscreen text-box",
+	"Theme": "Theme",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Wait for page to load",
