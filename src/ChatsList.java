@@ -224,14 +224,21 @@ public class ChatsList extends MPList {
 			// forward
 			MP.deleteFromHistory(this);
 //#ifndef NO_CHAT_CANVAS
-			if (msgs != null) {
-				// TODO
-				
+			if (!MP.legacyChatUI) {
+				if (MP.current instanceof ChatCanvas && id.equals(((ChatCanvas) MP.current).id)) {
+					((ChatCanvas) MP.current).startForward(peerId, msgId, msgs);
+					return;
+				}
+				if (msgs != null) {
+					MP.openLoad(new ChatCanvas(id, 0, msgs));
+					return;
+				}
+				MP.openLoad(new ChatCanvas(id, 0, peerId, msgId));
 				return;
 			}
 //#endif
 			
-			MP.display(new ChatForm(id, null, 0, 0));
+			MP.openChat(id, 0);
 			MP.display(MP.writeForm(id, null, "", null, peerId, msgId));
 			return;
 		}

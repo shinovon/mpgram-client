@@ -175,6 +175,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	boolean updateEditor;
 	int inputFieldHeight;
 	boolean inputFocused;
+	UIMessage[] forwardMsgs;
+	String forwardPeer, forwardMsg;
 	
 	ChatCanvas() {
 		setFullScreenMode(true);
@@ -283,6 +285,26 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		this.topMsgId = topMsg;
 		init(query == null);
 	}
+	
+	// forward multiple message
+	public ChatCanvas(String id, int topMsg, UIMessage[] forward) {
+		this();
+		this.id = id;
+		this.topMsgId = topMsg;
+		this.forwardMsgs = forward;
+		init(query == null);
+	}
+	
+	// forward one message
+	public ChatCanvas(String id, int topMsg, String forwardPeerId, String forwardMsgId) {
+		this();
+		this.id = id;
+		this.topMsgId = topMsg;
+		this.forwardPeer = forwardPeerId;
+		this.forwardMsg = forwardMsgId;
+		init(query == null);
+	}
+	
 	
 	// create in media mode
 	public ChatCanvas(String id, String mediaFilter, int topMsg) {
@@ -535,6 +557,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			loading = false;
 			if (touch && hasInput && (canWrite || left) && mediaFilter == null && query == null) {
 				bottom = inputFieldHeight = Math.max(MP.medPlainFontHeight + 16, 40);
+				if (forwardMsgs != null || forwardMsg != null) {
+					bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
+				}
 			} else {
 				bottom = 0;
 			}
@@ -923,7 +948,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					}
 				} else if (touch || inputFocused) {
 					if (canWrite && hasInput) {
-						// TODO
 						g.setFont(MP.smallBoldFont);
 						g.setColor(colors[COLOR_CHAT_SEND_ICON]);
 						if (replyMsgId != 0) {
@@ -931,6 +955,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						}
 						if (editMsgId != 0) {
 							g.drawString(MP.L[LEdit], 2, iy - MP.smallBoldFontHeight - 4, 0);
+						}
+						if (forwardMsgs != null || forwardMsg != null) {
+							g.drawString(MP.L[LForward], 2, iy - MP.smallBoldFontHeight - 4, 0);
 						}
 						if (ih != bottom) {
 							g.setColor(colors[COLOR_CHAT_INPUT_BORDER]);
@@ -978,7 +1005,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							g.drawString(text, 10, iy + ((ih - MP.smallPlainFontHeight) >> 1), 0);
 						}
 							
-						if ((text != null && text.trim().length() != 0) || file != null) {
+						if ((text != null && text.trim().length() != 0) || file != null || forwardMsgs != null || forwardMsg != null) {
 							// send icon
 							int ty = iy + ((ih - 20) >> 1);
 							
@@ -1519,7 +1546,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				} else if (canWrite) {
 					if (y < height - inputFieldHeight) {
 						if (x > width - 48) {
-							if (editMsgId != 0) {
+							if (editMsgId != 0 || forwardMsgs != null || forwardMsg != null) {
 								resetInput();
 							} else {
 								replyMsgId = 0;
@@ -1527,7 +1554,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							}
 						}
 					} else if (x > width - 48) {
-						if ((text != null && text.trim().length() != 0) || file != null) {
+						if ((text != null && text.trim().length() != 0) || file != null || forwardMsgs != null || forwardMsg != null) {
 							// send
 							if (!MP.sending) {
 								MP.sending = true;
@@ -1536,7 +1563,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 										replyMsgId == 0 ? null : Integer.toString(replyMsgId),
 										editMsgId == 0 ? null : Integer.toString(editMsgId),
 										file,
-										null, null, null
+										null, forwardPeer, forwardMsg, forwardMsgs
 										});
 							}
 						} else {
@@ -1973,7 +2000,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	public void startReply(UIMessage item) {
 		// TODO
-		if (editMsgId != 0) resetInput();
+		if (editMsgId != 0 || forwardMsgs != null || forwardMsg != null) resetInput();
 		replyMsgId = item.id;
 		bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
 		if (!touch) {
@@ -1983,12 +2010,26 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		queueRepaint();
 	}
 	
+	public void startForward(String peer, String msg, UIMessage[] msgs) {
+		resetInput();
+		MP.display(this);
+		this.forwardPeer = peer;
+		this.forwardMsg = msg;
+		this.forwardMsgs = msgs;
+		bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
+
+		queueRepaint();
+	}
+	
 	private void resetInput() {
 		text = "";
 		replyMsgId = 0;
 		editMsgId = 0;
 		file = null;
 		bottom = inputFieldHeight;
+		forwardPeer = null;
+		forwardMsg = null;
+		forwardMsgs = null;
 //#ifndef NO_NOKIAUI
 		if (nokiaEditor != null) {
 			NokiaAPI.TextEditor_setContent(nokiaEditor, "");

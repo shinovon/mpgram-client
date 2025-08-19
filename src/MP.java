@@ -1327,8 +1327,11 @@ public class MP extends MIDlet
 				String edit = (String) ((Object[]) param)[3];
 				String file = (String) ((Object[]) param)[4];
 				ChoiceGroup sendChoice = (ChoiceGroup) ((Object[]) param)[5];
-				String fwdPeer = (String)  ((Object[]) param)[6];
-				String fwdMsg = (String)  ((Object[]) param)[7];
+				String fwdPeer = (String) ((Object[]) param)[6];
+				String fwdMsg = (String) ((Object[]) param)[7];
+//#ifndef NO_CHAT_CANVAS
+				UIMessage[] fwdMsgs = ((Object[]) param).length < 9 ? null : (UIMessage[]) ((Object[]) param)[8];
+//#endif
 				if (file != null && file.length() <= 8) {
 					file = null;
 				}
@@ -1356,6 +1359,16 @@ public class MP extends MIDlet
 							sb.append("&spoiler=1");
 						}
 					}
+//#ifndef NO_CHAT_CANVAS
+					if (fwdMsgs != null) {
+						if (fwdMsgs.length == 1) {
+							sb.append("&fwd_from=").append(fwdMsgs[0].peerId)
+							.append("&id=").append(fwdMsgs[0].id);
+						} else {
+							// TODO there is no api parameter for this yet
+						}
+					} else
+//#endif
 					if (fwdPeer != null && fwdMsg != null) {
 						sb.append("&fwd_from=").append(fwdPeer)
 						.append("&id=").append(fwdMsg);
@@ -4364,6 +4377,9 @@ public class MP extends MIDlet
 	static void deleteFromHistory(Displayable d) {
 		synchronized (formHistory) {
 			formHistory.removeElement(d);
+			if (display.getCurrent() == d) {
+				display((Displayable) formHistory.lastElement());
+			}
 		}
 	}
 	
