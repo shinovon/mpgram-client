@@ -150,6 +150,21 @@ public class MP extends MIDlet
 		}
 	};
 	
+	static final String[][] THEMES = {
+		{
+			"tint",
+			"webdark",
+			"weblight",
+			"edge",
+		},
+		{
+			"Tint",
+			"Web Dark",
+			"Web Light",
+			"Edge",
+		}
+	};
+	
 //#ifdef MINI
 //#	static final boolean MINI_BUILD = true;
 //#else
@@ -244,6 +259,7 @@ public class MP extends MIDlet
 	static String downloadPath;
 	static boolean longpoll = true;
 	static int textMethod; // 0 - auto, 1 - nokiaui, 2 - j2mekeyboard, 3 - fullscreen textbox
+	static String theme = "weblight";
 	
 	// platform
 	static boolean symbianJrt;
@@ -417,6 +433,7 @@ public class MP extends MIDlet
 //#endif
 //#ifndef NO_CHAT_CANVAS
 	private static ChoiceGroup textMethodChoice;
+	private static ChoiceGroup themeChoice;
 //#endif
 	
 	// write items
@@ -2568,6 +2585,16 @@ public class MP extends MIDlet
 					textMethodChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					textMethodChoice.setSelectedIndex(textMethod, true);
 					f.append(textMethodChoice);
+					
+					themeChoice = new ChoiceGroup(L[LLanguage], Choice.POPUP, THEMES[1], null);
+					for (i = 0; i < THEMES[0].length; ++i) {
+						if (theme.equals(THEMES[0][i])) {
+							themeChoice.setSelectedIndex(i, true);
+							break;
+						}
+					}
+					themeChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(themeChoice);
 //#endif
 					
 					photoSizeGauge = new Gauge(L[LThumbnailsSize], true, 64, Math.min(64, photoSize / 8));
@@ -2786,6 +2813,11 @@ public class MP extends MIDlet
 				legacyChatUI = uiChoice.isSelected(++i);
 				
 				textMethod = textMethodChoice.getSelectedIndex();
+				String prevTheme = theme;
+				theme = THEMES[0][themeChoice.getSelectedIndex()];
+				if (!theme.equals(prevTheme)) {
+					ChatCanvas.colorsCopy = null;
+				}
 //#endif
 				
 				if ((photoSize = (photoSizeGauge.getValue() * 8)) < 16) {
@@ -2904,6 +2936,7 @@ public class MP extends MIDlet
 //#ifndef NO_CHAT_CANVAS
 					j.put("legacyChatUI", legacyChatUI);
 					j.put("textMethod", textMethod);
+					j.put("theme", theme);
 //#endif
 //#ifndef NO_FILE
 					j.put("downloadPath", downloadPath);

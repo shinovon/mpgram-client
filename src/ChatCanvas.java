@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 //#ifndef NO_CHAT_CANVAS
+import java.io.DataInputStream;
 import java.util.Hashtable;
 
 import javax.microedition.lcdui.Alert;
@@ -49,6 +50,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	static final int COLOR_CHAT_POINTER_HOLD = 11;
 	static final int COLOR_CHAT_INPUT_ICON = 12;
 	static final int COLOR_CHAT_SEND_ICON = 13;
+	static final int COLOR_CHAT_INPUT_BORDER = 14;
 	
 	static int[] colors = new int[40];
 	static int[] colorsCopy;
@@ -113,6 +115,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	int scroll;
 	int scrollTarget;
 	int lastScrollDir;
+	int lastDragDir;
 	UIItem scrollCurrentItem, scrollTargetItem;
 	UIItem focusedItem;
 	UIItem nextFocusItem;
@@ -177,37 +180,47 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		setFullScreenMode(true);
 		
 		if (colorsCopy == null) {
-			colors[COLOR_CHAT_BG] = 0x0E1621;
-			colors[COLOR_CHAT_FG] = 0xFFFFFF;
-			colors[COLOR_CHAT_HIGHLIGHT_BG] = 0x1A3756;
-			colors[COLOR_CHAT_PANEL_BG] = 0x17212B;
-			colors[COLOR_CHAT_PANEL_FG] = 0xFFFFFF;
-			colors[COLOR_CHAT_PANEL_BORDER] = 0x0A121B;
-			colors[COLOR_CHAT_MENU_BG] = 0x17212B;
-			colors[COLOR_CHAT_MENU_HIGHLIGHT_BG] = 0x232E3C;
-			colors[COLOR_CHAT_MENU_FG] = 0xFFFFFF;
-			colors[COLOR_CHAT_STATUS_FG] = 0x708499;
-			colors[COLOR_CHAT_STATUS_HIGHLIGHT_FG] = 0x73B9F5;
-			colors[COLOR_CHAT_POINTER_HOLD] = 0xFFFFFF;
-			colors[COLOR_CHAT_INPUT_ICON] = 0x6A7580;
-			colors[COLOR_CHAT_SEND_ICON] = 0x5288C1;
-			
-			colors[UIMessage.COLOR_MESSAGE_BG] = 0x182533;
-			colors[UIMessage.COLOR_MESSAGE_OUT_BG] = 0x2B5278;
-			colors[UIMessage.COLOR_MESSAGE_FG] = 0xFFFFFF;
-			colors[UIMessage.COLOR_MESSAGE_LINK] = 0x71BAFA;
-			colors[UIMessage.COLOR_MESSAGE_LINK_FOCUS] = 0xABABAB; // TODO
-			colors[UIMessage.COLOR_MESSAGE_SENDER] = 0x71BAFA;
-			colors[UIMessage.COLOR_MESSAGE_ATTACHMENT_BORDER] = 0x6AB3F3;
-			colors[UIMessage.COLOR_MESSAGE_ATTACHMENT_TITLE] = 0xFFFFFF;
-			colors[UIMessage.COLOR_MESSAGE_ATTACHMENT_SUBTITLE] = 0x7DA8D3;
-			colors[UIMessage.COLOR_MESSAGE_ATTACHMENT_FOCUS_BG] = 0x1A3756;
-			colors[UIMessage.COLOR_MESSAGE_COMMENT_BORDER] = 0x31404E;
-			colors[UIMessage.COLOR_MESSAGE_IMAGE] = 0xABABAB; // TODO
-			colors[UIMessage.COLOR_MESSAGE_FOCUS_BORDER] = 0xFFFFFF;
-			colors[UIMessage.COLOR_MESSAGE_TIME] = 0x6D7F8F;
-			colors[UIMessage.COLOR_MESSAGE_OUT_TIME] = 0x7DA8D3;
-			colors[UIMessage.COLOR_ACTION_BG] = 0x1E2C3A;
+			try {
+				DataInputStream d = new DataInputStream(getClass().getResourceAsStream("/c/".concat(MP.theme)));
+				d.readUTF();
+				for (int i = 0; i < 40; ++i) {
+					colors[i] = d.readInt();
+				}
+				d.close();
+			} catch (Exception e) {
+				colors[COLOR_CHAT_BG] = 0x0E1621;
+				colors[COLOR_CHAT_FG] = 0xFFFFFF;
+				colors[COLOR_CHAT_HIGHLIGHT_BG] = 0x1A3756;
+				colors[COLOR_CHAT_PANEL_BG] = 0x17212B;
+				colors[COLOR_CHAT_PANEL_FG] = 0xFFFFFF;
+				colors[COLOR_CHAT_PANEL_BORDER] = 0x0A121B;
+				colors[COLOR_CHAT_MENU_BG] = 0x17212B;
+				colors[COLOR_CHAT_MENU_HIGHLIGHT_BG] = 0x232E3C;
+				colors[COLOR_CHAT_MENU_FG] = 0xFFFFFF;
+				colors[COLOR_CHAT_STATUS_FG] = 0x708499;
+				colors[COLOR_CHAT_STATUS_HIGHLIGHT_FG] = 0x73B9F5;
+				colors[COLOR_CHAT_POINTER_HOLD] = 0xFFFFFF;
+				colors[COLOR_CHAT_INPUT_ICON] = 0x6A7580;
+				colors[COLOR_CHAT_SEND_ICON] = 0x5288C1;
+				colors[COLOR_CHAT_INPUT_BORDER] = 0x01C272D;
+				
+				colors[UIMessage.COLOR_MESSAGE_BG] = 0x182533;
+				colors[UIMessage.COLOR_MESSAGE_OUT_BG] = 0x2B5278;
+				colors[UIMessage.COLOR_MESSAGE_FG] = 0xFFFFFF;
+				colors[UIMessage.COLOR_MESSAGE_LINK] = 0x71BAFA;
+				colors[UIMessage.COLOR_MESSAGE_LINK_FOCUS] = 0xABABAB;
+				colors[UIMessage.COLOR_MESSAGE_SENDER] = 0x71BAFA;
+				colors[UIMessage.COLOR_MESSAGE_ATTACHMENT_BORDER] = 0x6AB3F3;
+				colors[UIMessage.COLOR_MESSAGE_ATTACHMENT_TITLE] = 0xFFFFFF;
+				colors[UIMessage.COLOR_MESSAGE_ATTACHMENT_SUBTITLE] = 0x7DA8D3;
+				colors[UIMessage.COLOR_MESSAGE_ATTACHMENT_FOCUS_BG] = 0x1A3756;
+				colors[UIMessage.COLOR_MESSAGE_COMMENT_BORDER] = 0x31404E;
+				colors[UIMessage.COLOR_MESSAGE_IMAGE] = 0xABABAB;
+				colors[UIMessage.COLOR_MESSAGE_FOCUS_BORDER] = 0xFFFFFF;
+				colors[UIMessage.COLOR_MESSAGE_TIME] = 0x6D7F8F;
+				colors[UIMessage.COLOR_MESSAGE_OUT_TIME] = 0x7DA8D3;
+				colors[UIMessage.COLOR_ACTION_BG] = 0x1E2C3A;
+			}
 			
 			colorsCopy = new int[colors.length];
 			for (int i = 0; i < colors.length; ++i) {
@@ -920,7 +933,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							g.drawString(MP.L[LEdit], 2, iy - MP.smallBoldFontHeight - 4, 0);
 						}
 						if (ih != bottom) {
-							g.setColor(colors[COLOR_CHAT_PANEL_BORDER]);
+							g.setColor(colors[COLOR_CHAT_INPUT_BORDER]);
 							g.drawLine(0, iy, w, iy);
 							
 							// cancel icon
@@ -1016,7 +1029,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			}
 		} else {
 			skipRender = false;
-			if (touch && !loading && (scroll >= clipHeight || (!endReached && hasOffset))) {
+			if (touch && !loading && lastDragDir == (reverse ? -1 : 1) && (scroll >= clipHeight || (!endReached && hasOffset))) {
 				g.setColor(colors[COLOR_CHAT_PANEL_FG]);
 				int tx = width - 40, ty = reverse ? height - bottom - 40 : top + 40;
 				g.fillTriangle(tx, ty, tx + 32, ty, tx + 16, reverse ? ty + 32 : ty - 32);
@@ -1397,6 +1410,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						if (reverse) dy2 = -dy2;
 						scroll += dy2;
 						if (kineticScroll * dy2 < 0) kineticScroll = 0;
+						lastDragDir = dy2 < 0 ? -1 : 1;
 					}
 					dragging = true;
 					dragXHold = 0;
