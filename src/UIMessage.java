@@ -61,7 +61,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	private static final int FOCUS_REPLY = 2;
 	private static final int FOCUS_MEDIA = 3;
 	private static final int FOCUS_TEXT = 4;
-	private static final int FOCUS_BUTTONS = 5; // TODO
+//	private static final int FOCUS_BUTTONS = 5; // TODO
 	private static final int FOCUS_COMMENT = 6;
 	
 	UILabel text;

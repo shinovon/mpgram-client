@@ -170,6 +170,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	static Keyboard keyboard;
 	Object nokiaEditor;
 	boolean updateEditor;
+	int inputFieldHeight;
+	boolean inputFocused;
 	
 	ChatCanvas() {
 		setFullScreenMode(true);
@@ -519,7 +521,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			// postLoad
 			loading = false;
 			if (touch && hasInput && (canWrite || left) && mediaFilter == null && query == null) {
-				bottom = Math.max(MP.medPlainFontHeight + 16, 40);
+				bottom = inputFieldHeight = Math.max(MP.medPlainFontHeight + 16, 40);
 			} else {
 				bottom = 0;
 			}
@@ -878,16 +880,19 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				g.setFont(MP.smallBoldFont);
 				g.setColor(colors[COLOR_CHAT_PANEL_BG]);
 				int by = h - bottom;
+				int ih = inputFieldHeight;
+				int iy = h - ih;
 				g.fillRect(0, by, w, bottom);
 				g.setColor(colors[COLOR_CHAT_PANEL_BORDER]);
 				g.drawLine(0, by, w, by);
 				g.setColor(colors[COLOR_CHAT_PANEL_FG]);
 				if (selected != 0 || loading) {
-					if (!loading)
-						g.drawString(MP.L[LMenu], 2, by + 1, Graphics.TOP | Graphics.LEFT);
-					g.drawString(MP.L[LCancel], w - 2, by, Graphics.TOP | Graphics.RIGHT);
+					if (!touch) {
+						if (!loading)
+							g.drawString(MP.L[LMenu], 2, by + 1, Graphics.TOP | Graphics.LEFT);
+						g.drawString(MP.L[LCancel], w - 2, by, Graphics.TOP | Graphics.RIGHT);
+					}
 				} else if (fieldFocused) {
-					// TODO
 					by += 1;
 					g.drawString(MP.L[LMenu], 2, by, Graphics.TOP | Graphics.LEFT);
 					g.drawString(MP.L[LBack], w - 2, by, Graphics.TOP | Graphics.RIGHT);
@@ -903,16 +908,26 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						fieldAnimTarget = 0;
 						keyGuide = false;
 					}
-				} else if (touch) {
-					if (canWrite) {
+				} else if (touch || inputFocused) {
+					if (canWrite && hasInput) {
 						// TODO
 						g.setFont(MP.smallBoldFont);
 						g.setColor(colors[COLOR_CHAT_SEND_ICON]);
 						if (replyMsgId != 0) {
-							g.drawString(MP.L[LReply], 2, by - MP.smallBoldFontHeight, 0);
+							g.drawString(MP.L[LReply], 2, iy - MP.smallBoldFontHeight - 4, 0);
 						}
 						if (editMsgId != 0) {
-							g.drawString(MP.L[LEdit], 2, by - MP.smallBoldFontHeight, 0);
+							g.drawString(MP.L[LEdit], 2, iy - MP.smallBoldFontHeight - 4, 0);
+						}
+						if (ih != bottom) {
+							g.setColor(colors[COLOR_CHAT_PANEL_BORDER]);
+							g.drawLine(0, iy, w, iy);
+							
+							// cancel icon
+							int ty = by + ((MP.smallBoldFontHeight + 8 - 12) >> 1);
+							g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
+							g.drawLine(w - 20, ty, w - 8, ty + 12);
+							g.drawLine(w - 20, ty + 12, w - 8, ty);
 						}
 						g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
 //#ifndef NO_NOKIAUI
@@ -924,7 +939,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 										NokiaAPI.TextEditor_setFocus(nokiaEditor, false);
 										NokiaAPI.TextEditor_setVisible(nokiaEditor, false);
 									} else {
-										NokiaAPI.TextEditor_setSize(nokiaEditor, 10, by + 8, w - 40, bottom - 8);
+										NokiaAPI.TextEditor_setSize(nokiaEditor, 10, iy + 8, w - 40, ih - 8);
 										NokiaAPI.TextEditor_setIndicatorVisibility(nokiaEditor, false);
 										NokiaAPI.TextEditor_setBackgroundColor(nokiaEditor, colors[COLOR_CHAT_PANEL_BG] | 0xFF000000);
 										NokiaAPI.TextEditor_setForegroundColor(nokiaEditor, colors[COLOR_CHAT_FG] | 0xFF000000);
@@ -939,21 +954,20 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						} else
 //#endif
 						if (keyboard != null) {
-							keyboard.drawTextBox(g, 10, by, w - 40, bottom);
+							keyboard.drawTextBox(g, 10, by, w - 40, ih);
 							if (keyboard.isVisible()) keyboard.drawOverlay(g);
-							g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
 						} else if (text == null || text.length() == 0) {
 							g.setFont(MP.medPlainFont);
-							g.drawString(MP.L[LTextField_Hint], 10, by + ((bottom - MP.medPlainFontHeight) >> 1), 0);
+							g.drawString(MP.L[LTextField_Hint], 10, iy + ((ih - MP.medPlainFontHeight) >> 1), 0);
 						} else {
 							g.setFont(MP.smallPlainFont);
 							g.setColor(colors[COLOR_CHAT_FG]);
-							g.drawString(text, 10, by + ((bottom - MP.smallPlainFontHeight) >> 1), 0);
+							g.drawString(text, 10, iy + ((ih - MP.smallPlainFontHeight) >> 1), 0);
 						}
 							
 						if ((text != null && text.trim().length() != 0) || file != null) {
 							// send icon
-							int ty = by + ((bottom - 20) >> 1);
+							int ty = iy + ((ih - 20) >> 1);
 							
 							g.setColor(colors[COLOR_CHAT_SEND_ICON]);
 							g.fillTriangle(w - 8 - 20, ty, w - 8, ty + 10, w - 8 - 20, ty + 20);
@@ -962,13 +976,15 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							g.drawLine(w - 8 - 20, ty + 10, w - 8 - 10, ty + 10);
 						} else {
 							// attach icon
-							int ty = by + ((bottom - 24) >> 1);
+							int ty = iy + ((ih - 24) >> 1);
+							
+							g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
 							g.fillRect(w - 40 + 12, ty + 12, 17, 1);
 							g.fillRect(w - 40 + 20, ty + 4, 1, 17);
 						}
 					} else if (left) {
 						g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
-						g.drawString(MP.L[LJoinGroup], w >> 1, by + ((bottom - MP.medPlainFontHeight) >> 1), Graphics.TOP | Graphics.HCENTER);
+						g.drawString(MP.L[LJoinGroup], w >> 1, iy + ((ih - MP.medPlainFontHeight) >> 1), Graphics.TOP | Graphics.HCENTER);
 					}
 				}
 			}
@@ -1180,7 +1196,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			if (menuFocused) {
 				closeMenu();
 			} else if (selected != 0) {
-				// TODO
 				showMenu(null, new int[] { LDelete, LForward });
 			} else if (fieldFocused) {
 				showMenu(null, canWrite && hasInput ? new int[] { LRefresh, LChatInfo, LSearchMessages, LSendSticker } : new int[] { LRefresh, LChatInfo, LSearchMessages });
@@ -1404,6 +1419,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					movesIdx = (movesIdx + 1) % moveSamples;
 				}
 			}
+		} else if (menuFocused) {
+			// TODO menu scroll
 		}
 		pointerX = x;
 		pointerY = y;
@@ -1481,15 +1498,23 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				} else if (postId == null) {
 					openProfile();
 				}
-			} else if (y > height - bottom) {
-				// TODO
+			} else if (y > height - bottom && hasInput) {
 				if (selected != 0 || loading) { // do nothing
 				} else if (left) {
 					MP.midlet.start(MP.RUN_JOIN_CHANNEL, id);
 				} else if (canWrite) {
-					if (x > width - 48) {
+					if (y < height - inputFieldHeight) {
+						if (x > width - 48) {
+							if (editMsgId != 0) {
+								resetInput();
+							} else {
+								replyMsgId = 0;
+								bottom = inputFieldHeight;
+							}
+						}
+					} else if (x > width - 48) {
 						if ((text != null && text.trim().length() != 0) || file != null) {
-							// send TODO
+							// send
 							if (!MP.sending) {
 								MP.sending = true;
 								MP.midlet.start(MP.RUN_SEND_MESSAGE, new Object[] {
@@ -1545,7 +1570,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	private void menuAction(int i) {
 		if (i < menu.length) {
-			if (menuItem == null) {
+			if (menu[i] == LCancel) {
+				// just close
+			} else if (menuItem == null) {
 				switch (menu[i]) {
 				case LRefresh:
 					MP.midlet.commandAction(MP.latestCmd, this);
@@ -1821,7 +1848,15 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			}
 		}
 		menuCount = len;
-		menuAnimTarget = (MP.medPlainFontHeight + 8) * len;
+		int h = (MP.medPlainFontHeight + 8) * len;
+		if (touch && h >= height - 20) {
+			this.menu = new int[len + 1];
+			System.arraycopy(menu, 0, this.menu, 0, len);
+			this.menu[len] = LCancel;
+			menuCount++;
+			h += MP.medPlainFontHeight + 8;
+		}
+		menuAnimTarget = h;
 		
 		if (len != 0 && menu != null) {
 			for (int i = 0; i < colors.length; ++i) {
@@ -1906,6 +1941,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		resetInput();
 		text = item.origText;
 		editMsgId = item.id;
+		bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
 		if (!touch) {
 //			fieldFocused = true;
 			MP.display(MP.writeForm(id, null, item.origText, Integer.toString(item.id), null, null));
@@ -1925,6 +1961,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		// TODO
 		if (editMsgId != 0) resetInput();
 		replyMsgId = item.id;
+		bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
 		if (!touch) {
 //			fieldFocused = true;
 			MP.display(MP.writeForm(id, Integer.toString(item.id), "", null, null, null));
@@ -1937,6 +1974,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		replyMsgId = 0;
 		editMsgId = 0;
 		file = null;
+		bottom = inputFieldHeight;
 //#ifndef NO_NOKIAUI
 		if (nokiaEditor != null) {
 			NokiaAPI.TextEditor_setContent(nokiaEditor, "");
@@ -2255,8 +2293,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	public void inputAction(int actions) {
 		// TODO
 		if ((actions & NokiaAPI.ACTION_CONTENT_CHANGE) != 0) {
+			String p = text;
 			text = NokiaAPI.TextEditor_getContent(nokiaEditor);
-			MP.midlet.sendTyping(text.trim().length() != 0);
+			if (!text.equals(p) && (p != null || text.length() != 0)) {
+				MP.midlet.sendTyping(text.trim().length() == 0);
+			}
 			queueRepaint();
 		} else if ((actions & NokiaAPI.ACTION_PAINT_REQUEST) != 0) {
 			queueRepaint();
