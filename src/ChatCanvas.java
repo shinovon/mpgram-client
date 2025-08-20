@@ -457,9 +457,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			this.selfChat = MP.selfId.equals(id);
 			this.reverse = MP.reverseChat && mediaFilter == null;
 			
-			if (query != null) {
-				title = MP.L[LSearch];
-			} else if (selfChat) {
+			if (selfChat) {
 				title = MP.L[LSavedMessages];
 			} else if (postId != null || topMsgId != 0) {
 				title = MP.L[LComments];
@@ -897,7 +895,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					if (title != null) {
 						Font font = hideStatus ? MP.medPlainFont : MP.smallBoldFont;
 						if (titleRender == null) {
-							titleRender = UILabel.ellipsis(title, font, tw - 4);
+							titleRender = UILabel.ellipsis(query != null ? MP.L[LSearch] : title, font, tw - 4);
 						}
 						g.setColor(colors[COLOR_CHAT_FG]);
 						g.setFont(font);

@@ -161,9 +161,9 @@ public class MP extends MIDlet
 		},
 		{
 			"Tint",
-			"Web Dark",
-			"Web Light",
-			"Edge",
+			"Dark (Web)",
+			"Light (Web)",
+			"Edge (by SD)",
 		}
 	};
 	
