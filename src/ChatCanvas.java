@@ -85,6 +85,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	boolean selfChat;
 	boolean user;
+	boolean channel;
 	boolean reverse;
 	
 	// discussion
@@ -387,7 +388,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				forum = peer.getBoolean("f", false);
 				id = peer.getString("id");
 				username = peer.getString("name", null);
-	
+				channel = MP.ZERO_CHANNEL_ID >= Long.parseLong(id);
 				title = MP.getName(id, false);
 	
 				if (mediaFilter == null) {

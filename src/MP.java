@@ -109,6 +109,8 @@ public class MP extends MIDlet
 	static final int RUN_CANCEL_UPDATES = 25;
 	static final int RUN_DOWNLOAD_DOCUMENT = 26;
 	
+	static final long ZERO_CHANNEL_ID = -1000000000000L;
+	
 	// RMS
 	private static final String SETTINGS_RECORD_NAME = "mp4config";
 	private static final String AUTH_RECORD_NAME = "mp4user";
@@ -4222,8 +4224,7 @@ public class MP extends MIDlet
 		String username = ((MPChat) current).username();
 		if (peerId.charAt(0) == '-' && username == null) {
 			sb.append("c/");
-			 // FIXME handle channel offset properly
-			peerId = peerId.substring(peerId.startsWith("-100") ? 4 : 1);
+			peerId = Long.toString(-Long.parseLong(peerId) + ZERO_CHANNEL_ID);
 		}
 		sb.append(username != null ? username : peerId).append('/').append(msgId);
 		copy("", sb.toString());
@@ -4522,8 +4523,7 @@ public class MP extends MIDlet
 				}
 				if ("c".equals(s[0]) && s.length > 1) {
 //					privat = true;
-					// FIXME handle channel offset (-100...)
-					domain = "-".concat(s[1]);
+					domain = Long.toString(-Long.parseLong(s[1]) + ZERO_CHANNEL_ID);
 					if (s.length == 3) {
 						messageId = s[2];
 					} else if (s.length == 4) {

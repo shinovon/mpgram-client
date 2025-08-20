@@ -1133,7 +1133,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			general[count++] = LForward;
 		} else if (action) {
 			if (chat.canWrite) general[count++] = LReply;
-			if (!chat.selfChat && !chat.user) general[count++] = LCopyMessageLink;
+			if (chat.channel) general[count++] = LCopyMessageLink;
 			if (chat.canDelete) general[count++] = LDelete;
 		} else {
 			if (chat.canWrite) general[count++] = LReply;

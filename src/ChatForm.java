@@ -53,6 +53,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 	boolean infoLoaded;
 	boolean left, broadcast, forum;
 	boolean canWrite, canDelete, canBan, canPin;
+	boolean channel;
 	
 	// pagination
 	int dir;
@@ -171,6 +172,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 			forum = peer.getBoolean("f", false);
 			id = peer.getString("id");
 			username = peer.getString("name", null);
+			channel = MP.ZERO_CHANNEL_ID >= Long.parseLong(id);
 
 			title = MP.getName(id, false);
 
@@ -461,7 +463,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 			s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			s.setItemCommandListener(MP.midlet);
 			
-			if (this.id.charAt(0) == '-') {
+			if (channel) {
 				s.addCommand(MP.messageLinkCmd);
 			}
 			if (text != null && text.length() != 0) {
