@@ -35,7 +35,8 @@ enum_colors = {
     "MESSAGE_FOCUS_BORDER": 32,
     "MESSAGE_TIME": 33,
     "MESSAGE_OUT_TIME": 34,
-    "ACTION_BG": 35
+    "ACTION_BG": 35,
+    "MESSAGE_OUT_READ": 36
 }
 
 enum_style = {

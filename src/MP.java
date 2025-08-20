@@ -1554,6 +1554,9 @@ public class MP extends MIDlet
 							} else if ("updateEditMessage".equals(type)
 									|| "updateEditChannelMessage".equals(type)) {
 								form.handleUpdate(MPChat.UPDATE_EDIT_MESSAGE, update);
+							} else if ("updateReadHistoryOutbox".equals(type)
+									|| "updateReadChannelOutbox".equals(type)) {
+								form.handleUpdate(MPChat.UPDATE_READ_OUTBOX, update);
 							}
 						}
 						

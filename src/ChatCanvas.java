@@ -80,6 +80,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	int firstMsgId, lastMsgId;
 	boolean endReached, hasOffset;
 	private int idOffset;
+	int readOutboxId;
 	
 	boolean switched;
 	boolean update, shouldUpdate;
@@ -454,6 +455,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							addOffset = -limit;
 							dir = 1;
 						}
+					}
+					if (full != null && full.has("read_outbox_max_id")) {
+						readOutboxId = full.getInt("read_outbox_max_id");
 					}
 				}
 				infoLoaded = true;
@@ -2261,6 +2265,20 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				item.layoutWidth = 0;
 				requestLayout(item);
 			}
+			break;
+		}
+		case UPDATE_READ_OUTBOX: {
+			int maxId = readOutboxId = update.getInt("max_id");
+			System.out.println("read outbox " + maxId);
+			
+			UIItem item = firstItem;
+			if (item == null) break;
+			do {
+				if (!(item instanceof UIMessage) || ((UIMessage) item).id > maxId)
+					continue;
+				((UIMessage) item).read = true;
+			} while ((item = item.next) != null);
+			queueRepaint();
 			break;
 		}
 		}

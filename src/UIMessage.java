@@ -43,6 +43,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	static final int COLOR_MESSAGE_TIME = 33;
 	static final int COLOR_MESSAGE_OUT_TIME = 34;
 	static final int COLOR_ACTION_BG = 35;
+	static final int COLOR_MESSAGE_OUT_READ = 36;
 	
 	static final int STYLE_MESSAGE_FILL = 0;
 	static final int STYLE_MESSAGE_ROUND = 1;
@@ -59,6 +60,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	private static final int DATE_PADDING_HEIGHT = 2;
 	private static final int DATE_MARGIN_HEIGHT = 1;
 	private static final int SPACE_HEIGHT = 4;
+	private static final int READ_WIDTH = 20;
 	
 	private static final int FOCUS_SENDER = 0;
 	private static final int FOCUS_FORWARD = 1;
@@ -88,6 +90,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	String commentPeer;
 	int commentRead;
 	String peerId;
+	boolean read;
 	
 	boolean fwd, reply, media, photo, sticker;
 	String replyName, replyText, replyPrefix;
@@ -108,7 +111,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	String mediaTitleRender, mediaSubtitleRender;
 	int timeWidth, dateWidth, senderWidth, replyPrefixWidth, forwardNameWidth;
 	int mediaRenderHeight;
-	boolean showDate, hideName, timeBreak, space;
+	boolean showDate, hideName, timeBreak, space, showReadMark;
 	int forwardedFromWidth;
 	int photoRenderWidth, photoRenderHeight;
 	
@@ -131,6 +134,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		dateWidth = MP.smallBoldFont.stringWidth(dateRender);
 		edited = message.has("edit") && chat.mediaFilter == null;
 		peerId = chat.id;
+		showReadMark = out && !chat.selfChat;
 		
 		if ((action = message.has("act"))) {
 			JSONObject act = message.getObject("act");
@@ -407,6 +411,8 @@ public class UIMessage extends UIItem implements LangConstants {
 				commentRead = comments.getInt("read", 0);
 				subFocus[order++] = FOCUS_COMMENT;
 			}
+			
+			read = id <= chat.readOutboxId;
 		}
 		
 		subFocusLength = order;
@@ -631,11 +637,30 @@ public class UIMessage extends UIItem implements LangConstants {
 		
 		// time
 		if (timeBreak) y += MP.smallPlainFontHeight;
+		int mw = 0;
+		if (showReadMark) {
+			// TODO
+			mw = READ_WIDTH;
+			int ty = y - 10;
+			int tx = rx + rw - mw - 2;
+			if (read) {
+				g.setColor(ChatCanvas.colors[COLOR_MESSAGE_OUT_READ]);
+				g.fillTriangle(tx, ty, tx + 9, ty + 10, tx + 19, ty);
+				g.setColor(ChatCanvas.colors[ChatCanvas.style[STYLE_MESSAGE_FILL] != 0 ? (out ? COLOR_MESSAGE_OUT_BG : COLOR_MESSAGE_BG) : ChatCanvas.COLOR_CHAT_BG]);
+				g.fillTriangle(tx + 2, ty, tx + 9, ty + 10 - 2, tx + 19 - 2, ty);
+			}
+			tx -= 3;
+			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_OUT_READ]);
+			g.fillTriangle(tx, ty, tx + 9, ty + 10, tx + 19, ty);
+			g.setColor(ChatCanvas.colors[ChatCanvas.style[STYLE_MESSAGE_FILL] != 0 ? (out ? COLOR_MESSAGE_OUT_BG : COLOR_MESSAGE_BG) : ChatCanvas.COLOR_CHAT_BG]);
+			g.fillTriangle(tx + 2, ty, tx + 9, ty + 10 - 2, tx + 19 - 2, ty);
+			g.fillRect(tx, ty, 9, 6);
+		}
 		g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_TIME : COLOR_MESSAGE_TIME]);
 		g.setFont(MP.smallPlainFont);
-		g.drawString(time, rx + rw - TIME_PADDING_WIDTH, y + PADDING_HEIGHT - TIME_PADDING_HEIGHT, Graphics.BOTTOM | Graphics.RIGHT);
+		g.drawString(time, rx + rw - TIME_PADDING_WIDTH - mw, y + PADDING_HEIGHT - TIME_PADDING_HEIGHT, Graphics.BOTTOM | Graphics.RIGHT);
 		if (edited) {
-			g.drawString(MP.L[LEdited], rx + rw - timeWidth - MP.smallPlainFontSpaceWidth - TIME_PADDING_WIDTH, y + PADDING_HEIGHT - TIME_PADDING_HEIGHT, Graphics.BOTTOM | Graphics.RIGHT);
+			g.drawString(MP.L[LEdited], rx + rw - timeWidth - MP.smallPlainFontSpaceWidth - TIME_PADDING_WIDTH - mw, y + PADDING_HEIGHT - TIME_PADDING_HEIGHT, Graphics.BOTTOM | Graphics.RIGHT);
 		}
 		
 		y += PADDING_HEIGHT;
@@ -787,6 +812,9 @@ public class UIMessage extends UIItem implements LangConstants {
 		
 		int timeWidth = this.timeWidth + TIME_PADDING_WIDTH;
 		boolean timeBreak = false;
+		if (showReadMark) {
+			timeWidth += READ_WIDTH;
+		}
 		if (edited) {
 			timeWidth += MP.smallPlainFontSpaceWidth + MP.smallPlainFont.stringWidth(MP.L[LEdited]);
 		}

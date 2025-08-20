@@ -29,6 +29,7 @@ interface MPChat {
 	static final int UPDATE_NEW_MESSAGE = 3;
 	static final int UPDATE_DELETE_MESSAGES = 4;
 	static final int UPDATE_EDIT_MESSAGE = 5;
+	static final int UPDATE_READ_OUTBOX = 6;
 	
 	// getters
 	String id();
