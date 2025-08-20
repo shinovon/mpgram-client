@@ -643,7 +643,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (commentsText != null) {
 			y += PADDING_HEIGHT;
 			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_COMMENT_BORDER]);
-			g.drawLine(rx, y, rx + cw, y++);
+			g.drawLine(rx, y, rx + rw, y++);
 			
 			g.setFont(MP.smallBoldFont);
 			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_LINK]);
