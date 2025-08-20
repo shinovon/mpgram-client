@@ -685,9 +685,11 @@ public class MP extends MIDlet
 		fullPlayerCover = reverseChat = f.getHeight() >= 360;
 		
 //#ifndef NO_NOTIFY
+//#ifndef NO_NOKIAUI
 		notifyMethod = checkClass("org.pigler.api.PiglerAPI") ? 3 :
 			// softnotification is stubbed in s40
 			checkClass("com.nokia.mid.ui.SoftNotification") && !s40 ? 2 : 1;
+//#endif
 //#endif
 		
 		reopenChat = s40;
@@ -2674,8 +2676,10 @@ public class MP extends MIDlet
 					notifyMethodChoice = new ChoiceGroup(L[LNotificationMethod], ChoiceGroup.POPUP, new String[] {
 							L[LOff],
 							L[LAlertWindow],
+//#ifndef NO_NOKIAUI
 							"Nokia UI",
 							"Pigler API"
+//#endif
 					}, null);
 					notifyMethodChoice.setSelectedIndex(Math.min(notifyMethod, notifyMethodChoice.size()), true);
 					notifyMethodChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
