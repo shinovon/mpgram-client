@@ -851,9 +851,9 @@ public class MP extends MIDlet
 		joinChatCmd = new Command(L[LJoinGroup], Command.SCREEN, 1);
 		leaveChatCmd = new Command(L[LLeaveGroup], Command.ITEM, 1);
 		chatPhotosCmd = new Command(L[LPhotos], Command.ITEM, 1);
-		chatVideosCmd = new Command(L[LVideos], Command.ITEM, 1);
-		chatFilesCmd = new Command(L[LFiles], Command.ITEM, 1);
-		chatMusicCmd = new Command(L[LAudioFiles], Command.ITEM, 1);
+		chatVideosCmd = new Command(L[LVideos], Command.ITEM, 2);
+		chatFilesCmd = new Command(L[LFiles], Command.ITEM, 3);
+		chatMusicCmd = new Command(L[LAudioFiles], Command.ITEM, 4);
 		gotoPinnedMsgCmd = new Command(L[LGoTo], Command.ITEM, 1);
 		chatMembersCmd = new Command(L[LMembers], Command.SCREEN, 6);
 		

@@ -1084,8 +1084,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					if (now - pressTime > 200) {
 						kineticScroll = 0;
 						int size = Math.min(360, (int) (now - pressTime - 200) / 2);
-	//					g.setColor(colors[COLOR_CHAT_POINTER_HOLD]);
-	//					g.fillArc(pointerX - 25, pointerY - 25, 50, 50, 90, (size * 360) / 200);
+//						g.setColor(colors[COLOR_CHAT_POINTER_HOLD]);
+//						g.fillArc(pointerX - 25, pointerY - 25, 50, 50, 90, (size * 360) / 200);
 						if (size >= 200) {
 							// handle long tap
 							longTap = true;
@@ -1272,6 +1272,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				menuAction(menuCurrent);
 				repaint = true;
 			}
+		} else if (loading) {
+			// prevent NPE below
 		} else if (fieldFocused) {
 			if (game == Canvas.UP) {
 				fieldFocused = false;
@@ -2169,6 +2171,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (table != null) table.clear();
 		switched = false;
 		shouldUpdate = false;
+		mediaFilter = null;
 	}
 
 	public void openMessage(String msg, int topMsg) {
