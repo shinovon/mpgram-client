@@ -1385,11 +1385,15 @@ public class MP extends MIDlet
 						.append("&id=").append(fwdMsg);
 					}
 				}
-//#ifdef NO_FILE
-//#				api(appendUrl(sb.append("&text="), text).toString());
-//#else
-				postMessage(sb.toString(), file, text);
+//#ifndef NO_FILE
+				try {
+					if (!checkClass("javax.microedition.io.file.FileConnection")) throw new Error();
+					postMessage(sb.toString(), file, text);
+				} catch (Error e)
 //#endif
+				{
+					api(appendUrl(sb.append("&text="), text).toString());
+				}
 				
 				// go back to chat screen
 				if (!(current instanceof MPChat)) {
@@ -3019,7 +3023,9 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 			if (c == downloadPathCmd) {
 				downloadMessage = null;
-				openFilePicker("", false);
+				try {
+					openFilePicker("", false);
+				} catch (Throwable ignored) {}
 				return;
 			}
 //#endif
@@ -3053,7 +3059,9 @@ public class MP extends MIDlet
 			}
 //#ifndef NO_FILE
 			if (c == chooseFileCmd) {
-				openFilePicker("", true);
+				try {
+					openFilePicker("", true);
+				} catch (Throwable ignored) {}
 				return;
 			}
 //#endif
@@ -4285,14 +4293,19 @@ public class MP extends MIDlet
 	void downloadContinue(int state) {
 //#ifndef NO_FILE
 		if (downloading) return;
-		if (state == 1) {
-			if (downloadPath == null || downloadPath.trim().length() == 0) {
-				openFilePicker("", false);
-				return;
-			} else {
-				start(RUN_DOWNLOAD_DOCUMENT, downloadPath);
-				return;
+		try {
+			Class.forName("javax.microedition.io.file.FileConnection");
+			if (state == 1) {
+				if (downloadPath == null || downloadPath.trim().length() == 0) {
+					openFilePicker("", false);
+					return;
+				} else {
+					start(RUN_DOWNLOAD_DOCUMENT, downloadPath);
+					return;
+				}
 			}
+		} catch (Throwable ignored) {
+			// no jsr 75
 		}
 //#endif
 		String peerId = downloadMessage[0];
