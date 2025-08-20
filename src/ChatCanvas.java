@@ -719,6 +719,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			} else {
 				menuAnimProgress = menuAnimTarget;
 				menuAnimTarget = -1;
+				updateEditor = true;
 			}
 		}
 		
@@ -991,7 +992,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							if (updateEditor) {
 								updateEditor = false;
 								try {
-									if (menuFocused) {
+									if (menuFocused || menuAnimProgress != 0) {
 										NokiaAPI.TextEditor_setFocus(nokiaEditor, false);
 										NokiaAPI.TextEditor_setVisible(nokiaEditor, false);
 									} else {
