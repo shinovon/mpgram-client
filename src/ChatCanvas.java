@@ -1663,6 +1663,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					forwardSelected();
 					break;
 				}
+				case LOpenPlayer: {
+					MP.midlet.commandAction(MP.playerCmd, this);
+					break;
+				}
 				}
 			} else {
 				menuItem.menuAction(menu[i]);
@@ -1893,6 +1897,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 
 	void showMenu(UIItem item, int[] menu) {
 		if (keyboard != null && keyboard.isVisible()) onKeyboardCancel();
+		if (item == null && menu[0] != LDelete && MP.playerState != 0) {
+			int[] t = menu;
+			menu = new int[menu.length + 1];
+			System.arraycopy(t, 0, menu, 0, t.length);
+			menu[t.length] = LOpenPlayer;
+		}
 		kineticScroll = 0;
 		this.menuItem = item;
 		this.menu = menu;

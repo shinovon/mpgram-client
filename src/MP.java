@@ -483,7 +483,7 @@ public class MP extends MIDlet
 	private static boolean playlistDirection = true;
 	private static String playlistPeer;
 	private static JSONObject currentMusic;
-	private static int playerState; // 1 - playing, 2 - paused, 3 - loading
+	static int playerState; // 1 - playing, 2 - paused, 3 - loading
 	private static Player currentPlayer;
 	
 	// notifications
