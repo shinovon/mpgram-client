@@ -117,7 +117,7 @@ public class Notifier implements SoftNotificationListener {
 					((PiglerAPI) piglerApi).updateNotification(id, peer, text, image);
 				}
 				piglerIds.put(new Integer(id), peerId);
-				return true;
+				return false;
 			} else if (mode == 2) {
 				Class.forName("com.nokia.mid.ui.SoftNotification");
 				if (nokiaIds.contains(peerId)) {
@@ -149,7 +149,7 @@ public class Notifier implements SoftNotificationListener {
 				s.setText(peer.concat("\n").concat(text), peer);
 				s.post();
 				nokiaIds.put(new Integer(id), peerId);
-				return true;
+				return false;
 			}
 		} catch (Throwable ignored) {}
 		return false;
@@ -199,6 +199,10 @@ public class Notifier implements SoftNotificationListener {
 			} catch (Exception ignored) {}
 			break;
 		}
+	}
+	
+	public static boolean has(String peerId) {
+		return piglerIds.contains(peerId) || nokiaIds.contains(peerId);
 	}
 	
 	public static void close() {
