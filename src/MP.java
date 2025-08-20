@@ -4242,7 +4242,6 @@ public class MP extends MIDlet
 		f.append(playerArtistLabel = s);
 		
 		Gauge g = new Gauge(null, false, 100, 0);
-		s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_EXPAND);
 		f.append(playerProgress = g);
 		
 		s = new StringItem(null, L[LPrev_Player], Item.BUTTON);
