@@ -3,7 +3,7 @@
 from os import listdir, makedirs, path
 import json
 
-enum = {
+enum_colors = {
     "CHAT_BG": 0,
     "CHAT_FG": 1,
     "CHAT_HIGHLIGHT_BG": 2,
@@ -38,6 +38,12 @@ enum = {
     "ACTION_BG": 35
 }
 
+enum_style = {
+    "MESSAGE_FILL": 36,
+    "MESSAGE_ROUND": 37,
+    "MESSAGE_BORDER": 38
+}
+
 if not path.exists("../res/c/"):
     makedirs("../res/c")
 
@@ -53,17 +59,23 @@ for n in listdir():
     theme = [0]*40
     name = j["name"]
     
-    for key in enum.keys():
+    for key in enum_colors.keys():
         if not key in j:
             print("Missing key:", key);
             continue
-        theme[enum[key]] = int(j[key], 16);
+        theme[enum_colors[key]] = int(j[key], 16);
+    
+    for key in enum_style.keys():
+        if not key in j:
+            print("Missing key:", key);
+            continue
+        theme[enum_style[key]] = 1 if j[key] else 0;
     
     with open("../res/c/" + n[:-5], mode='wb') as f:
         name = bytes(name, "utf-8")
         f.write((len(name)).to_bytes(2, byteorder='big', signed=False))
         f.write(name)
-        for i in range(40):
-            f.write((theme[i]).to_bytes(4, byteorder='big', signed=False))
+        for i in theme:
+            f.write((i).to_bytes(4, byteorder='big', signed=False))
     
     print()
