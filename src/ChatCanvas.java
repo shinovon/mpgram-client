@@ -589,10 +589,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				handleBotAnswer(b);
 			}
 //#ifndef NO_NOTIFY
+//#ifndef NO_NOKIAUI
 			try {
 				Notifier.remove(id);
 			} catch (Throwable ignored) {}
 			MP.notificationMessages.remove(id);
+//#endif
 //#endif
 			MP.display(this);
 			queueRepaint();
@@ -640,10 +642,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				(typingThread = new Thread(this)).start();
 			}
 		}
+//#ifndef NO_NOKIAUI
 		if (nokiaEditor != null) {
 			NokiaAPI.TextEditor_setParent(nokiaEditor, this);
 			updateEditor = true;
 		}
+//#endif
 		if (keyboard != null) {
 			keyboard.setListener(this);
 		}

@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 //#ifndef NO_NOTIFY
+//#ifndef NO_NOKIAUI
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -243,4 +244,5 @@ public class Notifier implements SoftNotificationListener {
 	}
 	
 }
+//#endif
 //#endif

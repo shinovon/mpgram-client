@@ -396,10 +396,12 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 			handleBotAnswer(j);
 		}
 //#ifndef NO_NOTIFY
+//#ifndef NO_NOKIAUI
 		try {
 			Notifier.remove(id);
 		} catch (Throwable ignored) {}
 		MP.notificationMessages.remove(id);
+//#endif
 //#endif
 	}
 

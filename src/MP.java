@@ -488,7 +488,9 @@ public class MP extends MIDlet
 	
 	// notifications
 //#ifndef NO_NOTIFY
+//#ifndef NO_NOKIAUI
 	static Hashtable notificationMessages = new Hashtable();
+//#endif
 	static Player notificationPlayer;
 //#endif
 	
@@ -496,9 +498,11 @@ public class MP extends MIDlet
 	
 	protected void destroyApp(boolean u) {
 //#ifndef NO_NOTIFY
+//#ifndef NO_NOKIAUI
 		try {
 			Notifier.close();
 		} catch (Throwable ignored) {}
+//#endif
 //#endif
 		notifyDestroyed();
 	}
@@ -947,10 +951,12 @@ public class MP extends MIDlet
 		f.append(s);
 		
 //#ifndef NO_NOTIFY
+//#ifndef NO_NOKIAUI
 		// init notifications api wrapper
 		try {
 			Notifier.init();
 		} catch (Throwable ignored) {}
+//#endif
 //#endif
 		
 		authForm = f;
@@ -1726,9 +1732,11 @@ public class MP extends MIDlet
 							msg.put("peer_id", peerId);
 							msg.put("text", text);
 							int count = 0;
+//#ifndef NO_NOKIAUI
 							if (notificationMessages.containsKey(peerId)) {
 								count = ((JSONObject) notificationMessages.get(peerId)).getInt("count", 0);
 							}
+//#endif
 
 							// filter latest messages
 							int n = newMsgs.size();
@@ -1741,7 +1749,9 @@ public class MP extends MIDlet
 							}
 							msg.put("count", ++count);
 							newMsgs.add(msg);
+//#ifndef NO_NOKIAUI
 							notificationMessages.put(peerId, msg);
+//#endif
 						}
 						
 						if (newMsgs.size() != 0) {
@@ -1762,14 +1772,17 @@ public class MP extends MIDlet
 								String title = sb.toString();
 								
 								if (!paused && current instanceof MPChat && current.isShown() && peerId.equals(((MPChat) current).id())) {
+//#ifndef NO_NOKIAUI
 									try {
 										Notifier.remove(peerId);
 									} catch (Throwable ignored) {}
 									notificationMessages.remove(peerId);
+//#endif
 									continue;
 								}
 								
 								if (notifyMethod != 0) {
+//#ifndef NO_NOKIAUI
 									if (notifyMethod != 1) {
 										Image img = null;
 										if (count <= 1 && imagesCache.containsKey(peerId)) {
@@ -1781,7 +1794,9 @@ public class MP extends MIDlet
 												MP.queueAvatar(peerId, peerId);
 											}
 										} catch (Throwable ignored) {}
-									} else {
+									} else
+//#endif
+									{
 										Alert alert = new Alert(title);
 										alert.setString(text);
 										alert.setTimeout(1500);
@@ -3839,6 +3854,7 @@ public class MP extends MIDlet
 		}
 //#endif
 //#ifndef NO_NOTIFY
+//#ifndef NO_NOKIAUI
 		if (target instanceof String) {
 			// notification
 			try {
@@ -3846,6 +3862,7 @@ public class MP extends MIDlet
 			} catch (Throwable ignored) {}
 			return;
 		}
+//#endif
 //#endif
 	}
 	

@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 //#ifndef NO_NOTIFY
+//#ifndef NO_NOKIAUI
 import org.pigler.api.IPiglerTapHandler;
 
 public class PiglerListener implements IPiglerTapHandler {
@@ -34,4 +35,5 @@ public class PiglerListener implements IPiglerTapHandler {
 	}
 
 }
+//#endif
 //#endif
