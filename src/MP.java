@@ -1625,16 +1625,16 @@ public class MP extends MIDlet
 		case RUN_KEEP_ALIVE: { // Keep session alive & notifications
 			try {
 				boolean wasShown = true;
-//#ifndef NO_NOTIFY
 				StringBuffer sb = new StringBuffer();
 				JSONObject j;
 				
 				int offset = 0;
 				boolean check = true;
-				while (keepAlive || notifications || updateChatsList) {
-//#else
-//#				while (keepAlive) {
+				while (keepAlive
+//#ifndef NO_NOTIFY
+						|| notifications || updateChatsList
 //#endif
+						) {
 					Thread.sleep(wasShown ? pushInterval : pushBgInterval);
 					if (threadConnections.size() != 0 || (playerState == 1 && reopenChat))
 						continue;
