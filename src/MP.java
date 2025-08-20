@@ -261,7 +261,7 @@ public class MP extends MIDlet
 	static String downloadPath;
 	static boolean longpoll = true;
 	static int textMethod; // 0 - auto, 1 - nokiaui, 2 - j2mekeyboard, 3 - fullscreen textbox
-	static String theme = "weblight";
+	static String theme = "tint";
 	
 	// platform
 	static boolean symbianJrt;
@@ -749,6 +749,7 @@ public class MP extends MIDlet
 //#ifndef NO_CHAT_CANVAS
 			legacyChatUI = j.getBoolean("legacyChatUI", legacyChatUI);
 			textMethod = j.getInt("textMethod", textMethod);
+			theme = j.getString("theme", theme);
 //#endif
 //#ifndef NO_FILE
 			downloadPath = j.getString("downloadPath", downloadPath);
