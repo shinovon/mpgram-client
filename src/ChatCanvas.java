@@ -627,6 +627,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			fieldAnimTarget = MP.smallBoldFontHeight + 2;
 		}
 		if (shouldUpdate && !update && !loading) {
+			update = true;
 			MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
 			if (typingThread == null) {
 				(typingThread = new Thread(this)).start();

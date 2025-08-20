@@ -1477,9 +1477,9 @@ public class MP extends MIDlet
 			Thread thread;
 			updatesThread = updatesThreadCopy = thread = Thread.currentThread();
 			updatesRunning = true;
+			MPChat form = (MPChat) param;
 			try {
 				StringBuffer sb = new StringBuffer();
-				MPChat form = (MPChat) param;
 				JSONObject j;
 				
 				int offset = 0;
@@ -1585,6 +1585,9 @@ public class MP extends MIDlet
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
+				if (form != null && form.update()) {
+					form.setUpdate(false);
+				}
 				if (updatesThread == thread)
 					updatesThread = null;
 				updatesRunning = false;
