@@ -2269,7 +2269,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		}
 		case UPDATE_READ_OUTBOX: {
 			int maxId = readOutboxId = update.getInt("max_id");
-			System.out.println("read outbox " + maxId);
 			
 			UIItem item = firstItem;
 			if (item == null) break;
