@@ -361,6 +361,7 @@
 	"Next_Player": "Siguiente",
 	"UnknownTrack": "Pista Desconocida",
 	"Playlist_Title": "Lista de reproducción",
+	"Volume": "Volume", // Untranslated
 	
 	// Profile/chat info
 	"Online": "en linea",

@@ -361,6 +361,7 @@
 	"Next_Player": "التالي",
 	"UnknownTrack": "مقطع غير معروف",
 	"Playlist_Title": "قائمة تشغيل", 
+	"Volume": "Volume", // Untranslated
 	
 	// Profile/chat info
 	"Online": "متصل",

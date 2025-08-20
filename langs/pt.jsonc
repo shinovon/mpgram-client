@@ -361,6 +361,7 @@
 	"Next_Player": "Próxima",
 	"UnknownTrack": "Faixa desconhecida",
 	"Playlist_Title": "Playlist", 
+	"Volume": "Volume", // Untranslated
 	
 	// Profile/chat info
 	"Online": "online",

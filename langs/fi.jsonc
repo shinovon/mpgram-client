@@ -361,6 +361,7 @@
 	"Next_Player": "Seur.",
 	"UnknownTrack": "Tuntematon kappale",
 	"Playlist_Title": "Soittolista",
+	"Volume": "Volume", // Untranslated
 	
 	// Profile/chat info
 	"Online": "paikalla",

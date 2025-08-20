@@ -361,6 +361,7 @@
 	"Next_Player": "След.",
 	"UnknownTrack": "Без названия",
 	"Playlist_Title": "Плейлист",
+	"Volume": "Volume", // Untranslated
 	
 	// Profile/chat info
 	"Online": "в сети",

@@ -252,6 +252,7 @@ public class MP extends MIDlet
 	static boolean notifySound = true;
 	static int notifyMethod = 1; // 0: off, 1: alert, 2: nokiaui, 3: pigler api
 	static boolean notifyAvas = true;
+	static int notificationVolume = 100;
 //#endif
 	static boolean updateChatsList;
 	static boolean legacyChatUI;
@@ -262,6 +263,7 @@ public class MP extends MIDlet
 	static boolean longpoll = true;
 	static int textMethod; // 0 - auto, 1 - nokiaui, 2 - j2mekeyboard, 3 - fullscreen textbox
 	static String theme = "tint";
+	static int playerVolume = 50;
 	
 	// platform
 	static boolean symbianJrt;
@@ -428,6 +430,7 @@ public class MP extends MIDlet
 	private static ChoiceGroup notifyMethodChoice;
 	private static Gauge pushIntervalGauge;
 	private static Gauge pushBgIntervalGauge;
+	private static Gauge notificationVolumeGauge;
 //#endif
 //#ifndef NO_FILE
 	private static ChoiceGroup downloadMethodChoice;
@@ -449,6 +452,7 @@ public class MP extends MIDlet
 	// player items
 	private static StringItem playerTitleLabel, playerArtistLabel;
 	private static Gauge playerProgress;
+	private static Gauge playerVolumeGauge;
 	private static StringItem playerPlaypauseBtn;
 	private static ImageItem playerCover;
 
@@ -1820,7 +1824,7 @@ public class MP extends MIDlet
 									}
 									notificationPlayer.stop();
 									try { 
-										((VolumeControl) notificationPlayer.getControl("VolumeControl")).setLevel(100);
+										((VolumeControl) notificationPlayer.getControl("VolumeControl")).setLevel(notificationVolume);
 									} catch (Throwable ignored) {}
 									notificationPlayer.setMediaTime(0);
 									notificationPlayer.start();
@@ -2688,6 +2692,10 @@ public class MP extends MIDlet
 					notifyMethodChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(notifyMethodChoice);
 					
+					notificationVolumeGauge = new Gauge(L[LVolume], true, 100, notificationVolume);
+					notificationVolumeGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(notificationVolumeGauge);
+					
 					pushIntervalGauge = new Gauge(L[LPushInterval], true, 120, (int) (pushInterval / 1000));
 					pushIntervalGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(pushIntervalGauge);
@@ -2881,6 +2889,8 @@ public class MP extends MIDlet
 				notifySound = notifyChoice.isSelected(1);
 				
 				notifyMethod = notifyMethodChoice.getSelectedIndex();
+				
+				notificationVolume = notificationVolumeGauge.getValue();
 				
 				if ((pushInterval = pushIntervalGauge.getValue() * 1000L) < 5000L) {
 					pushIntervalGauge.setValue((int) ((pushInterval = 5000) / 1000L));
@@ -3620,6 +3630,13 @@ public class MP extends MIDlet
 				return;
 			}
 			sendTyping(((TextField) item).getString().trim().length() == 0);
+			return;
+		}
+		if (item == playerVolumeGauge) {
+			try { 
+				((VolumeControl) currentPlayer.getControl("VolumeControl"))
+				.setLevel(playerVolume = playerVolumeGauge.getValue());
+			} catch (Throwable ignored) {}
 		}
 		// TODO update updateTimeoutGauge label when longpoll is changed
 //		if (item == behChoice) {
@@ -3782,6 +3799,9 @@ public class MP extends MIDlet
 			currentPlayer = p;
 			
 			p.realize();
+			try { 
+				((VolumeControl) p.getControl("VolumeControl")).setLevel(playerVolume);
+			} catch (Throwable ignored) {}
 			p.prefetch();
 			p.start();
 			playerState = 1;
@@ -4200,6 +4220,7 @@ public class MP extends MIDlet
 		f.addCommand(backCmd);
 		f.addCommand(playlistCmd);
 		f.setCommandListener(midlet);
+		f.setItemStateListener(midlet);
 		
 		ImageItem img = playerCover = new ImageItem("", null, 0, "");
 		try {
@@ -4221,6 +4242,7 @@ public class MP extends MIDlet
 		f.append(playerArtistLabel = s);
 		
 		Gauge g = new Gauge(null, false, 100, 0);
+		s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_EXPAND);
 		f.append(playerProgress = g);
 		
 		s = new StringItem(null, L[LPrev_Player], Item.BUTTON);
@@ -4240,6 +4262,10 @@ public class MP extends MIDlet
 		s.setDefaultCommand(playlistNextCmd);
 		s.setItemCommandListener(midlet);
 		f.append(s);
+		
+		g = new Gauge(L[LVolume], true, 100, playerVolume);
+		g.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_EXPAND);
+		f.append(playerVolumeGauge = g);
 		
 		return playerForm = f;
 	}
