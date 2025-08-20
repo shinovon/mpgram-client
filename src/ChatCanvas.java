@@ -54,6 +54,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	static int[] colors = new int[40];
 	static int[] colorsCopy;
+	static int[] style = new int[20];
 	
 //	static Image attachIcon;
 
@@ -189,6 +190,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				for (int i = 0; i < 40; ++i) {
 					colors[i] = d.readInt();
 				}
+				for (int i = 0; i < 20; ++i) {
+					style[i] = d.readByte() & 0xFF;
+				}
 				d.close();
 			} catch (Exception e) {
 				colors[COLOR_CHAT_BG] = 0x0E1621;
@@ -223,9 +227,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				colors[UIMessage.COLOR_MESSAGE_TIME] = 0x6D7F8F;
 				colors[UIMessage.COLOR_MESSAGE_OUT_TIME] = 0x7DA8D3;
 				colors[UIMessage.COLOR_ACTION_BG] = 0x1E2C3A;
-				colors[UIMessage.STYLE_MESSAGE_FILL] = 1;
-				colors[UIMessage.STYLE_MESSAGE_ROUND] = 1;
-				colors[UIMessage.STYLE_MESSAGE_BORDER] = 0;
+				
+				style[UIMessage.STYLE_MESSAGE_FILL] = 1;
+				style[UIMessage.STYLE_MESSAGE_ROUND] = 1;
+				style[UIMessage.STYLE_MESSAGE_BORDER] = 0;
 			}
 			
 			colorsCopy = new int[colors.length];
@@ -1904,8 +1909,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		
 		if (len != 0 && menu != null) {
 			for (int i = 0; i < colors.length; ++i) {
-				if (i == COLOR_CHAT_MENU_BG || i == COLOR_CHAT_MENU_HIGHLIGHT_BG || i == COLOR_CHAT_MENU_FG
-						|| i == UIMessage.STYLE_MESSAGE_FILL || i == UIMessage.STYLE_MESSAGE_ROUND || i == UIMessage.STYLE_MESSAGE_BORDER)
+				if (i == COLOR_CHAT_MENU_BG || i == COLOR_CHAT_MENU_HIGHLIGHT_BG || i == COLOR_CHAT_MENU_FG)
 					continue;
 				int c = colorsCopy[i];
 				colors[i] = ((((c >> 16) & 0xFF) * 15) >> 5) << 16 | ((((c >> 8) & 0xFF) * 15) >> 5) << 8 | ((((c) & 0xFF) * 15) >> 5);

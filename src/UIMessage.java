@@ -43,9 +43,10 @@ public class UIMessage extends UIItem implements LangConstants {
 	static final int COLOR_MESSAGE_TIME = 33;
 	static final int COLOR_MESSAGE_OUT_TIME = 34;
 	static final int COLOR_ACTION_BG = 35;
-	static final int STYLE_MESSAGE_FILL = 36;
-	static final int STYLE_MESSAGE_ROUND = 37;
-	static final int STYLE_MESSAGE_BORDER = 38;
+	
+	static final int STYLE_MESSAGE_FILL = 0;
+	static final int STYLE_MESSAGE_ROUND = 1;
+	static final int STYLE_MESSAGE_BORDER = 2;
 	
 	private static final int MAX_WIDTH = 440;
 	private static final int MARGIN_TOP = 1;
@@ -466,15 +467,15 @@ public class UIMessage extends UIItem implements LangConstants {
 		h -= MARGIN_TOP;
 		
 		g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_BG : COLOR_MESSAGE_BG]);
-		if (ChatCanvas.colors[STYLE_MESSAGE_FILL] != 0) {
+		if (ChatCanvas.style[STYLE_MESSAGE_FILL] != 0) {
 			g.fillRect(x, y, cw, h);
 		}
 		if (focus && focusChild == null && subFocusCurrent == -1 && focusDir != 0) {
 			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_FOCUS_BORDER]);
 			g.drawRect(x, y, cw - 1, h - 1);
-		} else if (ChatCanvas.colors[STYLE_MESSAGE_BORDER] != 0) {
+		} else if (ChatCanvas.style[STYLE_MESSAGE_BORDER] != 0) {
 			g.drawRect(x, y, cw - 1, h - 1);
-		} else if (ChatCanvas.colors[STYLE_MESSAGE_ROUND] != 0) {
+		} else if (ChatCanvas.style[STYLE_MESSAGE_ROUND] != 0) {
 			// fake rounding
 			g.setColor(ChatCanvas.colors[ChatCanvas.COLOR_CHAT_BG]);
 			g.drawLine(x, y, x, y);

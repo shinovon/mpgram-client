@@ -39,9 +39,9 @@ enum_colors = {
 }
 
 enum_style = {
-    "MESSAGE_FILL": 36,
-    "MESSAGE_ROUND": 37,
-    "MESSAGE_BORDER": 38
+    "MESSAGE_FILL": 0,
+    "MESSAGE_ROUND": 1,
+    "MESSAGE_BORDER": 2
 }
 
 if not path.exists("../res/c/"):
@@ -57,6 +57,7 @@ for n in listdir():
         j = json.load(f)
     
     theme = [0]*40
+    style = [0]*20
     name = j["name"]
     
     for key in enum_colors.keys():
@@ -69,7 +70,7 @@ for n in listdir():
         if not key in j:
             print("Missing key:", key);
             continue
-        theme[enum_style[key]] = 1 if j[key] else 0;
+        style[enum_style[key]] = 1 if j[key] else 0;
     
     with open("../res/c/" + n[:-5], mode='wb') as f:
         name = bytes(name, "utf-8")
@@ -77,5 +78,7 @@ for n in listdir():
         f.write(name)
         for i in theme:
             f.write((i).to_bytes(4, byteorder='big', signed=False))
+        for i in style:
+            f.write((i).to_bytes(1, byteorder='big', signed=False))
     
     print()
