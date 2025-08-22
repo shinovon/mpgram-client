@@ -370,6 +370,22 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				}
 			}
 			
+			if (mediaFilter == null && query == null && postPeer == null) {
+				JSONObject dialog = ((JSONObject) MP.api("getDialog&id=".concat(id))).getObject("res");
+				if (messageId == -1 && dialog.has("read_inbox_max_id")) {
+					messageId = 0;
+					int maxId = dialog.getInt("read_inbox_max_id");
+					if (maxId != 0 && dialog.getInt("unread_count", 0) > limit) {
+						offsetId = messageId = maxId;
+						addOffset = -limit;
+						dir = 1;
+					}
+				}
+				if (dialog.has("read_outbox_max_id")) {
+					readOutboxId = dialog.getInt("read_outbox_max_id");
+				}
+			}
+			
 			StringBuffer sb = new StringBuffer();
 			if (!infoLoaded) {
 				if (postPeer != null) {
@@ -402,8 +418,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 				if (mediaFilter == null) {
 					canWrite = !broadcast;
-					JSONObject info = (JSONObject) MP.api(((messageId == -1 || !user) && !forum ? "getFullInfo&id=" : "getInfo&id=").concat(id));
+					
+					JSONObject info = (JSONObject) MP.api((!user && !forum ? "getFullInfo&id=" : "getInfo&id=").concat(id));
 					JSONObject full = info.getObject("full", null);
+					
 					if (id.charAt(0) == '-') {
 						JSONObject chat = info.getObject("Chat");
 						if (chat.has("admin_rights")) {
@@ -446,18 +464,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						if (MP.chatStatus && info.getObject("User").has("status")) {
 							setStatus(info.getObject("User").getObject("status"));
 						}
-					}
-					if (messageId == -1 && full != null && full.has("read_inbox_max_id")) {
-						messageId = 0;
-						int maxId = full.getInt("read_inbox_max_id");
-						if (maxId != 0 && full.getInt("unread_count", 0) > limit) {
-							offsetId = messageId = maxId;
-							addOffset = -limit;
-							dir = 1;
-						}
-					}
-					if (full != null && full.has("read_outbox_max_id")) {
-						readOutboxId = full.getInt("read_outbox_max_id");
 					}
 				}
 				infoLoaded = true;
@@ -504,7 +510,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					MP.appendUrl(sb.append("&q="), query);
 				}
 			} else {
-				sb.append("getHistory&read=1");
+				sb.append("getHistory");
+				if (mediaFilter == null && query == null) {
+					sb.append("&read=1");
+				}
 			}
 			
 			sb.append("&media=1&peer=").append(id);
