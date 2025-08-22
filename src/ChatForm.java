@@ -145,6 +145,19 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 			}
 		}
 		
+		if (mediaFilter == null && query == null && postPeer == null && messageId == -1) {
+			JSONObject dialog = ((JSONObject) MP.api("getDialog&id=".concat(id))).getObject("res");
+			if (dialog.has("read_inbox_max_id")) {
+				messageId = 0;
+				int maxId = dialog.getInt("read_inbox_max_id");
+				if (maxId != 0 && dialog.getInt("unread_count", 0) > limit) {
+					offsetId = messageId = maxId;
+					addOffset = -limit;
+					dir = 1;
+				}
+			}
+		}
+		
 		StringBuffer sb = new StringBuffer();
 		if (!infoLoaded) {
 			if (postPeer != null) {
@@ -178,7 +191,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 
 			if (mediaFilter == null) {
 				canWrite = !broadcast;
-				JSONObject info = (JSONObject) MP.api((messageId == -1 && !forum ? "getFullInfo&id=" : "getInfo&id=").concat(id));
+				JSONObject info = (JSONObject) MP.api("getInfo&id=".concat(id));
 				if (id.charAt(0) == '-') {
 					JSONObject chat = info.getObject("Chat");
 					if (chat.has("admin_rights")) {
@@ -214,16 +227,6 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 					canDelete = true;
 					if (MP.chatStatus && info.getObject("User").has("status")) {
 						setStatus(info.getObject("User").getObject("status"));
-					}
-				}
-				JSONObject full;
-				if (messageId == -1 && (full = info.getObject("full")).has("read_inbox_max_id")) {
-					messageId = 0;
-					int maxId = full.getInt("read_inbox_max_id");
-					if (maxId != 0 && full.getInt("unread_count", 0) > limit) {
-						offsetId = messageId = maxId;
-						addOffset = -limit;
-						dir = 1;
 					}
 				}
 			}

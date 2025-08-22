@@ -510,10 +510,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					MP.appendUrl(sb.append("&q="), query);
 				}
 			} else {
-				sb.append("getHistory");
-				if (mediaFilter == null && query == null) {
-					sb.append("&read=1");
-				}
+				sb.append("getHistory&read=1");
 			}
 			
 			sb.append("&media=1&peer=").append(id);
