@@ -312,19 +312,6 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 		int l = messages.size();
 		urls = new Hashtable();
 		
-//		if (query == null && mediaFilter == null && l != 0) {
-//			// mark messages as read
-//			try {
-//				sb.setLength(0);
-//				sb.append("readMessages&peer=").append(id)
-//				.append("&max=").append(messages.getObject(0).getString("id"));
-//				if (topMsgId != 0) {
-//					sb.append("&thread=").append(topMsgId);
-//				}
-//				MP.api(sb.toString());
-//			} catch (Exception e) {}
-//		}
-		
 		StringItem s;
 		Item focus = null;
 		

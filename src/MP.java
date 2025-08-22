@@ -264,6 +264,7 @@ public class MP extends MIDlet
 	static int textMethod; // 0 - auto, 1 - nokiaui, 2 - j2mekeyboard, 3 - fullscreen textbox
 	static String theme = "tint";
 	static int playerVolume = 50;
+	static boolean voiceConversion;
 	
 	// platform
 	static boolean symbianJrt;
@@ -1375,12 +1376,18 @@ public class MP extends MIDlet
 						}
 					}
 //#ifndef NO_CHAT_CANVAS
-					if (fwdMsgs != null) {
+					if (fwdMsgs != null && fwdMsgs.length != 0) {
 						if (fwdMsgs.length == 1) {
 							sb.append("&fwd_from=").append(fwdMsgs[0].peerId)
 							.append("&id=").append(fwdMsgs[0].id);
 						} else {
-							// TODO there is no api parameter for this yet
+							sb.append("&fwd_from=").append(fwdMsgs[0].peerId)
+							.append("&id=");
+							int l = fwdMsgs.length;
+							for (int i = 0; i < l; ++i) {
+								sb.append(fwdMsgs[i].id).append(',');
+							}
+							sb.setLength(sb.length() - 1);
 						}
 					} else
 //#endif
@@ -4821,6 +4828,9 @@ public class MP extends MIDlet
 				// check if server has FILE_REWRITE
 				if (hc.getHeaderField("X-file-rewrite-supported") != null) {
 					fileRewrite = true;
+				}
+				if (hc.getHeaderField("X-voice-conversion-supported") != null) {
+					voiceConversion = true;
 				}
 			} catch (Exception ignored) {}
 			
