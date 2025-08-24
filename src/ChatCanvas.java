@@ -180,6 +180,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	boolean inputFocused;
 	UIMessage[] forwardMsgs;
 	String forwardPeer, forwardMsg;
+	boolean editorShown;
 	
 	ChatCanvas() {
 		setFullScreenMode(true);
@@ -254,7 +255,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			try {
 				nokiaEditor = NokiaAPI.createTextEditor(500, TextField.ANY, 40, 40);
 				if (nokiaEditor != null) {
-					NokiaAPI.TextEditor_setParent(nokiaEditor, this);
 					NokiaAPI.TextEditor_setContent(nokiaEditor, "");
 					NokiaAPI.TextEditor_setMultiline(nokiaEditor, true);
 				}
@@ -994,14 +994,16 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						}
 						g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
 //#ifndef NO_NOKIAUI
-						if (nokiaEditor != null) {
+						if (nokiaEditor != null && editorShown) {
 							if (updateEditor) {
 								updateEditor = false;
 								try {
 									if (menuFocused || menuAnimProgress != 0) {
 										NokiaAPI.TextEditor_setFocus(nokiaEditor, false);
 										NokiaAPI.TextEditor_setVisible(nokiaEditor, false);
+										NokiaAPI.TextEditor_setParent(nokiaEditor, null);
 									} else {
+										NokiaAPI.TextEditor_setParent(nokiaEditor, this);
 										NokiaAPI.TextEditor_setSize(nokiaEditor, 10, iy + 8, w - 40, ih - 8);
 										NokiaAPI.TextEditor_setIndicatorVisibility(nokiaEditor, false);
 										NokiaAPI.TextEditor_setBackgroundColor(nokiaEditor, colors[COLOR_CHAT_PANEL_BG] | 0xFF000000);
@@ -1597,6 +1599,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					} else { 
 //						MP.midlet.commandAction(MP.writeCmd, this);
 						if (nokiaEditor != null) {
+							if (!editorShown) {
+								editorShown = true;
+								updateEditor = true;
+							}
 						} else if (keyboard != null) {
 							keyboard.show();
 						} else {
