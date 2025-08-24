@@ -325,9 +325,11 @@ public class UILabel extends UIItem {
 			int ew = font.substringWidth(text, ch, sl - ch);
 			if (x + ew < width) {
 				String t = text.substring(ch, sl);
-				if (t.length() > 3 || t.trim().length() != 0)
+				if (t.length() > 3 || t.trim().length() != 0) {
 					res.addElement(new Object[] { t, font, url, new int[] {x, y + dy, ew, fh} });
-				x += ew; idx ++;
+					idx ++;
+				}
+				x += ew;
 				mw = Math.max(mw, x);
 			} else {
 				for (int i = ch; i < sl; i++) {
@@ -341,10 +343,12 @@ public class UILabel extends UIItem {
 									if (center) {
 										x = centerRow(width, tw, x, y, res);
 									}
-									if (t.length() > 3 || t.trim().length() != 0)
+									if (t.length() > 3 || t.trim().length() != 0) {
 										res.addElement(new Object[] { t, font, url, new int[] {x, y + dy, tw, fh} });
+										idx ++;
+									}
 									mw = Math.max(mw, x + tw);
-									x = 0; y += fh; idx ++;
+									x = 0; y += fh;
 									
 									i = ch = j;
 									break w;
@@ -356,10 +360,12 @@ public class UILabel extends UIItem {
 							if (center) {
 								x = centerRow(width, tw, x, y, res);
 							}
-							if (t.length() > 3 || t.trim().length() != 0)
+							if (t.length() > 3 || t.trim().length() != 0) {
 								res.addElement(new Object[] { t, font, url, new int[] {x, y + dy, tw, fh} });
+								idx ++;
+							}
 							mw = Math.max(mw, x + tw);
-							x = 0; y += fh; idx ++;
+							x = 0; y += fh;
 							ch = i;
 						}
 					}
@@ -367,9 +373,11 @@ public class UILabel extends UIItem {
 				if (ch != sl) {
 					String t = text.substring(ch, sl);
 					int tw = font.stringWidth(t);
-					if (t.length() > 3 || t.trim().length() != 0)
+					if (t.length() > 3 || t.trim().length() != 0) {
 						res.addElement(new Object[] { t, font, url, new int[] {x, y + dy, tw, fh} });
-					x += tw; idx ++;
+						idx ++;
+					}
+					x += tw;
 					mw = Math.max(mw, x);
 				}
 			}
