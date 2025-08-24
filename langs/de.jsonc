@@ -216,6 +216,7 @@
 	"Auto": "Auto", // Untranslated
 	"FullscreenTextBox": "Fullscreen text-box", // Untranslated
 	"Theme": "Theme", // Untranslated
+	"InputLanguages": "Input languages", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Warte bis Seite geladen",

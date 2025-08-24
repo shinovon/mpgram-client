@@ -2667,7 +2667,7 @@ public class MP extends MIDlet
 					textMethodChoice.setSelectedIndex(textMethod, true);
 					f.append(textMethodChoice);
 					
-					s = new StringItem(null, "Input languages", Item.BUTTON);
+					s = new StringItem(null, L[LInputLanguages], Item.BUTTON);
 					s.setDefaultCommand(keyboardLanguagesCmd);
 					s.setItemCommandListener(this);
 					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -3078,8 +3078,7 @@ public class MP extends MIDlet
 //#endif
 //#ifndef NO_CHAT_CANVAS
 			if (c == keyboardLanguagesCmd) {
-				// TODO
-				List l = new List("Languages", List.MULTIPLE);
+				List l = new List(L[LInputLanguages], List.MULTIPLE);
 				l.addCommand(saveLanguagesCmd);
 				l.setCommandListener(this);
 				
