@@ -276,6 +276,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				keyboard.setTextHintColor(colors[COLOR_CHAT_INPUT_ICON]);
 				keyboard.setCaretColor(colors[COLOR_CHAT_FG]);
 				keyboard.setTextHint(MP.L[LTextField_Hint]);
+				keyboard.setLanguages(MP.inputLanguages);
 			} else {
 				keyboard.setListener(this);
 				keyboard.reset();

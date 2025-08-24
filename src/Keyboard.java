@@ -964,6 +964,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 		} else {
 			Vector v = new Vector();
 			for(int i = 0; i < languages.length; i++) {
+				if (languages[i] == null) break;
 				for(int j = 0; j < supportedLanguages.length; j++) {
 					if(languages[i].equalsIgnoreCase(supportedLanguages[j])) {
 						v.addElement(new Integer(j));

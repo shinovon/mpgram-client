@@ -265,6 +265,9 @@ public class MP extends MIDlet
 	static String theme = "tint";
 	static int playerVolume = 50;
 	static boolean voiceConversion;
+//#ifndef NO_CHAT_CANVAS
+	static String[] inputLanguages;
+//#endif
 	
 	// platform
 	static boolean symbianJrt;
@@ -318,6 +321,8 @@ public class MP extends MIDlet
 	private static Command logoutCmd;
 	private static Command clearCacheCmd;
 	private static Command downloadPathCmd;
+	private static Command keyboardLanguagesCmd;
+	private static Command saveLanguagesCmd;
 
 	static Command refreshCmd;
 	static Command archiveCmd;
@@ -761,6 +766,17 @@ public class MP extends MIDlet
 			legacyChatUI = j.getBoolean("legacyChatUI", legacyChatUI);
 			textMethod = j.getInt("textMethod", textMethod);
 			theme = j.getString("theme", theme);
+			
+			JSONArray inputLanguagesJson = j.getArray("inputLanguages", null);
+			if (inputLanguagesJson != null) {
+				int l = inputLanguagesJson.size();
+				inputLanguages = new String[l];
+				for (int i = 0; i < l; i++) {
+					inputLanguages[i] = inputLanguagesJson.getString(i);
+				}
+			} else {
+				inputLanguages = new String[] { "en", "ru" };
+			}
 //#endif
 //#ifndef NO_FILE
 			downloadPath = j.getString("downloadPath", downloadPath);
@@ -815,6 +831,8 @@ public class MP extends MIDlet
 		logoutCmd = new Command(L[LLogout], Command.ITEM, 1);
 		clearCacheCmd = new Command(L[LClearCache], Command.ITEM, 1);
 		downloadPathCmd = new Command(L[LLocate], Command.ITEM, 1);
+		keyboardLanguagesCmd = new Command("Select", Command.ITEM, 1); // TODO
+		saveLanguagesCmd = new Command(L[LBack], Command.BACK, 1);
 
 		foldersCmd = new Command(L[LFolders], Command.SCREEN, 4);
 		refreshCmd = new Command(L[LRefresh], Command.SCREEN, 5);
@@ -2629,6 +2647,16 @@ public class MP extends MIDlet
 					f.append(uiChoice);
 					
 //#ifndef NO_CHAT_CANVAS
+					themeChoice = new ChoiceGroup(L[LTheme], Choice.POPUP, THEMES[1], null);
+					for (i = 0; i < THEMES[0].length; ++i) {
+						if (theme.equals(THEMES[0][i])) {
+							themeChoice.setSelectedIndex(i, true);
+							break;
+						}
+					}
+					themeChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(themeChoice);
+					
 					textMethodChoice = new ChoiceGroup(L[LKeyboard], Choice.POPUP, new String[] {
 							L[LAuto],
 							"Nokia UI",
@@ -2639,15 +2667,11 @@ public class MP extends MIDlet
 					textMethodChoice.setSelectedIndex(textMethod, true);
 					f.append(textMethodChoice);
 					
-					themeChoice = new ChoiceGroup(L[LTheme], Choice.POPUP, THEMES[1], null);
-					for (i = 0; i < THEMES[0].length; ++i) {
-						if (theme.equals(THEMES[0][i])) {
-							themeChoice.setSelectedIndex(i, true);
-							break;
-						}
-					}
-					themeChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(themeChoice);
+					s = new StringItem(null, "Input languages", Item.BUTTON);
+					s.setDefaultCommand(keyboardLanguagesCmd);
+					s.setItemCommandListener(this);
+					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(s);
 //#endif
 					
 					photoSizeGauge = new Gauge(L[LThumbnailsSize], true, 64, Math.min(64, photoSize / 8));
@@ -2998,6 +3022,13 @@ public class MP extends MIDlet
 					j.put("legacyChatUI", legacyChatUI);
 					j.put("textMethod", textMethod);
 					j.put("theme", theme);
+					
+					JSONArray inputLanguagesJson = new JSONArray();
+					for (int k = 0; k < inputLanguages.length; ++k) {
+						if (inputLanguages[k] == null) break;
+						inputLanguagesJson.add(inputLanguages[k]);
+					}
+					j.put("inputLanguages", inputLanguagesJson);
 //#endif
 //#ifndef NO_FILE
 					j.put("downloadPath", downloadPath);
@@ -3043,6 +3074,48 @@ public class MP extends MIDlet
 					openFilePicker("", false);
 				} catch (Throwable ignored) {}
 				return;
+			}
+//#endif
+//#ifndef NO_CHAT_CANVAS
+			if (c == keyboardLanguagesCmd) {
+				// TODO
+				List l = new List("Languages", List.MULTIPLE);
+				l.addCommand(saveLanguagesCmd);
+				l.setCommandListener(this);
+				
+				String[] langs = Keyboard.getSupportedLanguages();
+				
+				for (int i = 0; i < langs.length; ++i) {
+					String s = langs[i];
+					String lang = s.substring(s.lastIndexOf('[')+1,s.lastIndexOf(']'));
+					l.append(s, null);
+					
+					for (int j = 0; j < inputLanguages.length; j++) {
+						if (inputLanguages[j] == null) break;
+						if (inputLanguages[j].equals(lang)) {
+							l.setSelectedIndex(i, true);
+							break;
+						}
+					}
+				}
+				
+				display(l);
+				return;
+			}
+			if (c == saveLanguagesCmd) {
+				List l = (List) d;
+				boolean[] selected = new boolean[l.size()];
+				
+				inputLanguages = new String[l.getSelectedFlags(selected)];
+				int k = 0;
+				for (int i = 0; i < selected.length; ++i) {
+					if (selected[i]) {
+						String s = l.getString(i);
+						inputLanguages[k++] = s.substring(s.lastIndexOf('[')+1, s.lastIndexOf(']'));
+					}
+				}
+				
+				c = backCmd;
 			}
 //#endif
 		}
