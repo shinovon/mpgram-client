@@ -1636,7 +1636,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	private void menuAction(int i) {
 		if (i < menu.length) {
-			if (menu[i] == LCancel) {
+			if (menu[i] == LBack) {
 				// just close
 			} else if (menuItem == null) {
 				switch (menu[i]) {
@@ -1928,7 +1928,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (touch && h >= height - 20) {
 			this.menu = new int[len + 1];
 			System.arraycopy(menu, 0, this.menu, 0, len);
-			this.menu[len] = LCancel;
+			this.menu[len] = LBack;
 			menuCount++;
 			h += MP.medPlainFontHeight + 8;
 		}
