@@ -105,6 +105,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	int replyMsgId;
 	int photoRawWidth, photoRawHeight;
 	long fileSize;
+	boolean voice;
 	
 	String time, nameRender, dateRender;
 	String replyNameRender, replyTextRender, forwardRender;
@@ -324,12 +325,23 @@ public class UIMessage extends UIItem implements LangConstants {
 						name: {
 							if (media.has("audio")) {
 								JSONObject audio = media.getObject("audio");
-								if ((t = audio.getString("artist", null)) != null && t.length() != 0) {
-									sb.append(t).append(" - ");
-								}
-								if ((t = audio.getString("title", null)) != null && t.length() != 0) {
-									sb.append(t);
+								if (audio.getBoolean("voice", false)) {
+									int time = audio.getInt("time");
+									sb.append(time / 60).append(':').append(MP.n(time % 60));
+									mediaSubtitle = sb.toString();
+									sb.setLength(0);
+									
+									sb.append(MP.L[LVoiceMessage]);
+									voice = true;
 									break name;
+								} else {
+									if ((t = audio.getString("artist", null)) != null && t.length() != 0) {
+										sb.append(t).append(" - ");
+									}
+									if ((t = audio.getString("title", null)) != null && t.length() != 0) {
+										sb.append(t);
+										break name;
+									}
 								}
 							}
 							if ((t = media.getString("name", null)) != null && t.length() != 0) {
@@ -338,7 +350,7 @@ public class UIMessage extends UIItem implements LangConstants {
 						}
 						mediaTitle = sb.toString();
 						
-						if (!media.isNull("size")) {
+						if (!media.isNull("size") && !voice) {
 							sb.setLength(0);
 							long size = fileSize = media.getLong("size");
 							if (size >= 1024 * 1024) {
