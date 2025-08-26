@@ -2348,7 +2348,8 @@ public class MP extends MIDlet
 				return;
 			}
 			if (c == writeCmd) {
-				display(writeForm(((MPChat) d).id(), Integer.toString(((MPChat) d).topMsgId()), "", null, null, null));
+				int r = ((MPChat) d).topMsgId();
+				display(writeForm(((MPChat) d).id(), r == 0 ? null : Integer.toString(r), "", null, null, null));
 				return;
 			}
 			if (c == searchMsgCmd) {

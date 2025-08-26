@@ -2068,9 +2068,14 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		this.forwardPeer = peer;
 		this.forwardMsg = msg;
 		this.forwardMsgs = msgs;
-		bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
-
-		queueRepaint();
+		
+		if (!touch) {
+			// FIXME
+			MP.display(MP.errorAlert("Forwarding not implemented"), MP.current);
+		} else {
+			bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
+			queueRepaint();
+		}
 	}
 	
 	private void resetInput() {
