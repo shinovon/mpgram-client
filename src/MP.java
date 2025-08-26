@@ -890,7 +890,7 @@ public class MP extends MIDlet
 		addStickerPackCmd = new Command(L[LAddStickers], Command.OK, 2);
 		
 		okCmd = new Command(L[LOk], Command.OK, 1);
-		cancelCmd = new Command(L[LCancel], Command.CANCEL, 20);
+		cancelCmd = new Command(L[LCancel], Command.CANCEL, 30);
 		goCmd = new Command(L[LOk], Command.OK, 1);
 		copyCmd = new Command(L[LCopy], Command.OK, 1);
 		downloadInappCmd = new Command(L[LInApp], Command.OK, 0);
@@ -1371,11 +1371,9 @@ public class MP extends MIDlet
 				}
 				StringBuffer sb;
 				if (edit != null) {
-					sb = new StringBuffer(edit != null ? "editMessage" : "sendMessage");
-					sb.append("&peer=").append(writeTo);
-					if (edit != null) {
-						sb.append("&id=").append(edit);
-					}
+					sb = new StringBuffer("editMessage");
+					sb.append("&peer=").append(writeTo)
+					.append("&id=").append(edit);
 					if (replyTo != null) {
 						sb.append("&reply=").append(replyTo);
 					}
@@ -4424,7 +4422,7 @@ public class MP extends MIDlet
 	static Alert errorAlert(Exception e) {
 		e.printStackTrace();
 		if (!(e instanceof APIException)) {
-			return errorAlert(e.toString());
+			return errorAlert(e == cancelException ? "Operation canceled" : e.toString());
 		}
 		// parse api errors
 		
@@ -4915,7 +4913,15 @@ public class MP extends MIDlet
 				}
 			} catch (RuntimeException e) {
 				if (c >= 400) {
-					throw new APIException(url, c, null);
+					String r = null;
+					if (c >= 520) {
+						r = "Cloudflare: web server is down";
+					} else {
+						try {
+							r = hc.getResponseMessage();
+						} catch (Exception ignored) {}
+					}
+					throw new APIException(url, c, r);
 				} else throw e;
 			}
 			if (c >= 400 || (res instanceof JSONObject && ((JSONObject) res).has("error"))) {
@@ -4937,34 +4943,6 @@ public class MP extends MIDlet
 //		System.out.println(res instanceof JSONObject ?
 //				((JSONObject) res).format(0) : res instanceof JSONArray ?
 //						((JSONArray) res).format(0) : res);
-		return res;
-	}
-
-	// unused
-	static JSONStream apiStream(String url) throws IOException {
-		JSONStream res = null;
-
-		HttpConnection hc = null;
-		InputStream in = null;
-		try {
-			hc = openHttpConnection(instanceUrl.concat(API_URL + "?v=" + API_VERSION + "&method=").concat(url));
-			hc.setRequestMethod("GET");
-			
-			int c = hc.getResponseCode();
-			if (c >= 400) {
-				throw new APIException(url, c, null);
-			}
-			res = getJSONStream(hc);
-		} finally {
-			if (res == null) {
-				if (in != null) try {
-					in.close();
-				} catch (IOException e) {}
-				if (hc != null) try {
-					hc.close();
-				} catch (IOException e) {}
-			}
-		}
 		return res;
 	}
 
