@@ -268,6 +268,7 @@ public class MP extends MIDlet
 //#ifndef NO_CHAT_CANVAS
 	static String[] inputLanguages;
 //#endif
+	static boolean uploadFlush;
 	
 	// platform
 	static boolean symbianJrt;
@@ -387,6 +388,7 @@ public class MP extends MIDlet
 	static Command downloadBrowserCmd;
 	static Command cancelDownloadCmd;
 	static Command okDownloadCmd;
+	static Command cancelUploadCmd;
 	
 	static Command nextPageCmd;
 	static Command prevPageCmd;
@@ -681,6 +683,7 @@ public class MP extends MIDlet
 		useLoadingForm = !symbianJrt;
 		jsonStream = symbianJrt || !symbian;
 		threadedImages = symbianJrt;
+		uploadFlush = symbianJrt;
 		
 		avatarSize = Math.min(display.getBestImageHeight(Display.LIST_ELEMENT), display.getBestImageWidth(Display.LIST_ELEMENT));
 		if (avatarSize < 8) avatarSize = 16;
@@ -897,6 +900,7 @@ public class MP extends MIDlet
 		downloadBrowserCmd = new Command(L[LWithBrowser], Command.CANCEL, 1);
 		cancelDownloadCmd = new Command(L[LCancel], Command.CANCEL, 1);
 		okDownloadCmd = new Command(L[LOk], Command.OK, 1);
+		cancelUploadCmd = new Command(L[LCancel], Command.CANCEL, 1);
 
 		nextPageCmd = new Command(L[LNextPage], Command.SCREEN, 6);
 		prevPageCmd = new Command(L[LPrevPage], Command.SCREEN, 7);
@@ -1366,6 +1370,18 @@ public class MP extends MIDlet
 //#ifndef NO_CHAT_CANVAS
 				UIMessage[] fwdMsgs = ((Object[]) param).length < 9 ? null : (UIMessage[]) ((Object[]) param)[8];
 //#endif
+				
+				Alert alert = null;
+				if (sendChoice != null || file != null) {
+					alert = new Alert(symbian ? L[Lmpgram] : "");
+					alert.setString(L[LSending]);
+					alert.setIndicator(new Gauge(null, false, Gauge.INDEFINITE, Gauge.CONTINUOUS_RUNNING));
+					alert.addCommand(cancelUploadCmd);
+					alert.setCommandListener(this);
+					alert.setTimeout(Alert.FOREVER);
+					display(alert, current);
+				}
+				
 				if (file != null && file.length() <= 8) {
 					file = null;
 				}
@@ -1412,10 +1428,11 @@ public class MP extends MIDlet
 						.append("&id=").append(fwdMsg);
 					}
 				}
+				sb.append("&r=").append(System.currentTimeMillis());
 //#ifndef NO_FILE
 				try {
 					if (!checkClass("javax.microedition.io.file.FileConnection")) throw new Error();
-					postMessage(sb.toString(), file, text);
+					postMessage(sb.toString(), file, text, alert);
 				} catch (Error e)
 //#endif
 				{
@@ -1438,7 +1455,11 @@ public class MP extends MIDlet
 //				display(infoAlert(L[LMessageSent_Alert]), current);
 			} catch (Exception e) {
 				e.printStackTrace();
-				display(errorAlert(e), current);
+				if (e == cancelException) {
+					display(alert(null, L[LDownloadCanceled_Alert], AlertType.WARNING), current);
+				} else {
+					display(errorAlert(e), current);
+				}
 			} finally {
 				sending = false;
 			}
@@ -1906,7 +1927,8 @@ public class MP extends MIDlet
 				StringBuffer sb = new StringBuffer("botCallback&timeout=1");
 				sb.append("&peer=").append(((String[]) param)[0]);
 				sb.append("&id=").append(((String[]) param)[1]);
-				sb.append("&data=").append(((String[]) param)[2]);
+				sb.append("&data=").append(((String[]) param)[2])
+				.append("&r=").append(System.currentTimeMillis());
 				
 				JSONObject j = null;
 				
@@ -1981,7 +2003,8 @@ public class MP extends MIDlet
 				
 				StringBuffer sb = new StringBuffer("sendMedia&peer=").append(form.chatForm.id());
 				sb.append("&doc_id=").append(s.getString("id"))
-				.append("&doc_access_hash=").append(s.getString("access_hash"));
+				.append("&doc_access_hash=").append(s.getString("access_hash"))
+				.append("&r=").append(System.currentTimeMillis());
 				
 				MP.api(sb.toString());
 				
@@ -2162,7 +2185,7 @@ public class MP extends MIDlet
 								while ((read = in.read(buf)) != -1) {
 									out.write(buf, 0, read);
 									if (gauge != null) {
-										gauge.setValue((int) ((readTotal * 100) / size));
+										gauge.setValue(Math.min((int) ((readTotal * 100) / size), 100));
 									}
 									if (!downloading) throw cancelException;
 									readTotal += read;
@@ -3449,6 +3472,10 @@ public class MP extends MIDlet
 			}
 			if (c == cancelDownloadCmd) {
 				downloading = false;
+				return;
+			}
+			if (c == cancelUploadCmd) {
+				sending = false;
 				return;
 			}
 			if (c == okDownloadCmd) {
@@ -4947,13 +4974,21 @@ public class MP extends MIDlet
 	}
 
 //#ifndef NO_FILE
-	static Object postMessage(String url, String fileUrl, String text) throws IOException {
+	static Object postMessage(String url, String fileUrl, String text, Alert alert) throws IOException {
 		Object res;
 
 		HttpConnection http = null;
 		InputStream httpIn = null;
 		
 		FileConnection file = null;
+		
+		Gauge gauge = null;
+		if (alert != null) {
+			alert.setTitle(L[LSending]);
+			gauge = new Gauge(null, false, 100, 0);
+			alert.setIndicator(gauge);
+		}
+		int fileTotal = 0, fileSent = 0;
 		
 		StringBuffer sb = new StringBuffer();
 		Random rng = new Random();
@@ -4964,26 +4999,29 @@ public class MP extends MIDlet
 			sb.append(rng.nextInt(10));
 		}
 		String boundary = sb.toString();
-		int boundaryLength = boundary.length();
+//		int boundaryLength = boundary.length();
 		sb.setLength(0);
 		byte[] CRLF = new byte[] { (byte) '\r', (byte) '\n' };
 		byte[] DASHDASH = new byte[] { (byte) '-', (byte) '-' };
+		
+		if (!sending) throw cancelException;
 		
 		try {
 			http = openHttpConnection(instanceUrl.concat(API_URL + "?v=" + API_VERSION + "&method=").concat(url));
 			http.setRequestMethod("POST");
 			http.setRequestProperty("Content-Type", "multipart/form-data; charset=UTF-8; boundary=".concat(boundary));
 
-			int contentLength = 0;
-			if (text != null) {
-				contentLength += 43 + 10 + boundaryLength + text.getBytes("UTF-8").length;
-			}
+//			int contentLength = 0;
+//			if (text != null) {
+//				contentLength += 43 + 10 + boundaryLength + text.getBytes("UTF-8").length;
+//			}
 			if (fileUrl != null) {
 				file = (FileConnection) Connector.open(fileUrl);
-				contentLength += 55 + 1 + 10 + boundaryLength + file.getName().getBytes("UTF-8").length + (int) file.fileSize();
+				fileTotal = (int) file.fileSize();
+//				contentLength += 55 + 1 + 10 + boundaryLength + file.getName().getBytes("UTF-8").length + fileTotal;
 			}
-			contentLength += boundaryLength + 4;
-			http.setRequestProperty("Content-Length", String.valueOf(contentLength));
+//			contentLength += boundaryLength + 4;
+//			http.setRequestProperty("Content-Length", String.valueOf(contentLength));
 
 			OutputStream httpOut = http.openOutputStream();
 			try {
@@ -4999,8 +5037,16 @@ public class MP extends MIDlet
 					httpOut.write(CRLF);
 				}
 
+				if (!sending) throw cancelException;
 				if (fileUrl != null) {
 					InputStream fileIn = file.openInputStream();
+					
+					if (alert != null && fileTotal != 0) {
+						display(alert, current);
+					} else {
+						gauge = null;
+					}
+					
 					try {
 						httpOut.write(DASHDASH);
 						httpOut.write(boundary.getBytes());
@@ -5014,6 +5060,14 @@ public class MP extends MIDlet
 						int i;
 						while ((i = fileIn.read(b)) != -1) {
 							httpOut.write(b, 0, i);
+							if (uploadFlush) {
+								httpOut.flush();
+							}
+							fileSent += i;
+							if (gauge != null) {
+								gauge.setValue(Math.min((fileSent * 100) / fileTotal, 100));
+							}
+							if (!sending) throw cancelException;
 						}
 						httpOut.write(CRLF);
 					} finally {
@@ -5028,6 +5082,7 @@ public class MP extends MIDlet
 			} finally {
 				httpOut.close();
 			}
+			if (!sending) throw cancelException;
 			
 			int c = http.getResponseCode();
 			try {
