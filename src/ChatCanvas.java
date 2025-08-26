@@ -376,10 +376,15 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				if (messageId == -1 && dialog.has("read_inbox_max_id")) {
 					messageId = 0;
 					int maxId = dialog.getInt("read_inbox_max_id");
-					if (maxId != 0 && dialog.getInt("unread_count", 0) > limit) {
-						offsetId = messageId = maxId;
-						addOffset = -limit;
-						dir = 1;
+					if (maxId != 0) {
+						messageId = maxId;
+						if (dialog.getInt("unread_count", 0) > limit) {
+							offsetId = maxId;
+							addOffset = -limit;
+							dir = 1;
+						} else {
+							offsetId = -1;
+						}
 					}
 				}
 				if (dialog.has("read_outbox_max_id")) {
@@ -521,7 +526,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			if (addOffset != 0) {
 				sb.append("&add_offset=").append(addOffset);
 			}
-			if (offsetId != 0) {
+			if (offsetId > 0) {
 				sb.append("&offset_id=").append(offsetId);
 			}
 			if (topMsgId != 0) {
