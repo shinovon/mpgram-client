@@ -1040,6 +1040,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							// send icon
 							int ty = iy + ((ih - 20) >> 1);
 							
+							// TODO: better sending indication
+							if (MP.sending) { // disabled
+								g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
+							}
+							
 							g.setColor(colors[COLOR_CHAT_SEND_ICON]);
 							g.fillTriangle(w - 8 - 20, ty, w - 8, ty + 10, w - 8 - 20, ty + 20);
 							g.setColor(colors[COLOR_CHAT_PANEL_BG]);
