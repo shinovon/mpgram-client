@@ -4549,7 +4549,7 @@ public class MP extends MIDlet
 		synchronized (formHistory) {
 			formHistory.removeElement(d);
 			if (display.getCurrent() == d) {
-				display((Displayable) formHistory.lastElement());
+				display(formHistory.size() == 0 ? null : (Displayable) formHistory.lastElement());
 			}
 		}
 	}
