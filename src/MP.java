@@ -3834,7 +3834,7 @@ public class MP extends MIDlet
 				// filter playable media
 				if (!"audio/mpeg".equals(t = msg.getObject("media").getString("mime"))
 						&& !"audio/aac".equals(t)
-						&& !"audio/m4a".equals(t))
+						/*&& !"audio/m4a".equals(t)*/)
 					continue;
 				playlistIndex = idx;
 				startPlayer(currentMusic = msg);

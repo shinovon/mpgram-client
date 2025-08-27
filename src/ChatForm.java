@@ -646,7 +646,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 						final boolean playable = media.has("audio")
 								&& ("audio/mpeg".equals(t = media.getString("mime", null))
 										|| "audio/aac".equals(t)
-										|| "audio/m4a".equals(t));
+										/*|| "audio/m4a".equals(t)*/);
 						boolean voice = false;
 						
 						key[4] = media.getString("name", null);

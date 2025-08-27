@@ -319,7 +319,7 @@ public class UIMessage extends UIItem implements LangConstants {
 						mediaPlayable = media.has("audio")
 								&& ("audio/mpeg".equals(t = media.getString("mime", null))
 										|| "audio/aac".equals(t)
-										|| "audio/m4a".equals(t));
+										/*|| "audio/m4a".equals(t)*/);
 						mediaFileName = media.getString("name", null);
 						StringBuffer sb = new StringBuffer();
 						name: {
