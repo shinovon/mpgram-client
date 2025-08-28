@@ -1217,7 +1217,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 		return username;
 	}
 	
-	public boolean update() {
+	public boolean updating() {
 		return update;
 	}
 	

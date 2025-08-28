@@ -1446,7 +1446,7 @@ public class MP extends MIDlet
 					((MPChat) current).sent();
 				}
 				
-				if (reopenChat || !longpoll || !((MPChat) current).update() || !((MPChat) current).endReached()) {
+				if (reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) {
 					// load latest messages
 					commandAction(latestCmd, current);
 				} else if (display.getCurrent() != current) {
@@ -1545,9 +1545,9 @@ public class MP extends MIDlet
 				int offset = 0;
 				int fails = 0;
 				boolean check = true;
-				while (form.update() && updatesThread == thread) {
+				while (form.updating() && updatesThread == thread) {
 					try {
-						if (!form.update() || updatesThread != thread) break;
+						if (!form.updating() || updatesThread != thread) break;
 						if (!form.isShown()) {
 							updatesSleeping = true;
 							Thread.sleep(updatesDelay);
@@ -1571,7 +1571,7 @@ public class MP extends MIDlet
 							} catch (Exception ignored) {}
 							check = false;
 						}
-						if (!form.update() || updatesThread != thread) break;
+						if (!form.updating() || updatesThread != thread) break;
 						
 						sb.setLength(0);
 						sb.append("updates&media=1&read=1&peer=").append(form.id())
@@ -1633,7 +1633,7 @@ public class MP extends MIDlet
 						e.printStackTrace();
 						fails++;
 						check = true;
-						if (fails >= 5 && form.update()) {
+						if (fails >= 5 && form.updating()) {
 							form.setUpdate(false);
 							if (form.isShown()) {
 								display(errorAlert("Updates thread died!\n".concat(e.toString())), null);
@@ -1648,7 +1648,7 @@ public class MP extends MIDlet
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
-				if (form != null && form.update()) {
+				if (form != null && form.updating()) {
 					form.setUpdate(false);
 				}
 				if (updatesThread == thread)
@@ -1942,7 +1942,7 @@ public class MP extends MIDlet
 					} else throw e;
 				}
 
-				if (reopenChat || !longpoll || !form.update() || !form.endReached()) {
+				if (reopenChat || !longpoll || !form.updating() || !form.endReached()) {
 					// see ChatForm#postLoad() for answer handling
 					form.setBotAnswer(j);
 					commandAction(latestCmd, current);
@@ -1985,7 +1985,7 @@ public class MP extends MIDlet
 				String[] s = (String[]) param;
 				MP.api("pinMessage&peer=".concat(s[0].concat("&id=").concat(s[1])));
 				
-				if (reopenChat || !longpoll || !((MPChat) current).update() || !((MPChat) current).endReached()) {
+				if (reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) {
 					// load latest messages
 					commandAction(latestCmd, current);
 				} else if (display.getCurrent() != current) {
@@ -2009,7 +2009,7 @@ public class MP extends MIDlet
 				MP.api(sb.toString());
 				
 				goBackTo((Displayable) form.chatForm);
-				if (reopenChat || !longpoll || !((MPChat) current).update() || !((MPChat) current).endReached()) {
+				if (reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) {
 					// load latest messages
 					commandAction(latestCmd, (Displayable) form.chatForm);
 				}

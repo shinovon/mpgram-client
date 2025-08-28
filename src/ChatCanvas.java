@@ -2129,7 +2129,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		return username;
 	}
 
-	public boolean update() {
+	public boolean updating() {
 		return update;
 	}
 

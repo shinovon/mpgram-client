@@ -37,7 +37,7 @@ interface MPChat {
 	String query();
 	String mediaFilter();
 	String username();
-	boolean update();
+	boolean updating();
 	boolean endReached();
 	boolean forum();
 	boolean switched();
