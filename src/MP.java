@@ -817,7 +817,7 @@ public class MP extends MIDlet
 		
 		// commands
 		
-		exitCmd = new Command(L[LExit], Command.EXIT, 25);
+		exitCmd = new Command(L[LExit], Command.EXIT, 27);
 		backCmd = new Command(L[LBack], Command.BACK, 25);
 		
 		settingsCmd = new Command(L[LSettings], Command.SCREEN, 20);
@@ -893,7 +893,7 @@ public class MP extends MIDlet
 		addStickerPackCmd = new Command(L[LAddStickers], Command.OK, 2);
 		
 		okCmd = new Command(L[LOk], Command.OK, 1);
-		cancelCmd = new Command(L[LCancel], Command.CANCEL, 30);
+		cancelCmd = new Command(L[LCancel], Command.CANCEL, 26);
 		goCmd = new Command(L[LOk], Command.OK, 1);
 		copyCmd = new Command(L[LCopy], Command.OK, 1);
 		downloadInappCmd = new Command(L[LInApp], Command.OK, 0);
@@ -3493,6 +3493,11 @@ public class MP extends MIDlet
 			updateUrl = null;
 			
 			if (formHistory.size() == 0) {
+				if (d == mainDisplayable && symbian) {
+					// minimize app
+					display.setCurrent(null);
+					return;
+				}
 				display(null, true);
 				return;
 			}
@@ -4165,7 +4170,11 @@ public class MP extends MIDlet
 	
 	static ChatsList mainChatsList() {
 		ChatsList l = chatsList = new ChatsList(L[Lmpgram], 0);
-		l.removeCommand(backCmd);
+		if (symbian) {
+			l.addCommand(backCmd);
+		} else {
+			l.removeCommand(backCmd);
+		}
 		l.addCommand(exitCmd);
 		l.addCommand(aboutCmd);
 		l.addCommand(settingsCmd);
