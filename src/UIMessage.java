@@ -147,7 +147,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			label.linkColor = ChatCanvas.colors[COLOR_MESSAGE_FG];
 			label.bgColor = ChatCanvas.colors[COLOR_ACTION_BG];
 			label.focusColor = ChatCanvas.colors[COLOR_MESSAGE_LINK_FOCUS];
-			label.background = true;
+//			label.background = true;
 			label.center = true;
 			
 			String t = null;
