@@ -2904,96 +2904,96 @@ public class MP extends MIDlet
 			}
 			if (c == backCmd && d == settingsForm) {
 				// apply and save settings
-				int i;
-				lang = LANGS[0][langChoice.getSelectedIndex()];
-				
-				reverseChat = uiChoice.isSelected(i = 0);
-				showMedia = uiChoice.isSelected(++i);
-				chatStatus = uiChoice.isSelected(++i);
-				focusNewMessages = uiChoice.isSelected(++i);
-				chatField = uiChoice.isSelected(++i);
-				useView = uiChoice.isSelected(++i);
-				fullPlayerCover = uiChoice.isSelected(++i);
+				try {
+					int i;
+					lang = LANGS[0][Math.max(0, langChoice.getSelectedIndex())];
+					
+					reverseChat = uiChoice.isSelected(i = 0);
+					showMedia = uiChoice.isSelected(++i);
+					chatStatus = uiChoice.isSelected(++i);
+					focusNewMessages = uiChoice.isSelected(++i);
+					chatField = uiChoice.isSelected(++i);
+					useView = uiChoice.isSelected(++i);
+					fullPlayerCover = uiChoice.isSelected(++i);
 //#ifndef NO_CHAT_CANVAS
-				legacyChatUI = uiChoice.isSelected(++i);
-				
-				textMethod = textMethodChoice.getSelectedIndex();
-				String prevTheme = theme;
-				theme = THEMES[0][themeChoice.getSelectedIndex()];
-				if (!theme.equals(prevTheme)) {
-					ChatCanvas.colorsCopy = null;
-				}
+					legacyChatUI = uiChoice.isSelected(++i);
+					
+					textMethod = textMethodChoice.getSelectedIndex();
+					String prevTheme = theme;
+					theme = THEMES[0][Math.max(0, themeChoice.getSelectedIndex())];
+					if (!theme.equals(prevTheme)) {
+						ChatCanvas.colorsCopy = null;
+					}
 //#endif
 				
-				if ((photoSize = (photoSizeGauge.getValue() * 8)) < 16) {
-					photoSizeGauge.setValue((photoSize = 16) / 8);
-				}
-				if ((chatsLimit = chatsGauge.getValue()) < 5) {
-					chatsGauge.setValue(chatsLimit = 5);
-				}
-				if ((messagesLimit = msgsGauge.getValue()) < 5) {
-					msgsGauge.setValue(messagesLimit = 5);
-				}
-				
-				chatsListFontSize = chatsFontSizeCoice.getSelectedIndex();
+					if ((photoSize = (photoSizeGauge.getValue() * 8)) < 16) {
+						photoSizeGauge.setValue((photoSize = 16) / 8);
+					}
+					if ((chatsLimit = chatsGauge.getValue()) < 5) {
+						chatsGauge.setValue(chatsLimit = 5);
+					}
+					if ((messagesLimit = msgsGauge.getValue()) < 5) {
+						msgsGauge.setValue(messagesLimit = 5);
+					}
+					
+					chatsListFontSize = chatsFontSizeCoice.getSelectedIndex();
 				
 //#ifndef NO_NOTIFY
-				notifications = notifyChoice.isSelected(0);
-				notifySound = notifyChoice.isSelected(1);
-				
-				notifyMethod = notifyMethodChoice.getSelectedIndex();
-				
-				notificationVolume = notificationVolumeGauge.getValue();
-				
-				if ((pushInterval = pushIntervalGauge.getValue() * 1000L) < 5000L) {
-					pushIntervalGauge.setValue((int) ((pushInterval = 5000) / 1000L));
-				}
-				if ((pushBgInterval = pushBgIntervalGauge.getValue() * 1000L) < 5000L) {
-					pushBgIntervalGauge.setValue((int) ((pushBgInterval = 5000) / 1000L));
-				}
+					notifications = notifyChoice.isSelected(0);
+					notifySound = notifyChoice.isSelected(1);
+					
+					notifyMethod = notifyMethodChoice.getSelectedIndex();
+					
+					notificationVolume = notificationVolumeGauge.getValue();
+					
+					if ((pushInterval = pushIntervalGauge.getValue() * 1000L) < 5000L) {
+						pushIntervalGauge.setValue((int) ((pushInterval = 5000) / 1000L));
+					}
+					if ((pushBgInterval = pushBgIntervalGauge.getValue() * 1000L) < 5000L) {
+						pushBgIntervalGauge.setValue((int) ((pushBgInterval = 5000) / 1000L));
+					}
 //#endif
 				
-				if (networkChoice != null)
-					blackberryNetwork = networkChoice.getSelectedIndex();
-				
-				useLoadingForm = behChoice.isSelected(i = 0);
-				jsonStream = behChoice.isSelected(++i);
-				parseRichtext = behChoice.isSelected(++i);
-				parseLinks = behChoice.isSelected(++i);
-				chatUpdates = behChoice.isSelected(++i);
-				keepAlive = behChoice.isSelected(++i);
-				utf = behChoice.isSelected(++i);
+					if (networkChoice != null)
+						blackberryNetwork = networkChoice.getSelectedIndex();
+					
+					useLoadingForm = behChoice.isSelected(i = 0);
+					jsonStream = behChoice.isSelected(++i);
+					parseRichtext = behChoice.isSelected(++i);
+					parseLinks = behChoice.isSelected(++i);
+					chatUpdates = behChoice.isSelected(++i);
+					keepAlive = behChoice.isSelected(++i);
+					utf = behChoice.isSelected(++i);
 //#ifndef NO_ZIP
-				compress = behChoice.isSelected(++i);
+					compress = behChoice.isSelected(++i);
 //#endif
-				longpoll = behChoice.isSelected(++i);
-				
-				if ((updatesTimeout = updateTimeoutGauge.getValue() * 5) < 5) {
-					updateTimeoutGauge.setValue((updatesTimeout = 5) / 5);
-				}
-				
-				loadThumbs = imagesChoice.isSelected(i = 0);
+					longpoll = behChoice.isSelected(++i);
+					
+					if ((updatesTimeout = updateTimeoutGauge.getValue() * 5) < 5) {
+						updateTimeoutGauge.setValue((updatesTimeout = 5) / 5);
+					}
+					
+					loadThumbs = imagesChoice.isSelected(i = 0);
 //#ifndef NO_AVATARS
-				loadAvatars = imagesChoice.isSelected(++i);
-				roundAvatars = imagesChoice.isSelected(++i);
+					loadAvatars = imagesChoice.isSelected(++i);
+					roundAvatars = imagesChoice.isSelected(++i);
 //#endif
-				threadedImages = imagesChoice.isSelected(++i);
+					threadedImages = imagesChoice.isSelected(++i);
 				
 //#ifndef NO_AVATARS
-				avatarsCache = avaCacheChoice.getSelectedIndex();
-				avatarsCacheThreshold = avaCacheGauge.getValue() * 5;
+					avatarsCache = avaCacheChoice.getSelectedIndex();
+					avatarsCacheThreshold = avaCacheGauge.getValue() * 5;
 //#endif
-				peersCacheThreshold = profileCacheGauge.getValue() * 10;
+					peersCacheThreshold = profileCacheGauge.getValue() * 10;
 
 //#ifndef NO_FILE
-				downloadMethod = downloadMethodChoice.getSelectedIndex();
-				downloadPath = downloadPathField.getString();
+					downloadMethod = downloadMethodChoice.getSelectedIndex();
+					downloadPath = downloadPathField.getString();
 //#endif
-				
-				try {
-					RecordStore.deleteRecordStore(SETTINGS_RECORD_NAME);
-				} catch (Exception ignored) {}
-				try {
+
+					try {
+						RecordStore.deleteRecordStore(SETTINGS_RECORD_NAME);
+					} catch (Exception ignored) {}
 					JSONObject j = new JSONObject();
 					j.put("reverseChat", reverseChat);
 //#ifndef NO_AVATARS
@@ -3061,7 +3061,11 @@ public class MP extends MIDlet
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
 					r.addRecord(b, 0, b.length);
 					r.closeRecordStore();
-				} catch (Exception ignored) {}
+				} catch (Exception e) {
+					e.printStackTrace();
+					display(errorAlert("Failed to save settings: " + e)); // TODO unlocalized
+					return;
+				}
 			}
 			if (c == logoutCmd) {
 				userState = 0;
