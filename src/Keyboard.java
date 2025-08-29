@@ -383,6 +383,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 		}
 		updateText = true;
 		selectionStart = selectionEnd = -1;
+		caretPosition = 0;
 	}
 
 	
