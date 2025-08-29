@@ -266,7 +266,7 @@ public class MP extends MIDlet
 	static int playerVolume = 50;
 	static boolean voiceConversion;
 //#ifndef NO_CHAT_CANVAS
-	static String[] inputLanguages;
+	static String[] inputLanguages = new String[] { "en", "ru" };
 //#endif
 	static boolean uploadFlush;
 	
@@ -777,8 +777,6 @@ public class MP extends MIDlet
 				for (int i = 0; i < l; i++) {
 					inputLanguages[i] = inputLanguagesJson.getString(i);
 				}
-			} else {
-				inputLanguages = new String[] { "en", "ru" };
 			}
 //#endif
 //#ifndef NO_FILE
@@ -3046,9 +3044,11 @@ public class MP extends MIDlet
 					j.put("theme", theme);
 					
 					JSONArray inputLanguagesJson = new JSONArray();
-					for (int k = 0; k < inputLanguages.length; ++k) {
-						if (inputLanguages[k] == null) break;
-						inputLanguagesJson.add(inputLanguages[k]);
+					if (inputLanguages != null) {
+						for (int k = 0; k < inputLanguages.length; ++k) {
+							if (inputLanguages[k] == null) break;
+							inputLanguagesJson.add(inputLanguages[k]);
+						}
 					}
 					j.put("inputLanguages", inputLanguagesJson);
 //#endif
