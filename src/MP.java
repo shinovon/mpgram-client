@@ -685,7 +685,6 @@ public class MP extends MIDlet
 		useLoadingForm = !symbianJrt;
 		jsonStream = symbianJrt || !symbian;
 		threadedImages = symbianJrt;
-		uploadFlush = symbianJrt;
 		
 		avatarSize = Math.min(display.getBestImageHeight(Display.LIST_ELEMENT), display.getBestImageWidth(Display.LIST_ELEMENT));
 		if (avatarSize < 8) avatarSize = 16;
