@@ -268,7 +268,7 @@ public class MP extends MIDlet
 //#ifndef NO_CHAT_CANVAS
 	static String[] inputLanguages = new String[] { "en", "ru" };
 //#endif
-	static boolean uploadFlush;
+	static boolean chunkedUpload;
 	
 	// platform
 	static boolean symbianJrt;
@@ -552,12 +552,14 @@ public class MP extends MIDlet
 //#endif	
 		// get device name
 		String p, v, d;
+		boolean sym3 = false;
 		if ((p = System.getProperty("microedition.platform")) != null) {
 			d = p;
 			if ((symbianJrt = p.indexOf("platform=S60") != -1)) {
 				int i;
 				v = p.substring(i = p.indexOf("platform_version=") + 17, i = p.indexOf(';', i));
 				if (v.charAt(0) == '5') {
+					sym3 = true;
 					switch (v.charAt(2)) {
 					case '2':
 						systemName = p.indexOf("java_build_version=2.2") != -1 ? "Symbian Anna" : "Symbian^3";
@@ -573,6 +575,7 @@ public class MP extends MIDlet
 						break;
 					default:
 						systemName = "S60 5th Edition";
+						sym3 = false;
 					}
 				} else {
 					// 3.2
@@ -708,6 +711,7 @@ public class MP extends MIDlet
 		
 		longpoll = !s40;
 		parseRichtext = !s40;
+		chunkedUpload = !symbian || sym3;
 		if (blackberry) {
 			textMethod = 3;
 		}
@@ -783,7 +787,7 @@ public class MP extends MIDlet
 			downloadPath = j.getString("downloadPath", downloadPath);
 //#endif
 			longpoll = j.getBoolean("longpoll", longpoll);
-			uploadFlush = j.getBoolean("uploadFlush", uploadFlush);
+			chunkedUpload = j.getBoolean("chunkedUpload", chunkedUpload);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -2799,7 +2803,7 @@ public class MP extends MIDlet
 					behChoice.setSelectedIndex(++i, compress);
 //#endif
 					behChoice.setSelectedIndex(++i, longpoll);
-					behChoice.setSelectedIndex(++i, uploadFlush);
+					behChoice.setSelectedIndex(++i, chunkedUpload);
 					behChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(behChoice);
 					
@@ -2969,7 +2973,7 @@ public class MP extends MIDlet
 					compress = behChoice.isSelected(++i);
 //#endif
 					longpoll = behChoice.isSelected(++i);
-					uploadFlush = behChoice.isSelected(++i);
+					chunkedUpload = behChoice.isSelected(++i);
 					
 					if ((updatesTimeout = updateTimeoutGauge.getValue() * 5) < 5) {
 						updateTimeoutGauge.setValue((updatesTimeout = 5) / 5);
@@ -3060,7 +3064,7 @@ public class MP extends MIDlet
 					j.put("downloadPath", downloadPath);
 //#endif
 					j.put("longpoll", longpoll);
-					j.put("uploadFlush", uploadFlush);
+					j.put("chunkedUpload", chunkedUpload);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
@@ -5029,6 +5033,9 @@ public class MP extends MIDlet
 			http = openHttpConnection(instanceUrl.concat(API_URL + "?v=" + API_VERSION + "&method=").concat(url));
 			http.setRequestMethod("POST");
 			http.setRequestProperty("Content-Type", "multipart/form-data; charset=UTF-8; boundary=".concat(boundary));
+			if (chunkedUpload) {
+				http.setRequestProperty("Transfer-Encoding", "chunked");
+			}
 
 //			int contentLength = 0;
 //			if (text != null) {
@@ -5079,7 +5086,7 @@ public class MP extends MIDlet
 						int i;
 						while ((i = fileIn.read(b)) != -1) {
 							httpOut.write(b, 0, i);
-							if (uploadFlush) {
+							if (chunkedUpload) {
 								httpOut.flush();
 							}
 							fileSent += i;
