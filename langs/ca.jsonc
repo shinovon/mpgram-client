@@ -238,6 +238,7 @@
 	"AlwaysAsk": "Always ask", // Untranslated
 	"InApp": "In app", // Untranslated
 	"WithBrowser": "With browser", // Untranslated
+	"PartialUpload": "Partial upload", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "Carrega miniatures mèdia",

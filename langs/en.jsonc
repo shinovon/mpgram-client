@@ -238,6 +238,7 @@
 	"AlwaysAsk": "Always ask",
 	"InApp": "In app",
 	"WithBrowser": "With browser",
+	"PartialUpload": "Partial upload",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Load media thumbnails",

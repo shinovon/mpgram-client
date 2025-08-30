@@ -783,6 +783,7 @@ public class MP extends MIDlet
 			downloadPath = j.getString("downloadPath", downloadPath);
 //#endif
 			longpoll = j.getBoolean("longpoll", longpoll);
+			uploadFlush = j.getBoolean("uploadFlush", uploadFlush);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -2784,7 +2785,8 @@ public class MP extends MIDlet
 //#ifndef NO_ZIP
 							L[LUseCompression],
 //#endif
-							L[LLongpoll]
+							L[LLongpoll],
+							L[LPartialUpload],
 					}, null);
 					behChoice.setSelectedIndex(i = 0, useLoadingForm);
 					behChoice.setSelectedIndex(++i, jsonStream);
@@ -2797,6 +2799,7 @@ public class MP extends MIDlet
 					behChoice.setSelectedIndex(++i, compress);
 //#endif
 					behChoice.setSelectedIndex(++i, longpoll);
+					behChoice.setSelectedIndex(++i, uploadFlush);
 					behChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(behChoice);
 					
@@ -2966,6 +2969,7 @@ public class MP extends MIDlet
 					compress = behChoice.isSelected(++i);
 //#endif
 					longpoll = behChoice.isSelected(++i);
+					uploadFlush = behChoice.isSelected(++i);
 					
 					if ((updatesTimeout = updateTimeoutGauge.getValue() * 5) < 5) {
 						updateTimeoutGauge.setValue((updatesTimeout = 5) / 5);
@@ -3056,6 +3060,7 @@ public class MP extends MIDlet
 					j.put("downloadPath", downloadPath);
 //#endif
 					j.put("longpoll", longpoll);
+					j.put("uploadFlush", uploadFlush);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);

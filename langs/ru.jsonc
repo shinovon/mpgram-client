@@ -216,7 +216,8 @@
 	"Auto": "Автоматически",
 	"FullscreenTextBox": "Полноэкр. ввод",
 	"Theme": "Тема",
-	"InputLanguages": "Input languages", // Untranslated
+	"InputLanguages": "Языки ввода",
+	"PartialUpload": "Отправка по частям",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Ждать полной загрузки",
