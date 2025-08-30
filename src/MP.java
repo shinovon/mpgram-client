@@ -552,17 +552,17 @@ public class MP extends MIDlet
 //#endif	
 		// get device name
 		String p, v, d;
-		boolean sym3 = false;
+		boolean anna = false;
 		if ((p = System.getProperty("microedition.platform")) != null) {
 			d = p;
 			if ((symbianJrt = p.indexOf("platform=S60") != -1)) {
 				int i;
 				v = p.substring(i = p.indexOf("platform_version=") + 17, i = p.indexOf(';', i));
 				if (v.charAt(0) == '5') {
-					sym3 = true;
+					anna = true;
 					switch (v.charAt(2)) {
 					case '2':
-						systemName = p.indexOf("java_build_version=2.2") != -1 ? "Symbian Anna" : "Symbian^3";
+						systemName = (anna = (p.indexOf("java_build_version=2.2") != -1)) ? "Symbian Anna" : "Symbian^3";
 						break;
 					case '3':
 						systemName = "Symbian Belle";
@@ -575,7 +575,7 @@ public class MP extends MIDlet
 						break;
 					default:
 						systemName = "S60 5th Edition";
-						sym3 = false;
+						anna = false;
 					}
 				} else {
 					// 3.2
@@ -711,7 +711,8 @@ public class MP extends MIDlet
 		
 		longpoll = !s40;
 		parseRichtext = !s40;
-		chunkedUpload = !symbian || sym3;
+		// disable if symbian older than anna, or s40 older than v6
+		chunkedUpload = (!symbian || anna) && (!s40 || checkClass("javax.microedition.location.Location"));
 		if (blackberry) {
 			textMethod = 3;
 		}
