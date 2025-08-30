@@ -1523,7 +1523,8 @@ public class MP extends MIDlet
 			try {
 				JSONObject j = parseObject(new String(get(OTA_URL + "?v=" + version + "&l=" + lang
 						+ (MINI_BUILD ? "&m=1" : "")
-						+ (blackberry ? "&bb=1" : "")), encoding));
+						+ (blackberry ? "&bb=1" : "")
+						+ (midlet.getAppProperty("mpgram-samsung-build") != null ? "&sams=1" : "")), encoding));
 				if (j.getBoolean("update_available", false) && checkUpdates) {
 					updateUrl = j.getString("download_url");
 					Alert a = new Alert("", "", null, AlertType.INFO);
