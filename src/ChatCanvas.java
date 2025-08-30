@@ -361,6 +361,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					&& (MP.updatesThread != null || MP.updatesRunning)) {
 				MP.display(MP.loadingAlert(MP.L[LWaitingForPrevChat]), this);
 				
+				// TODO check if cancel is already in progress
 				MP.cancel(MP.updatesThreadCopy, true);
 				while (MP.updatesThread != null || MP.updatesRunning) {
 					Thread.sleep(1000L);
@@ -1302,6 +1303,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			}
 		} else if (loading) {
 			// prevent NPE below
+		} else if (inputFocused) {
+			
 		} else if (fieldFocused) {
 			if (game == Canvas.UP) {
 				fieldFocused = false;
@@ -1396,6 +1399,14 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			if (focusedItem != null) {
 				focusedItem.traverse(game);
 			}
+		} else {
+			try {
+				String s = getKeyName(key);
+				if ("send".equalsIgnoreCase(s)) {
+					send();
+					repaint = true;
+				}
+			} catch (Exception ignored) {}
 		}
 		if (repaint) {
 			queueRepaint();
@@ -1592,21 +1603,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							}
 						}
 					} else if (x > width - 48) {
-						if ((text != null && text.trim().length() != 0) || file != null || forwardMsgs != null || forwardMsg != null) {
-							// send
-							if (!MP.sending) {
-								MP.sending = true;
-								MP.midlet.start(MP.RUN_SEND_MESSAGE, new Object[] {
-										text, id,
-										replyMsgId == 0 ? null : Integer.toString(replyMsgId),
-										editMsgId == 0 ? null : Integer.toString(editMsgId),
-										file,
-										null, forwardPeer, forwardMsg, forwardMsgs
-										});
-							}
-						} else {
-							showMenu(null, new int[] { LSendSticker, LWriteMessage });
-						}
+						send();
 					} else { 
 //						MP.midlet.commandAction(MP.writeCmd, this);
 						if (nokiaEditor != null) {
@@ -2075,6 +2072,23 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		} else {
 			bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
 			queueRepaint();
+		}
+	}
+	
+	private void send() {
+		if ((text != null && text.trim().length() != 0) || file != null || forwardMsgs != null || forwardMsg != null) {
+			if (!MP.sending) {
+				MP.sending = true;
+				MP.midlet.start(MP.RUN_SEND_MESSAGE, new Object[] {
+						text, id,
+						replyMsgId == 0 ? null : Integer.toString(replyMsgId),
+						editMsgId == 0 ? null : Integer.toString(editMsgId),
+						file,
+						null, forwardPeer, forwardMsg, forwardMsgs
+						});
+			}
+		} else {
+			showMenu(null, new int[] { LSendSticker, LWriteMessage });
 		}
 	}
 	

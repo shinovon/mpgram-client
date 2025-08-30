@@ -244,7 +244,7 @@ public class MP extends MIDlet
 	static boolean fileRewrite;
 	static int blackberryNetwork = -1; // -1: undefined, 0: data, 1: wifi
 	static int playerHttpMethod = 1; // 0 - pass url, 1 - pass connection stream
-	static boolean reopenChat; // s40
+	static boolean reopenChat;
 	static boolean fullPlayerCover;
 	static boolean notifications;
 //#ifndef NO_NOTIFY
@@ -277,6 +277,7 @@ public class MP extends MIDlet
 	public static String encoding = "UTF-8";
 	static boolean blackberry;
 	static boolean symbian;
+	static boolean series40;
 	// endregion
 
 	// threading
@@ -612,6 +613,7 @@ public class MP extends MIDlet
 			// s40 check
 			Class.forName("com.nokia.mid.impl.isa.jam.Jam");
 			s40 = true;
+			series40 = true;
 			systemName = "Series 40";
 			try {
 				Class.forName("com.sun.mmedia.protocol.CommonDS");
@@ -705,7 +707,6 @@ public class MP extends MIDlet
 //#endif
 //#endif
 		
-		reopenChat = s40;
 		longpoll = !s40;
 		parseRichtext = !s40;
 		if (blackberry) {
@@ -1682,7 +1683,7 @@ public class MP extends MIDlet
 //#endif
 						) {
 					Thread.sleep(wasShown ? pushInterval : pushBgInterval);
-					if (threadConnections.size() != 0 || (playerState == 1 && reopenChat))
+					if (threadConnections.size() != 0 || (playerState == 1 && (reopenChat || series40)))
 						continue;
 					
 					// update status
@@ -4415,7 +4416,7 @@ public class MP extends MIDlet
 		downloadMessage = new String[] { peerId, msgId, fileName, size };
 //#ifndef NO_FILE
 		if (fileName != null && downloadMethod != 2
-				&& (!reopenChat || (!fileName.endsWith(".jar") && !fileName.endsWith(".jad")))) {
+				&& (!fileName.endsWith(".jar") && !fileName.endsWith(".jad"))) {
 			if (downloadMethod == 0) {
 				Alert a = new Alert(fileName);
 				a.setString(L[LChooseDownloadMethod_Alert]);
@@ -4610,7 +4611,7 @@ public class MP extends MIDlet
 		
 		if (d != playerForm) {
 			if (playerState != 0) {
-				if (playerState == 1 && reopenChat) {
+				if (playerState == 1 && (series40 || reopenChat)) {
 					closePlayer();
 					d.removeCommand(playerCmd);
 				} else {
@@ -4947,7 +4948,7 @@ public class MP extends MIDlet
 			
 			try {
 				threadConnections.put(hc, in = openInputStream(hc));
-				if (jsonStream) {
+				if (jsonStream && (!url.startsWith("updates") || !series40)) {
 					res = getJSONStream(in).nextValue();
 				} else {
 					res = parseJSON(readUtf(in, (int) hc.getLength()));
