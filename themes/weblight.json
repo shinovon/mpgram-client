@@ -35,7 +35,7 @@
 	"ACTION_BG": "0xEAEAEA",
 	"MESSAGE_OUT_READ": "0x168ACD",
 	
-	"MESSAGE_FILL": false,
-	"MESSAGE_ROUND": false,
-	"MESSAGE_BORDER": true
+	"MESSAGE_FILL": true,
+	"MESSAGE_ROUND": true,
+	"MESSAGE_BORDER": false
 }
