@@ -132,7 +132,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	UIItem pointedItem, heldItem;
 	boolean startSelectDir;
 	
-	static final int moveSamples = 5;
+	static final int moveSamples = 10;
 	int[] moves = new int[moveSamples];
 	long[] moveTimes = new long[moveSamples];
 	int movesIdx;
@@ -1434,7 +1434,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		} else {
 			pointedItem = null;
 		}
-		queueRepaint();
+//		queueRepaint();
 	}
 	
 	protected void pointerDragged(int x, int y) {
@@ -1468,9 +1468,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				final int dY = pointerY - y;
 				final int dX = pointerX - x;
 				if (dragging || dY > 1 || dY < -1
-						|| dragYHold + dY > 2 || dragYHold + dY < -2
+						|| dragYHold + dY > 1 || dragYHold + dY < -1
 						|| dX > 1 || dX < -1
-						|| dragXHold + dX > 2 || dragXHold + dX < -2) {
+						|| dragXHold + dX > 1 || dragXHold + dX < -1) {
 					int dx2 = dX;
 					int dy2 = dY;
 					if (now - pressTime < 100) {
@@ -1541,25 +1541,39 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					}
 				} else {
 					int move = 0;
-					long moveTime = 0;
+					long moveTime = 0, lastTime = 0, prevTime = 0;
 					for (int i = 0; i < moveSamples; i++) {
 						int idx = (movesIdx + moveSamples - 1 - i) % moveSamples;
-						long time;
-						if ((time = now - moveTimes[idx]) > 200) {
+						long time = moveTimes[idx];
+						if (time < prevTime) {
+							break;
+						}
+						prevTime = time;
+						if ((time = now - (lastTime = time)) > 200) {
 							break;
 						}
 						move += moves[idx];
 						moveTime += time;
 					}
-					if (moveTime > 0) {
+					if (moveTime == 0) moveTime = 1;
+					long holdTime = now - lastTime;
+					if (moveTime > 0 && holdTime < 150) {
 						// release kinetic velocity
-						float res = (130f * move) / moveTime; 
-						if (Math.abs(res) > 100) {
-							res = (res < 0 ? -60 : 60);
+						float res = (130f * move) / moveTime;
+						if (holdTime > 28) {
+							if (res > move)
+								res = move;
+							res *= 25f / (holdTime - 10);
 						}
-						if (reverse) res = -res;
-						if (kineticScroll * res < 0) kineticScroll = 0;
-						kineticScroll += res;
+						float abs = Math.abs(res);
+						if (abs >= 1) {
+							if (abs > 100) {
+								res = (res < 0 ? -60 : 60);
+							}
+							if (reverse) res = -res;
+							if (kineticScroll * res < 0) kineticScroll = 0;
+							kineticScroll += res;
+						}
 					}
 				}
 			}
