@@ -256,7 +256,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				nokiaEditor = NokiaAPI.createTextEditor(500, TextField.ANY, 40, 40);
 				if (nokiaEditor != null) {
 					NokiaAPI.TextEditor_setContent(nokiaEditor, "");
-					NokiaAPI.TextEditor_setMultiline(nokiaEditor, true);
 				}
 			} catch (Throwable ignored) {
 				ignored.printStackTrace();
@@ -1011,6 +1010,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 										NokiaAPI.TextEditor_setParent(nokiaEditor, null);
 									} else {
 										NokiaAPI.TextEditor_setParent(nokiaEditor, this);
+										NokiaAPI.TextEditor_setMultiline(nokiaEditor, true);
 										NokiaAPI.TextEditor_setSize(nokiaEditor, 10, iy + 8, w - 40, ih - 8);
 										NokiaAPI.TextEditor_setIndicatorVisibility(nokiaEditor, false);
 										NokiaAPI.TextEditor_setBackgroundColor(nokiaEditor, colors[COLOR_CHAT_PANEL_BG] | 0xFF000000);
