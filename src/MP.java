@@ -5035,15 +5035,15 @@ public class MP extends MIDlet
 			http = openHttpConnection(instanceUrl.concat(API_URL + "?v=" + API_VERSION + "&method=").concat(url));
 			http.setRequestMethod("POST");
 			http.setRequestProperty("Content-Type", "multipart/form-data; charset=UTF-8; boundary=".concat(boundary));
-			if (chunkedUpload) {
-				http.setRequestProperty("Transfer-Encoding", "chunked");
-			}
 
 //			int contentLength = 0;
 //			if (text != null) {
 //				contentLength += 43 + 10 + boundaryLength + text.getBytes("UTF-8").length;
 //			}
 			if (fileUrl != null) {
+				if (chunkedUpload) {
+					http.setRequestProperty("Transfer-Encoding", "chunked");
+				}
 				file = (FileConnection) Connector.open(fileUrl);
 				fileTotal = (int) file.fileSize();
 //				contentLength += 55 + 1 + 10 + boundaryLength + file.getName().getBytes("UTF-8").length + fileTotal;
