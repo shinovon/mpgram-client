@@ -552,17 +552,15 @@ public class MP extends MIDlet
 //#endif	
 		// get device name
 		String p, v, d;
-		boolean anna = false;
 		if ((p = System.getProperty("microedition.platform")) != null) {
 			d = p;
 			if ((symbianJrt = p.indexOf("platform=S60") != -1)) {
 				int i;
 				v = p.substring(i = p.indexOf("platform_version=") + 17, i = p.indexOf(';', i));
 				if (v.charAt(0) == '5') {
-					anna = true;
 					switch (v.charAt(2)) {
 					case '2':
-						systemName = (anna = (p.indexOf("java_build_version=2.2") != -1)) ? "Symbian Anna" : "Symbian^3";
+						systemName = (p.indexOf("java_build_version=2.2") != -1) ? "Symbian Anna" : "Symbian^3";
 						break;
 					case '3':
 						systemName = "Symbian Belle";
@@ -575,7 +573,6 @@ public class MP extends MIDlet
 						break;
 					default:
 						systemName = "S60 5th Edition";
-						anna = false;
 					}
 				} else {
 					// 3.2
@@ -712,7 +709,7 @@ public class MP extends MIDlet
 		longpoll = !s40;
 		parseRichtext = !s40;
 		// disable if symbian older than anna, or s40 older than v6
-		chunkedUpload = (!symbian || anna) && (!s40 || checkClass("javax.microedition.location.Location"));
+//		chunkedUpload = (!symbian || anna) && (!s40 || checkClass("javax.microedition.location.Location"));
 		if (blackberry) {
 			textMethod = 3;
 		}
@@ -788,7 +785,7 @@ public class MP extends MIDlet
 			downloadPath = j.getString("downloadPath", downloadPath);
 //#endif
 			longpoll = j.getBoolean("longpoll", longpoll);
-			chunkedUpload = j.getBoolean("chunkedUpload", chunkedUpload);
+			chunkedUpload = j.getBoolean("uploadChunked", chunkedUpload);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -3066,7 +3063,7 @@ public class MP extends MIDlet
 					j.put("downloadPath", downloadPath);
 //#endif
 					j.put("longpoll", longpoll);
-					j.put("chunkedUpload", chunkedUpload);
+					j.put("uploadChunked", chunkedUpload);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
