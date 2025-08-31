@@ -127,6 +127,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	// pointer
 	int pressX, pressY, pointerX, pointerY;
 	boolean pressed, dragging, longTap, contentPressed, draggingHorizontally;
+	int dragged;
 	long pressTime;
 	int dragXHold, dragYHold;
 	UIItem pointedItem, heldItem;
@@ -1108,8 +1109,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				if (now - pressTime > 100) {
 					kineticScroll = 0;
 				}
-				if (!dragging && !longTap
-						&& pointedItem != null && pointedItem.focusable) {
+				if (!longTap && dragged < 10 && pointedItem != null && pointedItem.focusable
+						&& Math.abs(pointerX - pressX) < 5 && Math.abs(pointerY - pressY) < 5) {
 					animate = true;
 					if (now - pressTime > 200) {
 						kineticScroll = 0;
@@ -1420,6 +1421,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		pressed = true;
 		dragging = false;
 		draggingHorizontally = false;
+		dragged = 0;
 		dragXHold = 0;
 		dragYHold = 0;
 		pressX = pointerX = x;
@@ -1468,10 +1470,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			} else {
 				final int dY = pointerY - y;
 				final int dX = pointerX - x;
+				dragged += Math.abs(dX) + Math.abs(dY);
 				if (dragging || dY > 1 || dY < -1
-						|| dragYHold + dY > 1 || dragYHold + dY < -1
+						|| dragYHold + dY > 2 || dragYHold + dY < -2
 						|| dX > 1 || dX < -1
-						|| dragXHold + dX > 1 || dragXHold + dX < -1) {
+						|| dragXHold + dX > 2 || dragXHold + dX < -2) {
 					int dx2 = dX;
 					int dy2 = dY;
 					if (now - pressTime < 100) {
@@ -1523,7 +1526,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		long now = System.currentTimeMillis();
 		if (contentPressed) {
 			if (!longTap) {
-				if (!dragging) {
+				if (!dragging || (dragged < 10 && Math.abs(x - pressX) < 4 && Math.abs(y - pressY) < 4)) {
 					if (kineticScroll != 0) {
 						kineticScroll = 0;
 					} else if (now - pressTime < 300 && pointedItem != null && pointedItem.focusable) {
