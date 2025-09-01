@@ -127,7 +127,8 @@ public class UIMessage extends UIItem implements LangConstants {
 		date = message.getLong("date");
 		id = message.getInt("id");
 		fromId = message.has("from_id") ? message.getString("from_id") : chat.id;
-		out = (!chat.broadcast && chat.mediaFilter == null) && (message.getBoolean("out", false) || fromId.equals(MP.selfId));
+		out = (!chat.broadcast && chat.mediaFilter == null) && (message.getBoolean("out", false)
+				|| (fromId.equals(MP.selfId)) && (!chat.selfChat || !message.has("fwd")));
 		hideName = chat.selfChat || chat.user || out || chat.mediaFilter != null;
 		space = chat.broadcast;
 		name = out && !chat.broadcast ? MP.L[LYou] : MP.getName(fromId, true).trim();
