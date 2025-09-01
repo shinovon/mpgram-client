@@ -253,25 +253,27 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		case 0: // auto
 		case 1: // nokiaui
 //#ifndef NO_NOKIAUI
-			try {
-				nokiaEditor = NokiaAPI.createTextEditor(500, TextField.ANY, 40, 40);
+			if (touch) {
+				try {
+					nokiaEditor = NokiaAPI.createTextEditor(500, TextField.ANY, 40, 40);
+					if (nokiaEditor != null) {
+						NokiaAPI.TextEditor_setContent(nokiaEditor, "");
+					}
+				} catch (Throwable ignored) {}
 				if (nokiaEditor != null) {
-					NokiaAPI.TextEditor_setContent(nokiaEditor, "");
+					updateEditor = true;
+					keyboard = null;
+					break;
 				}
-			} catch (Throwable ignored) {
-				ignored.printStackTrace();
-			}
-			if (nokiaEditor != null) {
-				updateEditor = true;
-				keyboard = null;
-				break;
 			}
 //#endif
 			if (MP.textMethod == 1) break;
 		case 2: // j2mekeyboard
 			nokiaEditor = null;
 			if (keyboard == null) {
+				// do not use multiline in j2mekeyboard as it's too broken
 				keyboard = Keyboard.getKeyboard(this, false, getWidth(), getHeight());
+				
 				keyboard.setTextColor(colors[COLOR_CHAT_FG]);
 				keyboard.setTextHintColor(colors[COLOR_CHAT_INPUT_ICON]);
 				keyboard.setCaretColor(colors[COLOR_CHAT_FG]);
@@ -644,6 +646,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 	
 	public void showNotify() {
+		skipRender = false;
 		if (!touch && keyGuideTime == 0) {
 			keyGuide = true;
 			fieldAnimTarget = MP.smallBoldFontHeight + 2;
