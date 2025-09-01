@@ -1440,6 +1440,10 @@ public class MP extends MIDlet
 				} catch (Error e)
 //#endif
 				{
+					if (e instanceof OutOfMemoryError) {
+						display(errorAlert(L[LNotEnoughMemory_Alert]), current);
+						break;
+					}
 					api(appendUrl(sb.append("&text="), text).toString());
 				}
 				
