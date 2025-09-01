@@ -747,7 +747,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				contentHeight = this.contentHeight;
 			}
 			
-			if (nextFocusItem != null) {
+			if (nextFocusItem != null && nextFocusItem.layoutWidth != 0) {
 				focusItem(nextFocusItem, 0);
 				if (!isVisible(nextFocusItem)) scrollTo(nextFocusItem);
 				nextFocusItem = null;
@@ -1733,7 +1733,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		} else {
 			layoutStart = (UIItem) item;
 		}
-		queueRepaint();
+		if (!loading) queueRepaint();
 	}
 	
 	private void layout(UIItem offsetItem, int w, int h) {
@@ -2251,6 +2251,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		switched = false;
 		shouldUpdate = false;
 		mediaFilter = null;
+		focusItem(null, 0);
+		firstItem = lastItem = null;
+		kineticScroll = scroll = 0;
 	}
 
 	public void openMessage(String msg, int topMsg) {
@@ -2378,6 +2381,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	public void paginate(int dir) {
 		this.dir = dir;
 		cancel();
+
+		focusItem(null, 0);
+		firstItem = lastItem = null;
+		kineticScroll = scroll = 0;
 		messageId = 0;
 		update = false;
 		if (dir == 1) {
