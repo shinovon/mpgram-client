@@ -625,14 +625,16 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 					// document
 					sb.setLength(0);
 					
-					if ("image/webp".equals(media.getString("mime", null)) && "sticker.webp".equals(media.getString("name", null))) {
+					t = media.getString("mime", null);
+					if ("application/x-tgsticker".equals(t)
+							|| ("image/webp".equals(t) && "sticker.webp".equals(media.getString("name", null)))) {
 						// sticker
 						ImageItem img = new ImageItem(sb.toString(), null, 0, "");
 						img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 						img.setItemCommandListener(MP.midlet);
 						safeInsert(thread, insert++, lastItem = img);
 						
-						key[3] = "rsticker";
+						key[3] = "application/x-tgsticker".equals(t) ? "rtgs" : "rsticker";
 						urls.put(img, key);
 						if (MP.loadThumbs) {
 							MP.queueImage(key, img);
@@ -644,7 +646,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 					} else {
 						boolean nameSet = false;
 						final boolean playable = media.has("audio")
-								&& ("audio/mpeg".equals(t = media.getString("mime", null))
+								&& ("audio/mpeg".equals(t)
 										|| "audio/aac".equals(t)
 										/*|| "audio/m4a".equals(t)*/);
 						boolean voice = false;
