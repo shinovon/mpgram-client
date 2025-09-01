@@ -708,7 +708,6 @@ public class MP extends MIDlet
 		
 		longpoll = !s40;
 		parseRichtext = !s40;
-		// disable if symbian older than anna, or s40 older than v6
 //		chunkedUpload = (!symbian || anna) && (!s40 || checkClass("javax.microedition.location.Location"));
 		if (blackberry) {
 			textMethod = 3;
@@ -1135,7 +1134,9 @@ public class MP extends MIDlet
 								url = sb.toString();
 							} else if (src instanceof JSONObject) { // sticker or document
 								url = instanceUrl + FILE_URL + "?a&sticker=" + ((JSONObject) src).getString("id")
-										+ "&access_hash=" + ((JSONObject) src).getString("access_hash") + "&p=rsprevs&s=32";
+										+ "&access_hash=" + ((JSONObject) src).getString("access_hash") + "&s=32&p=r" + 
+										("application/x-tgsticker".equals(((JSONObject) src).getString("mime", ""))
+												? "tgss" : "sprevs");
 //#ifndef NO_CHAT_CANVAS
 							} else if (src instanceof UIMessage) {
 								UIMessage msg = (UIMessage) src;
@@ -1146,6 +1147,8 @@ public class MP extends MIDlet
 								.append("&p=");
 								if (msg.photo) {
 									sb.append("rprev&s=").append(photoSize);
+								} else if (msg.animatedSticker) {
+									sb.append("rtgs&s=").append(photoSize);
 								} else if (msg.sticker) {
 									sb.append("rsticker&s=").append(photoSize);
 								} else {

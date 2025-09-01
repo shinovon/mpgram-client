@@ -92,7 +92,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	String peerId;
 	boolean read;
 	
-	boolean fwd, reply, media, photo, sticker;
+	boolean fwd, reply, media, photo, sticker, animatedSticker;
 	String replyName, replyText, replyPrefix;
 	String commentsText;
 	String mediaTitle, mediaSubtitle;
@@ -307,7 +307,9 @@ public class UIMessage extends UIItem implements LangConstants {
 					}
 					mediaUrl = media.getString("url");
 				} else if (type.equals("document")) {
-					if ("image/webp".equals(media.getString("mime", null)) && "sticker.webp".equals(media.getString("name", null))) {
+					t = media.getString("mime", null);
+					if ((animatedSticker = "application/x-tgsticker".equals(t))
+							|| ("image/webp".equals(t) && "sticker.webp".equals(media.getString("name", null)))) {
 						sticker = true;
 						if (MP.loadThumbs) {
 							MP.queueImage(this, this);
@@ -317,7 +319,7 @@ public class UIMessage extends UIItem implements LangConstants {
 					} else {
 						mediaDownload = true;
 						mediaPlayable = media.has("audio")
-								&& ("audio/mpeg".equals(t = media.getString("mime", null))
+								&& ("audio/mpeg".equals(t)
 										|| "audio/aac".equals(t)
 										/*|| "audio/m4a".equals(t)*/);
 						mediaFileName = media.getString("name", null);
