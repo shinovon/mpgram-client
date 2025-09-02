@@ -1149,7 +1149,7 @@ public class MP extends MIDlet
 								if (msg.photo) {
 									sb.append("rprev&s=").append(photoSize);
 								} else if (msg.animatedSticker) {
-									sb.append("tgs");
+									sb.append("rtgs");
 									if (pngStickers) {
 										sb.append('p');
 									}
