@@ -633,9 +633,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		closeMenu();
 //#ifndef NO_NOKIAUI
 		if (nokiaEditor != null) {
-			NokiaAPI.TextEditor_setFocus(nokiaEditor, false);
-			NokiaAPI.TextEditor_setVisible(nokiaEditor, false);
-			NokiaAPI.TextEditor_setParent(nokiaEditor, null);
+			try {
+				NokiaAPI.TextEditor_setFocus(nokiaEditor, false);
+				NokiaAPI.TextEditor_setVisible(nokiaEditor, false);
+				NokiaAPI.TextEditor_setParent(nokiaEditor, null);
+			} catch (Throwable ignored) {}
 		}
 //#endif
 		if (keyboard != null && keyboard.isVisible()) {
