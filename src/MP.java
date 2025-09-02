@@ -152,6 +152,7 @@ public class MP extends MIDlet
 		}
 	};
 	
+//#ifndef NO_CHAT_CANVAS
 	static final String[][] THEMES = {
 		{
 			"tint",
@@ -166,6 +167,7 @@ public class MP extends MIDlet
 			"Edge (by SD)",
 		}
 	};
+//#endif
 	
 //#ifdef MINI
 //#	static final boolean MINI_BUILD = true;
@@ -253,23 +255,25 @@ public class MP extends MIDlet
 	static int notifyMethod = 1; // 0: off, 1: alert, 2: nokiaui, 3: pigler api
 	static boolean notifyAvas = true;
 	static int notificationVolume = 100;
+	static boolean legacyChatUI;
 //#endif
 	static boolean updateChatsList;
-	static boolean legacyChatUI;
-	static boolean fastScrolling; // disable animations
-	static final boolean forceKeyUI = false;
-	static int downloadMethod; // 0 - always ask, 1 - in app, 2 - browser
-	static String downloadPath;
 	static boolean longpoll = true;
-	static int textMethod; // 0 - auto, 1 - nokiaui, 2 - j2mekeyboard, 3 - fullscreen textbox
-	static String theme = "tint";
 	static int playerVolume = 50;
 	static boolean voiceConversion;
 //#ifndef NO_CHAT_CANVAS
+	static String theme = "tint";
+	static int textMethod; // 0 - auto, 1 - nokiaui, 2 - j2mekeyboard, 3 - fullscreen textbox
+	static boolean fastScrolling; // disable animations
+	static final boolean forceKeyUI = false;
 	static String[] inputLanguages = new String[] { "en", "ru" };
-//#endif
-	static boolean chunkedUpload;
 	static boolean pngStickers;
+//#endif
+//#ifndef NO_FILE
+	static int downloadMethod; // 0 - always ask, 1 - in app, 2 - browser
+	static String downloadPath;
+	static boolean chunkedUpload;
+//#endif
 	
 	// platform
 	static boolean symbianJrt;
@@ -709,10 +713,10 @@ public class MP extends MIDlet
 		
 		longpoll = !s40;
 		parseRichtext = !s40;
+//#ifndef NO_FILE
 //		chunkedUpload = (!symbian || anna) && (!s40 || checkClass("javax.microedition.location.Location"));
-		if (blackberry) {
-			textMethod = 3;
-		}
+		if (blackberry) textMethod = 3;
+//#endif
 		
 		// load settings
 		try {
@@ -783,9 +787,9 @@ public class MP extends MIDlet
 //#endif
 //#ifndef NO_FILE
 			downloadPath = j.getString("downloadPath", downloadPath);
+			chunkedUpload = j.getBoolean("uploadChunked", chunkedUpload);
 //#endif
 			longpoll = j.getBoolean("longpoll", longpoll);
-			chunkedUpload = j.getBoolean("uploadChunked", chunkedUpload);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -1449,10 +1453,12 @@ public class MP extends MIDlet
 				} catch (Error e)
 //#endif
 				{
+//#ifndef NO_FILE
 					if (e instanceof OutOfMemoryError) {
 						display(errorAlert(L[LNotEnoughMemory_Alert]), current);
 						break;
 					}
+//#endif
 					api(appendUrl(sb.append("&text="), text).toString());
 				}
 				
@@ -2818,7 +2824,9 @@ public class MP extends MIDlet
 					behChoice.setSelectedIndex(++i, compress);
 //#endif
 					behChoice.setSelectedIndex(++i, longpoll);
+//#ifndef NO_FILE
 					behChoice.setSelectedIndex(++i, chunkedUpload);
+//#endif
 					behChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(behChoice);
 					
@@ -2988,7 +2996,9 @@ public class MP extends MIDlet
 					compress = behChoice.isSelected(++i);
 //#endif
 					longpoll = behChoice.isSelected(++i);
+//#ifndef NO_FILE
 					chunkedUpload = behChoice.isSelected(++i);
+//#endif
 					
 					if ((updatesTimeout = updateTimeoutGauge.getValue() * 5) < 5) {
 						updateTimeoutGauge.setValue((updatesTimeout = 5) / 5);
@@ -3077,9 +3087,9 @@ public class MP extends MIDlet
 //#endif
 //#ifndef NO_FILE
 					j.put("downloadPath", downloadPath);
+					j.put("uploadChunked", chunkedUpload);
 //#endif
 					j.put("longpoll", longpoll);
-					j.put("uploadChunked", chunkedUpload);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
