@@ -634,7 +634,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 						img.setItemCommandListener(MP.midlet);
 						safeInsert(thread, insert++, lastItem = img);
 						
-						key[3] = "application/x-tgsticker".equals(t) ? "rtgs" : "rsticker";
+						key[3] = "application/x-tgsticker".equals(t) ? "rtgss" : "rsticker";
 						urls.put(img, key);
 						if (MP.loadThumbs) {
 							MP.queueImage(key, img);

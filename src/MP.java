@@ -234,7 +234,7 @@ public class MP extends MIDlet
 	static int updatesTimeout = 30;
 	static boolean sendTyping = true;
 	static int chatsListFontSize = 0; // 0: default, 1: small, 2: medium
-	static boolean keepAlive = true;
+	static boolean keepAlive;
 	static boolean utf = true;
 	static long pushInterval = 30000L, pushBgInterval = 30000L;
 	static boolean chatField = true;
@@ -269,6 +269,7 @@ public class MP extends MIDlet
 	static String[] inputLanguages = new String[] { "en", "ru" };
 //#endif
 	static boolean chunkedUpload;
+	static boolean pngStickers;
 	
 	// platform
 	static boolean symbianJrt;
@@ -1148,9 +1149,17 @@ public class MP extends MIDlet
 								if (msg.photo) {
 									sb.append("rprev&s=").append(photoSize);
 								} else if (msg.animatedSticker) {
-									sb.append("rtgs&s=").append(photoSize);
+									sb.append("tgs");
+									if (pngStickers) {
+										sb.append('p');
+									}
+									sb.append("s&s=").append(photoSize);
 								} else if (msg.sticker) {
-									sb.append("rsticker&s=").append(photoSize);
+									sb.append("rsticker");
+									if (pngStickers) {
+										sb.append('p');
+									}
+									sb.append("&s=").append(photoSize);
 								} else {
 									// document thumbnail
 									sb.append("thumbrsprevs&s=").append(MP.smallBoldFontHeight + MP.smallPlainFontHeight - 2);
