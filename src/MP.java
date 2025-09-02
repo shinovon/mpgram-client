@@ -2559,6 +2559,9 @@ public class MP extends MIDlet
 					display(errorAlert(L[LInvalidInstance_Alert]), null);
 					return;
 				}
+				if (!instanceUrl.endsWith("/")) {
+					instanceUrl = instanceUrl.concat("/");
+				}
 				writeAuth();
 				
 				if (c == authImportSessionCmd) {
