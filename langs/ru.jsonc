@@ -52,7 +52,7 @@
 	"Jun": "Июн",
 	"Jul": "Июл",
 	"Aug": "Авг",
-	"Sep": "Сеп",
+	"Sep": "Сен",
 	"Oct": "Окт",
 	"Nov": "Ноя",
 	"Dec": "Дек",
@@ -124,7 +124,7 @@
 	"Older": "Старее",
 	"Newer": "Новее",
 	"SendSticker": "Отправить стикер",
-	"Menu": "Меню",
+	"Menu": "Опции",
 	"Write": "Написать",
 	
 	// Message writing form commands
@@ -150,7 +150,7 @@
 	
 	// Pagination commands
 	"NextPage": "След. стр.",
-	"PrevPage": "Прев. стр.",
+	"PrevPage": "Пред. стр.",
 	
 	// Loading states
 	"Loading": "Загрузка...",
@@ -169,7 +169,7 @@
 	"SessionCode": "Код сессии",
 	"Code": "Код",
 	"CloudPassword": "Облачный пароль",
-	"Captcha": "Капча",
+	"Captcha": "Антибот-проверка",
 	"Auth_Btn": "Авторизоваться",
 	"InvalidCode_Alert": "Неправильный код!",
 	"CodeExpired_Alert": "Код истек!",
@@ -211,7 +211,7 @@
 	"ChatTextField": "Текстовое поле в чате",
 	"BuiltinImageViewer": "Встроен. просмотр изображений",
 	"LargeMusicCover": "Большая обложка в плеере",
-	"LegacyUI": "Простой интерфейс",
+	"LegacyUI": "Старый интерфейс",
 	"Keyboard": "Клавиатура",
 	"Auto": "Автоматически",
 	"FullscreenTextBox": "Полноэкр. ввод",
@@ -244,7 +244,7 @@
 	"LoadMediaThumbnails": "Загружать медиа",
 	"LoadAvatars": "Загружать аватарки",
 	"MultiThreadedLoading": "Многопоточная загрузка",
-	"RoundAvatars": "Закругленные аватарки",
+	"RoundAvatars": "Круглые аватарки",
 	
 	// Cache settings
 	"AvatarsCaching": "Кэшироние аватарок",
@@ -260,7 +260,7 @@
 	"EnableNotifications": "Вкл. уведомления",
 	"EnableSound": "Звук",
 	"NotificationMethod": "Способ уведомления",
-	"Off": "Выкл",
+	"Off": "Выкл.",
 	"AlertWindow": "Диалоговое окно",
 	"PushInterval": "Интервал опроса уведомлений",
 	"PushBackgroundInterval": "Интервал опроса в фоне",
@@ -269,7 +269,7 @@
 	"AboutText": "Клиент Telegram для J2ME, основанный на API MPGram Web.",
 	"Developer": "Разработчик",
 	"Author": "Автор",
-	"Donate": "Донат",
+	"Donate": "Поддержать",
 	"Chat": "Чат",
 	
 	// Write form
@@ -290,11 +290,11 @@
 	// Alert messages
 	"MessageSent_Alert": "Сообщение отправлено",
 	"MessageDeleted_Alert": "Сообщение удалено",
-	"UpdateAvailable_Alert": "Доступно обновление клиента",
+	"UpdateAvailable_Alert": "Доступно обновление",
 	"MemberBanned_Alert": "Участник забанен",
 	"StickersAdded_Alert": "Стикеры добавлены",
 	"ChooseNetwork_Alert": "Выберите точку доступа",
-	"FailedToLoadImage": "Не удалось загр. изобр.", // unwrapped, should be short
+	"FailedToLoadImage": "Изобр. не загружено", // unwrapped, should be short
 	"TextCopied_Alert": "Текст скопирован",
 	"NotEnoughMemory_Alert": "Недостаточно памяти",
 	"DownloadCanceled_Alert": "Скачивание отменено",
