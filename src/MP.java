@@ -1572,7 +1572,7 @@ public class MP extends MIDlet
 				while (form.updating() && updatesThread == thread) {
 					try {
 						if (!form.updating() || updatesThread != thread) break;
-						if (!form.isShown()) {
+						if (!form.isShown() || paused) {
 							updatesSleeping = true;
 							Thread.sleep(updatesDelay);
 							updatesSleeping = false;
@@ -1727,7 +1727,7 @@ public class MP extends MIDlet
 					// get notifications
 					if (!notifications && (!updateChatsList || !chatsList.isShown()))
 						continue;
-					if (updatesThread != null) {
+					if (updatesThread != null && !paused) {
 						check = true;
 						continue;
 					}
