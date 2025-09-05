@@ -1032,7 +1032,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						} else
 //#endif
 						if (keyboard != null) {
-							keyboard.drawTextBox(g, 10, by, w - 40, ih);
+							keyboard.drawTextBox(g, 10, iy, w - 40, ih);
 							if (keyboard.isVisible()) keyboard.drawOverlay(g);
 						} else if (text == null || text.length() == 0) {
 							g.setFont(MP.medPlainFont);
