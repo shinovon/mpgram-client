@@ -182,7 +182,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	UIMessage[] forwardMsgs;
 	String forwardPeer, forwardMsg;
 	boolean editorShown;
-	boolean fieldWasFocused;
+	boolean funcWasFocused;
 	
 	ChatCanvas() {
 		setFullScreenMode(true);
@@ -1224,7 +1224,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			forwardMsg = null;
 			forwardMsgs = null;
 			inputFocused = false;
-			if ((funcFocused = fieldWasFocused)) {
+			if ((funcFocused = funcWasFocused)) {
 				bottomAnimTarget = MP.smallBoldFontHeight + 4;
 			} else {
 				bottomAnimTarget = 0;
@@ -2150,7 +2150,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			this.bottomAnimTarget = h;
 			keyGuide = false;
 			inputFocused = true;
-			fieldWasFocused = funcFocused;
+			funcWasFocused = funcFocused;
 		} else {
 //#ifndef NO_NOKIAUI
 			if (nokiaEditor != null) {
