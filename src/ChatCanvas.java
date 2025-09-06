@@ -1032,7 +1032,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						} else
 //#endif
 						if (keyboard != null) {
-							if (!touch && !keyboard.isVisible()) {
+							if (!touch && !menuFocused && !keyboard.isVisible()) {
 								keyboard.show();
 							}
 							keyboard.drawTextBox(g, 10, iy, w - 40, ih);
@@ -1674,7 +1674,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					} else if (x > width - 48) {
 						send();
 					} else { 
-//						MP.midlet.commandAction(MP.writeCmd, this);
 						if (nokiaEditor != null) {
 							if (!editorShown) {
 								editorShown = true;
@@ -2123,31 +2122,13 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		resetInput();
 		text = item.origText;
 		editMsgId = item.id;
-		if (!touch) {
-			focusInput();
-			return;
-		}
-		bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
-//#ifndef NO_NOKIAUI
-		if (nokiaEditor != null) {
-			NokiaAPI.TextEditor_setContent(nokiaEditor, text);
-		}
-//#endif
-		if (keyboard != null) {
-			keyboard.setText(text);
-		}
-		queueRepaint();
+		focusInput();
 	}
 	
 	public void startReply(UIMessage item) {
 		if (editMsgId != 0 || forwardMsgs != null || forwardMsg != null) resetInput();
 		replyMsgId = item.id;
-		if (!touch) {
-			focusInput();
-			return;
-		}
-		bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
-		queueRepaint();
+		focusInput();
 	}
 	
 	public void startForward(String peer, String msg, UIMessage[] msgs) {
@@ -2156,13 +2137,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		this.forwardPeer = peer;
 		this.forwardMsg = msg;
 		this.forwardMsgs = msgs;
-		
-		if (!touch) {
-			focusInput();
-		} else {
-			bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
-			queueRepaint();
-		}
+		focusInput();
 	}
 	
 	private void focusInput() {
@@ -2170,18 +2145,26 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (replyMsgId != 0 || editMsgId != 0 || forwardMsgs != null || forwardMsg != null) {
 			h += MP.smallBoldFontHeight + 8;
 		}
+		if (text == null) text = "";
 		if (!touch) {
 			this.bottomAnimTarget = h;
 			keyGuide = false;
 			inputFocused = true;
 			fieldWasFocused = funcFocused;
-			if (text == null) text = "";
-			if (keyboard != null) {
-				keyboard.setText(text);
-				keyboard.show();
-			}
 		} else {
+//#ifndef NO_NOKIAUI
+			if (nokiaEditor != null) {
+				NokiaAPI.TextEditor_setContent(nokiaEditor, text);
+				editorShown = true;
+				updateEditor = true;
+			}
+//#endif
 			this.bottom = h;
+		}
+
+		if (keyboard != null) {
+			keyboard.setText(text);
+			keyboard.show();
 		}
 		queueRepaint();
 	}
@@ -2550,7 +2533,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	// TextEditorListener
 
 	public void inputAction(int actions) {
-		// TODO
 		if ((actions & NokiaAPI.ACTION_CONTENT_CHANGE) != 0) {
 			String p = text;
 			text = NokiaAPI.TextEditor_getContent(nokiaEditor);
