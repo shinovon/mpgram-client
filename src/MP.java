@@ -2219,7 +2219,7 @@ public class MP extends MIDlet
 								}
 								
 								// done
-								display(current);
+								goBackToChat();
 								alert.addCommand(okDownloadCmd);
 								alert.removeCommand(cancelDownloadCmd);
 								alert.setIndicator(null);
@@ -3420,9 +3420,15 @@ public class MP extends MIDlet
 			return;
 		}
 //#ifndef NO_FILE
-		if (c == cancelCmd && (d instanceof List) && !(d instanceof ChatsList) && fileMode) {
-			// go back to write form from file picker
-			goBackTo(writeForm);
+		if (c == cancelCmd && (d instanceof List) && !(d instanceof ChatsList)) {
+			if (fileMode) {
+				// go back to write form from file picker
+				goBackTo(writeForm);
+			} else if (downloadMessage == null) {
+				goBackTo(settingsForm);
+			} else {
+				goBackToChat();
+			}
 			return;
 		}
 //#endif
@@ -4596,6 +4602,20 @@ public class MP extends MIDlet
 			}
 		}
 		display(d, true);
+	}
+	
+	static void goBackToChat() {
+		synchronized (formHistory) {
+			int i = formHistory.size();
+			while (i-- != 0) {
+				Object d = formHistory.elementAt(i);
+				if (d instanceof MPChat) {
+					display((Displayable) d, true);
+					break;
+				}
+				formHistory.removeElementAt(i);
+			}
+		}
 	}
 	
 	static void deleteFromHistory(Displayable d) {
