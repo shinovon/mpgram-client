@@ -268,6 +268,7 @@ public class MP extends MIDlet
 	static final boolean forceKeyUI = false;
 	static String[] inputLanguages = new String[] { "en", "ru" };
 	static boolean pngStickers;
+	static boolean lazyLoading = true;
 //#endif
 //#ifndef NO_FILE
 	static int downloadMethod; // 0 - always ask, 1 - in app, 2 - browser

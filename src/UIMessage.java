@@ -120,6 +120,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	
 	boolean updateColors;
 	int focusDir = 1;
+	private boolean imageQueued;
 	
 	UIMessage(JSONObject message, ChatCanvas chat) {
 		focusable = true;
@@ -313,7 +314,7 @@ public class UIMessage extends UIItem implements LangConstants {
 							|| ("image/webp".equals(t) && "sticker.webp".equals(media.getString("name", null)))) {
 						sticker = true;
 						if (MP.loadThumbs) {
-							MP.queueImage(this, this);
+							if (!MP.lazyLoading) loadImage();
 						} else {
 							mediaTitle = MP.L[LSticker];
 						}
@@ -368,7 +369,7 @@ public class UIMessage extends UIItem implements LangConstants {
 						
 						if (MP.loadThumbs && media.getBoolean("thumb", false)) {
 							mediaThumb = true;
-							MP.queueImage(this, this);
+							if (!MP.lazyLoading) loadImage();
 						}
 					}
 				} else if (type.equals("photo")) {
@@ -377,7 +378,7 @@ public class UIMessage extends UIItem implements LangConstants {
 					if (MP.loadThumbs) {
 						photoRawWidth = media.getInt("w", 0);
 						photoRawHeight = media.getInt("h", 0);
-						MP.queueImage(this, this);
+						if (!MP.lazyLoading) loadImage();
 					} else {
 						mediaTitle = MP.L[LPhoto];
 					}
@@ -583,6 +584,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (media) {
 			if ((photo || sticker) && mediaTitle == null) {
 				if (mediaImage == null) {
+					if (!imageQueued && MP.lazyLoading) loadImage();
 					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_IMAGE]);
 					g.fillRect(x, y + 1, photoRenderWidth, photoRenderHeight);
 				} else {
@@ -617,6 +619,7 @@ public class UIMessage extends UIItem implements LangConstants {
 						// TODO thumb placeholder
 //						g.setColor(ChatCanvas.colors[COLOR_MESSAGE_IMAGE]);
 //						g.fillRect(px, y, s, s);
+						if (!imageQueued && MP.lazyLoading) loadImage();
 					}
 					px += s + 2;
 				}
@@ -1292,6 +1295,12 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (!selected) return;
 		selected = false;
 		((ChatCanvas) container).unselected(this);
+	}
+	
+	private void loadImage() {
+		if (imageQueued) return;
+		imageQueued = true;
+		MP.queueImage(this, this);
 	}
 
 }
