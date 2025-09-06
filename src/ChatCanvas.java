@@ -2190,7 +2190,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 	
 	private void send() {
-		if ((text != null && text.trim().length() != 0) || file != null || forwardMsgs != null || forwardMsg != null) {
+		if (!touch && !inputFocused) {
+			focusInput();
+		} else if ((text != null && text.trim().length() != 0) || file != null || forwardMsgs != null || forwardMsg != null) {
 			if (!MP.sending) {
 				MP.sending = true;
 				MP.midlet.start(MP.RUN_SEND_MESSAGE, new Object[] {
@@ -2201,8 +2203,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						null, forwardPeer, forwardMsg, forwardMsgs
 						});
 			}
-		} else if (!touch && !inputFocused) {
-			focusInput();
 		} else {
 			showMenu(null, new int[] { LSendSticker, LWriteMessage });
 		}
