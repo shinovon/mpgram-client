@@ -1280,6 +1280,16 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	private void key(int key, boolean repeat) {
 		int game = mapGameAction(key);
 		key = mapKey(key);
+		String s = null;
+		try {
+			s = getKeyName(key).toLowerCase();
+			if (s.equals("send") || s.equals("call")
+					|| (MP.symbian && key == -10)) {
+				game = -10;
+			} else if (s.indexOf("back") != -1) {
+				game = -11;
+			}
+		} catch (Exception ignored) {}
 		boolean repaint = false;
 		if (keyboard != null && keyboard.isVisible() && (repeat ? keyboard.keyRepeated(key) : keyboard.keyPressed(key))) {
 			// keyboard grabbed event
@@ -1463,16 +1473,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			if (focusedItem != null) {
 				focusedItem.traverse(game);
 			}
-		} else {
-			try {
-				String s = getKeyName(key);
-				if ("send".equalsIgnoreCase(s)) {
-					send();
-					repaint = true;
-				} else if ("back".equalsIgnoreCase(s)) {
-					back();
-				}
-			} catch (Exception ignored) {}
+		} else if (game == -10) {
+			send();
+			repaint = true;
+		} else if (game == -11) {
+			back();
 		}
 		if (repaint) {
 			queueRepaint();
