@@ -1381,6 +1381,19 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			focusedItem = scrollCurrentItem = scrollTargetItem = null;
 			scrollTo(scroll + ((clipHeight * 7 / 8) * dir));
 			repaint = true;
+		} else if (key == Canvas.KEY_NUM1) {
+			// search
+			if (canWrite && hasInput) MP.midlet.commandAction(MP.searchMsgCmd, this);
+		} else if (key == Canvas.KEY_NUM3) {
+			// chat info
+			openProfile();
+		} else if (key == Canvas.KEY_NUM4) {
+			// write message
+			resetInput();
+			MP.midlet.commandAction(MP.writeCmd, this);
+		} else if (key == Canvas.KEY_NUM6) {
+			// refresh
+			MP.midlet.commandAction(MP.latestCmd, this);
 		} else if (key >= Canvas.KEY_NUM0 && key <= Canvas.KEY_NUM9) {
 			// ignore
 		} else if (game == Canvas.DOWN || game == Canvas.UP) {
