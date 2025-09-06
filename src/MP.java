@@ -716,6 +716,9 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 //		chunkedUpload = (!symbian || anna) && (!s40 || checkClass("javax.microedition.location.Location"));
 		if (blackberry) textMethod = 3;
+		else if (s40 && System.getProperty("com.nokia.mid.ui.version") == null) {
+			textMethod = 2;
+		}
 //#endif
 		
 		// load settings
