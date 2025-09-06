@@ -1205,7 +1205,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			menuAnimProgress = val;
 		}
 		
-		return true;
+		return !MP.fastScrolling;
 	}
 
 	protected void keyPressed(int key) {
