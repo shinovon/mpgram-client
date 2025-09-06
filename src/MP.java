@@ -331,6 +331,7 @@ public class MP extends MIDlet
 	private static Command downloadPathCmd;
 	private static Command keyboardLanguagesCmd;
 	private static Command saveLanguagesCmd;
+	private static Command exportSessionCmd;
 
 	static Command refreshCmd;
 	static Command archiveCmd;
@@ -847,6 +848,7 @@ public class MP extends MIDlet
 		downloadPathCmd = new Command(L[LLocate], Command.ITEM, 1);
 		keyboardLanguagesCmd = new Command("Select", Command.ITEM, 1); // TODO
 		saveLanguagesCmd = new Command(L[LBack], Command.BACK, 1);
+		exportSessionCmd = new Command("Show user code", Command.ITEM, 1);
 
 		foldersCmd = new Command(L[LFolders], Command.SCREEN, 4);
 		refreshCmd = new Command(L[LRefresh], Command.SCREEN, 5);
@@ -2928,6 +2930,12 @@ public class MP extends MIDlet
 					s.setFont(largePlainFont);
 					f.append(s);
 					
+					s = new StringItem(null, "Show user code", Item.BUTTON);
+					s.setDefaultCommand(exportSessionCmd);
+					s.setItemCommandListener(this);
+					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(s);
+					
 					s = new StringItem(null, L[LLogout], Item.BUTTON);
 					s.setDefaultCommand(logoutCmd);
 					s.setItemCommandListener(this);
@@ -3126,6 +3134,9 @@ public class MP extends MIDlet
 			}
 			if (c == logoutCmd) {
 				userState = 0;
+				user = null;
+				phone = null;
+				selfId = null;
 				display(mainDisplayable = authForm);
 				writeAuth();
 				return;
@@ -3198,6 +3209,10 @@ public class MP extends MIDlet
 				}
 				
 				c = backCmd;
+			}
+			if (c == exportSessionCmd) {
+				copy("", user);
+				return;
 			}
 //#endif
 		}
