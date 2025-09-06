@@ -1263,7 +1263,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		case -4:
 			return Canvas.RIGHT;
 		default:
-			return getGameAction(key);
+			int g = 0;
+			try {
+				g = getGameAction(key);
+			} catch (Exception ignored) {}
+			return g <= 0 ? 0 : g;
 		}
 	}
 	
@@ -1341,7 +1345,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				}
 			}
 			repaint = true;
-		} else if (menuFocused) {
+		} else if (menuFocused && game >= 0) {
 			if (menuCurrent == -1) menuCurrent = 0;
 			if (game == Canvas.UP) {
 				if (menuCurrent-- == 0) {
@@ -1359,15 +1363,13 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			}
 		} else if (loading) {
 			// prevent NPE below
-		} else if (inputFocused) {
+		} else if (inputFocused && game >= 0) {
 			if (key == -5 || game == Canvas.FIRE) {
 				if (keyboard == null) {
 					showTextBox();
 				}
-			} else if (key == -7) {
-				
 			}
-		} else if (funcFocused) {
+		} else if (funcFocused && game >= 0) {
 			if (game == Canvas.UP) {
 				funcFocused = false;
 				bottomAnimTarget = 0;
