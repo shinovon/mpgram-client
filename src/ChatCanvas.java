@@ -1324,18 +1324,18 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		} else if (key == -6 || (MP.blackberry && (key == 'q' || key == 'Q'))) {
 			if (repeat || loading) return;
 			// menu
-			if (inputFocused) {
+			if (menuFocused) {
+				closeMenu();
+			} else if (inputFocused) {
 				// TODO use LFullscreenTextBox instead of LEdit?
 				showMenu(null,
 						(text != null && text.trim().length() != 0) || file != null || forwardMsgs != null || forwardMsg != null ?
 						new int[] { LSend, LEdit, LClear, LCancel } :
 						new int[] { LEdit, LCancel });
-			} else if (menuFocused) {
-				closeMenu();
 			} else if (selected != 0) {
 				showMenu(null, new int[] { LDelete, LForward });
 			} else if (funcFocused) {
-				showMenu(null, canWrite && hasInput ? new int[] { LRefresh, LChatInfo, LSearchMessages, LSendSticker } : new int[] { LRefresh, LChatInfo, LSearchMessages });
+				showMenu(null, canWrite && hasInput ? new int[] { LRefresh, LChatInfo, LSearchMessages, LSendSticker, LWriteMessage } : new int[] { LRefresh, LChatInfo, LSearchMessages });
 			} else {
 				if (focusedItem != null && focusedItem.focusable) {
 					int[] menu = focusedItem.menu();
@@ -2201,6 +2201,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						null, forwardPeer, forwardMsg, forwardMsgs
 						});
 			}
+		} else if (!touch && !inputFocused) {
+			focusInput();
 		} else {
 			showMenu(null, new int[] { LSendSticker, LWriteMessage });
 		}
