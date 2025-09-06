@@ -788,6 +788,8 @@ public class MP extends MIDlet
 					inputLanguages[i] = inputLanguagesJson.getString(i);
 				}
 			}
+			lazyLoading = j.getBoolean("lazyLoading", lazyLoading);
+			fastScrolling = j.getBoolean("fastScrolling", fastScrolling);
 //#endif
 //#ifndef NO_FILE
 			downloadPath = j.getString("downloadPath", downloadPath);
@@ -2684,6 +2686,7 @@ public class MP extends MIDlet
 							L[LLargeMusicCover],
 //#ifndef NO_CHAT_CANVAS
 							L[LLegacyUI],
+							"Fast scrolling",
 //#endif
 					}, null);
 					uiChoice.setSelectedIndex(i = 0, reverseChat);
@@ -2695,6 +2698,7 @@ public class MP extends MIDlet
 					uiChoice.setSelectedIndex(++i, fullPlayerCover);
 //#ifndef NO_CHAT_CANVAS
 					uiChoice.setSelectedIndex(++i, legacyChatUI);
+					uiChoice.setSelectedIndex(++i, fastScrolling);
 //#endif
 					uiChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(uiChoice);
@@ -2819,6 +2823,9 @@ public class MP extends MIDlet
 //#endif
 							L[LLongpoll],
 							L[LPartialUpload],
+//#ifndef NO_CHAT_CANVAS
+							"Lazy loading",
+//#endif
 					}, null);
 					behChoice.setSelectedIndex(i = 0, useLoadingForm);
 					behChoice.setSelectedIndex(++i, jsonStream);
@@ -2833,6 +2840,9 @@ public class MP extends MIDlet
 					behChoice.setSelectedIndex(++i, longpoll);
 //#ifndef NO_FILE
 					behChoice.setSelectedIndex(++i, chunkedUpload);
+//#endif
+//#ifndef NO_CHAT_CANVAS
+					behChoice.setSelectedIndex(++i, lazyLoading);
 //#endif
 					behChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(behChoice);
@@ -2952,6 +2962,7 @@ public class MP extends MIDlet
 					fullPlayerCover = uiChoice.isSelected(++i);
 //#ifndef NO_CHAT_CANVAS
 					legacyChatUI = uiChoice.isSelected(++i);
+					fastScrolling = uiChoice.isSelected(++i);
 					
 					textMethod = textMethodChoice.getSelectedIndex();
 					String prevTheme = theme;
@@ -3005,6 +3016,9 @@ public class MP extends MIDlet
 					longpoll = behChoice.isSelected(++i);
 //#ifndef NO_FILE
 					chunkedUpload = behChoice.isSelected(++i);
+//#endif
+//#ifndef NO_CHAT_CANVAS
+					lazyLoading = behChoice.isSelected(++i);
 //#endif
 					
 					if ((updatesTimeout = updateTimeoutGauge.getValue() * 5) < 5) {
@@ -3089,8 +3103,10 @@ public class MP extends MIDlet
 							if (inputLanguages[k] == null) break;
 							inputLanguagesJson.add(inputLanguages[k]);
 						}
+						j.put("inputLanguages", inputLanguagesJson);
 					}
-					j.put("inputLanguages", inputLanguagesJson);
+					j.put("lazyLoading", lazyLoading);
+					j.put("fastScrolling", fastScrolling);
 //#endif
 //#ifndef NO_FILE
 					j.put("downloadPath", downloadPath);
