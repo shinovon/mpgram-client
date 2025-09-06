@@ -1291,7 +1291,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			}
 		} catch (Exception ignored) {}
 		boolean repaint = false;
-		if (keyboard != null && keyboard.isVisible() && (repeat ? keyboard.keyRepeated(key) : keyboard.keyPressed(key))) {
+		if (keyboard != null && keyboard.isVisible() && game >= 0 && (repeat ? keyboard.keyRepeated(key) : keyboard.keyPressed(key))) {
 			// keyboard grabbed event
 		} else if (key == -7 || (MP.blackberry && (key == 'p' || key == 'P'))) {
 			if (repeat) return;
