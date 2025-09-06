@@ -142,9 +142,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	boolean animating;
 	
 	// animations
-	boolean fieldFocused;
-	int fieldAnimTarget = -1;
-	float fieldAnimProgress;
+	boolean funcFocused;
+	int bottomAnimTarget = -1;
+	float bottomAnimProgress;
 	boolean keyGuide;
 	long keyGuideTime;
 	
@@ -182,6 +182,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	UIMessage[] forwardMsgs;
 	String forwardPeer, forwardMsg;
 	boolean editorShown;
+	boolean fieldWasFocused;
 	
 	ChatCanvas() {
 		setFullScreenMode(true);
@@ -581,10 +582,13 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			
 			// postLoad
 			loading = false;
-			if (touch && hasInput && (canWrite || left) && mediaFilter == null && query == null) {
-				bottom = inputFieldHeight = Math.max(MP.medPlainFontHeight + 16, 40);
+			if (hasInput && (canWrite || left) && mediaFilter == null && query == null) {
+				inputFieldHeight = Math.max(MP.medPlainFontHeight + 16, 40);
 				if (forwardMsgs != null || forwardMsg != null) {
 					bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
+					if (!touch) inputFocused = true;
+				} else if (touch) {
+					bottom = inputFieldHeight;
 				}
 			} else {
 				bottom = 0;
@@ -640,7 +644,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			} catch (Throwable ignored) {}
 		}
 //#endif
-		if (keyboard != null && keyboard.isVisible()) {
+		if (destroy && keyboard != null && keyboard.isVisible()) {
 			keyboard.reset();
 			keyboard.hide();
 			keyboard.setListener(null);
@@ -651,7 +655,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		skipRender = false;
 		if (!touch && keyGuideTime == 0) {
 			keyGuide = true;
-			fieldAnimTarget = MP.smallBoldFontHeight + 2;
+			bottomAnimTarget = MP.smallBoldFontHeight + 2;
 		}
 		if (shouldUpdate && !update && !loading) {
 			update = true;
@@ -723,12 +727,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 
 		// animations
 		
-		if (fieldAnimTarget != -1) {
-			if (slide(1, fieldAnimProgress, fieldAnimTarget, deltaTime)) {
+		if (bottomAnimTarget != -1) {
+			if (slide(1, bottomAnimProgress, bottomAnimTarget, deltaTime)) {
 				animate = true;
 			} else {
-				fieldAnimProgress = bottom = fieldAnimTarget;
-				fieldAnimTarget = -1;
+				bottomAnimProgress = bottom = bottomAnimTarget;
+				bottomAnimTarget = -1;
 			}
 		}
 		if (menuAnimTarget != -1) {
@@ -965,12 +969,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							g.drawString(MP.L[LMenu], 2, by + 1, Graphics.TOP | Graphics.LEFT);
 						g.drawString(MP.L[LCancel], w - 2, by, Graphics.TOP | Graphics.RIGHT);
 					}
-				} else if (fieldFocused) {
-					by += 1;
-					g.drawString(MP.L[LMenu], 2, by, Graphics.TOP | Graphics.LEFT);
-					g.drawString(MP.L[LBack], w - 2, by, Graphics.TOP | Graphics.RIGHT);
-					if (hasInput && canWrite)
-						g.drawString(MP.L[LWrite], w >> 1, by, Graphics.TOP | Graphics.HCENTER);
 				} else if (keyGuide) {
 					animate = true;
 					g.drawString(MP.L[LMenu], 2, by + 1, Graphics.TOP | Graphics.LEFT);
@@ -978,11 +976,13 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					if (keyGuideTime == 0) {
 						keyGuideTime = now;
 					} else if (now - keyGuideTime > 3000) {
-						fieldAnimTarget = 0;
+						bottomAnimTarget = 0;
 						keyGuide = false;
 					}
 				} else if (touch || inputFocused) {
-					if (canWrite && hasInput) {
+					if (bottomAnimTarget != -1) {
+						// don't draw input field when animation is in progress
+					} else if (canWrite && hasInput) {
 						g.setFont(MP.smallBoldFont);
 						g.setColor(colors[COLOR_CHAT_SEND_ICON]);
 						if (replyMsgId != 0) {
@@ -1032,6 +1032,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						} else
 //#endif
 						if (keyboard != null) {
+							if (!touch && !keyboard.isVisible()) {
+								keyboard.show();
+							}
 							keyboard.drawTextBox(g, 10, iy, w - 40, ih);
 							if (keyboard.isVisible()) keyboard.drawOverlay(g);
 						} else if (text == null || text.length() == 0) {
@@ -1058,7 +1061,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							g.setColor(colors[COLOR_CHAT_PANEL_BG]);
 							g.fillTriangle(w - 8 - 20, ty, w - 8 - 18, ty + 10, w - 8 - 20, ty + 20);
 							g.drawLine(w - 8 - 20, ty + 10, w - 8 - 10, ty + 10);
-						} else {
+						} else if (touch) {
 							// attach icon
 							int ty = iy + ((ih - 24) >> 1);
 							
@@ -1070,6 +1073,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
 						g.drawString(MP.L[LJoinGroup], w >> 1, iy + ((ih - MP.medPlainFontHeight) >> 1), Graphics.TOP | Graphics.HCENTER);
 					}
+				} else if (funcFocused) {
+					by += 1;
+					g.drawString(MP.L[LMenu], 2, by, Graphics.TOP | Graphics.LEFT);
+					g.drawString(MP.L[LBack], w - 2, by, Graphics.TOP | Graphics.RIGHT);
+					if (hasInput && canWrite)
+						g.drawString(MP.L[LWrite], w >> 1, by, Graphics.TOP | Graphics.HCENTER);
 				}
 			}
 		} else {
@@ -1191,7 +1200,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (mode == 0) {
 			scroll = (int) val;
 		} else if (mode == 1) {
-			bottom = (int) (fieldAnimProgress = val);
+			bottom = (int) (bottomAnimProgress = val);
 		} else /* (mode == 2) */ {
 			menuAnimProgress = val;
 		}
@@ -1204,6 +1213,27 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 	
 	private void back() {
+		if (inputFocused) {
+			if (editMsgId != 0) {
+				text = "";
+			}
+			replyMsgId = 0;
+			editMsgId = 0;
+			file = null;
+			forwardPeer = null;
+			forwardMsg = null;
+			forwardMsgs = null;
+			inputFocused = false;
+			if ((funcFocused = fieldWasFocused)) {
+				bottomAnimTarget = MP.smallBoldFontHeight + 4;
+			} else {
+				bottomAnimTarget = 0;
+			}
+			if (keyboard != null) {
+				onKeyboardCancel();
+			}
+			return;
+		}
 		if (selected != 0) {
 			unselectAll();
 			return;
@@ -1258,30 +1288,39 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			// back
 			if (menuFocused) {
 				closeMenu();
+			} else if (inputFocused) {
+				back();
 			} else if (keyboard != null && keyboard.isVisible()) {
 				onKeyboardCancel();
 				return;
 			} else if (touch || query != null || mediaFilter != null || selected != 0 || loading) {
 				back();
 				return;
-			} else if (fieldFocused) {
+			} else if (funcFocused) {
 //				fieldFocused = false;
 //				fieldAnimTarget = 0;
 				back();
 				return;
 			} else {
-				fieldFocused = true;
-				fieldAnimTarget = MP.smallBoldFontHeight + 4;
+				funcFocused = true;
+				bottomAnimTarget = MP.smallBoldFontHeight + 4;
+				keyGuide = false;
 			}
 			repaint = true;
 		} else if (key == -6 || (MP.blackberry && (key == 'q' || key == 'Q'))) {
 			if (repeat || loading) return;
 			// menu
-			if (menuFocused) {
+			if (inputFocused) {
+				// TODO use LFullscreenTextBox instead of LEdit?
+				showMenu(null,
+						(text != null && text.trim().length() != 0) || file != null || forwardMsgs != null || forwardMsg != null ?
+						new int[] { LSend, LEdit, LClear, LCancel } :
+						new int[] { LEdit, LCancel });
+			} else if (menuFocused) {
 				closeMenu();
 			} else if (selected != 0) {
 				showMenu(null, new int[] { LDelete, LForward });
-			} else if (fieldFocused) {
+			} else if (funcFocused) {
 				showMenu(null, canWrite && hasInput ? new int[] { LRefresh, LChatInfo, LSearchMessages, LSendSticker } : new int[] { LRefresh, LChatInfo, LSearchMessages });
 			} else {
 				if (focusedItem != null && focusedItem.focusable) {
@@ -1311,16 +1350,21 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		} else if (loading) {
 			// prevent NPE below
 		} else if (inputFocused) {
-			
-		} else if (fieldFocused) {
+			if (key == -5 || game == Canvas.FIRE) {
+				if (keyboard == null) {
+					showTextBox();
+				}
+			} else if (key == -7) {
+				
+			}
+		} else if (funcFocused) {
 			if (game == Canvas.UP) {
-				fieldFocused = false;
-				fieldAnimTarget = 0;
+				funcFocused = false;
+				bottomAnimTarget = 0;
 				repaint = true;
 			} else if (key == -5 || game == Canvas.FIRE) {
-				// TODO text field
 				if (canWrite && hasInput) {
-					MP.midlet.commandAction(MP.writeCmd, this);
+					focusInput();
 				}
 			}
 		} else if (key == -5 || game == Canvas.FIRE) {
@@ -1412,6 +1456,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				if ("send".equalsIgnoreCase(s)) {
 					send();
 					repaint = true;
+				} else if ("back".equalsIgnoreCase(s)) {
+					back();
 				}
 			} catch (Exception ignored) {}
 		}
@@ -1637,13 +1683,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						} else if (keyboard != null) {
 							keyboard.show();
 						} else {
-							if (text == null) text = "";
-							TextBox t = new TextBox("", text, 500, TextField.ANY);
-							t.addCommand(MP.okCmd);
-							t.addCommand(MP.cancelCmd);
-							t.setCommandListener(MP.midlet);
-							
-							MP.display(t);
+							showTextBox();
 						}
 					}
 				}
@@ -1669,6 +1709,16 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		pointerX = x;
 		pointerY = y;
 		queueRepaint();
+	}
+	
+	private void showTextBox() {
+		if (text == null) text = "";
+		TextBox t = new TextBox("", text, 500, TextField.ANY);
+		t.addCommand(MP.okCmd);
+		t.addCommand(MP.cancelCmd);
+		t.setCommandListener(MP.midlet);
+		
+		MP.display(t);
 	}
 	
 	private void menuAction(int i) {
@@ -1708,6 +1758,26 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				}
 				case LOpenPlayer: {
 					MP.midlet.commandAction(MP.playerCmd, this);
+					break;
+				}
+				
+				// input menu
+				case LEdit: {
+					showTextBox();
+					break;
+				}
+				case LCancel: {
+					back();
+					break;
+				}
+				case LClear: {
+					text = "";
+					if (keyboard != null) {
+						keyboard.setText("");
+					}
+				}
+				case LSend: {
+					send();
 					break;
 				}
 				}
@@ -2050,15 +2120,14 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 
 	public void startEdit(UIMessage item) {
-		// TODO
 		resetInput();
 		text = item.origText;
 		editMsgId = item.id;
-		bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
 		if (!touch) {
-//			fieldFocused = true;
-			MP.display(MP.writeForm(id, null, item.origText, Integer.toString(item.id), null, null));
+			focusInput();
+			return;
 		}
+		bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
 //#ifndef NO_NOKIAUI
 		if (nokiaEditor != null) {
 			NokiaAPI.TextEditor_setContent(nokiaEditor, text);
@@ -2071,14 +2140,13 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 	
 	public void startReply(UIMessage item) {
-		// TODO
 		if (editMsgId != 0 || forwardMsgs != null || forwardMsg != null) resetInput();
 		replyMsgId = item.id;
-		bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
 		if (!touch) {
-//			fieldFocused = true;
-			MP.display(MP.writeForm(id, Integer.toString(item.id), "", null, null, null));
+			focusInput();
+			return;
 		}
+		bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
 		queueRepaint();
 	}
 	
@@ -2090,12 +2158,32 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		this.forwardMsgs = msgs;
 		
 		if (!touch) {
-			// FIXME
-			MP.display(MP.errorAlert("Forwarding not implemented"), MP.current);
+			focusInput();
 		} else {
 			bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
 			queueRepaint();
 		}
+	}
+	
+	private void focusInput() {
+		int h = inputFieldHeight;
+		if (replyMsgId != 0 || editMsgId != 0 || forwardMsgs != null || forwardMsg != null) {
+			h += MP.smallBoldFontHeight + 8;
+		}
+		if (!touch) {
+			this.bottomAnimTarget = h;
+			keyGuide = false;
+			inputFocused = true;
+			fieldWasFocused = funcFocused;
+			if (text == null) text = "";
+			if (keyboard != null) {
+				keyboard.setText(text);
+				keyboard.show();
+			}
+		} else {
+			this.bottom = h;
+		}
+		queueRepaint();
 	}
 	
 	private void send() {
@@ -2120,7 +2208,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		replyMsgId = 0;
 		editMsgId = 0;
 		file = null;
-		bottom = inputFieldHeight;
+		if (touch) bottom = inputFieldHeight;
 		forwardPeer = null;
 		forwardMsg = null;
 		forwardMsgs = null;

@@ -286,6 +286,7 @@
 	"HideWithSpoiler": "Позначити як спойлер",
 	"EnableHTMLFormatting": "HTML-форматування",
 	"TextField_Hint": "Write a message...", // Untranslated
+	"Clear": "Clear", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Повідомлення відправлено",

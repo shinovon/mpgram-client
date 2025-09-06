@@ -286,6 +286,7 @@
 	"HideWithSpoiler": "Ocultar con spoiler",
 	"EnableHTMLFormatting": "HTML formato",
 	"TextField_Hint": "Write a message...", // Untranslated
+	"Clear": "Clear", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Mensaje enviado",

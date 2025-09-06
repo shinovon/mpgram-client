@@ -286,6 +286,7 @@
 	"HideWithSpoiler": "اخفاء الرسالة",
 	"EnableHTMLFormatting": "تفعيل تنسيق HTML",
 	"TextField_Hint": "Write a message...", // Untranslated
+	"Clear": "Clear", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "الرسالة مرسلة",

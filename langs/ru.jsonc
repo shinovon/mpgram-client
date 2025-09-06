@@ -217,7 +217,6 @@
 	"FullscreenTextBox": "Полноэкр. ввод",
 	"Theme": "Тема",
 	"InputLanguages": "Языки ввода",
-	"PartialUpload": "Отправка по частям",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Ждать полной загрузки",
@@ -239,6 +238,7 @@
 	"AlwaysAsk": "Всегда спрашивать",
 	"InApp": "В приложении",
 	"WithBrowser": "В браузере",
+	"PartialUpload": "Отправка по частям",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Загружать медиа",
@@ -286,6 +286,7 @@
 	"HideWithSpoiler": "Пометить как спойлер",
 	"EnableHTMLFormatting": "HTML-форматирование",
 	"TextField_Hint": "Написать сообщение...",
+	"Clear": "Очистить",
 	
 	// Alert messages
 	"MessageSent_Alert": "Сообщение отправлено",

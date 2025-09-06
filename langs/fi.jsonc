@@ -286,6 +286,7 @@
 	"HideWithSpoiler": "Piilota",
 	"EnableHTMLFormatting": "HTML-muotoilu",
 	"TextField_Hint": "Kirjoita viesti...",
+	"Clear": "Clear", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Viesti lähetetty",

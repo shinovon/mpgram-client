@@ -286,6 +286,7 @@
 	"HideWithSpoiler": "Hide with spoiler", // Untranslated
 	"EnableHTMLFormatting": "Enable HTML-formatting", // Untranslated
 	"TextField_Hint": "Write a message...", // Untranslated
+	"Clear": "Clear", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Mesaj göndərildi",
