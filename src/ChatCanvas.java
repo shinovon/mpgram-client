@@ -967,7 +967,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					if (!touch) {
 						if (!loading)
 							g.drawString(MP.L[LMenu], 2, by + 1, Graphics.TOP | Graphics.LEFT);
-						g.drawString(MP.L[LCancel], w - 2, by, Graphics.TOP | Graphics.RIGHT);
+						g.drawString(MP.L[LCancel], w - 2, by + 1, Graphics.TOP | Graphics.RIGHT);
 					}
 				} else if (keyGuide) {
 					animate = true;
@@ -980,6 +980,18 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						keyGuide = false;
 					}
 				} else if (touch || inputFocused) {
+					if (!touch && inputFocused) {
+						int bh = 4 + MP.smallBoldFontHeight;
+						g.setColor(colors[COLOR_CHAT_INPUT_BORDER]);
+						g.drawLine(0, h - bh, w, h - bh);
+						g.setColor(colors[COLOR_CHAT_PANEL_FG]);
+						
+						iy -= bh;
+						bh -= 1;
+						g.drawString(MP.L[LMenu], 2, h - bh, Graphics.TOP | Graphics.LEFT);
+						g.drawString(MP.L[LEdit], w >> 1, h - bh, Graphics.TOP | Graphics.HCENTER);
+						g.drawString(MP.L[keyboard != null && text.length() != 0 ? LClear : LCancel], w - 2, h - bh, Graphics.TOP | Graphics.RIGHT);
+					}
 					if (bottomAnimTarget != -1) {
 						// don't draw input field when animation is in progress
 					} else if (canWrite && hasInput) {
@@ -998,11 +1010,13 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							g.setColor(colors[COLOR_CHAT_INPUT_BORDER]);
 							g.drawLine(0, iy, w, iy);
 							
-							// cancel icon
-							int ty = by + ((MP.smallBoldFontHeight + 8 - 12) >> 1);
-							g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
-							g.drawLine(w - 20, ty, w - 8, ty + 12);
-							g.drawLine(w - 20, ty + 12, w - 8, ty);
+							if (touch) {
+								// cancel icon
+								int ty = by + ((MP.smallBoldFontHeight + 8 - 12) >> 1);
+								g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
+								g.drawLine(w - 20, ty, w - 8, ty + 12);
+								g.drawLine(w - 20, ty + 12, w - 8, ty);
+							}
 						}
 						g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
 //#ifndef NO_NOKIAUI
@@ -1075,10 +1089,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					}
 				} else if (funcFocused) {
 					by += 1;
-					g.drawString(MP.L[LMenu], 2, by, Graphics.TOP | Graphics.LEFT);
-					g.drawString(MP.L[LBack], w - 2, by, Graphics.TOP | Graphics.RIGHT);
+					g.drawString(MP.L[LMenu], 2, by + 1, Graphics.TOP | Graphics.LEFT);
+					g.drawString(MP.L[LBack], w - 2, by + 1, Graphics.TOP | Graphics.RIGHT);
 					if (hasInput && canWrite)
-						g.drawString(MP.L[LWrite], w >> 1, by, Graphics.TOP | Graphics.HCENTER);
+						g.drawString(MP.L[LWrite], w >> 1, by + 1, Graphics.TOP | Graphics.HCENTER);
 				}
 			}
 		} else {
@@ -1365,9 +1379,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			// prevent NPE below
 		} else if (inputFocused && game >= 0) {
 			if (key == -5 || game == Canvas.FIRE) {
-				if (keyboard == null) {
-					showTextBox();
-				}
+//				if (keyboard == null) {
+				showTextBox();
 			}
 		} else if (funcFocused && game >= 0) {
 			if (game == Canvas.UP) {
@@ -2167,7 +2180,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		}
 		if (text == null) text = "";
 		if (!touch) {
-			this.bottomAnimTarget = h;
+			this.bottomAnimTarget = h + MP.smallBoldFontHeight + 4;
 			keyGuide = false;
 			inputFocused = true;
 			funcWasFocused = funcFocused;
