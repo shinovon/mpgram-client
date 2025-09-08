@@ -81,7 +81,7 @@
 	// Settings commands
 	"Logout": "Tanca sessió",
 	"ClearCache": "Esborra memòria cau",
-	"Locate": "Locate", // Untranslated
+	"Locate": "Localitza",
 	
 	// Chats list commands
 	"Folders": "Carpetes",
@@ -104,9 +104,9 @@
 	"Pin": "Fixa",
 	"BanMember": "Prohibeix membre",
 	"Comments": "Discussió",
-	"Copy": "Copy", // Untranslated
-	"CopyLink": "Copy link", // Untranslated
-	"Select": "Select", // Untranslated
+	"Copy": "Copia",
+	"CopyLink": "Copia enllaç",
+	"Select": "Selecciona",
 	
 	// Item commands
 	"Link_Cmd": "Enllaç", // assuming noun, if verb - Enllaça
@@ -114,8 +114,8 @@
 	"Call": "Truca",
 	"Download": "Baixa",
 	"Play_Item": "Reprodueix",
-	"RunBotAction": "Run", // Untranslated
-	"SaveHere": "Save here", // Untranslated
+	"RunBotAction": "Executa",
+	"SaveHere": "Desa aquí",
 	
 	// Chat form commands
 	"WriteMessage": "Escriu missatge",
@@ -124,8 +124,8 @@
 	"Older": "Més vell",
 	"Newer": "Més nou",
 	"SendSticker": "Envia adhesiu",
-	"Menu": "Menu", // Untranslated
-	"Write": "Write", // Untranslated
+	"Menu": "Menú",
+	"Write": "Escriu",
 	
 	// Message writing form commands
 	"Send": "Envia",
@@ -158,7 +158,7 @@
 	"WaitingForServerResponse": "Esperant resposta de servidor...",
 	"Sending": "Enviant...",
 	"WaitingForPrevChat": "Esperant que xat anterior es desconnecti...",
-	"Downloading": "Downloading", // Untranslated
+	"Downloading": "Descarregant",
 	
 	// Authorization process
 	"Auth_Title": "Autorització",
@@ -185,7 +185,7 @@
 	"APIDisabled_Alert": "Aquesta instància no admet API!",
 	"ClientOutdated_Alert": "Client obsolet!",
 	"InvalidInstancePassword_Alert": "Mot de pas d'instància no vàlid!",
-	"InvalidSessionCode_Alert": "Invalid session code!", // Untranslated
+	"InvalidSessionCode_Alert": "Codi de sessió no vàlid!",
 	"Retry": "Reintenta",
 	
 	// Settings sections
@@ -210,13 +210,13 @@
 	"FocusNewMessages": "Centra nous missatges",
 	"ChatTextField": "Camp de text a xat",
 	"BuiltinImageViewer": "Visualitzador d'imatges integrat",
-	"LargeMusicCover": "Coberta de reproductor gran", // Untranslated
-	"LegacyUI": "Legacy UI", // Untranslated
-	"Keyboard": "Keyboard", // Untranslated
-	"Auto": "Auto", // Untranslated
-	"FullscreenTextBox": "Fullscreen text-box", // Untranslated
-	"Theme": "Theme", // Untranslated
-	"InputLanguages": "Input languages", // Untranslated
+	"LargeMusicCover": "Coberta de reproductor gran",
+	"LegacyUI": "IU antiga",
+	"Keyboard": "Teclat",
+	"Auto": "Auto",
+	"FullscreenTextBox": "Quadre de pantalla completa",
+	"Theme": "Tema",
+	"InputLanguages": "Idiomes d'entrada",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Espera que pàgina es carregui",
@@ -231,14 +231,14 @@
 	"NetworkAccess": "Accés a xarxa",
 	"MobileData": "Dades",
 	"WiFi": "Wi-Fi",
-	"Longpoll": "Longpoll", // Untranslated
-	"UpdatesInterval": "Updates interval", // Untranslated
-	"DownloadPath": "Download path", // Untranslated
-	"DownloadMethod": "Download method", // Untranslated
-	"AlwaysAsk": "Always ask", // Untranslated
-	"InApp": "In app", // Untranslated
-	"WithBrowser": "With browser", // Untranslated
-	"PartialUpload": "Partial upload", // Untranslated
+	"Longpoll": "Longpoll",
+	"UpdatesInterval": "Interval d'actualització",
+	"DownloadPath": "Ruta de descàrrega",
+	"DownloadMethod": "Mètode de descàrrega",
+	"AlwaysAsk": "Pregunta sempre",
+	"InApp": "A aplicació",
+	"WithBrowser": "Amb navegador",
+	"PartialUpload": "Càrrega parcial",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Carrega miniatures mèdia",
@@ -285,8 +285,8 @@
 	"SendAsVoice": "Envia com a missatge de veu",
 	"HideWithSpoiler": "Amaga amb spoiler",
 	"EnableHTMLFormatting": "Activa formatació HTML",
-	"TextField_Hint": "Write a message...", // Untranslated
-	"Clear": "Clear", // Untranslated
+	"TextField_Hint": "Escriu un missatge...",
+	"Clear": "Esborra",
 	
 	// Alert messages
 	"MessageSent_Alert": "Missatge enviat",
@@ -296,20 +296,20 @@
 	"StickersAdded_Alert": "Adhesius afegits",
 	"ChooseNetwork_Alert": "Selecciona punt d'accés a xarxa",
 	"FailedToLoadImage": "No s'ha pogut carregar imatge",
-	"TextCopied_Alert": "Text copied", // Untranslated
-	"NotEnoughMemory_Alert": "Not enough memory", // Untranslated
-	"DownloadCanceled_Alert": "Download canceled", // Untranslated
-	"DownloadedTo": "Downloaded to ", // Untranslated
-	"ChooseDownloadMethod_Alert": "Choose download method", // Untranslated
+	"TextCopied_Alert": "Text copiat",
+	"NotEnoughMemory_Alert": "No hi ha prou memòria",
+	"DownloadCanceled_Alert": "Descàrrega canceŀlada",
+	"DownloadedTo": "Descarregat a ",
+	"ChooseDownloadMethod_Alert": "Trieu mètode de descàrrega",
 	
 	// Chat form
 	"ChatMedia_Title": "Mèdia",
 	"Search_TitlePrefix": "Cerce - ",
 	"OlderMessages": "Missatges més vell",
 	"NewerMessages": "Missatges més nou",
-	"SavedMessages": "Saved messages", // Untranslated
-	"SomeoneIsTyping": "Someone is typing...", // Untranslated
-	"Typing": "typing...", // Untranslated
+	"SavedMessages": "Missatges desats",
+	"SomeoneIsTyping": "Algú està escrivint...",
+	"Typing": "escrivint...",
 	
 	// Message
 	"ForwardedFrom": "Reenviat des ",
@@ -321,15 +321,15 @@
 	"_comment": " comentari",
 	"_comments": " comentaris",
 	"_comments2": "",
-	"ReplyTo": "Reply to ", // Untranslated
+	"ReplyTo": "Respon a ",
 	
 	// Message media
 	"Media": "Mèdia",
 	"Poll": "Enquesta",
 	"Geo": "Geo: ",
-	"Photo": "Photo", // Untranslated
-	"Video": "Video", // Untranslated
-	"VoiceMessage": "Voice message", // Untranslated
+	"Photo": "Foto",
+	"Video": "Vídeo",
+	"VoiceMessage": "Missatge de veu",
 	
 	// Chat actions
 	"PinnedMessage_Action": " fixar missatge",
@@ -339,7 +339,7 @@
 	"Removed_Action": " tret",
 	"JoinedByLink_Action": " s'ha unit a grup via enllaç d'invitació",
 	"JoinedByRequest_Action": " ser acceptat a grup",
-	"ChatHistoryCleared_Action": "Chat history was cleared", // Untranslated
+	"ChatHistoryCleared_Action": "Historial de xats esborrat",
 	"GroupCreated_Action": "Grup creat",
 	"ChannelCreated_Action": "Canal creat",
 	"PhotoUpdated_Action": "Foto actualitzat",
@@ -364,7 +364,7 @@
 	"Next_Player": "Següent",
 	"UnknownTrack": "Pista desconeguda",
 	"Playlist_Title": "Llista de reproducció",
-	"Volume": "Volume", // Untranslated
+	"Volume": "Volum",
 	
 	// Profile/chat info
 	"Online": "en línia",
