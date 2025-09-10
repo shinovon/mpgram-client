@@ -795,6 +795,7 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 			downloadPath = j.getString("downloadPath", downloadPath);
 			chunkedUpload = j.getBoolean("uploadChunked", chunkedUpload);
+			downloadMethod = j.getInt("downloadMethod", downloadMethod);
 //#endif
 			longpoll = j.getBoolean("longpoll", longpoll);
 		} catch (Exception ignored) {}
@@ -3119,6 +3120,7 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 					j.put("downloadPath", downloadPath);
 					j.put("uploadChunked", chunkedUpload);
+					j.put("downloadMethod", downloadMethod);
 //#endif
 					j.put("longpoll", longpoll);
 					
