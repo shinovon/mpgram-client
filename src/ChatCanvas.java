@@ -1676,7 +1676,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		} else if (touch && now - pressTime < 300) {
 			if (y < top) {
 				if (x < 40) {
-					keyPressed(-7);
+					if (keyboard != null && keyboard.isVisible()) {
+						onKeyboardCancel();
+					} else {
+						keyPressed(-7);
+					}
 				} else if (selected != 0) {
 					if (x > width - 40) {
 						deleteSelected();
