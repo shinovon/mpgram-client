@@ -2432,7 +2432,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				remove(lastItem instanceof UIPageButton ? lastItem.prev : lastItem);
 			}
 			
-			addFirst(new UIMessage(update.getObject("message"), this));
+			safeAddFirst(null, new UIMessage(update.getObject("message"), this));
 			firstMsgId = update.getObject("message").getInt("id");
 			break;
 		}
