@@ -1287,4 +1287,8 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 		setTitle(this.title = title);
 	}
 	
+	public void gc() {
+		// TODO
+	}
+	
 }

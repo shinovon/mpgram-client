@@ -500,7 +500,7 @@ public class MP extends MIDlet
 	private static int playlistIndex;
 	private static int playlistSize;
 	private static int playlistOffset;
-	private static boolean playlistDirection = true;
+	private static boolean playlistDirection = true; // TODO ui toggle
 	private static String playlistPeer;
 	private static JSONObject currentMusic;
 	static int playerState; // 1 - playing, 2 - paused, 3 - loading
@@ -1228,6 +1228,8 @@ public class MP extends MIDlet
 //#endif
 							
 							putImage(target, img);
+						} catch (OutOfMemoryError e) {
+							gc();
 						} catch (Exception e) {
 							e.printStackTrace();
 						} 
@@ -1464,6 +1466,7 @@ public class MP extends MIDlet
 				{
 //#ifndef NO_FILE
 					if (e instanceof OutOfMemoryError) {
+						gc();
 						display(errorAlert(L[LNotEnoughMemory_Alert]), current);
 						break;
 					}
@@ -5662,6 +5665,19 @@ public class MP extends MIDlet
 		} catch (Exception e) {
 			return false;
 		}
+	}
+	
+	static void gc() {
+		System.out.println("EMERGENCY COLLECTION");
+		imagesToLoad.removeAllElements();
+		usersCache.clear();
+		chatsCache.clear();
+		imagesCache.clear();
+		if (current instanceof MPChat) {
+			((MPChat) current).gc();
+		}
+		formHistory.removeAllElements();
+		System.gc();
 	}
 	
 	// endregion

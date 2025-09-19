@@ -69,5 +69,6 @@ interface MPChat {
 	
 	void load();
 	void closed(boolean destroy);
+	void gc();
 
 }

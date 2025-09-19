@@ -65,6 +65,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 				repaint();
 			}
 		} catch (OutOfMemoryError e) {
+			MP.gc();
 			toDraw = null;
 			MP.midlet.commandAction(MP.backCmd, this);
 			try {

@@ -567,9 +567,16 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				} else if (i == l - 1) {
 					lastMsgId = id;
 				}
-				safeAdd(thread, new UIMessage(message, this),
-						this.messageId != 0 ? (messageId == id)
-						: (i == 0 ? ((endReached && dir == 0) || dir == -1) : (i == l - 1 && dir == 1)));
+				do {
+					try {
+						safeAdd(thread, new UIMessage(message, this),
+								this.messageId != 0 ? (messageId == id)
+								: (i == 0 ? ((endReached && dir == 0) || dir == -1) : (i == l - 1 && dir == 1)));
+					} catch (OutOfMemoryError e) {
+						MP.gc();
+						continue;
+					}
+				} while (false);
 			}
 			
 			if (l == limit && j.has("count")) {
@@ -2651,6 +2658,16 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		} finally {
 			typingThread = null;
 		}
+	}
+	
+	public void gc() {
+		UIItem item = firstItem;
+		if (item == null) return;
+		do {
+			if (!(item instanceof UIMessage))
+				continue;
+			((UIMessage) item).mediaImage = null;
+		} while ((item = item.next) != null);
 	}
 
 }
