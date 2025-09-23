@@ -41,7 +41,7 @@ public class Notifier implements SoftNotificationListener {
 	static Hashtable piglerIds = new Hashtable();
 	
 	private static Notifier inst;
-	private static PiglerListener piglerListener;
+	private static Object piglerListener;
 	private static Object piglerApi;
 	
 	public static boolean init() {
@@ -58,7 +58,7 @@ public class Notifier implements SoftNotificationListener {
 			piglerListener = new PiglerListener();
 			piglerApi = new PiglerAPI();
 			((PiglerAPI) piglerApi).init();
-			((PiglerAPI) piglerApi).setListener(piglerListener);
+			((PiglerAPI) piglerApi).setListener((PiglerListener) piglerListener);
 			try {
 				((PiglerAPI) piglerApi).removeAllNotifications();
 			} catch (Throwable ignored) {}
