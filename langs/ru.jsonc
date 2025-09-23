@@ -169,7 +169,7 @@
 	"SessionCode": "Код сессии",
 	"Code": "Код",
 	"CloudPassword": "Облачный пароль",
-	"Captcha": "Антибот-проверка",
+	"Captcha": "Капча",
 	"Auth_Btn": "Авторизоваться",
 	"InvalidCode_Alert": "Неправильный код!",
 	"CodeExpired_Alert": "Код истек!",
