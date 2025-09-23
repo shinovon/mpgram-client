@@ -5314,7 +5314,8 @@ public class MP extends MIDlet
 		if (blackberry && blackberryNetwork == 1) {
 			url = url.concat(";deviceside=true;interface=wifi");
 		}
-		boolean u = (url.indexOf("method=updates") != -1 || url.indexOf(OTA_URL) != -1);
+		boolean u = (url.indexOf("method=updates") != -1 || url.indexOf("method=notifications") != -1
+				|| url.indexOf(OTA_URL) != -1);
 		HttpConnection hc = (HttpConnection) Connector.open(url, Connector.READ_WRITE, u);
 		hc.setRequestProperty("User-Agent", "mpgram4/".concat(version).concat(" (https://github.com/shinovon/mpgram-client)"));
 //#ifndef NO_ZIP
