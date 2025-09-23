@@ -1012,6 +1012,14 @@ public class MP extends MIDlet
 				display(infoAlert(L[LChooseNetwork_Alert]), current);
 				return;
 			}
+//#ifndef NO_NOTIFY
+//#ifndef NO_NOKIAUI
+			else if (notifyMethod == 3 && !checkClass("org.pigler.api.PiglerAPI")) {
+				// TODO localize
+				display(alert(null, "Pigler API is selected but not available, \ndownload it from https://nnproject.cc/pna", AlertType.WARNING), current);
+			}
+//#endif
+//#endif
 			start(RUN_CHECK_OTA, null);
 			return;
 		}
