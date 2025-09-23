@@ -1728,7 +1728,12 @@ public class MP extends MIDlet
 //#endif
 						) {
 					Thread.sleep(wasShown ? pushInterval : pushBgInterval);
-					if (threadConnections.size() != 0 || (playerState == 1 && (reopenChat || series40)))
+					if (
+//#ifndef NO_NOTIFY
+							!notifications &&
+//#endif
+							(threadConnections.size() != 0
+							|| (playerState == 1 && (reopenChat || series40))))
 						continue;
 					
 					// update status
