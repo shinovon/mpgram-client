@@ -1016,9 +1016,8 @@ public class MP extends MIDlet
 			}
 //#ifndef NO_NOTIFY
 //#ifndef NO_NOKIAUI
-			else if (notifyMethod == 3 && !checkClass("org.pigler.api.PiglerAPI")) {
-				// TODO localize
-				display(alert(null, "Pigler API is selected but not available, \ndownload it from https://nnproject.cc/pna", AlertType.WARNING), current);
+			else if (notifyMethod == 3 && symbianJrt && !checkClass("org.pigler.api.PiglerAPI")) {
+				display(alert(null, L[LPiglerNotAvailable_Alert], AlertType.WARNING), current);
 			}
 //#endif
 //#endif
@@ -3148,9 +3147,17 @@ public class MP extends MIDlet
 					r.closeRecordStore();
 				} catch (Exception e) {
 					e.printStackTrace();
-					display(errorAlert("Failed to save settings: " + e)); // TODO unlocalized
+					display(errorAlert(L[LFailedToSaveSettings_Alert] + ": " + e));
 					return;
 				}
+//#ifndef NO_NOTIFY
+//#ifndef NO_NOKIAUI
+			if (notifyMethod == 3 && symbianJrt && !checkClass("org.pigler.api.PiglerAPI")) {
+				display(alert(null, L[LPiglerNotAvailable_Alert], AlertType.WARNING), mainDisplayable);
+				return;
+			}
+//#endif
+//#endif
 			}
 			if (c == logoutCmd) {
 				userState = 0;

@@ -301,6 +301,8 @@
 	"DownloadCanceled_Alert": "Скачивание отменено",
 	"DownloadedTo": "Скачано в ",
 	"ChooseDownloadMethod_Alert": "Выберите способ скачивания",
+	"FailedToSaveSettings_Alert": "Не удалось сохранить настройки",
+	"PiglerNotAvailable_Alert": "Pigler API is selected but not available, \ndownload it from https://nnproject.cc/pna", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Медиафайлы",

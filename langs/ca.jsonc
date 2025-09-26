@@ -301,6 +301,8 @@
 	"DownloadCanceled_Alert": "Descàrrega canceŀlada",
 	"DownloadedTo": "Descarregat a ",
 	"ChooseDownloadMethod_Alert": "Trieu mètode de descàrrega",
+	"FailedToSaveSettings_Alert": "Failed to save settings", // Untranslated
+	"PiglerNotAvailable_Alert": "Pigler API is selected but not available, \ndownload it from https://nnproject.cc/pna", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Mèdia",

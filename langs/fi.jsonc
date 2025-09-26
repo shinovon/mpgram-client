@@ -301,6 +301,8 @@
 	"DownloadCanceled_Alert": "Lataus peruttu",
 	"DownloadedTo": "Ladattu kansioon ",
 	"ChooseDownloadMethod_Alert": "Valitse lataustapa",
+	"FailedToSaveSettings_Alert": "Failed to save settings", // Untranslated
+	"PiglerNotAvailable_Alert": "Pigler API is selected but not available, \ndownload it from https://nnproject.cc/pna", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Media",
