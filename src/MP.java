@@ -5034,7 +5034,7 @@ public class MP extends MIDlet
 					hc.close();
 				} catch (Exception ignored) {}
 				try {
-					Thread.sleep(3000);
+					Thread.sleep(5000);
 				} catch (InterruptedException e) {
 					throw new RuntimeException(e.toString());
 				}
