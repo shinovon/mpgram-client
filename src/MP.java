@@ -277,6 +277,7 @@ public class MP extends MIDlet
 	static String downloadPath;
 	static boolean chunkedUpload;
 //#endif
+	private static boolean playlistDirection = true;
 	
 	// platform
 	static boolean symbianJrt;
@@ -502,7 +503,6 @@ public class MP extends MIDlet
 	private static int playlistIndex;
 	private static int playlistSize;
 	private static int playlistOffset;
-	private static boolean playlistDirection = true; // TODO ui toggle
 	private static String playlistPeer;
 	private static JSONObject currentMusic;
 	static int playerState; // 1 - playing, 2 - paused, 3 - loading
@@ -800,6 +800,7 @@ public class MP extends MIDlet
 			downloadMethod = j.getInt("downloadMethod", downloadMethod);
 //#endif
 			longpoll = j.getBoolean("longpoll", longpoll);
+			playlistDirection = j.getBoolean("playlistDirection", playlistDirection);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -3140,6 +3141,7 @@ public class MP extends MIDlet
 					j.put("downloadMethod", downloadMethod);
 //#endif
 					j.put("longpoll", longpoll);
+					j.put("playlistDirection", playlistDirection);
 					
 					byte[] b = j.toString().getBytes("UTF-8");
 					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
