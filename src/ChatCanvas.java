@@ -764,7 +764,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			}
 			
 			if (nextFocusItem != null && nextFocusItem.layoutWidth != 0) {
-				focusItem(nextFocusItem, 0);
+				focusItem(nextFocusItem, touch ? 0 : reverse ? -1 : 1);
 				if (!isVisible(nextFocusItem)) scrollTo(nextFocusItem);
 				nextFocusItem = null;
 			}
