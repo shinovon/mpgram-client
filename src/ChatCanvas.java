@@ -275,9 +275,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				// do not use multiline in j2mekeyboard as it's too broken
 				keyboard = Keyboard.getKeyboard(this, false, getWidth(), getHeight());
 				
-				keyboard.setTextColor(colors[COLOR_CHAT_FG]);
+				keyboard.setTextColor(colors[COLOR_CHAT_PANEL_FG]);
 				keyboard.setTextHintColor(colors[COLOR_CHAT_INPUT_ICON]);
-				keyboard.setCaretColor(colors[COLOR_CHAT_FG]);
+				keyboard.setCaretColor(colors[COLOR_CHAT_PANEL_FG]);
 				keyboard.setTextHint(MP.L[LTextField_Hint]);
 				keyboard.setLanguages(MP.inputLanguages);
 			} else {
@@ -901,7 +901,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					tx = 40;
 					tw = w - 80;
 					int bty = (th - 2) >> 1;
-					if (selected != 0) g.setColor(colors[COLOR_CHAT_FG]);
+					if (selected != 0) g.setColor(colors[COLOR_CHAT_PANEL_FG]);
 					// back button
 					g.drawLine(12, bty, 28, bty);
 					g.drawLine(12, bty, 20, bty-8);
@@ -931,7 +931,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				boolean medfont = (MP.chatStatus && mediaFilter == null) || touch;
 				if (selected != 0 || mediaFilter != null || loading) {
 					g.setFont(medfont ? MP.medPlainFont : MP.smallPlainFont);
-					g.setColor(colors[COLOR_CHAT_FG]);
+					g.setColor(colors[COLOR_CHAT_PANEL_FG]);
 					g.drawString(loading ? MP.L[LLoading] : selected != 0 ? Integer.toString(selected) : mediaFilter /* TODO unlocalized */, tx, medfont ? ((th - MP.medPlainFontHeight) >> 1) : 2, 0);
 				} else {
 					boolean hideStatus = medfont && (selfChat || postId != null || query != null);
@@ -940,7 +940,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						if (titleRender == null) {
 							titleRender = UILabel.ellipsis(query != null ? MP.L[LSearch] : title, font, tw - 4);
 						}
-						g.setColor(colors[COLOR_CHAT_FG]);
+						g.setColor(colors[COLOR_CHAT_PANEL_FG]);
 						g.setFont(font);
 						g.drawString(titleRender, tx, medfont ? (hideStatus ? (th - MP.medPlainFontHeight) >> 1 : 4) : 2, 0);
 					}
@@ -1041,7 +1041,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 										NokiaAPI.TextEditor_setSize(nokiaEditor, 10, iy + 8, w - 40, ih - 8);
 										NokiaAPI.TextEditor_setIndicatorVisibility(nokiaEditor, false);
 										NokiaAPI.TextEditor_setBackgroundColor(nokiaEditor, colors[COLOR_CHAT_PANEL_BG] | 0xFF000000);
-										NokiaAPI.TextEditor_setForegroundColor(nokiaEditor, colors[COLOR_CHAT_FG] | 0xFF000000);
+										NokiaAPI.TextEditor_setForegroundColor(nokiaEditor, colors[COLOR_CHAT_PANEL_FG] | 0xFF000000);
 										NokiaAPI.TextEditor_setFont(nokiaEditor, MP.smallPlainFont);
 										NokiaAPI.TextEditor_setVisible(nokiaEditor, true);
 										NokiaAPI.TextEditor_setFocus(nokiaEditor, true);
@@ -1063,7 +1063,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							g.drawString(MP.L[LTextField_Hint], 10, iy + ((ih - MP.medPlainFontHeight) >> 1), 0);
 						} else {
 							g.setFont(MP.smallPlainFont);
-							g.setColor(colors[COLOR_CHAT_FG]);
+							g.setColor(colors[COLOR_CHAT_PANEL_FG]);
 							g.drawString(text, 10, iy + ((ih - MP.smallPlainFontHeight) >> 1), 0);
 						}
 							
