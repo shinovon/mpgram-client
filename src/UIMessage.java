@@ -675,7 +675,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			g.fillTriangle(tx + 2, ty, tx + 9, ty + 10 - 2, tx + 19 - 2, ty);
 			g.fillRect(tx, ty, 9, 6);
 		}
-		g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_TIME : COLOR_MESSAGE_TIME]);
+		g.setColor(ChatCanvas.colors[sticker ? ChatCanvas.COLOR_CHAT_FG : out ? COLOR_MESSAGE_OUT_TIME : COLOR_MESSAGE_TIME]);
 		g.setFont(MP.smallPlainFont);
 		g.drawString(time, rx + rw - TIME_PADDING_WIDTH - mw, y + PADDING_HEIGHT - TIME_PADDING_HEIGHT, Graphics.BOTTOM | Graphics.RIGHT);
 		if (edited) {
