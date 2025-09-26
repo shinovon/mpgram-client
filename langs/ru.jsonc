@@ -367,6 +367,7 @@
 	"UnknownTrack": "Без названия",
 	"Playlist_Title": "Плейлист",
 	"Volume": "Громкость",
+	"TogglePlaylistOrder": "Поменять порядок восп.",
 	
 	// Profile/chat info
 	"Online": "в сети",

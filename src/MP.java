@@ -410,6 +410,7 @@ public class MP extends MIDlet
 	static Command playlistPrevCmd;
 	static Command playlistCmd;
 	static Command playerCmd;
+	static Command togglePlaylistOrderCmd;
 	
 	private static Command updateCmd;
 	// endregion
@@ -930,6 +931,7 @@ public class MP extends MIDlet
 		playlistPrevCmd = new Command(L[LPrev_Player], Command.ITEM, 1);
 		playlistCmd = new Command(L[LOpenPlaylist], Command.SCREEN, 2);
 		playerCmd = new Command(L[LOpenPlayer], Command.SCREEN, 20);
+		togglePlaylistOrderCmd = new Command(L[LTogglePlaylistOrder], Command.SCREEN, 3);
 		
 		loadingForm = new Form(L[Lmpgram]);
 		loadingForm.append(L[LLoading]);
@@ -3557,6 +3559,9 @@ public class MP extends MIDlet
 				display(playlistList);
 			} else if (c == playerCmd) {
 				display(initPlayerForm());
+			} else if (c == togglePlaylistOrderCmd) {
+				playlistDirection = !playlistDirection;
+				// TODO save
 			}
 		}
 //#ifndef NO_NOKIAUI
@@ -4444,6 +4449,7 @@ public class MP extends MIDlet
 		Form f = new Form(L[LPlayer_Title].concat(" - mpgram"));
 		f.addCommand(backCmd);
 		f.addCommand(playlistCmd);
+		f.addCommand(togglePlaylistOrderCmd);
 		f.setCommandListener(midlet);
 		f.setItemStateListener(midlet);
 		

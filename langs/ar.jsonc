@@ -367,6 +367,7 @@
 	"UnknownTrack": "مقطع غير معروف",
 	"Playlist_Title": "قائمة تشغيل", 
 	"Volume": "Volume", // Untranslated
+	"TogglePlaylistOrder": "Toggle order", // Untranslated
 	
 	// Profile/chat info
 	"Online": "متصل",

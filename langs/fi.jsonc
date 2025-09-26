@@ -367,6 +367,7 @@
 	"UnknownTrack": "Tuntematon kappale",
 	"Playlist_Title": "Soittolista",
 	"Volume": "Äänenvoimakkuus",
+	"TogglePlaylistOrder": "Toggle order", // Untranslated
 	
 	// Profile/chat info
 	"Online": "paikalla",

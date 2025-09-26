@@ -367,6 +367,7 @@
 	"UnknownTrack": "Unknown Track", // Untranslated
 	"Playlist_Title": "Playlist", // Untranslated
 	"Volume": "Volume", // Untranslated
+	"TogglePlaylistOrder": "Toggle order", // Untranslated
 	
 	// Profile/chat info
 	"Online": "onlayn",

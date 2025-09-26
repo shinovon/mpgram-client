@@ -367,6 +367,7 @@
 	"UnknownTrack": "Pista desconeguda",
 	"Playlist_Title": "Llista de reproducció",
 	"Volume": "Volum",
+	"TogglePlaylistOrder": "Toggle order", // Untranslated
 	
 	// Profile/chat info
 	"Online": "en línia",

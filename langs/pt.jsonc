@@ -367,6 +367,7 @@
 	"UnknownTrack": "Faixa desconhecida",
 	"Playlist_Title": "Playlist", 
 	"Volume": "Volume", // Untranslated
+	"TogglePlaylistOrder": "Toggle order", // Untranslated
 	
 	// Profile/chat info
 	"Online": "online",
