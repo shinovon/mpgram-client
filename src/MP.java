@@ -159,12 +159,14 @@ public class MP extends MIDlet
 			"webdark",
 			"weblight",
 			"edge",
+			"light2",
 		},
 		{
 			"Tint",
-			"Dark (Web)",
-			"Light (Web)",
-			"Edge (by SD)",
+			"Dark",
+			"Light",
+			"Edges",
+			"Desktop Light (nallion)",
 		}
 	};
 //#endif
