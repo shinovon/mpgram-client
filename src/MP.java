@@ -3287,7 +3287,10 @@ public class MP extends MIDlet
 //#ifndef NO_CHAT_CANVAS
 				if (!legacyChatUI) {
 					commandAction(backCmd, d);
-					((ChatCanvas) current).text = ((TextBox) d).getString();
+					String s = ((ChatCanvas) current).text = ((TextBox) d).getString();
+					if (ChatCanvas.keyboard != null) {
+						ChatCanvas.keyboard.setText(s);
+					}
 					((ChatCanvas) current).queueRepaint();
 					return;
 				}
