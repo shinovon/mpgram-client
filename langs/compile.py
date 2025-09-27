@@ -17,6 +17,9 @@ def load_jsonc(f,lines=None):
             cleaned += s
     return json.loads(cleaned)
 
+def escape(s):
+    return s.replace("\\", "\\\\").replace("\n", "\\n")
+
 en_lines = []
 en_json = None
 with open("en.jsonc", encoding="utf-8") as f:
@@ -60,16 +63,16 @@ if not err:
             for s in en_json.keys():
                 if s in j:
                     if j[s] == None:
-                        f.write(en_json[s].replace("\n", "\\\n"))
+                        f.write(escape(en_json[s]))
                         #print("Missing key:", s)
                     else:
                         o = en_json[s]
                         t = j[s]
                         if n != "ar.jsonc" and len(o.strip()) != 0 and len(t.strip()) != 0 and (o.strip().lower()[0] == o.strip()[0]) != (t.strip().lower()[0] == t.strip()[0]):
                             print('Warning: "{}": "{}"->"{}" does not match original case'.format(s, o, t))
-                        f.write(t.replace("\n", "\\\n"))
+                        f.write(escape(t.replace))
                 else:
-                    f.write(en_json[s].replace("\n", "\\\n"))
+                    f.write(escape(en_json[s]))
                     print("Missing key:", s)
                 f.write("\n")
         
