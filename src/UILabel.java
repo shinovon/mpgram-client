@@ -61,10 +61,20 @@ public class UILabel extends UIItem {
 		if (render == null) return;
 		int l = render.size();
 		g.setColor(color);
+		
+		UIItem root = (UIItem) container;
+		ChatCanvas chat = (ChatCanvas) root.container;
+		int t = !chat.reverse ? chat.top - chat.scroll + this.y + root.y
+				: chat.height - chat.bottom + chat.scroll - (root.y + root.contentHeight) + this.y;
+		
 		for (int i = 0; i < l; ++i) {
 			Object[] obj = (Object[]) render.elementAt(i);
 			int[] pos = (int[]) obj[3];
 //			if (getVisibility(pos) != 0) continue;
+			if (t + pos[1] + pos[3] <= chat.top)
+				continue;
+			if (t + pos[1] >= chat.height - chat.bottom)
+				break;
 			Font font = (Font) obj[1];
 			String text = (String) obj[0];
 			int tx = x + pos[0], ty = y + pos[1];
