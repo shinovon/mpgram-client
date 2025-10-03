@@ -18,7 +18,7 @@ def load_jsonc(f,lines=None):
     return json.loads(cleaned)
 
 def escape(s):
-    return s.replace("\\", "\\\\").replace("\n", "\\n")
+    return str(s).replace("\\", "\\\\").replace("\n", "\\n")
 
 en_lines = []
 en_json = None
