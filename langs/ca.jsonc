@@ -301,8 +301,8 @@
 	"DownloadCanceled_Alert": "Descàrrega canceŀlada",
 	"DownloadedTo": "Descarregat a ",
 	"ChooseDownloadMethod_Alert": "Trieu mètode de descàrrega",
-	"FailedToSaveSettings_Alert": "Failed to save settings", // Untranslated
-	"PiglerNotAvailable_Alert": "Pigler API is selected but not available, \ndownload it from https://nnproject.cc/pna", // Untranslated
+	"FailedToSaveSettings_Alert": "No s'ha pogut desar configuració",
+	"PiglerNotAvailable_Alert": "API de Pigler està seleccionada però no disponible, \ndescarrega-la des de https://nnproject.cc/pna",
 	
 	// Chat form
 	"ChatMedia_Title": "Mèdia",
@@ -367,7 +367,7 @@
 	"UnknownTrack": "Pista desconeguda",
 	"Playlist_Title": "Llista de reproducció",
 	"Volume": "Volum",
-	"TogglePlaylistOrder": "Toggle order", // Untranslated
+	"TogglePlaylistOrder": "Commuta ordre",
 	
 	// Profile/chat info
 	"Online": "en línia",
