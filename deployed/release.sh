@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [[ -z "$MPGRAM_DEPLOY_DIR" ]]; then
+MPGRAM_DEPLOY_DIR=$(pwd)
+fi
+
 # regular jar
 cd Regular || exit 1
 cp mpgram.jar "$MPGRAM_DEPLOY_DIR/mpgram.jar"
