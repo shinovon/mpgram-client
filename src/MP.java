@@ -1818,8 +1818,8 @@ public class MP extends MIDlet
 							JSONObject peer = getPeer(peerId, true);
 							String text = appendDialog(sb, peer, peerId, msg).toString();
 							
-							// update chats list
-							if (chatsList != null && chatsList.ids.contains(peerId)) {
+							// update chats list TODO
+							if (chatsList != null && updateChatsList && chatsList.ids.contains(peerId)) {
 								Vector ids = chatsList.ids;
 								int idx = ids.indexOf(peerId);
 								ids.removeElementAt(idx);
