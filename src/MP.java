@@ -693,7 +693,7 @@ public class MP extends MIDlet
 		}
 		
 		if (p != null) {
-			lang = p.length() > 2 ? p.substring(0, 2) : p;
+			lang = (p.length() > 2 ? p.substring(0, 2) : p).toLowerCase();
 		}
 
 		// init platform dependent settings
