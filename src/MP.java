@@ -1761,7 +1761,16 @@ public class MP extends MIDlet
 						continue;
 					}
 					try {
-						if (check) {
+						while (check) {
+							try {
+								j = ((JSONObject) api("getNotifySettings"));
+								muteUsers = j.getInt("users") != 0;
+								muteChats = j.getInt("chats") != 0;
+								muteBroadcasts = j.getInt("broadcasts") != 0;
+							} catch (Exception ignored) {
+								continue;
+							}
+							
 							try {
 								j = ((JSONObject) api("getLastUpdate")).getObject("res");
 								int off = j.getInt("update_id");
@@ -1769,15 +1778,11 @@ public class MP extends MIDlet
 									off -= 1;
 								if (offset <= 0 || off < offset)
 									offset = off;
-							} catch (Exception ignored) {}
-							
-							try {
-								j = ((JSONObject) api("getNotifySettings"));
-								muteUsers = j.getInt("users") != 0;
-								muteChats = j.getInt("chats") != 0;
-								muteBroadcasts = j.getInt("broadcasts") != 0;
-							} catch (Exception ignored) {}
+							} catch (Exception ignored) {
+								continue;
+							}
 							check = false;
+							break;
 						}
 						
 						sb.setLength(0);
@@ -1818,22 +1823,10 @@ public class MP extends MIDlet
 							JSONObject peer = getPeer(peerId, true);
 							String text = appendDialog(sb, peer, peerId, msg).toString();
 							
-							// update chats list TODO
-							if (chatsList != null && updateChatsList && chatsList.ids.contains(peerId)) {
-								Vector ids = chatsList.ids;
-								int idx = ids.indexOf(peerId);
-								ids.removeElementAt(idx);
-								chatsList.delete(idx);
-								
-								int newIdx = Math.min(chatsList.size(), idx < chatsList.pinnedCount ? 0 : chatsList.pinnedCount);
-								ids.insertElementAt(peerId, newIdx);
-								chatsList.insert(null, newIdx,
-										sb.insert(0, '\n').insert(0, getName(peer, false)).toString(), peerId);
-							}
-							
 							if (msg.getBoolean("out", false)
 									|| update.getBoolean("muted", false)
 									|| msg.getBoolean("silent", false))
+//								msg.put("muted", true);
 								continue;
 
 							msg.put("peer_id", peerId);
@@ -1846,16 +1839,19 @@ public class MP extends MIDlet
 //#endif
 
 							// filter latest messages
-							int n = newMsgs.size();
-							for (int m = 0; m < n; ++m) {
-								JSONObject t = newMsgs.getObject(m);
-								if (peerId.equals(t.getString("peer_id"))) {
-									newMsgs.remove(m);
-									count++;
+							f: {
+								int n = newMsgs.size();
+								for (int m = 0; m < n; ++m) {
+									JSONObject t = newMsgs.getObject(m);
+									if (peerId.equals(t.getString("peer_id"))) {
+										msg.put("count", ++count);
+										newMsgs.set(m, msg);
+										break f;
+									}
 								}
+								msg.put("count", ++count);
+								newMsgs.add(msg);
 							}
-							msg.put("count", ++count);
-							newMsgs.add(msg);
 //#ifndef NO_NOKIAUI
 							notificationMessages.put(peerId, msg);
 //#endif
@@ -1877,6 +1873,23 @@ public class MP extends MIDlet
 									sb.append(" +").append(count);
 								}
 								String title = sb.toString();
+								
+								// TODO
+//								if (chatsList != null && updateChatsList) {
+//									Vector ids = chatsList.ids;
+//									int idx = ids.indexOf(peerId);
+//									int newIdx;
+//									if (idx != -1) {
+//										ids.removeElementAt(idx);
+//										chatsList.delete(idx);
+//										newIdx = Math.min(chatsList.size(), idx < chatsList.pinnedCount ? 0 : chatsList.pinnedCount);
+//									} else {
+//										newIdx = Math.min(chatsList.size(), chatsList.pinnedCount);
+//									}
+//									chatsList.insert(null, newIdx, sb.append('\n').append(text).toString(), peerId);
+//									ids.insertElementAt(peerId, newIdx);
+//								}
+//								if (msg.has("muted")) continue;
 								
 								if (!paused && current instanceof MPChat && current.isShown() && peerId.equals(((MPChat) current).id())) {
 //#ifndef NO_NOKIAUI
