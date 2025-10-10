@@ -1096,13 +1096,14 @@ public class UIMessage extends UIItem implements LangConstants {
 		case LEdit:
 			((ChatCanvas) container).startEdit(this);
 			break;
-		case LPin:
-			MP.display(MP.loadingAlert(MP.L[LLoading]), MP.current);
-			if (MP.reopenChat && MP.updatesThread != null) {
-				MP.cancel(MP.updatesThread, true);
-			}
-			MP.midlet.start(MP.RUN_PIN_MESSAGE, new String[] { peerId, idStr });
+		case LPin: {
+			// TODO localize
+			MP.confirm(MP.RUN_PIN_MESSAGE | 0x100 | 0x200,
+					new String[] { peerId, idStr },
+					null,
+					"Pin message?");
 			break;
+		}
 		case LCopyMessage:
 //			if (text != null) {
 //				StringBuffer sb = new StringBuffer();
@@ -1120,10 +1121,14 @@ public class UIMessage extends UIItem implements LangConstants {
 		case LForward:
 			MP.openLoad(new ChatsList(peerId, idStr));
 			break;
-		case LDelete:
-			MP.display(MP.loadingAlert(MP.L[LLoading]), MP.current);
-			MP.midlet.start(MP.RUN_DELETE_MESSAGE, new String[] { peerId, idStr });
+		case LDelete: {
+			// TODO localize
+			MP.confirm(MP.RUN_DELETE_MESSAGE | 0x100 | 0x200,
+					new String[] { peerId, idStr },
+					null,
+					"Delete message?");
 			break;
+		}
 		case LViewImage:
 			if (MP.useView) {
 				MP.display(new ViewCanvas(peerId, idStr));

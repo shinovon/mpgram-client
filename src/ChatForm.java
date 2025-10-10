@@ -25,7 +25,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.ImageItem;
 import javax.microedition.lcdui.Item;
@@ -399,11 +398,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 		if (j == null) return;
 		
 		if (j.has("message")) {
-			Alert a = new Alert(title);
-			a.setType(AlertType.CONFIRMATION);
-			a.setString(j.getString("message"));
-			a.setTimeout(1500);
-			MP.display(a, this);
+			MP.display(MP.alert(title, j.getString("message"), AlertType.CONFIRMATION), this);
 		}
 		
 		if (j.has("url")) {

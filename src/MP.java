@@ -108,6 +108,7 @@ public class MP extends MIDlet
 	static final int RUN_PLAYER_LOOP = 24;
 	static final int RUN_CANCEL_UPDATES = 25;
 	static final int RUN_DOWNLOAD_DOCUMENT = 26;
+	static final int RUN_LOGOUT = 27;
 	
 	static final long ZERO_CHANNEL_ID = -1000000000000L;
 	
@@ -400,6 +401,7 @@ public class MP extends MIDlet
 	static Command cancelDownloadCmd;
 	static Command okDownloadCmd;
 	static Command cancelUploadCmd;
+	static Command confirmCmd;
 	
 	static Command nextPageCmd;
 	static Command prevPageCmd;
@@ -492,6 +494,9 @@ public class MP extends MIDlet
 	private static String updateUrl;
 	private static long lastType;
 	private static String[] downloadMessage;
+	
+	static int confirmationTask;
+	static Object confirmationParam;
 	
 //#ifndef NO_FILE
 	// file picker
@@ -919,6 +924,7 @@ public class MP extends MIDlet
 		cancelDownloadCmd = new Command(L[LCancel], Command.CANCEL, 1);
 		okDownloadCmd = new Command(L[LOk], Command.OK, 1);
 		cancelUploadCmd = new Command(L[LCancel], Command.CANCEL, 1);
+		confirmCmd = new Command(L[LOk], Command.OK, 1);
 
 		nextPageCmd = new Command(L[LNextPage], Command.SCREEN, 6);
 		prevPageCmd = new Command(L[LPrevPage], Command.SCREEN, 7);
@@ -2306,6 +2312,15 @@ public class MP extends MIDlet
 			break;
 		}
 //#endif
+		case RUN_LOGOUT: {
+			userState = 0;
+			user = null;
+			phone = null;
+			selfId = null;
+			display(mainDisplayable = authForm);
+			writeAuth();
+			break;
+		}
 		}
 //		running--;
 	}
@@ -3177,12 +3192,11 @@ public class MP extends MIDlet
 //#endif
 			}
 			if (c == logoutCmd) {
-				userState = 0;
-				user = null;
-				phone = null;
-				selfId = null;
-				display(mainDisplayable = authForm);
-				writeAuth();
+				// TODO localize
+				MP.confirm(RUN_LOGOUT,
+						null,
+						null,
+						"Logout?");
 				return;
 			}
 			if (c == clearCacheCmd) {
@@ -3620,9 +3634,29 @@ public class MP extends MIDlet
 			}
 		}
 //#endif
+		if (c == confirmCmd) {
+			commandAction(backCmd, d);
+			if ((confirmationTask & 0x100) != 0) {
+				display(loadingAlert(L[LLoading]), current);
+			}
+			if ((confirmationTask & 0x200) != 0) {
+				if ((reopenChat || !longpoll) && MP.updatesThread != null) {
+					MP.cancel(MP.updatesThread, true);
+				}
+			}
+			start(confirmationTask & 0xFF, confirmationParam);
+
+			confirmationTask = 0;
+			confirmationParam = null;
+			return;
+		}
 		if (c == backCmd || c == cancelCmd) {
-			// cancel ota update dialog
-			updateUrl = null;
+			// cancel dialogs
+			if (c == cancelCmd) {
+				updateUrl = null;
+				confirmationTask = 0;
+				confirmationParam = null;
+			}
 			
 			if (formHistory.size() == 0) {
 				if (d == mainDisplayable && symbian) {
@@ -3633,6 +3667,12 @@ public class MP extends MIDlet
 				display(null, true);
 				return;
 			}
+			
+			if (d instanceof Alert) {
+				display(current, true);
+				return;
+			}
+			
 			Displayable p = null;
 			synchronized (formHistory) {
 				int i = formHistory.size();
@@ -3708,8 +3748,12 @@ public class MP extends MIDlet
 			if (c == deleteMsgCmd) {
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
-				display(loadingAlert(L[LLoading]), current);
-				start(RUN_DELETE_MESSAGE, s);
+				
+				// TODO localize
+				MP.confirm(MP.RUN_DELETE_MESSAGE | 0x100 | 0x200,
+						s,
+						null,
+						"Delete message?");
 				return;
 			}
 			if (c == documentCmd) {
@@ -3765,20 +3809,23 @@ public class MP extends MIDlet
 			if (c == banMemberCmd) {
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
-
-				display(loadingAlert(L[LLoading]), current);
-				start(RUN_BAN_MEMBER, s);
+				
+				// TODO localize
+				MP.confirm(RUN_BAN_MEMBER | 0x100,
+						s,
+						null,
+						"Delete message?");
 				return;
 			}
 			if (c == pinMsgCmd) {
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
-
-				display(loadingAlert(L[LLoading]), current);
-				if ((reopenChat || !longpoll) && MP.updatesThread != null) {
-					MP.cancel(MP.updatesThread, true);
-				}
-				start(RUN_PIN_MESSAGE, s);
+				
+				// TODO localize
+				MP.confirm(RUN_PIN_MESSAGE | 0x100 | 0x200,
+						s,
+						null,
+						"Pin message?");
 				return;
 			}
 		}
@@ -4587,6 +4634,17 @@ public class MP extends MIDlet
 		} else {
 			browse(instanceUrl + FILE_URL + "?c=" + peerId + "&m=" + msgId + "&user=" + user);
 		}
+	}
+	
+	static void confirm(int task, Object param, String title, String text) {
+		MP.confirmationTask = task;
+		MP.confirmationParam = param;
+
+		Alert d = MP.alert(title, text, AlertType.CONFIRMATION);
+		d.addCommand(MP.cancelCmd);
+		d.addCommand(MP.confirmCmd);
+		d.setCommandListener(MP.midlet);
+		display(d, current);
 	}
 
 	static Alert errorAlert(Exception e) {
