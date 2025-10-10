@@ -1726,7 +1726,7 @@ public class MP extends MIDlet
 		}
 		case RUN_KEEP_ALIVE: { // Keep session alive & notifications
 			try {
-				boolean wasShown = true;
+				boolean wasShown = false;
 				StringBuffer sb = new StringBuffer();
 				JSONObject j;
 				
@@ -1747,10 +1747,11 @@ public class MP extends MIDlet
 						continue;
 					
 					// update status
+					boolean shown = false;
 					if (keepAlive) {
 						try {
-							boolean shown = !paused && current.isShown();
-							if (shown || wasShown != shown) {
+							shown = !paused && display.getCurrent().isShown();
+							if ((shown && !notifications) || wasShown != shown) {
 								api(wasShown != shown ?
 									("updateStatus".concat(!shown ? "&off=1" : "")) : "me");
 							}
@@ -1794,10 +1795,11 @@ public class MP extends MIDlet
 						sb.setLength(0);
 						sb.append("notifications")
 						.append("&offset=").append(offset)
-						.append("&mute_users=").append(muteUsers ? '1' : '0')
-						.append("&mute_chats=").append(muteChats ? '1' : '0')
-						.append("&mute_broadcasts=").append(muteBroadcasts ? '1' : '0')
+						.append("&mu=").append(muteUsers ? '1' : '0')
+						.append("&mc=").append(muteChats ? '1' : '0')
+						.append("&mb=").append(muteBroadcasts ? '1' : '0')
 						;
+						if (shown) sb.append("&online=1");
 						
 						if (updateChatsList) {
 							sb.append("&include_muted=1");
