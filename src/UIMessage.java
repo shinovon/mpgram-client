@@ -1097,11 +1097,10 @@ public class UIMessage extends UIItem implements LangConstants {
 			((ChatCanvas) container).startEdit(this);
 			break;
 		case LPin: {
-			// TODO localize
 			MP.confirm(MP.RUN_PIN_MESSAGE | 0x100 | 0x200,
 					new String[] { peerId, idStr },
 					null,
-					"Pin message?");
+					MP.L[LPinMessage_Alert]);
 			break;
 		}
 		case LCopyMessage:
@@ -1122,11 +1121,10 @@ public class UIMessage extends UIItem implements LangConstants {
 			MP.openLoad(new ChatsList(peerId, idStr));
 			break;
 		case LDelete: {
-			// TODO localize
 			MP.confirm(MP.RUN_DELETE_MESSAGE | 0x100 | 0x200,
 					new String[] { peerId, idStr },
 					null,
-					"Delete message?");
+					MP.L[LDeleteMessage_Alert]);
 			break;
 		}
 		case LViewImage:

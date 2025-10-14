@@ -303,6 +303,13 @@
 	"ChooseDownloadMethod_Alert": "Choose download method",
 	"FailedToSaveSettings_Alert": "Failed to save settings",
 	"PiglerNotAvailable_Alert": "Pigler API is selected but not available, \ndownload it from https://nnproject.cc/pna",
+	"DeleteNMessage_Alert": "Delete % message?",
+	"DeleteNMessages_Alert": "Delete % messages?",
+	"DeleteNMessages_Alert_2": "",
+	"DeleteMessage_Alert": "Delete message?",
+	"PinMessage_Alert": "Pin message?",
+	"BanMember_Alert": "Ban member?",
+	"Logout_Alert": "Are you sure you want to log out?",
 	
 	// Chat form
 	"ChatMedia_Title": "Media",

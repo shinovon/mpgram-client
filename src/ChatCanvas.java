@@ -2152,11 +2152,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		UIMessage[] msgs = getSelected();
 		unselectAll();
 		
-		// TODO localize
 		MP.confirm(MP.RUN_DELETE_MESSAGE,
 				msgs,
 				null,
-				"Delete " + msgs.length + " messages?");
+				MP.localizeFormattedPlural(MP.LDeleteNMessage_Alert, msgs.length));
 	}
 	
 	private void forwardSelected() {

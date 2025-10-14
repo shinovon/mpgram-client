@@ -303,6 +303,13 @@
 	"ChooseDownloadMethod_Alert": "Choose download method", // Untranslated
 	"FailedToSaveSettings_Alert": "Failed to save settings", // Untranslated
 	"PiglerNotAvailable_Alert": "Pigler API is selected but not available, \ndownload it from https://nnproject.cc/pna", // Untranslated
+	"DeleteNMessage_Alert": "Delete % message?", // Untranslated
+	"DeleteNMessages_Alert": "Delete % messages?", // Untranslated
+	"DeleteNMessages_Alert_2": "", // Untranslated
+	"DeleteMessage_Alert": "Delete message?", // Untranslated
+	"PinMessage_Alert": "Pin message?", // Untranslated
+	"BanMember_Alert": "Ban member?", // Untranslated
+	"Logout_Alert": "Are you sure you want to log out?", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Media faylları",

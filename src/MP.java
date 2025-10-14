@@ -3194,11 +3194,10 @@ public class MP extends MIDlet
 //#endif
 			}
 			if (c == logoutCmd) {
-				// TODO localize
 				MP.confirm(RUN_LOGOUT,
 						null,
 						null,
-						"Logout?");
+						MP.L[MP.LLogout_Alert]);
 				return;
 			}
 			if (c == clearCacheCmd) {
@@ -3751,11 +3750,10 @@ public class MP extends MIDlet
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
 				
-				// TODO localize
 				MP.confirm(MP.RUN_DELETE_MESSAGE | 0x100 | 0x200,
 						s,
 						null,
-						"Delete message?");
+						MP.L[MP.LDeleteMessage_Alert]);
 				return;
 			}
 			if (c == documentCmd) {
@@ -3812,22 +3810,20 @@ public class MP extends MIDlet
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
 				
-				// TODO localize
 				MP.confirm(RUN_BAN_MEMBER | 0x100,
 						s,
 						null,
-						"Delete message?");
+						MP.L[LBanMember_Alert]);
 				return;
 			}
 			if (c == pinMsgCmd) {
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
 				
-				// TODO localize
 				MP.confirm(RUN_PIN_MESSAGE | 0x100 | 0x200,
 						s,
 						null,
-						"Pin message?");
+						MP.L[LPinMessage_Alert]);
 				return;
 			}
 		}
@@ -5522,6 +5518,29 @@ public class MP extends MIDlet
 		return sb.append(n(((int) date / 60) % 24))
 				.append(':')
 				.append(n((int) date % 60));
+	}
+
+	static String localizeFormattedPlural(int n, int i) {
+		String s = Integer.toString(n);
+		String l;
+		if (L[LLocaleSlavicPlurals].length() == 0) {
+			l = L[n == 1 ? i : i + 1];
+		} else {
+			int a = n % 10;
+			int b = n % 100;
+			if ("pl".equals(lang) ? n == 1 : (a == 1 && b != 11))
+				l = L[i];
+			else if ((a >= 2 && a <= 4) && !(b >= 12 && b <= 14))
+				l = L[i + 1];
+			else
+				l = L[i + 2];
+		}
+
+		int idx;
+		if ((idx = l.indexOf('%')) != -1) {
+			return l.substring(0, idx).concat(s.concat(l.substring(idx + 1)));
+		}
+		return s.concat(l);
 	}
 
 	static String localizePlural(int n, int i) {
