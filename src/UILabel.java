@@ -297,9 +297,8 @@ public class UILabel extends UIItem {
 	private int getVisibility(int[] pos) {
 		UIItem root = (UIItem) container;
 		ChatCanvas chat = (ChatCanvas) root.container;
-		int y = this.y + root.y;
-		int screenTop = !chat.reverse ? chat.top - chat.scroll + y + pos[1]
-				: chat.height - chat.bottom + chat.scroll - (root.y + root.contentHeight) + (y - root.y) + pos[1];
+		int screenTop = !chat.reverse ? chat.top - chat.scroll + this.y + root.y + pos[1]
+				: chat.height - chat.bottom + chat.scroll - (root.y + root.contentHeight) + this.y + pos[1];
 
 		return (screenTop + pos[3]) <= chat.top ? 1 : screenTop >= chat.height - chat.bottom ? -1 : 0;
 	}

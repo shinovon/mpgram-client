@@ -240,9 +240,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			}
 			
 			colorsCopy = new int[colors.length];
-			for (int i = 0; i < colors.length; ++i) {
-				colorsCopy[i] = colors[i];
-			}
+			System.arraycopy(colors, 0, colorsCopy, 0, colors.length);
 		}
 		
 		if (touch) {
@@ -2103,9 +2101,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		menuItem = null;
 		menu = null;
 		menuAnimTarget = 0;
-		for (int i = 0; i < colors.length; ++i) {
-			colors[i] = colorsCopy[i];
-		}
+		System.arraycopy(colorsCopy, 0, colors, 0, colors.length);
 		updateColors();
 		skipRender = false;
 		updateEditor = true;

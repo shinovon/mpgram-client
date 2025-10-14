@@ -1676,7 +1676,7 @@ public class MP extends MIDlet
 						
 						if (!longpoll) {
 							updatesSleeping = true;
-							Thread.sleep(updatesTimeout * 1000);
+							Thread.sleep(updatesTimeout * 1000L);
 							updatesSleeping = false;
 						}
 					} catch (Exception e) {
@@ -4035,7 +4035,7 @@ public class MP extends MIDlet
 			playerState = 3;
 			
 			StringBuffer url = new StringBuffer(instanceUrl);
-			String name = msg.getObject("media").getString("name", null);
+			String name;
 			if ((name = msg.getObject("media").getString("name", null)) != null && fileRewrite) {
 				appendUrl(url.append("file/"), name);
 			} else {
