@@ -21,6 +21,7 @@ SOFTWARE.
 */
 //#ifndef NO_CHAT_CANVAS
 import javax.microedition.lcdui.Canvas;
+import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
@@ -1144,9 +1145,15 @@ public class UIMessage extends UIItem implements LangConstants {
 			MP.midlet.start(MP.RUN_LOAD_PLAYLIST, new String[] {peerId, "3", idStr});
 			break;
 		case LGoTo:
-			// TODO close chat info
-			((ChatCanvas) container).reset();
-			((ChatCanvas) container).openMessage(idStr, -1);
+			MPChat parent = ((ChatCanvas) container).parent;
+			if (parent != null) {
+				MP.goBackTo((Displayable) parent);
+				parent.reset();
+				parent.openMessage(idStr, -1);
+			} else {
+				((ChatCanvas) container).reset();
+				((ChatCanvas) container).openMessage(idStr, -1);
+			}
 			break;
 		case LSelect:
 			if (selected) break;

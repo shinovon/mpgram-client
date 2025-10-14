@@ -90,6 +90,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	boolean channel;
 	boolean reverse;
 	
+	MPChat parent;
+	
 	// discussion
 	String postPeer, postId;
 	ChatTopicsList topicsList;
@@ -2315,15 +2317,13 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 
 	public MPChat parent() {
-		// TODO Auto-generated method stub
-		return null;
+		return parent;
 	}
 	
 	// interface setters
 
 	public void setParent(MPChat parent) {
-		// TODO Auto-generated method stub
-		
+		this.parent = parent;
 	}
 
 	public void setQuery(String s) {

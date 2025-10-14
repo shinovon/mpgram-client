@@ -2535,7 +2535,7 @@ public class MP extends MIDlet
 				default:
 					return;
 				}
-				Displayable form;
+				MPChat form;
 //#ifndef NO_CHAT_CANVAS
 				if (!legacyChatUI) {
 					form = new ChatCanvas(((ChatInfoForm) current).id, mediaFilter, ((ChatInfoForm) current).chatForm.topMsgId());
@@ -2544,7 +2544,8 @@ public class MP extends MIDlet
 				{
 					form = new ChatForm(((ChatInfoForm) current).id, mediaFilter, ((ChatInfoForm) current).chatForm.topMsgId());
 				}
-				openLoad(form);
+				form.setParent(((ChatInfoForm) current).chatForm);
+				openLoad((Displayable) form);
 				return;
 			}
 			if (c == gotoPinnedMsgCmd) {
