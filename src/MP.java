@@ -3464,7 +3464,7 @@ public class MP extends MIDlet
 			}
 			if (d == playlistList) {
 				if (playerState == 3) return;
-				startPlayer(playlist.getObject(playlistIndex = ((List) d).getSelectedIndex()));
+				startPlayer(currentMusic = playlist.getObject(playlistIndex = ((List) d).getSelectedIndex()));
 				return;
 			}
 			if (d instanceof ChatTopicsList) {
