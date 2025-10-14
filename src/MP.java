@@ -2829,7 +2829,7 @@ public class MP extends MIDlet
 							"Pigler API"
 //#endif
 					}, null);
-					notifyMethodChoice.setSelectedIndex(Math.min(notifyMethod, notifyMethodChoice.size()), true);
+					notifyMethodChoice.setSelectedIndex(Math.min(notifyMethod, notifyMethodChoice.size() - 1), true);
 					notifyMethodChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(notifyMethodChoice);
 					
