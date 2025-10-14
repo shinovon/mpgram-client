@@ -36,4 +36,42 @@
 		<nature>org.eclipse.mtj.core.preprocessingNature</nature>
 		<nature>org.eclipse.mtj.core.nature</nature>
 	</natures>
+	<filteredResources>
+		<filter>
+			<id>1760467240076</id>
+			<name></name>
+			<type>10</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-out</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1760467240081</id>
+			<name></name>
+			<type>10</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-langs</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1760467240082</id>
+			<name></name>
+			<type>10</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-themes</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1760467240083</id>
+			<name></name>
+			<type>10</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-META-INF</arguments>
+			</matcher>
+		</filter>
+	</filteredResources>
 </projectDescription>
