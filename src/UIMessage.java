@@ -1242,10 +1242,6 @@ public class UIMessage extends UIItem implements LangConstants {
 			if (text.tap(x - PADDING_WIDTH - MARGIN_WIDTH, y - text.y, longTap))
 				return true;
 		}
-		if (!longTap && (((ChatCanvas) container).query != null || ((ChatCanvas) container).mediaFilter != null)) {
-			menuAction(LGoTo);
-			return true;
-		}
 		if (x > 0 && x < contentWidth) {
 			for (int i = 0; i < touchZones.length && touchZones[i] != Integer.MIN_VALUE; i += 5) {
 				if (x >= touchZones[i] && y >= touchZones[i + 1] && x <= touchZones[i + 2] && y <= touchZones[i + 3]) {
@@ -1267,6 +1263,10 @@ public class UIMessage extends UIItem implements LangConstants {
 					break;
 				}
 			}
+		}
+		if (!longTap && (((ChatCanvas) container).query != null || ((ChatCanvas) container).mediaFilter != null)) {
+			menuAction(LGoTo);
+			return true;
 		}
 		if (longTap) {
 			selected = true;
