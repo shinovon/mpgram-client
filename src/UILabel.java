@@ -312,9 +312,8 @@ public class UILabel extends UIItem {
 		int l = text.length();
 		width -= font.stringWidth("...");
 		for (int i = 1; i < l; ++i) {
-			String s = text.substring(0, i);
-			if (font.stringWidth(s) > width) {
-				return s.concat("...");
+			if (font.stringWidth(text.substring(0, i)) > width) {
+				return text.substring(0, i - 1).concat("...");
 			}
 		}
 		return "...";
