@@ -3194,6 +3194,8 @@ public class MP extends MIDlet
 //#endif
 			}
 			if (c == logoutCmd) {
+				if (userState == 0) return;
+				
 				MP.confirm(RUN_LOGOUT,
 						null,
 						null,
