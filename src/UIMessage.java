@@ -68,7 +68,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	private static final int FOCUS_REPLY = 2;
 	private static final int FOCUS_MEDIA = 3;
 	private static final int FOCUS_TEXT = 4;
-//	private static final int FOCUS_BUTTONS = 5; // TODO
+	private static final int FOCUS_BUTTONS = 5; // TODO
 	private static final int FOCUS_COMMENT = 6;
 	
 	UILabel text;
@@ -117,7 +117,6 @@ public class UIMessage extends UIItem implements LangConstants {
 	boolean showDate, hideName, timeBreak, space, showReadMark;
 	int forwardedFromWidth;
 	int photoRenderWidth, photoRenderHeight;
-	int reactsCount;
 	
 	Image mediaImage;
 	
@@ -417,10 +416,27 @@ public class UIMessage extends UIItem implements LangConstants {
 				this.text = label;
 			}
 			
-			// buttons TODO
-	//		if (message.has("markup")) {
-	//			subFocus[order++] = FOCUS_BUTTONS;
-	//		}
+			// buttons
+			if (message.has("markup")) {
+				subFocus[order++] = FOCUS_BUTTONS;
+
+				JSONArray markup = message.getArray("markup");
+				int rows = markup.size();
+				for (int i = 0; i < rows; i++) {
+					JSONArray markupRow = markup.getArray(i);
+					int cols = markupRow.size();
+					for (int j = 0; j < cols; j++) {
+						JSONObject markupItem = markupRow.getObject(j);
+
+						// TODO
+						if (markupItem.has("data")) {
+
+						} else if (markupItem.has("url")) {
+
+						}
+					}
+				}
+			}
 			
 			// comments
 			if (message.has("comments")) {
@@ -433,8 +449,10 @@ public class UIMessage extends UIItem implements LangConstants {
 
 			if (message.has("reacts")) {
 				JSONObject reacts = message.getObject("reacts");
-				reactsCount = reacts.getInt("count");
-				reactsText = MP.localizePlural(reactsCount, L_react);
+				int reactsCount = reacts.getInt("count");
+				if (reactsCount != 0) {
+					reactsText = MP.localizePlural(reactsCount, L_react);
+				}
 			}
 			read = id <= chat.readOutboxId;
 		}
@@ -661,7 +679,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 
 		// reacts
-		if (reactsCount != 0) {
+		if (reactsText != null) {
 			g.setFont(MP.smallPlainFont);
 			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_LINK]);
 			g.drawString(reactsText, x, y + MP.smallPlainFontHeight + PADDING_HEIGHT - TIME_PADDING_HEIGHT, Graphics.BOTTOM | Graphics.LEFT);
@@ -932,7 +950,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		// buttons
 
 		// reacts
-		if (reactsCount != 0) {
+		if (reactsText != null) {
 			int reactWidth = MP.smallPlainFont.stringWidth(reactsText);
 			h += MP.smallPlainFontHeight;
 			if (minW + timeWidth + reactWidth >= cw) {
