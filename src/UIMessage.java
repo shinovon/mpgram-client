@@ -497,7 +497,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		h -= MARGIN_TOP;
 		
 		g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_BG : COLOR_MESSAGE_BG]);
-		if (ChatCanvas.style[STYLE_MESSAGE_FILL] != 0 && !sticker) {
+		if (ChatCanvas.style[STYLE_MESSAGE_FILL] != 0 && (!sticker || commentsText != null)) {
 			g.fillRect(x, y, cw, h);
 		}
 		if (focus && focusChild == null && subFocusCurrent == -1 && focusDir != 0) {
