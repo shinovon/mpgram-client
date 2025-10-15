@@ -42,6 +42,10 @@ public class CaptchaForm extends MPForm {
 		
 		Image img = MP.getImage(MP.instanceUrl.concat(MP.API_URL + "?v=" + MP.API_VERSION
 				+ "&method=getCaptchaImg&captcha_id=".concat(id)));
+
+		int[] imgSize = resizeFit(img.getWidth(), img.getHeight(), getWidth(), getHeight()*3/4, true);
+
+		img = MP.resize(img, imgSize[0], imgSize[1]);
 		
 		ImageItem imgItem = new ImageItem("", img, 0, null);
 		append(imgItem);
@@ -57,4 +61,24 @@ public class CaptchaForm extends MPForm {
 		MP.display(this);
 	}
 
+	// https://github.com/gtrxAC/discord-j2me/blob/e53e97f93c27682048687f4f18f13b8ae9fb24e6/src/com/gtrxac/discord/Util.java#L85
+	public static int[] resizeFit(int imgW, int imgH, int maxW, int maxH, boolean mustUpscale) {
+		int imgAspect = imgW*100 / imgH;
+		int maxAspect = maxW*100 / maxH;
+		int width, height;
+
+		if (!mustUpscale && imgW <= maxW && imgH <= maxH) {
+			width = imgW;
+			height = imgH;
+		}
+		else if (imgAspect > maxAspect) {
+			width = maxW;
+			height = (maxW*100)/imgAspect;
+		} else {
+			height = maxH;
+			width = (maxH*imgAspect)/100;
+		}
+
+		return new int[]{width, height};
+	}
 }
