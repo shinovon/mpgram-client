@@ -286,7 +286,7 @@
 	"HideWithSpoiler": "Piilota",
 	"EnableHTMLFormatting": "HTML-muotoilu",
 	"TextField_Hint": "Kirjoita viesti...",
-	"Clear": "Clear", // Untranslated
+	"Clear": "Tyhjennä",
 	
 	// Alert messages
 	"MessageSent_Alert": "Viesti lähetetty",
@@ -301,15 +301,15 @@
 	"DownloadCanceled_Alert": "Lataus peruttu",
 	"DownloadedTo": "Ladattu kansioon ",
 	"ChooseDownloadMethod_Alert": "Valitse lataustapa",
-	"FailedToSaveSettings_Alert": "Failed to save settings", // Untranslated
-	"PiglerNotAvailable_Alert": "Pigler API is selected but not available, \ndownload it from https://nnproject.cc/pna", // Untranslated
-	"DeleteNMessage_Alert": "Delete % message?", // Untranslated
-	"DeleteNMessages_Alert": "Delete % messages?", // Untranslated
-	"DeleteNMessages_Alert_2": "", // Untranslated
-	"DeleteMessage_Alert": "Delete message?", // Untranslated
-	"PinMessage_Alert": "Pin message?", // Untranslated
-	"BanMember_Alert": "Ban member?", // Untranslated
-	"Logout_Alert": "Are you sure you want to log out?", // Untranslated
+	"FailedToSaveSettings_Alert": "Asetusten tallennus epäonnistui",
+	"PiglerNotAvailable_Alert": "Pigler API on valittu mutta ei ole asennettuna. \nAsenna se: https://nnproject.cc/pna",
+	"DeleteNMessage_Alert": "Poistetaanko % viesti?",
+	"DeleteNMessages_Alert": "Poistetaanko % viestiä?",
+	"DeleteNMessages_Alert_2": "",
+	"DeleteMessage_Alert": "Poistetaanko viesti?",
+	"PinMessage_Alert": "Kiinnitetäänkö viesti?",
+	"BanMember_Alert": "Estetäänkö jäsen?",
+	"Logout_Alert": "Haluatko varmasti kirjautua ulos?",
 	
 	// Chat form
 	"ChatMedia_Title": "Media",
@@ -331,8 +331,8 @@
 	"_comments": " kommenttia",
 	"_comments2": "",
 	"ReplyTo": "Vastaus käyttäjälle ",
-	"_react": " react", // Untranslated
-	"_reacts": " reacts", // Untranslated
+	"_react": " reaktio",
+	"_reacts": " reaktiota",
 	"_reacts2": "",
 	
 	// Message media
@@ -377,7 +377,7 @@
 	"UnknownTrack": "Tuntematon kappale",
 	"Playlist_Title": "Soittolista",
 	"Volume": "Äänenvoimakkuus",
-	"TogglePlaylistOrder": "Toggle order", // Untranslated
+	"TogglePlaylistOrder": "Vaihda järjestys",
 	
 	// Profile/chat info
 	"Online": "paikalla",
