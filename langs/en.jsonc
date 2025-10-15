@@ -331,6 +331,9 @@
 	"_comments": " comments",
 	"_comments2": "",
 	"ReplyTo": "Reply to ",
+	"_react": " react",
+	"_reacts": " reacts",
+	"_reacts2": "",
 	
 	// Message media
 	"Media": "Media",

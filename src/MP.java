@@ -1106,7 +1106,7 @@ public class MP extends MIDlet
 					}
 					Thread.sleep(200);
 					while (imagesToLoad.size() > 0) {
-						Object[] o = null;
+						Object[] o;
 						
 						try {
 							synchronized (imagesLoadLock) {
@@ -4641,7 +4641,7 @@ public class MP extends MIDlet
 		MP.confirmationTask = task;
 		MP.confirmationParam = param;
 
-		Alert d = MP.alert(title, text, AlertType.CONFIRMATION);
+		Alert d = MP.alert(title, text, AlertType.WARNING);
 		d.addCommand(MP.cancelCmd);
 		d.addCommand(MP.confirmCmd);
 		d.setCommandListener(MP.midlet);

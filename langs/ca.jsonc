@@ -331,6 +331,9 @@
 	"_comments": " comentaris",
 	"_comments2": "",
 	"ReplyTo": "Respon a ",
+	"_react": " react", // Untranslated
+	"_reacts": " reacts", // Untranslated
+	"_reacts2": "",
 	
 	// Message media
 	"Media": "Mèdia",

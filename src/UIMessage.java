@@ -111,11 +111,13 @@ public class UIMessage extends UIItem implements LangConstants {
 	String time, nameRender, dateRender;
 	String replyNameRender, replyTextRender, forwardRender;
 	String mediaTitleRender, mediaSubtitleRender;
+	String reactsText;
 	int timeWidth, dateWidth, senderWidth, replyPrefixWidth, forwardNameWidth;
 	int mediaRenderHeight;
 	boolean showDate, hideName, timeBreak, space, showReadMark;
 	int forwardedFromWidth;
 	int photoRenderWidth, photoRenderHeight;
+	int reactsCount;
 	
 	Image mediaImage;
 	
@@ -428,7 +430,12 @@ public class UIMessage extends UIItem implements LangConstants {
 				commentRead = comments.getInt("read", 0);
 				subFocus[order++] = FOCUS_COMMENT;
 			}
-			
+
+			if (message.has("reacts")) {
+				JSONObject reacts = message.getObject("reacts");
+				reactsCount = reacts.getInt("count");
+				reactsText = MP.localizePlural(reactsCount, L_react);
+			}
 			read = id <= chat.readOutboxId;
 		}
 		
@@ -651,6 +658,13 @@ public class UIMessage extends UIItem implements LangConstants {
 			}
 			text.paint(g, x, y, cw);
 			y += text.contentHeight;
+		}
+
+		// reacts
+		if (reactsCount != 0) {
+			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_LINK]);
+			g.drawString(reactsText, x, y + MP.smallPlainFontHeight + PADDING_HEIGHT - TIME_PADDING_HEIGHT, Graphics.BOTTOM | Graphics.LEFT);
+			y += MP.smallPlainFontHeight;
 		}
 		
 		// buttons
@@ -915,6 +929,18 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 		
 		// buttons
+
+		// reacts
+		if (reactsCount != 0) {
+			int reactWidth = MP.smallPlainFont.stringWidth(reactsText);
+			h += MP.smallPlainFontHeight;
+			if (minW + timeWidth + reactWidth >= cw) {
+				timeBreak = true;
+			} else {
+				maxW = Math.max(maxW, minW + timeWidth + reactWidth);
+				timeBreak = false;
+			}
+		}
 		
 		// time
 		if (timeBreak) {

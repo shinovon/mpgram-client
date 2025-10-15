@@ -331,6 +331,9 @@
 	"_comments": " kommenttia",
 	"_comments2": "",
 	"ReplyTo": "Vastaus käyttäjälle ",
+	"_react": " react", // Untranslated
+	"_reacts": " reacts", // Untranslated
+	"_reacts2": "",
 	
 	// Message media
 	"Media": "Media",
