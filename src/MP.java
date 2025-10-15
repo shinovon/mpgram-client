@@ -1309,7 +1309,7 @@ public class MP extends MIDlet
 					}
 
 					writeAuth();
-					TextBox t = new TextBox(L[LCode], "", 5, TextField.NUMERIC);
+					TextBox t = new TextBox(L[LCode], "", 6, TextField.NUMERIC);
 					t.addCommand(authCodeCmd);
 					t.setCommandListener(this);
 					display(t);
