@@ -662,6 +662,7 @@ public class UIMessage extends UIItem implements LangConstants {
 
 		// reacts
 		if (reactsCount != 0) {
+			g.setFont(MP.smallPlainFont);
 			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_LINK]);
 			g.drawString(reactsText, x, y + MP.smallPlainFontHeight + PADDING_HEIGHT - TIME_PADDING_HEIGHT, Graphics.BOTTOM | Graphics.LEFT);
 			y += MP.smallPlainFontHeight;
