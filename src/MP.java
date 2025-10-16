@@ -300,7 +300,6 @@ public class MP extends MIDlet
 	static boolean sending;
 	static boolean updatesRunning;
 	static boolean updatesSleeping;
-	static Object updatesLock = new Object();
 //#ifndef NO_FILE
 	static boolean downloading;
 //#endif
@@ -4591,19 +4590,26 @@ public class MP extends MIDlet
 //#endif
 		downloadMessage = new String[] { peerId, msgId, fileName, size };
 //#ifndef NO_FILE
-		if (fileName != null && downloadMethod != 2
-				&& (!fileName.endsWith(".jar") && !fileName.endsWith(".jad"))) {
-			if (downloadMethod == 0) {
-				Alert a = new Alert(fileName);
-				a.setString(L[LChooseDownloadMethod_Alert]);
-				a.addCommand(downloadInappCmd);
-				a.addCommand(downloadBrowserCmd);
-				a.setCommandListener(this);
-				display(a, current);
+		file: {
+			if (fileName != null && downloadMethod != 2) {
+				if (fileName.endsWith(".jar") || fileName.endsWith(".jad")) {
+					if (downloadMethod == 1) {
+						// .jar -> .jar0
+						if (System.getProperty("forcedomain") == null)
+							downloadMessage[2] = fileName.concat("0");
+					} else break file;
+				} else if (downloadMethod == 0) {
+					Alert a = new Alert(fileName);
+					a.setString(L[LChooseDownloadMethod_Alert]);
+					a.addCommand(downloadInappCmd);
+					a.addCommand(downloadBrowserCmd);
+					a.setCommandListener(this);
+					display(a, current);
+					return;
+				}
+				downloadContinue(1);
 				return;
 			}
-			downloadContinue(1);
-			return;
 		}
 //#endif
 		downloadContinue(2);
@@ -6063,7 +6069,7 @@ public class MP extends MIDlet
 		return insert;
 	}
 
-	private static Font getFont(int[] state) {
+	static Font getFont(int[] state) {
 		if (state == null) return smallPlainFont;
 		int face = 0, style = 0, size = Font.SIZE_SMALL;
 		if (state[RT_PRE] != 0) {

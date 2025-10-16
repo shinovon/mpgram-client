@@ -29,9 +29,9 @@ import javax.microedition.lcdui.Graphics;
 
 public class UILabel extends UIItem {
 	
-	Vector parsed = new Vector();
-	Vector render;
-	Vector urls;
+	Vector parsed = new Vector(); // Object[] {text, font, url }
+	Vector render; // Object[] { text, font, url, int[] {x, y, width, height} }
+	Vector urls; // Object[] { url, Vector(elements of render) }
 	Vector selectedParts; String selectedUrl;
 
 	int color = -1, bgColor, linkColor = 0x0000FF, focusColor = 0xABABAB;

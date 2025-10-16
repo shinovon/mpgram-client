@@ -406,7 +406,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				if (MP.parseRichtext && message.has("entities")) {
 					label = new UILabel(text, message.getArray("entities"));
 				} else {
-					label = new UILabel(text, MP.smallPlainFont, null);
+					label = new UILabel(text, MP.getFont(null), null);
 				}
 				label.color = ChatCanvas.colors[COLOR_MESSAGE_FG];
 				label.linkColor = ChatCanvas.colors[COLOR_MESSAGE_LINK];
