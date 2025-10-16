@@ -129,7 +129,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 	}
 
 	void loadInternal(Thread thread) throws Exception {
-		if ((MP.reopenChat || (query == null && mediaFilter == null))
+		if (!MP.heavyUpdates && !MP.heavyUpdates && (MP.reopenChat || (query == null && mediaFilter == null))
 				&& MP.chatUpdates
 				&& (MP.updatesThread != null || MP.updatesRunning)) {
 			MP.display(MP.loadingAlert(MP.L[LWaitingForPrevChat]), this);
@@ -371,7 +371,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 			return;
 		if (endReached && !hasOffset
 				&& query == null && mediaFilter == null
-				&& MP.chatUpdates && !update)
+				&& !MP.heavyUpdates && MP.chatUpdates && !update)
 		{
 			// start updater thread
 			update = true;
@@ -994,7 +994,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 		// close updater thread
 		if (update) {
 			update = false;
-			if (MP.updatesThread != null || MP.updatesRunning) {
+			if (!MP.heavyUpdates && (MP.updatesThread != null || MP.updatesRunning)) {
 				MP.cancel(MP.updatesThread, true);
 			}
 		}
@@ -1228,6 +1228,10 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 	
 	public boolean switched() {
 		return switched;
+	}
+
+	public boolean channel() {
+		return channel;
 	}
 	
 	public int topMsgId() {

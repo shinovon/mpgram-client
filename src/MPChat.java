@@ -41,6 +41,7 @@ interface MPChat {
 	boolean endReached();
 	boolean forum();
 	boolean switched();
+	boolean channel();
 	int topMsgId();
 	int firstMsgId();
 	JSONArray topics();

@@ -109,6 +109,7 @@ public class MP extends MIDlet
 	static final int RUN_CANCEL_UPDATES = 25;
 	static final int RUN_DOWNLOAD_DOCUMENT = 26;
 	static final int RUN_LOGOUT = 27;
+	static final int RUN_GLOBAL_UPDATES = 28;
 	
 	static final long ZERO_CHANNEL_ID = -1000000000000L;
 	
@@ -259,10 +260,10 @@ public class MP extends MIDlet
 	static boolean notifyAvas = true;
 	static int notificationVolume = 100;
 //#endif
+	static boolean heavyUpdates = true;
 //#ifndef NO_CHAT_CANVAS
 	static boolean legacyChatUI;
 //#endif
-	static boolean updateChatsList;
 	static boolean longpoll = true;
 	static int playerVolume = 50;
 	static boolean voiceConversion;
@@ -1072,8 +1073,10 @@ public class MP extends MIDlet
 				} else {
 					start(RUN_CHECK_OTA, null);
 				}
-				
-				if (keepAlive || notifications || updateChatsList)
+
+				if (heavyUpdates)
+					start(RUN_GLOBAL_UPDATES, null);
+				else if (keepAlive || notifications)
 					start(RUN_KEEP_ALIVE, null);
 				break;
 			} catch (APIException e) {
@@ -1500,7 +1503,7 @@ public class MP extends MIDlet
 					((MPChat) current).sent();
 				}
 				
-				if (reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) {
+				if ((reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) && !heavyUpdates) {
 					// load latest messages
 					commandAction(latestCmd, current);
 				} else if (display.getCurrent() != current) {
@@ -1735,7 +1738,7 @@ public class MP extends MIDlet
 				boolean check = true;
 				while (keepAlive
 //#ifndef NO_NOTIFY
-						|| notifications || updateChatsList
+						|| notifications
 //#endif
 						) {
 					Thread.sleep(wasShown ? pushInterval : pushBgInterval);
@@ -1762,7 +1765,7 @@ public class MP extends MIDlet
 
 //#ifndef NO_NOTIFY
 					// get notifications
-					if (!notifications && (!updateChatsList || !chatsList.isShown()))
+					if (!notifications && (!chatsList.isShown()))
 						continue;
 					if (updatesThread != null && !paused) {
 						check = true;
@@ -1801,157 +1804,14 @@ public class MP extends MIDlet
 						.append("&mb=").append(muteBroadcasts ? '1' : '0')
 						;
 						if (shown) sb.append("&online=1");
-						
-						if (updateChatsList) {
-							sb.append("&include_muted=1");
-						}
 
 						j = (JSONObject) api(sb.toString());
 						
 						JSONArray updates = j.getArray("res");
-						int l = updates.size();
 						
 						offset = j.getInt("offset");
 						
-						JSONArray newMsgs = new JSONArray();
-						
-						for (int i = 0; i < l; ++i) {
-							JSONObject update = updates.getObject(i);
-							String type = update.getString("_");
-							if (!"updateNewMessage".equals(type) && !"updateNewChannelMessage".equals(type))
-								continue;
-
-							JSONObject msg = update.getObject("message");
-							
-							String peerId = msg.getString("peer_id");
-							if (peerId.equals(selfId)) {
-								peerId = msg.getString("from_id");
-							}
-							sb.setLength(0);
-
-							JSONObject peer = getPeer(peerId, true);
-							String text = appendDialog(sb, peer, peerId, msg).toString();
-							
-							if (msg.getBoolean("out", false)
-									|| update.getBoolean("muted", false)
-									|| msg.getBoolean("silent", false))
-//								msg.put("muted", true);
-								continue;
-
-							msg.put("peer_id", peerId);
-							msg.put("text", text);
-							int count = 0;
-//#ifndef NO_NOKIAUI
-							if (notificationMessages.containsKey(peerId)) {
-								count = ((JSONObject) notificationMessages.get(peerId)).getInt("count", 0);
-							}
-//#endif
-
-							// filter latest messages
-							f: {
-								int n = newMsgs.size();
-								for (int m = 0; m < n; ++m) {
-									JSONObject t = newMsgs.getObject(m);
-									if (peerId.equals(t.getString("peer_id"))) {
-										msg.put("count", ++count);
-										newMsgs.set(m, msg);
-										break f;
-									}
-								}
-								msg.put("count", ++count);
-								newMsgs.add(msg);
-							}
-//#ifndef NO_NOKIAUI
-							notificationMessages.put(peerId, msg);
-//#endif
-						}
-						
-						if (newMsgs.size() != 0) {
-							boolean notified = false;
-							
-							l = newMsgs.size();
-							for (int i = 0; i < l; ++i) {
-								JSONObject msg = newMsgs.getObject(i);
-								String text = msg.getString("text");
-								String peerId = msg.getString("peer_id");
-								
-								sb.setLength(0);
-								sb.append(getName(peerId, false));
-								int count = msg.getInt("count", 0);
-								if (count > 1) {
-									sb.append(" +").append(count);
-								}
-								String title = sb.toString();
-								
-								// TODO
-//								if (chatsList != null && updateChatsList) {
-//									Vector ids = chatsList.ids;
-//									int idx = ids.indexOf(peerId);
-//									int newIdx;
-//									if (idx != -1) {
-//										ids.removeElementAt(idx);
-//										chatsList.delete(idx);
-//										newIdx = Math.min(chatsList.size(), idx < chatsList.pinnedCount ? 0 : chatsList.pinnedCount);
-//									} else {
-//										newIdx = Math.min(chatsList.size(), chatsList.pinnedCount);
-//									}
-//									chatsList.insert(null, newIdx, sb.append('\n').append(text).toString(), peerId);
-//									ids.insertElementAt(peerId, newIdx);
-//								}
-//								if (msg.has("muted")) continue;
-								
-								if (!paused && current instanceof MPChat && current.isShown() && peerId.equals(((MPChat) current).id())) {
-//#ifndef NO_NOKIAUI
-									try {
-										Notifier.remove(peerId);
-									} catch (Throwable ignored) {}
-									notificationMessages.remove(peerId);
-//#endif
-									continue;
-								}
-								
-								if (notifyMethod != 0) {
-//#ifndef NO_NOKIAUI
-									if (notifyMethod != 1) {
-										Image img = null;
-										if (!Notifier.has(peerId) && imagesCache.containsKey(peerId)) {
-											img = (Image) imagesCache.get(peerId);
-										}
-										try {
-											if (Notifier.post(peerId, title, text, notifyMethod, img) && img == null && notifyAvas) {
-												MP.queueAvatar(peerId, peerId);
-											}
-										} catch (Throwable ignored) {}
-									} else
-//#endif
-									{
-										Alert alert = new Alert(title);
-										alert.setString(text);
-										alert.setTimeout(1500);
-										display(alert, null);
-									}
-								}
-								notified = true;
-							}
-							
-							if (notified && notifySound) {
-								try {
-									if (notificationPlayer == null) {
-										notificationPlayer = Manager.createPlayer(getClass().getResourceAsStream("/msg.mid"), "audio/midi");
-										notificationPlayer.realize();
-										notificationPlayer.prefetch();
-									}
-									notificationPlayer.stop();
-									try { 
-										((VolumeControl) notificationPlayer.getControl("VolumeControl")).setLevel(notificationVolume);
-									} catch (Throwable ignored) {}
-									notificationPlayer.setMediaTime(0);
-									notificationPlayer.start();
-								} catch (Exception e) {
-									AlertType.ALARM.playSound(display);
-								}
-							}
-						}
+						handleNotifications(updates, sb, false);
 						
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -2018,7 +1878,7 @@ public class MP extends MIDlet
 					} else throw e;
 				}
 
-				if (reopenChat || !longpoll || !form.updating() || !form.endReached()) {
+				if ((reopenChat || !longpoll || !form.updating() || !form.endReached()) && !heavyUpdates) {
 					// see ChatForm#postLoad() for answer handling
 					form.setBotAnswer(j);
 					commandAction(latestCmd, current);
@@ -2061,7 +1921,7 @@ public class MP extends MIDlet
 				String[] s = (String[]) param;
 				MP.api("pinMessage&peer=".concat(s[0].concat("&id=").concat(s[1])));
 				
-				if (reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) {
+				if ((reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) && !heavyUpdates) {
 					// load latest messages
 					commandAction(latestCmd, current);
 				} else if (display.getCurrent() != current) {
@@ -2085,7 +1945,7 @@ public class MP extends MIDlet
 				MP.api(sb.toString());
 				
 				goBackTo((Displayable) form.chatForm);
-				if (reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) {
+				if ((reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) && !heavyUpdates) {
 					// load latest messages
 					commandAction(latestCmd, (Displayable) form.chatForm);
 				}
@@ -2224,7 +2084,7 @@ public class MP extends MIDlet
 			alert.setTimeout(Alert.FOREVER);
 			display(alert, current);
 			
-			if (reopenChat && updatesThread != null) {
+			if (reopenChat && updatesThread != null && !heavyUpdates) {
 				MP.cancel(MP.updatesThread, true);
 			}
 			
@@ -2325,8 +2185,298 @@ public class MP extends MIDlet
 			writeAuth();
 			break;
 		}
+		case RUN_GLOBAL_UPDATES: {
+			Thread thread;
+			updatesThread = updatesThreadCopy = thread = Thread.currentThread();
+			updatesRunning = true;
+			try {
+				StringBuffer sb = new StringBuffer();
+				JSONObject j;
+
+				int offset = 0;
+				int fails = 0;
+				boolean check = true;
+				while (updatesThread == thread) {
+					try {
+						if (updatesThread != thread) break;
+						Thread.sleep(10);
+						if (check) {
+							sb.setLength(0);
+							sb.append("getLastUpdate");
+							try {
+								j = ((JSONObject) api(sb.toString())).getObject("res");
+								int off = j.getInt("update_id");
+								if (!j.getBoolean("exact", false))
+									off -= 1;
+								if (offset <= 0 || off < offset)
+									offset = off;
+							} catch (Exception ignored) {}
+							check = false;
+						}
+						if (updatesThread != thread) break;
+
+						sb.setLength(0);
+						sb.append("updates&media=1")
+								.append("&offset=").append(offset)
+								.append("&timeout=").append(longpoll ? updatesTimeout : 1)
+								.append("&limit=200")
+								.append("&types=" +
+										"updateUserStatus,updateUserTyping,updateChatUserTyping,updateChannelUserTyping," +
+										"updateNewMessage,updateNewChannelMessage," +
+										"updateDeleteChannelMessages,updateDeleteMessages," +
+										"updateEditMessage,updateEditChannelMessage," +
+										"updateReadHistoryOutbox,updateReadChannelOutbox")
+						;
+						if (!longpoll) {
+							sb.append("&longpoll=0");
+						}
+
+						j = (JSONObject) api(sb.toString());
+
+						System.out.println(j);
+
+						if (j.has("cancel")) {
+							throw cancelException;
+						}
+
+						JSONArray updates = j.getArray("res");
+						int l = updates.size();
+
+						MPChat form = current instanceof MPChat ? (MPChat) current : null;
+
+						if (form != null) {
+							String peer = form.id();
+							boolean channel = form.channel();
+							boolean user = peer.charAt(0) != '-';
+							int topMsgId = form.topMsgId();
+
+							for (int i = 0; i < l; ++i) {
+								JSONObject update = updates.getObject(i);
+								offset = update.getInt("update_id");
+								update = update.getObject("update");
+								String type = update.getString("_");
+
+								JSONObject msg = update.getObject("message", null);
+
+								if (user && "updateUserStatus".equals(type)) {
+									if (!update.getString("user_id").equals(peer)) continue;
+									form.handleUpdate(MPChat.UPDATE_USER_STATUS, update);
+								} else if (user ? "updateUserTyping".equals(type)
+										: channel ? "updateChannelUserTyping".equals(type)
+										: "updateChatUserTyping".equals(type)) {
+									if (user && !update.getString("user_id").equals(peer)) continue;
+									if (channel) {
+										if (!peer.equals(update.getString("channel_id"))
+												|| (update.has("top_msg_id") && update.getInt("top_msg_id") != topMsgId)) {
+											continue;
+										}
+									} else if (!update.getString("chat_id").equals(peer)) continue;
+									form.handleUpdate(MPChat.UPDATE_USER_TYPING, update);
+								} else if (!channel ? "updateNewMessage".equals(type)
+										: "updateNewChannelMessage".equals(type)) {
+									if (msg.getInt("id") <= form.firstMsgId()) continue;
+									if (user) {
+										if (peer.equals(selfId) && (!msg.getString("peer_id", peer).equals(peer))
+											|| !msg.getString("peer_id").equals(peer) &&
+												(msg.getBoolean("out", false) || !msg.getString("peer_id").equals(selfId) || !msg.getString("from_id").equals(peer))) {
+											continue;
+										}
+									} else if (!peer.equals(msg.getString("peer_id"))
+											|| (msg.has("reply") && msg.getObject("reply").getInt("top") != topMsgId)) {
+										continue;
+									}
+									form.handleUpdate(MPChat.UPDATE_NEW_MESSAGE, update);
+								} else if (channel && "updateDeleteChannelMessages".equals(type)) {
+									if (!peer.equals(update.getString("channel_id"))
+											|| (update.has("top_msg_id") && update.getInt("top_msg_id") != topMsgId)) {
+										continue;
+									}
+									form.handleUpdate(MPChat.UPDATE_DELETE_MESSAGES, update);
+								} else if (!channel ? "updateEditMessage".equals(type)
+										: "updateEditChannelMessage".equals(type)) {
+									if (user) {
+										if (peer.equals(selfId) && (!msg.getString("peer_id", peer).equals(peer))
+												|| !msg.getString("peer_id").equals(peer) &&
+												(msg.getBoolean("out", false) || !msg.getString("peer_id").equals(selfId) || !msg.getString("from_id").equals(peer))) {
+											continue;
+										}
+									} else if (!peer.equals(msg.getString("peer_id"))
+											|| (msg.has("reply") && msg.getObject("reply").getInt("top") != topMsgId)) {
+										continue;
+									}
+									form.handleUpdate(MPChat.UPDATE_EDIT_MESSAGE, update);
+								} else if (!channel ? "updateReadHistoryOutbox".equals(type)
+										: "updateReadChannelOutbox".equals(type)) {
+									if ((update.has("peer") && !update.getString("peer").equals(peer))
+										|| (update.has("channel_id") && !update.getString("channel_id").equals(peer)))
+										continue;
+									form.handleUpdate(MPChat.UPDATE_READ_OUTBOX, update);
+								} else if ("updateDeleteMessages".equals(type)) {
+									form.handleUpdate(MPChat.UPDATE_DELETE_MESSAGES, update);
+								}
+							}
+						}
+
+//						handleNotifications(updates, sb, true);
+
+						if (!longpoll) {
+							updatesSleeping = true;
+							Thread.sleep(updatesTimeout * 1000L);
+							updatesSleeping = false;
+						} else {
+							Thread.sleep(1);
+						}
+					} catch (Exception e) {
+						if (e.toString().indexOf("Interrupted") != -1 || e == cancelException) {
+							break;
+						}
+						e.printStackTrace();
+						fails++;
+						check = true;
+						updatesSleeping = true;
+						Thread.sleep(updatesDelay);
+						updatesSleeping = false;
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				if (updatesThread == thread)
+					updatesThread = null;
+				updatesRunning = false;
+				updatesSleeping = false;
+			}
+			break;
+		}
 		}
 //		running--;
+	}
+
+	void handleNotifications(JSONArray updates, StringBuffer sb, boolean global) {
+		int l = updates.size();
+		JSONArray newMsgs = new JSONArray();
+
+		for (int i = 0; i < l; ++i) {
+			JSONObject update = updates.getObject(i);
+			if (update.has("update")) update = update.getObject("update");
+			String type = update.getString("_");
+			if (!"updateNewMessage".equals(type) && !"updateNewChannelMessage".equals(type))
+				continue;
+
+			JSONObject msg = update.getObject("message");
+
+			String peerId = msg.getString("peer_id");
+			if (peerId.equals(selfId)) {
+				peerId = msg.getString("from_id");
+			}
+			sb.setLength(0);
+
+			JSONObject peer = getPeer(peerId, true);
+			String text = appendDialog(sb, peer, peerId, msg).toString();
+
+			if (msg.getBoolean("out", false)
+					|| update.getBoolean("muted", false)
+					|| msg.getBoolean("silent", false))
+//								msg.put("muted", true);
+				continue;
+
+			msg.put("peer_id", peerId);
+			msg.put("text", text);
+			int count = 0;
+//#ifndef NO_NOKIAUI
+			if (notificationMessages.containsKey(peerId)) {
+				count = ((JSONObject) notificationMessages.get(peerId)).getInt("count", 0);
+			}
+//#endif
+
+			// filter latest messages
+			f: {
+				int n = newMsgs.size();
+				for (int m = 0; m < n; ++m) {
+					JSONObject t = newMsgs.getObject(m);
+					if (peerId.equals(t.getString("peer_id"))) {
+						msg.put("count", ++count);
+						newMsgs.set(m, msg);
+						break f;
+					}
+				}
+				msg.put("count", ++count);
+				newMsgs.add(msg);
+			}
+//#ifndef NO_NOKIAUI
+			notificationMessages.put(peerId, msg);
+//#endif
+		}
+
+		if (newMsgs.size() != 0) {
+			boolean notified = false;
+
+			l = newMsgs.size();
+			for (int i = 0; i < l; ++i) {
+				JSONObject msg = newMsgs.getObject(i);
+				String text = msg.getString("text");
+				String peerId = msg.getString("peer_id");
+
+				sb.setLength(0);
+				sb.append(getName(peerId, false));
+				int count = msg.getInt("count", 0);
+				if (count > 1) {
+					sb.append(" +").append(count);
+				}
+				String title = sb.toString();
+
+				if (!paused && current instanceof MPChat && current.isShown() && peerId.equals(((MPChat) current).id())) {
+//#ifndef NO_NOKIAUI
+					try {
+						Notifier.remove(peerId);
+					} catch (Throwable ignored) {}
+					notificationMessages.remove(peerId);
+//#endif
+					continue;
+				}
+
+				if (notifyMethod != 0) {
+//#ifndef NO_NOKIAUI
+					if (notifyMethod != 1) {
+						Image img = null;
+						if (!Notifier.has(peerId) && imagesCache.containsKey(peerId)) {
+							img = (Image) imagesCache.get(peerId);
+						}
+						try {
+							if (Notifier.post(peerId, title, text, notifyMethod, img) && img == null && notifyAvas) {
+								MP.queueAvatar(peerId, peerId);
+							}
+						} catch (Throwable ignored) {}
+					} else
+//#endif
+					{
+						Alert alert = new Alert(title);
+						alert.setString(text);
+						alert.setTimeout(1500);
+						display(alert, null);
+					}
+				}
+				notified = true;
+			}
+
+			if (notified && notifySound) {
+				try {
+					if (notificationPlayer == null) {
+						notificationPlayer = Manager.createPlayer(getClass().getResourceAsStream("/msg.mid"), "audio/midi");
+						notificationPlayer.realize();
+						notificationPlayer.prefetch();
+					}
+					notificationPlayer.stop();
+					try {
+						((VolumeControl) notificationPlayer.getControl("VolumeControl")).setLevel(notificationVolume);
+					} catch (Throwable ignored) {}
+					notificationPlayer.setMediaTime(0);
+					notificationPlayer.start();
+				} catch (Exception e) {
+					AlertType.ALARM.playSound(display);
+				}
+			}
+		}
 	}
 
 	Thread start(int i, Object param) {
@@ -2343,6 +2493,7 @@ public class MP extends MIDlet
 	}
 	
 	static void cancel(Thread thread, boolean updates) {
+		new Exception().printStackTrace();
 		if (thread == null) return;
 		if (updates) updatesThread = null;
 		Connection c = (Connection) threadConnections.get(thread);
@@ -3293,7 +3444,7 @@ public class MP extends MIDlet
 				}
 
 				display(loadingAlert(L[LSending]), d);
-				if ((reopenChat || !longpoll || sendFile != null) && MP.updatesThread != null) {
+				if ((reopenChat || !longpoll || sendFile != null) && MP.updatesThread != null && !heavyUpdates) {
 					MP.cancel(MP.updatesThread, true);
 				}
 				start(RUN_SEND_MESSAGE, new Object[] { t, writeTo, replyTo, edit, sendFile, sendChoice, fwdPeer, fwdMsg });
@@ -3814,7 +3965,7 @@ public class MP extends MIDlet
 					sending = true;
 				}
 
-				if (reopenChat || !longpoll) {
+				if ((reopenChat || !longpoll) && !heavyUpdates) {
 					display(loadingAlert(L[LSending]), current);
 					if (MP.updatesThread != null) {
 						MP.cancel(MP.updatesThread, true);

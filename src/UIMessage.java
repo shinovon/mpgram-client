@@ -512,7 +512,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			if (text != null) {
 				y += MARGIN_TOP;
 				g.setColor(ChatCanvas.colors[COLOR_ACTION_BG]);
-				g.fillRect(x + (w - text.contentWidth - PADDING_WIDTH) >> 1, y, text.contentWidth + PADDING_WIDTH, text.contentHeight + PADDING_HEIGHT * 2);
+				g.fillRect(x + ((w - text.contentWidth) >> 1) - PADDING_WIDTH, y, text.contentWidth + PADDING_WIDTH, text.contentHeight + PADDING_HEIGHT * 2);
 				if (updateColors) {
 					updateColors = false;
 					text.color = ChatCanvas.colors[COLOR_MESSAGE_FG];
@@ -973,7 +973,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		// text
 		if (text != null) {
 			text.y = h - MARGIN_TOP - PADDING_HEIGHT;
-			h += text.layout(cw);
+			h += text.layout(cw - 6);
 			int l = text.render.size();
 			int tw = 0;
 			if (l != 0) {

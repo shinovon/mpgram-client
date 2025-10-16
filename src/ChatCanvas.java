@@ -360,7 +360,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			scrollCurrentItem = scrollTargetItem = focusedItem = null;
 			titleRender = null;
 			
-			if ((MP.reopenChat || (query == null && mediaFilter == null))
+			if (!MP.heavyUpdates && (MP.reopenChat || (query == null && mediaFilter == null))
 					&& MP.chatUpdates
 					&& (MP.updatesThread != null || MP.updatesRunning)) {
 				MP.display(MP.loadingAlert(MP.L[LWaitingForPrevChat]), this);
@@ -610,7 +610,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					&& MP.chatUpdates && !update) {
 				// start updater thread
 				update = shouldUpdate = true;
-				MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
+				if (!MP.heavyUpdates) {
+					MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
+				}
 				(typingThread = new Thread(this)).start();
 			}
 			if (botAnswer != null) {
@@ -670,7 +672,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		}
 		if (shouldUpdate && !update && !loading) {
 			update = true;
-			MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
+			if (!MP.heavyUpdates) {
+				MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
+			}
 			if (typingThread == null) {
 				(typingThread = new Thread(this)).start();
 			}
@@ -691,7 +695,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		// close updater thread
 		if (update) {
 			update = false;
-			if (MP.updatesThread != null || MP.updatesRunning) {
+			if (!MP.heavyUpdates && (MP.updatesThread != null || MP.updatesRunning)) {
 				MP.cancel(MP.updatesThread, true);
 			}
 			if (typingThread != null) typingThread.interrupt();
@@ -2305,6 +2309,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 
 	public boolean switched() {
 		return switched;
+	}
+
+	public boolean channel() {
+		return channel;
 	}
 
 	public int topMsgId() {
