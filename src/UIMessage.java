@@ -20,10 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 //#ifndef NO_CHAT_CANVAS
-import javax.microedition.lcdui.Canvas;
-import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.Image;
+import javax.microedition.lcdui.*;
+import java.util.Vector;
 
 public class UIMessage extends UIItem implements LangConstants {
 	
@@ -62,13 +60,17 @@ public class UIMessage extends UIItem implements LangConstants {
 	private static final int DATE_MARGIN_HEIGHT = 1;
 	private static final int SPACE_HEIGHT = 4;
 	private static final int READ_WIDTH = 20;
+	private static final int BUTTON_GRID_HGAP = 1;
+	private static final int BUTTON_GRID_VGAP = 1;
+	private static final int BUTTON_PADDING_WIDTH = 6;
+	private static final int BUTTON_PADDING_HEIGHT = 6;
 	
 	private static final int FOCUS_SENDER = 0;
 	private static final int FOCUS_FORWARD = 1;
 	private static final int FOCUS_REPLY = 2;
 	private static final int FOCUS_MEDIA = 3;
 	private static final int FOCUS_TEXT = 4;
-//	private static final int FOCUS_BUTTONS = 5; // TODO
+	private static final int FOCUS_BUTTONS = 5;
 	private static final int FOCUS_COMMENT = 6;
 	
 	UILabel text;
@@ -124,9 +126,11 @@ public class UIMessage extends UIItem implements LangConstants {
 	int focusDir = 1;
 	private boolean imageQueued;
 
-//	String[][][] buttons;
-//	int buttonMaxCols;
-//	Object buttonsRender;
+	String[][][] buttons;
+	int buttonMaxCols;
+	Object[][] buttonsRender;
+	int buttonsHeight;
+	Object focusedButton;
 	
 	UIMessage(JSONObject message, ChatCanvas chat) {
 		focusable = true;
@@ -424,36 +428,6 @@ public class UIMessage extends UIItem implements LangConstants {
 				this.text = null;
 			}
 			
-			// buttons
-//			if (message.has("markup")) {
-//				subFocus[order++] = FOCUS_BUTTONS;
-//
-//				JSONArray markup = message.getArray("markup");
-//				int rows = markup.size();
-//
-//				buttons = new String[rows][][];
-//				for (int i = 0; i < rows; ++i) {
-//					JSONArray markupRow = markup.getArray(i);
-//					int cols = markupRow.size();
-//					buttons[i] = new String[cols][];
-//					if (cols > buttonMaxCols) buttonMaxCols = cols;
-//
-//					for (int j = 0; j < cols; ++j) {
-//						JSONObject markupItem = markupRow.getObject(j);
-//
-//						String t = markupItem.getString("text");
-//						if (markupItem.has("data")) {
-//							buttons[i][j] = new String[] { t, "", markupItem.getString("data") };
-//						} else if (markupItem.has("url")) {
-//							buttons[i][j] = new String[] { t, markupItem.getString("url") };
-//						}
-//					}
-//				}
-//			} else {
-//				buttons = null;
-//				buttonMaxCols = 0;
-//			}
-			
 			// comments
 			if (message.has("comments")) {
 				JSONObject comments = message.getObject("comments");
@@ -472,6 +446,37 @@ public class UIMessage extends UIItem implements LangConstants {
 			} else {
 				reactsText = null;
 			}
+
+			// buttons
+			if (message.has("markup")) {
+				subFocus[order++] = FOCUS_BUTTONS;
+
+				JSONArray markup = message.getArray("markup");
+				int rows = markup.size();
+
+				buttons = new String[rows][][];
+				for (int i = 0; i < rows; ++i) {
+					JSONArray markupRow = markup.getArray(i);
+					int cols = markupRow.size();
+					buttons[i] = new String[cols][];
+					if (cols > buttonMaxCols) buttonMaxCols = cols;
+
+					for (int j = 0; j < cols; ++j) {
+						JSONObject markupItem = markupRow.getObject(j);
+
+						String t = markupItem.getString("text");
+						if (markupItem.has("data")) {
+							buttons[i][j] = new String[] { t, "", markupItem.getString("data") };
+						} else if (markupItem.has("url")) {
+							buttons[i][j] = new String[] { t, markupItem.getString("url") };
+						}
+					}
+				}
+			} else {
+				buttons = null;
+				buttonMaxCols = 0;
+			}
+			focusedButton = null;
 			read = id <= chat.readOutboxId;
 		}
 		
@@ -479,7 +484,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	}
 	
 	void paint(Graphics g, int x, int y, int w) {
-		int h = contentHeight;
+		int h = contentHeight - buttonsHeight;
 		if (selected) {
 			g.setColor(ChatCanvas.colors[ChatCanvas.COLOR_CHAT_HIGHLIGHT_BG]);
 			g.fillRect(0, y, w, h);
@@ -704,11 +709,6 @@ public class UIMessage extends UIItem implements LangConstants {
 			y += MP.smallPlainFontHeight;
 		}
 		
-		// buttons
-//		if (buttonsRender != null) {
-//
-//		}
-		
 		// time
 		if (timeBreak) y += MP.smallPlainFontHeight;
 		int mw = 0;
@@ -752,6 +752,27 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 		
 		//y += MARGIN_BOTTOM;
+
+		// buttons
+		if (buttonsRender != null) {
+			g.setFont(MP.smallBoldFont);
+			y += 2;
+			boolean focus = this.focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_BUTTONS;
+			for (int j = 0; j < buttonsRender.length; j++) {
+				Object[] btn = buttonsRender[j];
+				String s = (String) btn[0];
+				int[] pos = (int[]) btn[1];
+				g.setColor(ChatCanvas.colors[COLOR_ACTION_BG]);
+				g.fillRect(rx + pos[0], y + pos[1], pos[2], pos[3]);
+				g.setColor(ChatCanvas.colors[COLOR_MESSAGE_FG]);
+				g.drawString(s, rx + pos[0] + (pos[2] >> 1), y + pos[1] + BUTTON_PADDING_HEIGHT, Graphics.TOP | Graphics.HCENTER);
+				if (focus && focusedButton == btn[2]) {
+					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_FOCUS_BORDER]);
+					g.drawRect(rx + pos[0], y + pos[1], pos[2], pos[3]);
+				}
+			}
+			y += buttonsHeight;
+		}
 		
 		// date not reversed
 		if (showDate && !((ChatCanvas) container).reverse) {
@@ -761,7 +782,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			g.fillRect(x - PADDING_WIDTH + (w - dateWidth - x) >> 1, y, dateWidth + PADDING_WIDTH * 2, MP.smallBoldFontHeight + DATE_PADDING_HEIGHT * 2);
 			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_FG]);
 			g.drawString(dateRender, x + (w - dateWidth - x) >> 1, y += DATE_PADDING_HEIGHT, 0);
-			y += DATE_MARGIN_HEIGHT + DATE_PADDING_HEIGHT + MP.smallBoldFontHeight;
+//			y += DATE_MARGIN_HEIGHT + DATE_PADDING_HEIGHT + MP.smallBoldFontHeight;
 		}
 	}
 	
@@ -967,13 +988,6 @@ public class UIMessage extends UIItem implements LangConstants {
 		} else if (!(timeBreak = maxW + timeWidth >= cw)) {
 			maxW += timeWidth;
 		}
-		
-		// buttons
-//		if (buttons != null) {
-//
-//		} else {
-//			buttonsRender = null;
-//		}
 
 		// reacts
 		if (reactsText != null) {
@@ -1003,10 +1017,103 @@ public class UIMessage extends UIItem implements LangConstants {
 			touchZones[order ++] = FOCUS_COMMENT;
 		}
 		if (space && !((ChatCanvas) container).reverse) h += SPACE_HEIGHT;
+
+		// buttons
+		if (buttons != null) {
+			Font f = MP.smallBoldFont;
+
+			int by = -BUTTON_GRID_VGAP;
+			int bh = f.getHeight() + BUTTON_GRID_VGAP * 2 + BUTTON_PADDING_HEIGHT * 2;
+			int count = 0;
+			Vector v = new Vector();
+			for (int i = 0; i < buttons.length; ++i) {
+				String[][] row = buttons[i];
+
+				int rowWidth = 0;
+				int cols = 0;
+				for (int j = 0; j < row.length; ++j) {
+					String s = row[j][0];
+					int sw = f.stringWidth(s);
+					count++;
+					boolean full = false;
+					if (rowWidth + sw > cw - (BUTTON_GRID_HGAP + BUTTON_PADDING_WIDTH) * 2) {
+						if (cols != 0) {
+							cols = 0;
+							by += bh;
+							rowWidth = 0;
+						}
+						full = true;
+					}
+
+					v.addElement(new Object[] { s, new int[] { rowWidth, by + BUTTON_GRID_VGAP, full ? -1 : 0, cols++ }, row[j] });
+
+					if (full) {
+						cols = 0;
+						rowWidth = 0;
+						by += bh;
+					} else {
+						rowWidth += sw + (BUTTON_GRID_HGAP + BUTTON_PADDING_WIDTH) * 2;
+						maxW = Math.min(cw + PADDING_WIDTH * 2, Math.max(maxW, rowWidth + minW + PADDING_WIDTH * 2));
+					}
+				}
+				if (cols != 0) {
+					by += bh;
+				}
+			}
+			{
+				bh -= BUTTON_GRID_VGAP * 2;
+				int w = maxW - (MARGIN_WIDTH * 2 + MARGIN_SIDE);
+				for (int i = v.size() - 1; i >= 0; --i) {
+					Object[] btn = (Object[]) v.elementAt(i);
+					int[] pos = (int[]) btn[1];
+					if (pos[2] == -1 || pos[3] == 0) {
+						btn[0] = UILabel.ellipsis((String) btn[0], f, w);
+						pos[2] = w;
+						pos[3] = bh;
+					} else {
+						int cols = pos[3];
+						int bw = w / (cols + 1);
+
+						btn[0] = UILabel.ellipsis((String) btn[0], f, bw - BUTTON_PADDING_WIDTH * 2);
+						pos = (int[]) btn[1];
+						pos[0] = cols * bw + BUTTON_GRID_HGAP;
+						pos[2] = bw + w - bw * (cols + 1) - BUTTON_GRID_HGAP;
+						pos[3] = bh;
+
+						while (cols-- > 0) {
+							btn = (Object[]) v.elementAt(--i);
+							btn[0] = UILabel.ellipsis((String) btn[0], f, bw - BUTTON_PADDING_WIDTH * 2);
+							pos = (int[]) btn[1];
+							pos[0] = cols * bw;
+							pos[2] = bw - BUTTON_GRID_HGAP;
+							if (cols != 0) {
+								pos[0] += BUTTON_GRID_HGAP;
+								pos[2] -= BUTTON_GRID_HGAP;
+							}
+							pos[3] = bh;
+						}
+					}
+				}
+			}
+			by += 2;
+			buttonsHeight = by;
+			buttonsRender = new Object[count][];
+			for (int i = 0; i < count; ++i) {
+				buttonsRender[i] = (Object[]) v.elementAt(i);
+			}
+
+			touchZones[order ++] = MARGIN_WIDTH;
+			touchZones[order ++] = h + y + PADDING_HEIGHT;
+			touchZones[order ++] = maxW + PADDING_WIDTH * 2;
+			touchZones[order ++] = (h += by) + y + PADDING_HEIGHT;
+			touchZones[order ++] = FOCUS_BUTTONS;
+		} else {
+			buttonsRender = null;
+		}
 		
 		touchZones[order] = Integer.MIN_VALUE;
 		contentWidth = Math.min(maxW, Math.min(MAX_WIDTH, width));
-		return contentHeight = h += PADDING_HEIGHT;
+		return contentHeight = h + PADDING_HEIGHT;
 	}
 	
 	boolean grabFocus(int dir) {
@@ -1022,7 +1129,7 @@ public class UIMessage extends UIItem implements LangConstants {
 					subFocusCurrent = dir == -1 ? subFocusLength - 1
 							: subFocusLength > 1 && subFocus[0] == FOCUS_SENDER && hideName ? 1 : 0;
 				}
-				subFocus(subFocusCurrent);
+				subFocus(subFocusCurrent, dir);
 			}
 		} else {
 			subFocusCurrent = -1;
@@ -1033,11 +1140,16 @@ public class UIMessage extends UIItem implements LangConstants {
 		return true;
 	}
 	
-	private void subFocus(int idx) {
+	private void subFocus(int idx, int dir) {
 		switch (subFocus[idx]) {
 		case FOCUS_TEXT:
 			if (text != null) {
 				focusChild = text;
+			}
+			break;
+		case FOCUS_BUTTONS:
+			if (focusedButton == null && dir != 0) {
+				focusedButton = buttons[dir == Canvas.UP ? buttons.length - 1 : 0];
 			}
 			break;
 		}
@@ -1082,7 +1194,7 @@ public class UIMessage extends UIItem implements LangConstants {
 						return Integer.MIN_VALUE;
 					if (subFocusCurrent == 1 && subFocus[0] == FOCUS_SENDER && hideName)
 						return Integer.MIN_VALUE;
-					subFocus(--subFocusCurrent);
+					subFocus(--subFocusCurrent, dir);
 					if (focusChild != null) {
 						if (!focusChild.grabFocus(dir)) focusChild = null;
 					}
@@ -1090,7 +1202,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				} else if (dir == Canvas.DOWN) {
 					if (subFocusCurrent == subFocusLength - 1)
 						return Integer.MIN_VALUE;
-					subFocus(++subFocusCurrent);
+					subFocus(++subFocusCurrent, dir);
 					if (focusChild != null) {
 						if (!focusChild.grabFocus(dir)) focusChild = null;
 					}
@@ -1324,7 +1436,7 @@ public class UIMessage extends UIItem implements LangConstants {
 					int focus = touchZones[i + 4];
 					for (int j = 0; j < subFocusLength; j++) {
 						if (subFocus[j] == focus) {
-							subFocus(subFocusCurrent = j);
+							subFocus(subFocusCurrent = j, 0);
 							break;
 						}
 					}
@@ -1333,8 +1445,12 @@ public class UIMessage extends UIItem implements LangConstants {
 						((ChatCanvas) container).showMenu(this, menu);
 						return true;
 					}
-					if (!longTap && action(focus)) {
-						return true;
+					if (!longTap) {
+						if (focus == FOCUS_BUTTONS) {
+							// TODO handle
+						} else if (action(focus)) {
+							return true;
+						}
 					}
 					break;
 				}
