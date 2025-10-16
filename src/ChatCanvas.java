@@ -88,6 +88,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	boolean selfChat;
 	boolean user;
 	boolean channel;
+	boolean bot;
 	boolean reverse;
 	
 	MPChat parent;
@@ -471,6 +472,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						user = true;
 						canPin = true;
 						canDelete = true;
+						if (bot = info.getObject("User").getBoolean("bot", false)) {
+							defaultStatus = MP.L[LBot];
+						}
 						if (MP.chatStatus && info.getObject("User").has("status")) {
 							setStatus(info.getObject("User").getObject("status"));
 						}
