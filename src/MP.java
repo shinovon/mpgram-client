@@ -3441,6 +3441,18 @@ public class MP extends MIDlet
 			s.setItemCommandListener(this);
 			f.append(s);
 
+			s = new StringItem(null, "Community translations:\n\n"
+					+ "Arabic: ZAIOOD999, nourhan5908\n"
+					+ "Azerbaijani: Red Fixrai\n"
+					+ "Catalan: Dragan232\n"
+					+ "Spanish: Jazmin Rocio\n"
+					+ "Finnish: gtrxAC\n"
+					+ "Portuguese: kefelili\n"
+					+ "Ukrainian: karusel33, PhantomHorror\n");
+			s.setFont(smallPlainFont);
+			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
+			f.append(s);
+
 			s = new StringItem(null, "\n\nReleased under the MIT license.\n"
 					+ "Copyright (C) 2022-2025 Arman Jussupgaliyev\n\n"
 //#ifndef NO_AVATARS
