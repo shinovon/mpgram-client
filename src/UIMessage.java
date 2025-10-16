@@ -1349,10 +1349,10 @@ public class UIMessage extends UIItem implements LangConstants {
 			MPChat parent = ((ChatCanvas) container).parent;
 			if (parent != null) {
 				MP.goBackTo((Displayable) parent);
-				parent.reset();
+				parent.resetChat();
 				parent.openMessage(idStr, -1);
 			} else {
-				((ChatCanvas) container).reset();
+				((ChatCanvas) container).resetChat();
 				((ChatCanvas) container).openMessage(idStr, -1);
 			}
 			break;
@@ -1459,7 +1459,6 @@ public class UIMessage extends UIItem implements LangConstants {
 						}
 					}
 					if (focus == FOCUS_REPLY_MARKUP) {
-						// TODO
 						focusedButton = null;
 						x -= touchZones[i];
 						y -= touchZones[i + 1];

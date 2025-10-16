@@ -977,7 +977,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 		MP.openLoad(this);
 	}
 	
-	public void reset() {
+	public void resetChat() {
 		cancel();
 		dir = 0;
 		messageId = 0;

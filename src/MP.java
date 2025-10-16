@@ -2420,7 +2420,7 @@ public class MP extends MIDlet
 		}
 		if (d instanceof MPChat) { // chat form commands
 			if (c == latestCmd) {
-				((MPChat) d).reset();
+				((MPChat) d).resetChat();
 				start(RUN_LOAD_FORM, d);
 				return;
 			}
@@ -2452,7 +2452,7 @@ public class MP extends MIDlet
 			}
 			if (c == backCmd && ((MPChat) d).query() != null && ((MPChat) d).switched()) {
 				// close search
-				((MPChat) current).reset();
+				((MPChat) current).resetChat();
 				start(RUN_LOAD_FORM, current);
 				return;
 			}
@@ -2460,7 +2460,7 @@ public class MP extends MIDlet
 		if (d instanceof TextBox && c == searchMsgCmd) {
 			commandAction(backCmd, d);
 			if (current instanceof MPChat) {
-				((MPChat) current).reset();
+				((MPChat) current).resetChat();
 				((MPChat) current).setQuery(((TextBox) d).getString());
 				start(RUN_LOAD_FORM, current);
 				return;
@@ -3486,7 +3486,7 @@ public class MP extends MIDlet
 				int i = ((List) d).getSelectedIndex();
 				if (form == null || i == -1) return;
 				JSONObject topic = form.topics().getObject(i);
-				form.reset();
+				form.resetChat();
 				// TODO unread offset
 				form.openTopic(topic.getInt("id"),
 						!topic.getBoolean("closed", false),

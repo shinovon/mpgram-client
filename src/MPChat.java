@@ -59,7 +59,7 @@ interface MPChat {
 	Ticker getTicker();
 	void setTicker(Ticker t);
 	
-	void reset();
+	void resetChat();
 	void openMessage(String msg, int topMsg);
 	void sent();
 	void handleUpdate(int type, JSONObject update);

@@ -2366,7 +2366,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	//
 
-	public void reset() {
+	public void resetChat() {
 		cancel();
 		dir = 0;
 		messageId = 0;
@@ -2392,7 +2392,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				return;
 			}
 		}
-		reset();
+		resetChat();
 		this.messageId = Integer.parseInt(msg);
 		if (topMsg != -1) this.topMsgId = topMsg;
 		MP.openLoad(this);
