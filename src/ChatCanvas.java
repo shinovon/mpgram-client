@@ -925,7 +925,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						g.drawLine(w - 58, bty - 6, w - 52, bty);
 						g.drawLine(w - 58, bty + 6, w - 52, bty);
 						
-					} else if (query == null && mediaFilter == null) {
+					} else if (/*query == null && */ mediaFilter == null) {
 						// menu button
 						g.fillRect(w - 22, bty - 6, 3, 3);
 						g.fillRect(w - 22, bty, 3, 3);
@@ -1686,22 +1686,25 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			}
 		} else if (touch && now - pressTime < 300) {
 			if (y < top) {
-				if (x < 40) {
+				if (x < 40) { // back button
 					if (keyboard != null && keyboard.isVisible()) {
 						onKeyboardCancel();
 					} else {
 						keyPressed(-7);
 					}
-				} else if (selected != 0) {
+				} else if (selected != 0) { // selected messages actions
 					if (x > width - 40) {
 						deleteSelected();
 					} else if (x > width - 90) {
 						forwardSelected();
 					}
 				} else if (loading) { // do nothing
-				} else if (x > width - 48) {
-					if (query == null && mediaFilter == null)
+				} else if (x > width - 48) { // menu button
+					if (query != null) {
+						showMenu(null, new int[] { LSearchMessages });
+					} else if (mediaFilter == null) {
 						showMenu(null, new int[] { LRefresh, LSearchMessages });
+					}
 				} else if (postId == null) {
 					openProfile();
 				}
