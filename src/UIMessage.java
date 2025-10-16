@@ -68,7 +68,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	private static final int FOCUS_REPLY = 2;
 	private static final int FOCUS_MEDIA = 3;
 	private static final int FOCUS_TEXT = 4;
-	private static final int FOCUS_BUTTONS = 5; // TODO
+//	private static final int FOCUS_BUTTONS = 5; // TODO
 	private static final int FOCUS_COMMENT = 6;
 	
 	UILabel text;
@@ -123,6 +123,10 @@ public class UIMessage extends UIItem implements LangConstants {
 	boolean updateColors;
 	int focusDir = 1;
 	private boolean imageQueued;
+
+//	String[][][] buttons;
+//	int buttonMaxCols;
+//	Object buttonsRender;
 	
 	UIMessage(JSONObject message, ChatCanvas chat) {
 		focusable = true;
@@ -396,6 +400,8 @@ public class UIMessage extends UIItem implements LangConstants {
 				this.media = true;
 				if (!sticker) subFocus[order++] = FOCUS_MEDIA;
 			}
+		} else {
+			this.media = false;
 		}
 		
 		if (chat.mediaFilter == null) {
@@ -414,29 +420,39 @@ public class UIMessage extends UIItem implements LangConstants {
 				if (label.focusable) subFocus[order++] = FOCUS_TEXT;
 				label.container = this;
 				this.text = label;
+			} else {
+				this.text = null;
 			}
 			
 			// buttons
-			if (message.has("markup")) {
-				subFocus[order++] = FOCUS_BUTTONS;
-
-				JSONArray markup = message.getArray("markup");
-				int rows = markup.size();
-				for (int i = 0; i < rows; i++) {
-					JSONArray markupRow = markup.getArray(i);
-					int cols = markupRow.size();
-					for (int j = 0; j < cols; j++) {
-						JSONObject markupItem = markupRow.getObject(j);
-
-						// TODO
-						if (markupItem.has("data")) {
-
-						} else if (markupItem.has("url")) {
-
-						}
-					}
-				}
-			}
+//			if (message.has("markup")) {
+//				subFocus[order++] = FOCUS_BUTTONS;
+//
+//				JSONArray markup = message.getArray("markup");
+//				int rows = markup.size();
+//
+//				buttons = new String[rows][][];
+//				for (int i = 0; i < rows; ++i) {
+//					JSONArray markupRow = markup.getArray(i);
+//					int cols = markupRow.size();
+//					buttons[i] = new String[cols][];
+//					if (cols > buttonMaxCols) buttonMaxCols = cols;
+//
+//					for (int j = 0; j < cols; ++j) {
+//						JSONObject markupItem = markupRow.getObject(j);
+//
+//						String t = markupItem.getString("text");
+//						if (markupItem.has("data")) {
+//							buttons[i][j] = new String[] { t, "", markupItem.getString("data") };
+//						} else if (markupItem.has("url")) {
+//							buttons[i][j] = new String[] { t, markupItem.getString("url") };
+//						}
+//					}
+//				}
+//			} else {
+//				buttons = null;
+//				buttonMaxCols = 0;
+//			}
 			
 			// comments
 			if (message.has("comments")) {
@@ -453,6 +469,8 @@ public class UIMessage extends UIItem implements LangConstants {
 				if (reactsCount != 0) {
 					reactsText = MP.localizePlural(reactsCount, L_react);
 				}
+			} else {
+				reactsText = null;
 			}
 			read = id <= chat.readOutboxId;
 		}
@@ -687,6 +705,9 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 		
 		// buttons
+//		if (buttonsRender != null) {
+//
+//		}
 		
 		// time
 		if (timeBreak) y += MP.smallPlainFontHeight;
@@ -948,6 +969,11 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 		
 		// buttons
+//		if (buttons != null) {
+//
+//		} else {
+//			buttonsRender = null;
+//		}
 
 		// reacts
 		if (reactsText != null) {

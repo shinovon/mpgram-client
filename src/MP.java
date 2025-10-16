@@ -258,6 +258,8 @@ public class MP extends MIDlet
 	static int notifyMethod = 1; // 0: off, 1: alert, 2: nokiaui, 3: pigler api
 	static boolean notifyAvas = true;
 	static int notificationVolume = 100;
+//#endif
+//#ifndef NO_CHAT_CANVAS
 	static boolean legacyChatUI;
 //#endif
 	static boolean updateChatsList;
@@ -1997,11 +1999,12 @@ public class MP extends MIDlet
 			form.setTicker(ticker = new Ticker(MP.L[LSending]));
 			
 			try {
-				StringBuffer sb = new StringBuffer("botCallback&timeout=1");
-				sb.append("&peer=").append(((String[]) param)[0]);
-				sb.append("&id=").append(((String[]) param)[1]);
-				sb.append("&data=").append(((String[]) param)[2])
-				.append("&r=").append(System.currentTimeMillis());
+				StringBuffer sb = new StringBuffer("botCallback&timeout=1&r=")
+				.append(System.currentTimeMillis())
+				.append("&peer=").append(((String[]) param)[0])
+				.append("&id=").append(((String[]) param)[1])
+				.append("&data=").append(((String[]) param)[2])
+				;
 				
 				JSONObject j = null;
 				
