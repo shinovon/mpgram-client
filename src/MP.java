@@ -315,7 +315,7 @@ public class MP extends MIDlet
 	private static int userState;
 	private static String phone;
 	static String selfId;
-//	private static String phoneCodeHash; // TODO resend code
+	private static String phoneCodeHash;
 
 	// region Commands
 	private static Command exitCmd;
@@ -1292,9 +1292,9 @@ public class MP extends MIDlet
 					if (j.has("user")) {
 						user = j.getString("user");
 					}
-//					if (j.has("phone_code_hash")) {
-//						phoneCodeHash = j.getString("phone_code_hash");
-//					}
+					if (j.has("phone_code_hash")) {
+						phoneCodeHash = j.getString("phone_code_hash");
+					}
 					if (res.indexOf("captcha") != -1) {
 						display(errorAlert(L[LInvalidCaptcha_Alert]), null);
 						((CaptchaForm) param).load();
@@ -1330,8 +1330,7 @@ public class MP extends MIDlet
 							
 							if (!"1".equals(res)) {
 								if ("password_hash_invalid".equals(res)) {
-									display(errorAlert(L[LInvalidPassword_Alert]), null);
-									break;
+									res = L[LInvalidPassword_Alert];
 								}
 								display(errorAlert(res), null);
 								break;
@@ -1360,6 +1359,16 @@ public class MP extends MIDlet
 							break;
 						}
 						if (!"1".equals(res)) {
+							if ("phone_code_invalid".equals(res)) {
+								if (phoneCodeHash != null) {
+									sb.setLength(0);
+									sb.append("resendCode&hash=").append(phoneCodeHash).append("&phone=");
+									appendUrl(sb, phone);
+									api(sb.toString());
+								}
+								
+								res = L[LInvalidCode_Alert];
+							}
 							display(errorAlert(res), null);
 							break;
 						}
