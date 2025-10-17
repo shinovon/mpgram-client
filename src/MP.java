@@ -1774,11 +1774,13 @@ public class MP extends MIDlet
 
 //#ifndef NO_NOTIFY
 					// get notifications
-					if ((!notifications || !globalUpdates) && (!chatsList.isShown()))
-						continue;
-					if (!globalUpdates && updatesThread != null && !paused) {
-						check = true;
-						continue;
+					if (!globalUpdates) {
+						if (!notifications && (!chatsList.isShown()))
+							continue;
+						if (updatesThread != null && !paused) {
+							check = true;
+							continue;
+						}
 					}
 					for (;;) {
 						try {
@@ -1906,7 +1908,7 @@ public class MP extends MIDlet
 								}
 							}
 
-							handleNotifications(updates, sb, true);
+							if (notifications) handleNotifications(updates, sb, true);
 						} else {
 							sb.setLength(0);
 							sb.append("notifications")
