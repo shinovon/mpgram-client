@@ -303,13 +303,13 @@
 	"ChooseDownloadMethod_Alert": "Trieu mètode de descàrrega",
 	"FailedToSaveSettings_Alert": "No s'ha pogut desar configuració",
 	"PiglerNotAvailable_Alert": "API de Pigler està seleccionada però no disponible, \ndescarrega-la des de https://nnproject.cc/pna",
-	"DeleteNMessage_Alert": "Delete % message?", // Untranslated
-	"DeleteNMessages_Alert": "Delete % messages?", // Untranslated
-	"DeleteNMessages_Alert_2": "", // Untranslated
-	"DeleteMessage_Alert": "Delete message?", // Untranslated
-	"PinMessage_Alert": "Pin message?", // Untranslated
-	"BanMember_Alert": "Ban member?", // Untranslated
-	"Logout_Alert": "Are you sure you want to log out?", // Untranslated
+	"DeleteNMessage_Alert": "Suprimir % missatge?",
+	"DeleteNMessages_Alert": "Suprimir % missatges?",
+	"DeleteNMessages_Alert_2": "",
+	"DeleteMessage_Alert": "Suprimir missatge?",
+	"PinMessage_Alert": "Fixa missatge?",
+	"BanMember_Alert": "Prohibir membre?",
+	"Logout_Alert": "Segur que vols tancar sessió?",
 	
 	// Chat form
 	"ChatMedia_Title": "Mèdia",
@@ -331,8 +331,8 @@
 	"_comments": " comentaris",
 	"_comments2": "",
 	"ReplyTo": "Respon a ",
-	"_react": " react", // Untranslated
-	"_reacts": " reacts", // Untranslated
+	"_react": " reacció",
+	"_reacts": " reaccions",
 	"_reacts2": "",
 	
 	// Message media
