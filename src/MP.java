@@ -260,7 +260,7 @@ public class MP extends MIDlet
 	static boolean notifyAvas = true;
 	static int notificationVolume = 100;
 //#endif
-	static boolean heavyUpdates = true;
+	static boolean globalUpdates = true;
 //#ifndef NO_CHAT_CANVAS
 	static boolean legacyChatUI;
 //#endif
@@ -1074,12 +1074,7 @@ public class MP extends MIDlet
 					start(RUN_CHECK_OTA, null);
 				}
 
-//#ifndef NO_NOTIFY
-				if (heavyUpdates)
-					start(RUN_GLOBAL_UPDATES, null);
-				else
-//#endif
-				if (keepAlive || notifications)
+				if (keepAlive || notifications || globalUpdates)
 					start(RUN_KEEP_ALIVE, null);
 				break;
 			} catch (APIException e) {
@@ -1506,7 +1501,7 @@ public class MP extends MIDlet
 					((MPChat) current).sent();
 				}
 				
-				if ((reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) && !heavyUpdates) {
+				if ((reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) && !globalUpdates) {
 					// load latest messages
 					commandAction(latestCmd, current);
 				} else if (display.getCurrent() != current) {
@@ -1742,12 +1737,13 @@ public class MP extends MIDlet
 				while (keepAlive
 //#ifndef NO_NOTIFY
 						|| notifications
+						|| globalUpdates
 //#endif
 						) {
-					Thread.sleep(wasShown ? pushInterval : pushBgInterval);
+					Thread.sleep(globalUpdates ? 1 : wasShown ? pushInterval : pushBgInterval);
 					if (
 //#ifndef NO_NOTIFY
-							!notifications &&
+							(!notifications || !globalUpdates) &&
 //#endif
 							(threadConnections.size() != 0
 							|| (playerState == 1 && (reopenChat || series40))))
@@ -1769,23 +1765,25 @@ public class MP extends MIDlet
 
 //#ifndef NO_NOTIFY
 					// get notifications
-					if (!notifications && (!chatsList.isShown()))
+					if ((!notifications || !globalUpdates) && (!chatsList.isShown()))
 						continue;
-					if (updatesThread != null && !paused) {
+					if (!globalUpdates && updatesThread != null && !paused) {
 						check = true;
 						continue;
 					}
+					for (;;) {
+						try {
+							j = ((JSONObject) api("getNotifySettings"));
+							muteUsers = j.getInt("users") != 0;
+							muteChats = j.getInt("chats") != 0;
+							muteBroadcasts = j.getInt("broadcasts") != 0;
+							break;
+						} catch (Exception ignored) {
+							continue;
+						}
+					}
 					try {
 						while (check) {
-							try {
-								j = ((JSONObject) api("getNotifySettings"));
-								muteUsers = j.getInt("users") != 0;
-								muteChats = j.getInt("chats") != 0;
-								muteBroadcasts = j.getInt("broadcasts") != 0;
-							} catch (Exception ignored) {
-								continue;
-							}
-							
 							try {
 								j = ((JSONObject) api("getLastUpdate")).getObject("res");
 								int off = j.getInt("update_id");
@@ -1801,25 +1799,126 @@ public class MP extends MIDlet
 						}
 						
 						sb.setLength(0);
-						sb.append("notifications")
-						.append("&offset=").append(offset)
-						.append("&mu=").append(muteUsers ? '1' : '0')
-						.append("&mc=").append(muteChats ? '1' : '0')
-						.append("&mb=").append(muteBroadcasts ? '1' : '0')
-						;
-						if (shown) sb.append("&online=1");
+						if (globalUpdates) {
+							sb.append("updates&media=1")
+									.append("&offset=").append(offset)
+									.append("&timeout=").append(longpoll ? updatesTimeout : 1)
+									.append("&limit=200")
+									.append("&p=1&m=1")
+							;
+							if (!longpoll) {
+								sb.append("&longpoll=0");
+							} else {
+								sb.append("&delay=").append(shown ? 1 : 5);
+							}
 
-						j = (JSONObject) api(sb.toString());
-						
-						JSONArray updates = j.getArray("res");
-						
-						offset = j.getInt("offset");
-						
-						handleNotifications(updates, sb, false);
-						
+							j = (JSONObject) api(sb.toString());
+
+							if (j.has("cancel")) {
+								throw cancelException;
+							}
+
+							JSONArray updates = j.getArray("res");
+							int l = updates.size();
+
+							offset = updates.getObject(l - 1).getInt("update_id");
+
+							MPChat form = current instanceof MPChat ? (MPChat) current : null;
+
+							if (form != null && form.updating()) {
+								String peer = form.id();
+								boolean channel = form.channel();
+								boolean user = peer.charAt(0) != '-';
+								int topMsgId = form.topMsgId();
+
+								for (int i = 0; i < l; ++i) {
+									JSONObject update = updates.getObject(i);
+									update = update.getObject("update");
+									String type = update.getString("_");
+
+									JSONObject msg = update.getObject("message", null);
+
+									if (user && "updateUserStatus".equals(type)) {
+										if (!update.getString("user_id").equals(peer)) continue;
+										form.handleUpdate(MPChat.UPDATE_USER_STATUS, update);
+									} else if (user ? "updateUserTyping".equals(type)
+											: channel ? "updateChannelUserTyping".equals(type)
+											: "updateChatUserTyping".equals(type)) {
+										if (user && !update.getString("user_id").equals(peer)) continue;
+										if (channel) {
+											if (!peer.equals(update.getString("channel_id"))
+													|| (update.has("top_msg_id") && update.getInt("top_msg_id") != topMsgId)) {
+												continue;
+											}
+										} else if (!update.getString("chat_id").equals(peer)) continue;
+										form.handleUpdate(MPChat.UPDATE_USER_TYPING, update);
+									} else if (channel ? "updateNewChannelMessage".equals(type)
+											: "updateNewMessage".equals(type)) {
+										if (msg.getInt("id") <= form.firstMsgId()) continue;
+										if (user) {
+											if ((peer.equals(selfId) && !peer.equals(msg.getString("peer_id", peer)))
+													|| !msg.getString("peer_id").equals(peer) &&
+													(msg.getBoolean("out", false) || !selfId.equals(msg.getString("peer_id")) || !peer.equals(msg.getString("from_id")))) {
+												continue;
+											}
+										} else if (!peer.equals(msg.getString("peer_id"))
+												|| (msg.has("reply") && msg.getObject("reply").getInt("top") != topMsgId)) {
+											continue;
+										}
+										form.handleUpdate(MPChat.UPDATE_NEW_MESSAGE, update);
+									} else if (channel && "updateDeleteChannelMessages".equals(type)) {
+										if (!peer.equals(update.getString("channel_id"))
+												|| (update.has("top_msg_id") && update.getInt("top_msg_id") != topMsgId)) {
+											continue;
+										}
+										form.handleUpdate(MPChat.UPDATE_DELETE_MESSAGES, update);
+									} else if (channel ? "updateEditChannelMessage".equals(type)
+											: "updateEditMessage".equals(type)) {
+										if (user) {
+											if ((peer.equals(selfId) && !peer.equals(msg.getString("peer_id", peer)))
+													|| !msg.getString("peer_id").equals(peer) &&
+													(msg.getBoolean("out", false) || !selfId.equals(msg.getString("peer_id")) || !peer.equals(msg.getString("from_id")))) {
+												continue;
+											}
+										} else if (!peer.equals(msg.getString("peer_id"))
+												|| (msg.has("reply") && msg.getObject("reply").getInt("top") != topMsgId)) {
+											continue;
+										}
+										form.handleUpdate(MPChat.UPDATE_EDIT_MESSAGE, update);
+									} else if (channel ? "updateReadChannelOutbox".equals(type)
+											: "updateReadHistoryOutbox".equals(type)) {
+										if ((update.has("peer") && !update.getString("peer").equals(peer))
+												|| (update.has("channel_id") && !update.getString("channel_id").equals(peer)))
+											continue;
+										form.handleUpdate(MPChat.UPDATE_READ_OUTBOX, update);
+									} else if (!channel && "updateDeleteMessages".equals(type)) {
+										form.handleUpdate(MPChat.UPDATE_DELETE_MESSAGES, update);
+									}
+								}
+							}
+
+							handleNotifications(updates, sb, true);
+						} else {
+							sb.setLength(0);
+							sb.append("notifications")
+							.append("&offset=").append(offset)
+							.append("&mu=").append(muteUsers ? '1' : '0')
+							.append("&mc=").append(muteChats ? '1' : '0')
+							.append("&mb=").append(muteBroadcasts ? '1' : '0')
+							;
+							if (shown) sb.append("&online=1");
+
+							j = (JSONObject) api(sb.toString());
+							
+							JSONArray updates = j.getArray("res");
+							
+							offset = j.getInt("offset");
+							
+							handleNotifications(updates, sb, false);
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
-						if (e.toString().indexOf("Interrupted") != -1) {
+						if (e.toString().indexOf("Interrupted") != -1 || e == cancelException) {
 							break;
 						}
 						check = true;
@@ -1882,7 +1981,7 @@ public class MP extends MIDlet
 					} else throw e;
 				}
 
-				if ((reopenChat || !longpoll || !form.updating() || !form.endReached()) && !heavyUpdates) {
+				if ((reopenChat || !longpoll || !form.updating() || !form.endReached()) && !globalUpdates) {
 					// see ChatForm#postLoad() for answer handling
 					form.setBotAnswer(j);
 					commandAction(latestCmd, current);
@@ -1925,7 +2024,7 @@ public class MP extends MIDlet
 				String[] s = (String[]) param;
 				MP.api("pinMessage&peer=".concat(s[0].concat("&id=").concat(s[1])));
 				
-				if ((reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) && !heavyUpdates) {
+				if ((reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) && !globalUpdates) {
 					// load latest messages
 					commandAction(latestCmd, current);
 				} else if (display.getCurrent() != current) {
@@ -1949,7 +2048,7 @@ public class MP extends MIDlet
 				MP.api(sb.toString());
 				
 				goBackTo((Displayable) form.chatForm);
-				if ((reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) && !heavyUpdates) {
+				if ((reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) && !globalUpdates) {
 					// load latest messages
 					commandAction(latestCmd, (Displayable) form.chatForm);
 				}
@@ -2088,7 +2187,7 @@ public class MP extends MIDlet
 			alert.setTimeout(Alert.FOREVER);
 			display(alert, current);
 			
-			if (reopenChat && updatesThread != null && !heavyUpdates) {
+			if (reopenChat && updatesThread != null) {
 				MP.cancel(MP.updatesThread, true);
 			}
 			
@@ -2189,188 +2288,6 @@ public class MP extends MIDlet
 			writeAuth();
 			break;
 		}
-//#ifndef NO_NOTIFY
-		case RUN_GLOBAL_UPDATES: {
-			Thread thread;
-			updatesThread = updatesThreadCopy = thread = Thread.currentThread();
-			updatesRunning = true;
-			try {
-				StringBuffer sb = new StringBuffer();
-				JSONObject j;
-
-				int offset = 0;
-				int fails = 0;
-				boolean check = true;
-
-				for (; ; ) {
-					try {
-						j = ((JSONObject) api("getNotifySettings"));
-						muteUsers = j.getInt("users") != 0;
-						muteChats = j.getInt("chats") != 0;
-						muteBroadcasts = j.getInt("broadcasts") != 0;
-						break;
-					} catch (Exception ignored) {
-						continue;
-					}
-				}
-
-				while (updatesThread == thread) {
-					try {
-						boolean shown = false;
-						try {
-							Displayable c = display.getCurrent();
-							shown = !paused && c != null && c.isShown();
-						} catch (Exception ignored) {}
-
-						if (updatesThread != thread) break;
-						Thread.sleep(10);
-						if (check) {
-							sb.setLength(0);
-							sb.append("getLastUpdate");
-							try {
-								j = ((JSONObject) api(sb.toString())).getObject("res");
-								int off = j.getInt("update_id");
-								if (!j.getBoolean("exact", false))
-									off -= 1;
-								if (offset <= 0 || off < offset)
-									offset = off;
-							} catch (Exception ignored) {
-							}
-							check = false;
-						}
-						if (updatesThread != thread) break;
-
-						sb.setLength(0);
-						sb.append("updates&media=1")
-								.append("&offset=").append(offset)
-								.append("&timeout=").append(longpoll ? updatesTimeout : 1)
-								.append("&limit=200")
-								.append("&p=1&m=1")
-						;
-						if (!longpoll) {
-							sb.append("&longpoll=0");
-						} else {
-							sb.append("&delay=").append(shown ? 1 : 5);
-						}
-
-						j = (JSONObject) api(sb.toString());
-
-						if (j.has("cancel")) {
-							throw cancelException;
-						}
-
-						JSONArray updates = j.getArray("res");
-						int l = updates.size();
-
-						offset = updates.getObject(l - 1).getInt("update_id");
-
-						MPChat form = current instanceof MPChat ? (MPChat) current : null;
-
-						if (form != null && form.updating()) {
-							String peer = form.id();
-							boolean channel = form.channel();
-							boolean user = peer.charAt(0) != '-';
-							int topMsgId = form.topMsgId();
-
-							for (int i = 0; i < l; ++i) {
-								JSONObject update = updates.getObject(i);
-								offset = update.getInt("update_id");
-								update = update.getObject("update");
-								String type = update.getString("_");
-
-								JSONObject msg = update.getObject("message", null);
-
-								if (user && "updateUserStatus".equals(type)) {
-									if (!update.getString("user_id").equals(peer)) continue;
-									form.handleUpdate(MPChat.UPDATE_USER_STATUS, update);
-								} else if (user ? "updateUserTyping".equals(type)
-										: channel ? "updateChannelUserTyping".equals(type)
-										: "updateChatUserTyping".equals(type)) {
-									if (user && !update.getString("user_id").equals(peer)) continue;
-									if (channel) {
-										if (!peer.equals(update.getString("channel_id"))
-												|| (update.has("top_msg_id") && update.getInt("top_msg_id") != topMsgId)) {
-											continue;
-										}
-									} else if (!update.getString("chat_id").equals(peer)) continue;
-									form.handleUpdate(MPChat.UPDATE_USER_TYPING, update);
-								} else if (!channel ? "updateNewMessage".equals(type)
-										: "updateNewChannelMessage".equals(type)) {
-									if (msg.getInt("id") <= form.firstMsgId()) continue;
-									if (user) {
-										if (peer.equals(selfId) && (!msg.getString("peer_id", peer).equals(peer))
-												|| !msg.getString("peer_id").equals(peer) &&
-												(msg.getBoolean("out", false) || !msg.getString("peer_id").equals(selfId) || !msg.getString("from_id").equals(peer))) {
-											continue;
-										}
-									} else if (!peer.equals(msg.getString("peer_id"))
-											|| (msg.has("reply") && msg.getObject("reply").getInt("top") != topMsgId)) {
-										continue;
-									}
-									form.handleUpdate(MPChat.UPDATE_NEW_MESSAGE, update);
-								} else if (channel && "updateDeleteChannelMessages".equals(type)) {
-									if (!peer.equals(update.getString("channel_id"))
-											|| (update.has("top_msg_id") && update.getInt("top_msg_id") != topMsgId)) {
-										continue;
-									}
-									form.handleUpdate(MPChat.UPDATE_DELETE_MESSAGES, update);
-								} else if (!channel ? "updateEditMessage".equals(type)
-										: "updateEditChannelMessage".equals(type)) {
-									if (user) {
-										if (peer.equals(selfId) && (!msg.getString("peer_id", peer).equals(peer))
-												|| !msg.getString("peer_id").equals(peer) &&
-												(msg.getBoolean("out", false) || !msg.getString("peer_id").equals(selfId) || !msg.getString("from_id").equals(peer))) {
-											continue;
-										}
-									} else if (!peer.equals(msg.getString("peer_id"))
-											|| (msg.has("reply") && msg.getObject("reply").getInt("top") != topMsgId)) {
-										continue;
-									}
-									form.handleUpdate(MPChat.UPDATE_EDIT_MESSAGE, update);
-								} else if (!channel ? "updateReadHistoryOutbox".equals(type)
-										: "updateReadChannelOutbox".equals(type)) {
-									if ((update.has("peer") && !update.getString("peer").equals(peer))
-											|| (update.has("channel_id") && !update.getString("channel_id").equals(peer)))
-										continue;
-									form.handleUpdate(MPChat.UPDATE_READ_OUTBOX, update);
-								} else if ("updateDeleteMessages".equals(type)) {
-									form.handleUpdate(MPChat.UPDATE_DELETE_MESSAGES, update);
-								}
-							}
-						}
-
-						handleNotifications(updates, sb, true);
-
-						if (!longpoll) {
-							updatesSleeping = true;
-							Thread.sleep(updatesTimeout * 1000L);
-							updatesSleeping = false;
-						} else {
-							Thread.sleep(1);
-						}
-					} catch (Exception e) {
-						if (e.toString().indexOf("Interrupted") != -1 || e == cancelException) {
-							break;
-						}
-						e.printStackTrace();
-						fails++;
-						check = true;
-						updatesSleeping = true;
-						Thread.sleep(updatesDelay);
-						updatesSleeping = false;
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				if (updatesThread == thread)
-					updatesThread = null;
-				updatesRunning = false;
-				updatesSleeping = false;
-			}
-			break;
-		}
-//#endif
 		}
 //		running--;
 	}
@@ -3478,7 +3395,7 @@ public class MP extends MIDlet
 				}
 
 				display(loadingAlert(L[LSending]), d);
-				if ((reopenChat || !longpoll || sendFile != null) && MP.updatesThread != null && !heavyUpdates) {
+				if ((reopenChat || !longpoll || sendFile != null) && MP.updatesThread != null) {
 					MP.cancel(MP.updatesThread, true);
 				}
 				start(RUN_SEND_MESSAGE, new Object[] { t, writeTo, replyTo, edit, sendFile, sendChoice, fwdPeer, fwdMsg });
@@ -3999,7 +3916,7 @@ public class MP extends MIDlet
 					sending = true;
 				}
 
-				if ((reopenChat || !longpoll) && !heavyUpdates) {
+				if ((reopenChat || !longpoll) && !globalUpdates) {
 					display(loadingAlert(L[LSending]), current);
 					if (MP.updatesThread != null) {
 						MP.cancel(MP.updatesThread, true);
