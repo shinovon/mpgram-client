@@ -154,13 +154,7 @@ public class ChatsList extends MPList {
 					sb.append(" (").append(MP.L[LAdmin]).append(')');
 				}
 				
-				int itemIdx = safeAppend(thread, sb.toString(), null);
-				if (MP.chatsListFontSize != 0) {
-					setFont(itemIdx, MP.chatsListFontSize == 1 ? MP.smallPlainFont : MP.medPlainFont);
-				}
-				
-				if (noAvas || !MP.loadAvatars) continue;
-				MP.queueAvatar(id, new Object[] { this, new Integer(itemIdx) });
+				insert(thread, size(), sb.toString(), id);
 			}
 			
 			if (l == limit && j.has("count")) {
@@ -219,6 +213,7 @@ public class ChatsList extends MPList {
 		}
 	}
 	
+//#ifndef NO_AVATARS
 	void setImage(String id, Image img) {
 		synchronized (lock) {
 			int i = ids.indexOf(id);
@@ -227,6 +222,7 @@ public class ChatsList extends MPList {
 			super.set(i, getString(i), img);
 		}
 	}
+//#endif
 	
 	void select(int i) {
 		if (i == -1) return;

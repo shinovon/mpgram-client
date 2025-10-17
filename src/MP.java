@@ -2396,21 +2396,23 @@ public class MP extends MIDlet
 				String title = sb.toString();
 				
 				if (globalUpdates && chatsList != null) {
-					synchronized (chatsList.lock) {
-						Vector ids = chatsList.ids;
-						int idx = ids.indexOf(peerId);
-						int newIdx;
-						if (idx != -1) {
-							ids.removeElementAt(idx);
-							chatsList.delete(idx);
-							newIdx = Math.min(chatsList.size(), idx < chatsList.pinnedCount ? 0 : chatsList.pinnedCount);
-
-							chatsList.insert(null, newIdx, sb.append('\n').append(text).toString(), peerId);
-							ids.insertElementAt(peerId, newIdx);
-//						} else {
-//							newIdx = Math.min(chatsList.size(), chatsList.pinnedCount);
+					try {
+						synchronized (chatsList.lock) {
+							Vector ids = chatsList.ids;
+							int idx = ids.indexOf(peerId);
+							int newIdx;
+							if (idx != -1) {
+								ids.removeElementAt(idx);
+								chatsList.delete(idx);
+								newIdx = Math.min(chatsList.size(), idx < chatsList.pinnedCount ? 0 : chatsList.pinnedCount);
+	
+								chatsList.insert(null, newIdx, sb.append('\n').append(text).toString(), peerId);
+								ids.insertElementAt(peerId, newIdx);
+//							} else {
+//								newIdx = Math.min(chatsList.size(), chatsList.pinnedCount);
+							}
 						}
-					}
+					} catch (Exception ignored) {}
 				}
 
 				if (!paused && current instanceof MPChat && current.isShown() && peerId.equals(((MPChat) current).id())) {
