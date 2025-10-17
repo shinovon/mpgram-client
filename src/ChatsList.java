@@ -21,6 +21,7 @@ SOFTWARE.
 */
 import java.util.Vector;
 
+import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.List;
 
 public class ChatsList extends MPList {
@@ -41,6 +42,7 @@ public class ChatsList extends MPList {
 //#ifndef NO_CHAT_CANVAS
 	UIMessage[] msgs;
 //#endif
+	Object lock = new Object();
 
 	// main mode
 	public ChatsList(String title, int folder) {
@@ -204,15 +206,26 @@ public class ChatsList extends MPList {
 	}
 	
 	void insert(Thread thread, int idx, String s, String id) {
-		safeInsert(thread, idx, s, null);
-		if (MP.chatsListFontSize != 0) {
-			try {
-				setFont(idx, MP.chatsListFontSize == 1 ? MP.smallPlainFont : MP.medPlainFont);
-			} catch (Exception ignored) {}
+		synchronized (lock) {
+			safeInsert(thread, idx, s, null);
+			if (MP.chatsListFontSize != 0) {
+				try {
+					setFont(idx, MP.chatsListFontSize == 1 ? MP.smallPlainFont : MP.medPlainFont);
+				} catch (Exception ignored) {}
+			}
+			
+			if (noAvas || !MP.loadAvatars) return;
+			MP.queueAvatar(id, new Object[] { this, id });
 		}
-		
-		if (noAvas || !MP.loadAvatars) return;
-		MP.queueAvatar(id, new Object[] { this, new Integer(idx) });
+	}
+	
+	void setImage(String id, Image img) {
+		synchronized (lock) {
+			int i = ids.indexOf(id);
+			if (i == -1) return;
+			
+			super.set(i, getString(i), img);
+		}
 	}
 	
 	void select(int i) {

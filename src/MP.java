@@ -260,7 +260,7 @@ public class MP extends MIDlet
 	static boolean notifyAvas = true;
 	static int notificationVolume = 100;
 //#endif
-	static boolean globalUpdates = true;
+	static boolean globalUpdates;
 //#ifndef NO_CHAT_CANVAS
 	static boolean legacyChatUI;
 //#endif
@@ -785,6 +785,7 @@ public class MP extends MIDlet
 			pushInterval = j.getLong("pushInterval", pushInterval);
 			pushBgInterval = j.getLong("pushBgInterval", pushBgInterval);
 			notifyMethod = j.getInt("notifyMethod", notifyMethod);
+			notificationVolume = j.getInt("notifyVolume", notificationVolume);
 //#endif
 //#ifndef NO_CHAT_CANVAS
 			legacyChatUI = j.getBoolean("legacyChatUI", legacyChatUI);
@@ -1740,6 +1741,18 @@ public class MP extends MIDlet
 				boolean wasShown = false;
 				StringBuffer sb = new StringBuffer();
 				JSONObject j;
+
+				while (notifications) {
+					try {
+						j = ((JSONObject) api("getNotifySettings"));
+						muteUsers = j.getInt("users") != 0;
+						muteChats = j.getInt("chats") != 0;
+						muteBroadcasts = j.getInt("broadcasts") != 0;
+						break;
+					} catch (Exception ignored) {
+						continue;
+					}
+				}
 				
 				int offset = 0;
 				boolean check = true;
@@ -1758,12 +1771,15 @@ public class MP extends MIDlet
 							|| (playerState == 1 && (reopenChat || series40))))
 						continue;
 					
-					// update status
 					boolean shown = false;
-					if (keepAlive) {
+					try {
+						Displayable c = display.getCurrent();
+						shown = !paused && c != null && c.isShown();
+					} catch (Exception ignored) {}
+
+					// update status
+					if (keepAlive && !globalUpdates) {
 						try {
-							Displayable c = display.getCurrent();
-							shown = !paused && c != null && c.isShown();
 							if ((shown && !notifications) || wasShown != shown) {
 								api(wasShown != shown ?
 									("updateStatus".concat(!shown ? "&off=1" : "")) : "me");
@@ -1779,17 +1795,6 @@ public class MP extends MIDlet
 							continue;
 						if (updatesThread != null && !paused) {
 							check = true;
-							continue;
-						}
-					}
-					for (;;) {
-						try {
-							j = ((JSONObject) api("getNotifySettings"));
-							muteUsers = j.getInt("users") != 0;
-							muteChats = j.getInt("chats") != 0;
-							muteBroadcasts = j.getInt("broadcasts") != 0;
-							break;
-						} catch (Exception ignored) {
 							continue;
 						}
 					}
@@ -2312,6 +2317,18 @@ public class MP extends MIDlet
 			JSONObject update = updates.getObject(i);
 			if (update.has("update")) update = update.getObject("update");
 			String type = update.getString("_");
+			if ("updateReadChannelOutbox".equals(type) || "updateReadHistoryOutbox".equals(type)) {
+				String peerId = update.getString("peer", update.getString("channel_id", null));
+				if (peerId == null) continue;
+				
+//#ifndef NO_NOKIAUI
+				try {
+					Notifier.remove(peerId);
+				} catch (Throwable ignored) {}
+				notificationMessages.remove(peerId);
+//#endif
+				continue;
+			}
 			if (!"updateNewMessage".equals(type) && !"updateNewChannelMessage".equals(type))
 				continue;
 
@@ -2325,14 +2342,13 @@ public class MP extends MIDlet
 
 			if (msg.getBoolean("out", false)
 					|| update.getBoolean("muted", false)
-					|| msg.getBoolean("silent", false))
-				continue;
-
-			if (global && (update.has("left")
+					|| msg.getBoolean("silent", false)
+				    || (global && (update.has("left")
 					|| (!msg.getBoolean("mentioned", false)
 					&& (update.has("mute_until") || update.has("broadcast") ?
-					muteBroadcasts : update.has("chat") ? muteChats : muteUsers)))) {
-				continue;
+					muteBroadcasts : update.has("chat") ? muteChats : muteUsers))))) {
+				if (!global || update.has("left")) continue;
+				msg.put("muted", true);
 			}
 
 			if (newMsgs == null) {
@@ -2344,12 +2360,6 @@ public class MP extends MIDlet
 
 			msg.put("peer_id", peerId);
 			msg.put("text", text);
-			int count = 0;
-//#ifndef NO_NOKIAUI
-			if (notificationMessages.containsKey(peerId)) {
-				count = ((JSONObject) notificationMessages.get(peerId)).getInt("count", 0);
-			}
-//#endif
 
 			// filter latest messages
 			f: {
@@ -2357,12 +2367,10 @@ public class MP extends MIDlet
 				for (int m = 0; m < n; ++m) {
 					JSONObject t = newMsgs.getObject(m);
 					if (peerId.equals(t.getString("peer_id"))) {
-						msg.put("count", ++count);
 						newMsgs.set(m, msg);
 						break f;
 					}
 				}
-				msg.put("count", ++count);
 				newMsgs.add(msg);
 			}
 //#ifndef NO_NOKIAUI
@@ -2381,11 +2389,29 @@ public class MP extends MIDlet
 
 				sb.setLength(0);
 				sb.append(getName(peerId, false));
-				int count = msg.getInt("count", 0);
-				if (count > 1) {
+				int count = msg.getInt("unread", 0);
+				if (count != 0) {
 					sb.append(" +").append(count);
 				}
 				String title = sb.toString();
+				
+				if (globalUpdates && chatsList != null) {
+					synchronized (chatsList.lock) {
+						Vector ids = chatsList.ids;
+						int idx = ids.indexOf(peerId);
+						int newIdx;
+						if (idx != -1) {
+							ids.removeElementAt(idx);
+							chatsList.delete(idx);
+							newIdx = Math.min(chatsList.size(), idx < chatsList.pinnedCount ? 0 : chatsList.pinnedCount);
+
+							chatsList.insert(null, newIdx, sb.append('\n').append(text).toString(), peerId);
+							ids.insertElementAt(peerId, newIdx);
+//						} else {
+//							newIdx = Math.min(chatsList.size(), chatsList.pinnedCount);
+						}
+					}
+				}
 
 				if (!paused && current instanceof MPChat && current.isShown() && peerId.equals(((MPChat) current).id())) {
 //#ifndef NO_NOKIAUI
@@ -2397,6 +2423,7 @@ public class MP extends MIDlet
 					continue;
 				}
 
+				if (!notifications || msg.has("muted")) continue;
 				if (notifyMethod != 0) {
 //#ifndef NO_NOKIAUI
 					if (notifyMethod != 1) {
@@ -3266,6 +3293,7 @@ public class MP extends MIDlet
 					j.put("pushInterval", pushInterval);
 					j.put("pushBgInterval", pushBgInterval);
 					j.put("notifyMethod", notifyMethod);
+					j.put("notifyVolume", notificationVolume);
 //#endif
 //#ifndef NO_CHAT_CANVAS
 					j.put("legacyChatUI", legacyChatUI);
@@ -4287,6 +4315,10 @@ public class MP extends MIDlet
 			// list item
 			if (((Object[]) target)[0] instanceof List) {
 				List list = ((List) ((Object[]) target)[0]);
+				if (((Object[]) target)[1] instanceof String) {
+					((ChatsList) list).setImage((String) ((Object[]) target)[1], img);
+					return;
+				}
 				int idx = (((Integer) ((Object[]) target)[1])).intValue();
 				list.set(idx, list.getString(idx), img);
 				return;
