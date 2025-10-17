@@ -1074,9 +1074,12 @@ public class MP extends MIDlet
 					start(RUN_CHECK_OTA, null);
 				}
 
+//#ifndef NO_NOTIFY
 				if (heavyUpdates)
 					start(RUN_GLOBAL_UPDATES, null);
-				else if (keepAlive || notifications)
+				else
+//#endif
+				if (keepAlive || notifications)
 					start(RUN_KEEP_ALIVE, null);
 				break;
 			} catch (APIException e) {
@@ -1754,7 +1757,8 @@ public class MP extends MIDlet
 					boolean shown = false;
 					if (keepAlive) {
 						try {
-							shown = !paused && display.getCurrent().isShown();
+							Displayable c = display.getCurrent();
+							shown = !paused && c != null && c.isShown();
 							if ((shown && !notifications) || wasShown != shown) {
 								api(wasShown != shown ?
 									("updateStatus".concat(!shown ? "&off=1" : "")) : "me");
@@ -2185,6 +2189,7 @@ public class MP extends MIDlet
 			writeAuth();
 			break;
 		}
+//#ifndef NO_NOTIFY
 		case RUN_GLOBAL_UPDATES: {
 			Thread thread;
 			updatesThread = updatesThreadCopy = thread = Thread.currentThread();
@@ -2196,8 +2201,27 @@ public class MP extends MIDlet
 				int offset = 0;
 				int fails = 0;
 				boolean check = true;
+
+				for (; ; ) {
+					try {
+						j = ((JSONObject) api("getNotifySettings"));
+						muteUsers = j.getInt("users") != 0;
+						muteChats = j.getInt("chats") != 0;
+						muteBroadcasts = j.getInt("broadcasts") != 0;
+						break;
+					} catch (Exception ignored) {
+						continue;
+					}
+				}
+
 				while (updatesThread == thread) {
 					try {
+						boolean shown = false;
+						try {
+							Displayable c = display.getCurrent();
+							shown = !paused && c != null && c.isShown();
+						} catch (Exception ignored) {}
+
 						if (updatesThread != thread) break;
 						Thread.sleep(10);
 						if (check) {
@@ -2210,7 +2234,8 @@ public class MP extends MIDlet
 									off -= 1;
 								if (offset <= 0 || off < offset)
 									offset = off;
-							} catch (Exception ignored) {}
+							} catch (Exception ignored) {
+							}
 							check = false;
 						}
 						if (updatesThread != thread) break;
@@ -2220,20 +2245,15 @@ public class MP extends MIDlet
 								.append("&offset=").append(offset)
 								.append("&timeout=").append(longpoll ? updatesTimeout : 1)
 								.append("&limit=200")
-								.append("&types=" +
-										"updateUserStatus,updateUserTyping,updateChatUserTyping,updateChannelUserTyping," +
-										"updateNewMessage,updateNewChannelMessage," +
-										"updateDeleteChannelMessages,updateDeleteMessages," +
-										"updateEditMessage,updateEditChannelMessage," +
-										"updateReadHistoryOutbox,updateReadChannelOutbox")
+								.append("&p=1&m=1")
 						;
 						if (!longpoll) {
 							sb.append("&longpoll=0");
+						} else {
+							sb.append("&delay=").append(shown ? 1 : 5);
 						}
 
 						j = (JSONObject) api(sb.toString());
-
-						System.out.println(j);
 
 						if (j.has("cancel")) {
 							throw cancelException;
@@ -2242,9 +2262,11 @@ public class MP extends MIDlet
 						JSONArray updates = j.getArray("res");
 						int l = updates.size();
 
+						offset = updates.getObject(l - 1).getInt("update_id");
+
 						MPChat form = current instanceof MPChat ? (MPChat) current : null;
 
-						if (form != null) {
+						if (form != null && form.updating()) {
 							String peer = form.id();
 							boolean channel = form.channel();
 							boolean user = peer.charAt(0) != '-';
@@ -2277,7 +2299,7 @@ public class MP extends MIDlet
 									if (msg.getInt("id") <= form.firstMsgId()) continue;
 									if (user) {
 										if (peer.equals(selfId) && (!msg.getString("peer_id", peer).equals(peer))
-											|| !msg.getString("peer_id").equals(peer) &&
+												|| !msg.getString("peer_id").equals(peer) &&
 												(msg.getBoolean("out", false) || !msg.getString("peer_id").equals(selfId) || !msg.getString("from_id").equals(peer))) {
 											continue;
 										}
@@ -2308,7 +2330,7 @@ public class MP extends MIDlet
 								} else if (!channel ? "updateReadHistoryOutbox".equals(type)
 										: "updateReadChannelOutbox".equals(type)) {
 									if ((update.has("peer") && !update.getString("peer").equals(peer))
-										|| (update.has("channel_id") && !update.getString("channel_id").equals(peer)))
+											|| (update.has("channel_id") && !update.getString("channel_id").equals(peer)))
 										continue;
 									form.handleUpdate(MPChat.UPDATE_READ_OUTBOX, update);
 								} else if ("updateDeleteMessages".equals(type)) {
@@ -2317,7 +2339,7 @@ public class MP extends MIDlet
 							}
 						}
 
-//						handleNotifications(updates, sb, true);
+						handleNotifications(updates, sb, true);
 
 						if (!longpoll) {
 							updatesSleeping = true;
@@ -2348,13 +2370,15 @@ public class MP extends MIDlet
 			}
 			break;
 		}
+//#endif
 		}
 //		running--;
 	}
 
+//#ifndef NO_NOTIFY
 	void handleNotifications(JSONArray updates, StringBuffer sb, boolean global) {
 		int l = updates.size();
-		JSONArray newMsgs = new JSONArray();
+		JSONArray newMsgs = null;
 
 		for (int i = 0; i < l; ++i) {
 			JSONObject update = updates.getObject(i);
@@ -2371,14 +2395,24 @@ public class MP extends MIDlet
 			}
 			sb.setLength(0);
 
-			JSONObject peer = getPeer(peerId, true);
-			String text = appendDialog(sb, peer, peerId, msg).toString();
-
 			if (msg.getBoolean("out", false)
 					|| update.getBoolean("muted", false)
 					|| msg.getBoolean("silent", false))
-//								msg.put("muted", true);
 				continue;
+
+			if (global && (update.has("left")
+					|| (!msg.getBoolean("mentioned", false)
+					&& (update.has("mute_until") || update.has("broadcast") ?
+					muteBroadcasts : update.has("chat") ? muteChats : muteUsers)))) {
+				continue;
+			}
+
+			if (newMsgs == null) {
+				newMsgs = new JSONArray();
+			}
+
+			JSONObject peer = getPeer(peerId, true);
+			String text = appendDialog(sb, peer, peerId, msg).toString();
 
 			msg.put("peer_id", peerId);
 			msg.put("text", text);
@@ -2408,7 +2442,7 @@ public class MP extends MIDlet
 //#endif
 		}
 
-		if (newMsgs.size() != 0) {
+		if (newMsgs != null && newMsgs.size() != 0) {
 			boolean notified = false;
 
 			l = newMsgs.size();
@@ -2478,6 +2512,7 @@ public class MP extends MIDlet
 			}
 		}
 	}
+//#endif
 
 	Thread start(int i, Object param) {
 		Thread t = null;
@@ -2493,7 +2528,6 @@ public class MP extends MIDlet
 	}
 	
 	static void cancel(Thread thread, boolean updates) {
-		new Exception().printStackTrace();
 		if (thread == null) return;
 		if (updates) updatesThread = null;
 		Connection c = (Connection) threadConnections.get(thread);
