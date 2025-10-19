@@ -1112,10 +1112,12 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 					wasHoldingShift = holdingShift = true;
 				} else if(key != '*' && key >= 32) {
 					if(canvas != null) {
-						String keyName = canvas.getKeyName(key);
-						if(keyName.length() == 1) {
-							type(keyName.charAt(0));
-						}
+						try {
+							String keyName = canvas.getKeyName(key);
+							if (keyName.length() == 1) {
+								type(keyName.charAt(0));
+							}
+						} catch (Exception ignored) {}
 					} else {
 						type((char) key);
 					}
@@ -1239,10 +1241,12 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 				default:
 					if(key >= 32) {
 						if(canvas != null) {
-							String keyName = canvas.getKeyName(key);
-							if(keyName.length() == 1) {
-								type(keyName.charAt(0));
-							}
+							try {
+								String keyName = canvas.getKeyName(key);
+								if (keyName.length() == 1) {
+									type(keyName.charAt(0));
+								}
+							} catch (Exception ignored) {}
 						} else {
 							type((char) key);
 						}
