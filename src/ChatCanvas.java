@@ -1005,7 +1005,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						bh -= 1;
 						g.drawString(MP.L[LMenu], 2, h - bh, Graphics.TOP | Graphics.LEFT);
 						g.drawString(MP.L[LEdit], w >> 1, h - bh, Graphics.TOP | Graphics.HCENTER);
-						g.drawString(MP.L[keyboard != null && text.length() != 0 ? LClear : LCancel], w - 2, h - bh, Graphics.TOP | Graphics.RIGHT);
+						g.drawString(MP.L[keyboard != null && text != null && text.length() != 0 ? LClear : LCancel], w - 2, h - bh, Graphics.TOP | Graphics.RIGHT);
 					}
 					if (bottomAnimTarget != -1) {
 						// don't draw input field when animation is in progress
@@ -2050,6 +2050,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		}
 		if (y < scroll || y > clipHeight + scroll) return null;
 		UIItem item = firstItem;
+		if (item == null) return null;
 		do {
 			if (y >= item.y && y < item.y + item.contentHeight) {
 				return item;
@@ -2408,7 +2409,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 
 	public void sent() {
 		resetInput();
-		queueRepaint();
+		if (!MP.reopenChat && MP.longpoll && update) queueRepaint();
 	}
 
 	public void handleUpdate(int type, JSONObject update) {
