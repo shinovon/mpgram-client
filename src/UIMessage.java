@@ -323,6 +323,8 @@ public class UIMessage extends UIItem implements LangConstants {
 							|| ("image/webp".equals(t) && "sticker.webp".equals(media.getString("name", null)))) {
 						sticker = true;
 						if (MP.loadThumbs) {
+							photoRawWidth = media.getInt("w", 0);
+							photoRawHeight = media.getInt("h", 0);
 							if (!MP.lazyLoading) loadImage();
 						} else {
 							mediaTitle = MP.L[LSticker];
