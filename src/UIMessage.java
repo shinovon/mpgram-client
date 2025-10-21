@@ -535,7 +535,8 @@ public class UIMessage extends UIItem implements LangConstants {
 		h -= MARGIN_TOP;
 		
 		g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_BG : COLOR_MESSAGE_BG]);
-		if (ChatCanvas.style[STYLE_MESSAGE_FILL] != 0 && (!sticker || commentsText != null)) {
+		boolean bg;
+		if ((bg = (ChatCanvas.style[STYLE_MESSAGE_FILL] != 0 && (!sticker || commentsText != null)))) {
 			g.fillRect(x, y, cw, h);
 		}
 		if (focus && focusChild == null && subFocusCurrent == -1 && focusDir != 0) {
@@ -717,13 +718,13 @@ public class UIMessage extends UIItem implements LangConstants {
 			if (read) {
 				g.setColor(ChatCanvas.colors[COLOR_MESSAGE_OUT_READ]);
 				g.fillTriangle(tx, ty, tx + 9, ty + 10, tx + 19, ty);
-				g.setColor(ChatCanvas.colors[ChatCanvas.style[STYLE_MESSAGE_FILL] != 0 ? (out ? COLOR_MESSAGE_OUT_BG : COLOR_MESSAGE_BG) : ChatCanvas.COLOR_CHAT_BG]);
+				g.setColor(ChatCanvas.colors[bg ? (out ? COLOR_MESSAGE_OUT_BG : COLOR_MESSAGE_BG) : ChatCanvas.COLOR_CHAT_BG]);
 				g.fillTriangle(tx + 2, ty, tx + 9, ty + 10 - 2, tx + 19 - 2, ty);
 			}
 			tx -= 3;
 			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_OUT_READ]);
 			g.fillTriangle(tx, ty, tx + 9, ty + 10, tx + 19, ty);
-			g.setColor(ChatCanvas.colors[ChatCanvas.style[STYLE_MESSAGE_FILL] != 0 ? (out ? COLOR_MESSAGE_OUT_BG : COLOR_MESSAGE_BG) : ChatCanvas.COLOR_CHAT_BG]);
+			g.setColor(ChatCanvas.colors[bg ? (out ? COLOR_MESSAGE_OUT_BG : COLOR_MESSAGE_BG) : ChatCanvas.COLOR_CHAT_BG]);
 			g.fillTriangle(tx + 2, ty, tx + 9, ty + 10 - 2, tx + 19 - 2, ty);
 			g.fillRect(tx, ty, 9, 6);
 		}
