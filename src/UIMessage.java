@@ -448,27 +448,31 @@ public class UIMessage extends UIItem implements LangConstants {
 
 			// buttons
 			if (message.has("markup")) {
-				subFocus[order++] = FOCUS_REPLY_MARKUP;
-
 				JSONArray markup = message.getArray("markup");
 				int rows = markup.size();
 
-				this.replyMarkup = new String[rows][][];
-				for (int i = 0; i < rows; ++i) {
-					JSONArray markupRow = markup.getArray(i);
-					int cols = markupRow.size();
-					this.replyMarkup[i] = new String[cols][];
+				if (rows != 0) {
+					subFocus[order++] = FOCUS_REPLY_MARKUP;
 
-					for (int j = 0; j < cols; ++j) {
-						JSONObject markupItem = markupRow.getObject(j);
+					this.replyMarkup = new String[rows][][];
+					for (int i = 0; i < rows; ++i) {
+						JSONArray markupRow = markup.getArray(i);
+						int cols = markupRow.size();
+						this.replyMarkup[i] = new String[cols][];
 
-						String t = markupItem.getString("text");
-						if (markupItem.has("data")) {
-							this.replyMarkup[i][j] = new String[] { t, "", markupItem.getString("data") };
-						} else if (markupItem.has("url")) {
-							this.replyMarkup[i][j] = new String[] { t, markupItem.getString("url") };
+						for (int j = 0; j < cols; ++j) {
+							JSONObject markupItem = markupRow.getObject(j);
+
+							String t = markupItem.getString("text");
+							if (markupItem.has("data")) {
+								this.replyMarkup[i][j] = new String[] { t, "", markupItem.getString("data") };
+							} else if (markupItem.has("url")) {
+								this.replyMarkup[i][j] = new String[] { t, markupItem.getString("url") };
+							}
 						}
 					}
+				} else {
+					replyMarkup = null;
 				}
 			} else {
 				replyMarkup = null;
@@ -1146,7 +1150,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			}
 			break;
 		case FOCUS_REPLY_MARKUP:
-			if (focusedButton == null && dir != 0) {
+			if (focusedButton == null && dir != 0 && replyMarkup != null) {
 				if (dir == Canvas.UP) {
 					Object[][] r = replyMarkup[replyMarkup.length - 1];
 					focusedButton = r[r.length - 1];
