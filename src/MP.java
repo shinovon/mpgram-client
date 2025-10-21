@@ -109,7 +109,6 @@ public class MP extends MIDlet
 	static final int RUN_CANCEL_UPDATES = 25;
 	static final int RUN_DOWNLOAD_DOCUMENT = 26;
 	static final int RUN_LOGOUT = 27;
-	static final int RUN_GLOBAL_UPDATES = 28;
 	
 	static final long ZERO_CHANNEL_ID = -1000000000000L;
 	
@@ -1691,15 +1690,15 @@ public class MP extends MIDlet
 							Thread.sleep(updatesTimeout * 1000L);
 							updatesSleeping = false;
 						}
+						if (fails != 0) --fails;
 					} catch (Exception e) {
 						if (e.toString().indexOf("Interrupted") != -1 || e == cancelException) {
 							form.setUpdate(false);
 							break;
 						}
 						e.printStackTrace();
-						fails++;
 						check = true;
-						if (fails >= 5 && form.updating()) {
+						if (++fails >= 5 && form.updating()) {
 							form.setUpdate(false);
 							if (form.isShown()) {
 								display(errorAlert("Updates thread died!\n".concat(e.toString())), null);
@@ -1978,7 +1977,7 @@ public class MP extends MIDlet
 			form.setTicker(ticker = new Ticker(MP.L[LSending]));
 			
 			try {
-				StringBuffer sb = new StringBuffer("botCallback&timeout=1&r=")
+				StringBuffer sb = new StringBuffer("sendBotCallback&timeout=1&r=")
 				.append(System.currentTimeMillis())
 				.append("&peer=").append(((String[]) param)[0])
 				.append("&id=").append(((String[]) param)[1])
@@ -3129,13 +3128,13 @@ public class MP extends MIDlet
 					s = new StringItem(null, "Show user code", Item.BUTTON);
 					s.setDefaultCommand(exportSessionCmd);
 					s.setItemCommandListener(this);
-					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(s);
 					
 					s = new StringItem(null, L[LLogout], Item.BUTTON);
 					s.setDefaultCommand(logoutCmd);
 					s.setItemCommandListener(this);
-					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(s);
 					
 					settingsForm = f;
@@ -4701,25 +4700,25 @@ public class MP extends MIDlet
 		f.append(playerProgress = g);
 		
 		s = new StringItem(null, L[LPrev_Player], Item.BUTTON);
-		s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE);
+		s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE);
 		s.setDefaultCommand(playlistPrevCmd);
 		s.setItemCommandListener(midlet);
 		f.append(s);
 		
 		s = new StringItem(null, L[LPlay_Player], Item.BUTTON);
-		s.setLayout(Item.LAYOUT_LEFT);
+		s.setLayout(Item.LAYOUT_CENTER);
 		s.setDefaultCommand(playlistPlayCmd);
 		s.setItemCommandListener(midlet);
 		f.append(playerPlaypauseBtn = s);
 		
 		s = new StringItem(null, L[LNext_Player], Item.BUTTON);
-		s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_AFTER);
+		s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_AFTER);
 		s.setDefaultCommand(playlistNextCmd);
 		s.setItemCommandListener(midlet);
 		f.append(s);
 		
 		g = new Gauge(L[LVolume], true, 100, playerVolume);
-		g.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_EXPAND);
+		g.setLayout(Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_EXPAND);
 		f.append(playerVolumeGauge = g);
 		
 		return playerForm = f;
@@ -5283,9 +5282,19 @@ public class MP extends MIDlet
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e.toString());
 			}
-			threadConnections.put(thread, hc = openHttpConnection(t));
-			hc.setRequestMethod("GET");
-			int c = hc.getResponseCode();
+
+			int c;
+			try {
+				threadConnections.put(thread, hc = openHttpConnection(t));
+				hc.setRequestMethod("GET");
+				c = hc.getResponseCode();
+			} catch (IOException e) {
+				if (e.toString().indexOf("-36") != -1) {
+					c = 504;
+				} else {
+					throw e;
+				}
+			}
 			
 			// repeat request on server timeout
 			if ((c == 502 || c == 504)
@@ -5298,8 +5307,8 @@ public class MP extends MIDlet
 				} catch (InterruptedException e) {
 					throw new RuntimeException(e.toString());
 				}
-				
-				hc = openHttpConnection(t);
+
+				threadConnections.put(thread, hc = openHttpConnection(t));
 				hc.setRequestMethod("GET");
 				
 				c = hc.getResponseCode();
@@ -5314,30 +5323,9 @@ public class MP extends MIDlet
 					voiceConversion = true;
 				}
 			} catch (Exception ignored) {}
-			
-			try {
-				threadConnections.put(hc, in = openInputStream(hc));
-				if (jsonStream && (!url.startsWith("updates") || !series40)) {
-					res = getJSONStream(in).nextValue();
-				} else {
-					res = parseJSON(readUtf(in, (int) hc.getLength()));
-				}
-			} catch (RuntimeException e) {
-				if (c >= 400) {
-					String r = null;
-					if (c >= 520) {
-						r = "Cloudflare: web server is down";
-					} else {
-						try {
-							r = hc.getResponseMessage();
-						} catch (Exception ignored) {}
-					}
-					throw new APIException(url, c, r);
-				} else throw e;
-			}
-			if (c >= 400 || (res instanceof JSONObject && ((JSONObject) res).has("error"))) {
-				throw new APIException(url, c, res);
-			}
+
+			threadConnections.put(hc, in = openInputStream(hc));
+			res = readResponse(in, hc, c, url);
 		} finally {
 			threadConnections.remove(thread);
 			if (hc != null) {
@@ -5470,23 +5458,8 @@ public class MP extends MIDlet
 				httpOut.close();
 			}
 			if (!sending) throw cancelException;
-			
-			int c = http.getResponseCode();
-			try {
-				if (jsonStream) {
-					res = getJSONStream(httpIn = openInputStream(http)).nextValue();
-				} else {
-					res = parseJSON(readUtf(httpIn = openInputStream(http), (int) http.getLength()));
-				}
-			} catch (RuntimeException e) {
-				if (c >= 400) {
-					throw new APIException(url, c, null);
-				} else throw e;
-			}
-			if (c >= 400 || (res instanceof JSONObject && ((JSONObject) res).has("error"))) {
-				throw new APIException(url, c, res);
-			}
-			return res;
+
+			return readResponse(httpIn = openInputStream(http), http, http.getResponseCode(), url);
 		} finally {
 			if (file != null) try {
 				file.close();
@@ -5500,6 +5473,33 @@ public class MP extends MIDlet
 		}
 	}
 //#endif
+
+	private static Object readResponse(InputStream in, HttpConnection hc, int c, String url) throws IOException {
+		Object res;
+		try {
+			if (jsonStream && (!url.startsWith("updates") || !series40)) {
+				res = getJSONStream(in).nextValue();
+			} else {
+				res = parseJSON(readUtf(in, (int) hc.getLength()));
+			}
+		} catch (RuntimeException e) {
+			if (c >= 400) {
+				String r = null;
+				if (c >= 520) {
+					r = "Cloudflare: web server is down";
+				} else {
+					try {
+						r = hc.getResponseMessage();
+					} catch (Exception ignored) {}
+				}
+				throw new APIException(url, c, r);
+			} else throw e;
+		}
+		if (c >= 400 || (res instanceof JSONObject && ((JSONObject) res).has("error"))) {
+			throw new APIException(url, c, res);
+		}
+		return res;
+	}
 
 	static Image getImage(String url) throws IOException {
 		byte[] b = get(url);
@@ -5518,16 +5518,16 @@ public class MP extends MIDlet
 		return new String(buf, 0, i, encoding);
 	}
 	
-	private static byte[] readBytes(InputStream inputStream, int initialSize, int bufferSize, int expandSize)
+	private static byte[] readBytes(InputStream inputStream, int initialSize)
 			throws IOException {
-		if (initialSize <= 0) initialSize = bufferSize;
+		if (initialSize <= 0) initialSize = 8192;
 		byte[] buf = new byte[initialSize];
 		int count = 0;
-		byte[] readBuf = new byte[bufferSize];
+		byte[] readBuf = new byte[8192];
 		int readLen;
 		while ((readLen = inputStream.read(readBuf)) != -1) {
 			if (count + readLen > buf.length) {
-				System.arraycopy(buf, 0, buf = new byte[count + expandSize], 0, count);
+				System.arraycopy(buf, 0, buf = new byte[count + 16384], 0, count);
 			}
 			System.arraycopy(readBuf, 0, buf, count, readLen);
 			count += readLen;
@@ -5550,7 +5550,7 @@ public class MP extends MIDlet
 			if ((r = hc.getResponseCode()) >= 400) {
 				throw new IOException("HTTP ".concat(Integer.toString(r)));
 			}
-			return readBytes(in = openInputStream(hc), (int) hc.getLength(), 8*1024, 16*1024);
+			return readBytes(in = openInputStream(hc), (int) hc.getLength());
 		} finally {
 			try {
 				if (in != null) in.close();
