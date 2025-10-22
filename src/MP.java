@@ -1741,6 +1741,7 @@ public class MP extends MIDlet
 				StringBuffer sb = new StringBuffer();
 				JSONObject j;
 
+//#ifndef NO_NOTIFY
 				while (notifications) {
 					try {
 						j = ((JSONObject) api("getNotifySettings"));
@@ -1752,6 +1753,7 @@ public class MP extends MIDlet
 						continue;
 					}
 				}
+//#endif
 				
 				int offset = 0;
 				boolean check = true;
