@@ -212,6 +212,7 @@
 	"BuiltinImageViewer": "Näytä kuvat sovelluksessa",
 	"LargeMusicCover": "Suuri soittimen kansikuva",
 	"LegacyUI": "Vanha käyttöliittymä",
+	"FastScrolling": "Disable animations", // Untranslated
 	"Keyboard": "Näppäimistö",
 	"Auto": "Automaattinen",
 	"FullscreenTextBox": "Koko näyttö",

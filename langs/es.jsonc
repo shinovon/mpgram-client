@@ -212,6 +212,7 @@
 	"BuiltinImageViewer": "Visor de imágenes incorporado",
 	"LargeMusicCover": "Cubierta de reproductor grande",
 	"LegacyUI": "Legacy UI", // Untranslated
+	"FastScrolling": "Disable animations", // Untranslated
 	"Keyboard": "Keyboard", // Untranslated
 	"Auto": "Auto", // Untranslated
 	"FullscreenTextBox": "Fullscreen text-box", // Untranslated

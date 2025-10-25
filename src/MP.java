@@ -2887,7 +2887,7 @@ public class MP extends MIDlet
 							L[LLargeMusicCover],
 //#ifndef NO_CHAT_CANVAS
 							L[LLegacyUI],
-							"Fast scrolling",
+							L[LFastScrolling],
 //#endif
 					}, null);
 					uiChoice.setSelectedIndex(i = 0, reverseChat);
