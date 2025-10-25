@@ -281,6 +281,7 @@ public class MP extends MIDlet
 	static boolean chunkedUpload;
 //#endif
 	private static boolean playlistDirection = true;
+	private static boolean needWriteConfig;
 	
 	// platform
 	static boolean symbianJrt;
@@ -533,6 +534,11 @@ public class MP extends MIDlet
 		} catch (Throwable ignored) {}
 //#endif
 //#endif
+		if (needWriteConfig) {
+			try {
+				writeConfig();
+			} catch (Throwable ignored) {}
+		}
 		notifyDestroyed();
 	}
 
@@ -3248,84 +3254,7 @@ public class MP extends MIDlet
 					downloadPath = downloadPathField.getString();
 //#endif
 
-					try {
-						RecordStore.deleteRecordStore(SETTINGS_RECORD_NAME);
-					} catch (Exception ignored) {}
-					JSONObject j = new JSONObject();
-					j.put("reverseChat", reverseChat);
-//#ifndef NO_AVATARS
-					j.put("loadAvatars", loadAvatars);
-					j.put("avatarSize", avatarSize);
-//#endif
-					j.put("showMedia", showMedia);
-					j.put("photoSize", photoSize);
-					j.put("loadThumbs", loadThumbs);
-					j.put("threadedImages", threadedImages);
-//#ifndef NO_AVATARS
-					j.put("avatarsCache", avatarsCache);
-					j.put("avatarsCacheThreshold", avatarsCacheThreshold);
-//#endif
-					j.put("useLoadingForm", useLoadingForm);
-					j.put("chatsLimit", chatsLimit);
-					j.put("messagesLimit", messagesLimit);
-					j.put("profilesCacheThreshold", peersCacheThreshold);
-					j.put("jsonStream", jsonStream);
-					j.put("parseRichtext", parseRichtext);
-					j.put("parseLinks", parseLinks);
-					j.put("lang", lang);
-					j.put("checkUpdates", checkUpdates);
-					j.put("chatUpdates", chatUpdates);
-					j.put("chatStatus", chatStatus);
-					j.put("focusNewMessages", focusNewMessages);
-					j.put("updatesDelay", updatesDelay);
-					j.put("updatesTimeout", updatesTimeout);
-					j.put("chatsListFontSize", chatsListFontSize);
-					j.put("keepAlive", keepAlive);
-					j.put("chatField", chatField);
-					j.put("roundAvatars", roundAvatars);
-					j.put("utf", utf);
-//#ifndef NO_ZIP
-					j.put("compress", compress);
-//#endif
-					j.put("useView", useView);
-					j.put("blackberryNetwork", blackberryNetwork);
-					j.put("fullPlayerCover", fullPlayerCover);
-//#ifndef NO_NOTIFY
-					j.put("notifications", notifications);
-					j.put("notifySound", notifySound);
-					j.put("pushInterval", pushInterval);
-					j.put("pushBgInterval", pushBgInterval);
-					j.put("notifyMethod", notifyMethod);
-					j.put("notifyVolume", notificationVolume);
-//#endif
-//#ifndef NO_CHAT_CANVAS
-					j.put("legacyChatUI", legacyChatUI);
-					j.put("textMethod", textMethod);
-					j.put("theme", theme);
-					
-					JSONArray inputLanguagesJson = new JSONArray();
-					if (inputLanguages != null) {
-						for (int k = 0; k < inputLanguages.length; ++k) {
-							if (inputLanguages[k] == null) break;
-							inputLanguagesJson.add(inputLanguages[k]);
-						}
-						j.put("inputLanguages", inputLanguagesJson);
-					}
-					j.put("lazyLoading", lazyLoading);
-					j.put("fastScrolling", fastScrolling);
-//#endif
-//#ifndef NO_FILE
-					j.put("downloadPath", downloadPath);
-					j.put("uploadChunked", chunkedUpload);
-					j.put("downloadMethod", downloadMethod);
-//#endif
-					j.put("longpoll", longpoll);
-					j.put("playlistDirection", playlistDirection);
-					
-					byte[] b = j.toString().getBytes("UTF-8");
-					RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
-					r.addRecord(b, 0, b.length);
-					r.closeRecordStore();
+					writeConfig();
 				} catch (Exception e) {
 					e.printStackTrace();
 					display(errorAlert(L[LFailedToSaveSettings_Alert] + ": " + e));
@@ -3775,7 +3704,7 @@ public class MP extends MIDlet
 			}
 			if (c == togglePlaylistOrderCmd) {
 				playlistDirection = !playlistDirection;
-				// TODO save
+				needWriteConfig = true;
 				return;
 			}
 		}
@@ -5978,6 +5907,90 @@ public class MP extends MIDlet
 			r.addRecord(b, 0, b.length);
 			r.closeRecordStore();
 		} catch (Exception e) {}
+	}
+
+	private static void writeConfig() throws Exception {
+		try {
+			RecordStore.deleteRecordStore(SETTINGS_RECORD_NAME);
+		} catch (Exception ignored) {}
+
+		JSONObject j = new JSONObject();
+		j.put("reverseChat", reverseChat);
+//#ifndef NO_AVATARS
+		j.put("loadAvatars", loadAvatars);
+		j.put("avatarSize", avatarSize);
+//#endif
+		j.put("showMedia", showMedia);
+		j.put("photoSize", photoSize);
+		j.put("loadThumbs", loadThumbs);
+		j.put("threadedImages", threadedImages);
+//#ifndef NO_AVATARS
+		j.put("avatarsCache", avatarsCache);
+		j.put("avatarsCacheThreshold", avatarsCacheThreshold);
+//#endif
+		j.put("useLoadingForm", useLoadingForm);
+		j.put("chatsLimit", chatsLimit);
+		j.put("messagesLimit", messagesLimit);
+		j.put("profilesCacheThreshold", peersCacheThreshold);
+		j.put("jsonStream", jsonStream);
+		j.put("parseRichtext", parseRichtext);
+		j.put("parseLinks", parseLinks);
+		j.put("lang", lang);
+		j.put("checkUpdates", checkUpdates);
+		j.put("chatUpdates", chatUpdates);
+		j.put("chatStatus", chatStatus);
+		j.put("focusNewMessages", focusNewMessages);
+		j.put("updatesDelay", updatesDelay);
+		j.put("updatesTimeout", updatesTimeout);
+		j.put("chatsListFontSize", chatsListFontSize);
+		j.put("keepAlive", keepAlive);
+		j.put("chatField", chatField);
+		j.put("roundAvatars", roundAvatars);
+		j.put("utf", utf);
+//#ifndef NO_ZIP
+		j.put("compress", compress);
+//#endif
+		j.put("useView", useView);
+		j.put("blackberryNetwork", blackberryNetwork);
+		j.put("fullPlayerCover", fullPlayerCover);
+//#ifndef NO_NOTIFY
+		j.put("notifications", notifications);
+		j.put("notifySound", notifySound);
+		j.put("pushInterval", pushInterval);
+		j.put("pushBgInterval", pushBgInterval);
+		j.put("notifyMethod", notifyMethod);
+		j.put("notifyVolume", notificationVolume);
+//#endif
+//#ifndef NO_CHAT_CANVAS
+		j.put("legacyChatUI", legacyChatUI);
+		j.put("textMethod", textMethod);
+		j.put("theme", theme);
+
+		JSONArray inputLanguagesJson = new JSONArray();
+		if (inputLanguages != null) {
+			for (int k = 0; k < inputLanguages.length; ++k) {
+				if (inputLanguages[k] == null) break;
+				inputLanguagesJson.add(inputLanguages[k]);
+			}
+			j.put("inputLanguages", inputLanguagesJson);
+		}
+		j.put("lazyLoading", lazyLoading);
+		j.put("fastScrolling", fastScrolling);
+//#endif
+//#ifndef NO_FILE
+		j.put("downloadPath", downloadPath);
+		j.put("uploadChunked", chunkedUpload);
+		j.put("downloadMethod", downloadMethod);
+//#endif
+		j.put("longpoll", longpoll);
+		j.put("playlistDirection", playlistDirection);
+
+		byte[] b = j.toString().getBytes("UTF-8");
+		RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
+		r.addRecord(b, 0, b.length);
+		r.closeRecordStore();
+
+		needWriteConfig = false;
 	}
 	
 	private static boolean checkClass(String s) {
