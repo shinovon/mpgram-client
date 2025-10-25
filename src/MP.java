@@ -3185,7 +3185,7 @@ public class MP extends MIDlet
 					playMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(playMethodChoice);
 
-					playerCreateMethodChoice = new ChoiceGroup(L[LPlaybackMethod], Choice.POPUP, new String[] {
+					playerCreateMethodChoice = new ChoiceGroup(L[LPlayerCreationMethod], Choice.POPUP, new String[] {
 							L[LAuto],
 							L[LPassURL],
 							L[LPassConnectionStream]
