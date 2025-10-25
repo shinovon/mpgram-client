@@ -82,6 +82,7 @@
 	"Logout": "Çıxış",
 	"ClearCache": "Keç təmizlə",
 	"Locate": "Locate", // Untranslated
+	"ShowSessionCode": "Show session code", // Untranslated
 	
 	// Chats list commands
 	"Folders": "Qovluq",

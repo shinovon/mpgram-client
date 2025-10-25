@@ -82,6 +82,7 @@
 	"Logout": "Sair da conta",
 	"ClearCache": "Limpar cache",
 	"Locate": "Locate", // Untranslated
+	"ShowSessionCode": "Show session code", // Untranslated
 
 	// Chats list commands
 	"Folders": "Pastas",

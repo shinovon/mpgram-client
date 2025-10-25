@@ -82,6 +82,7 @@
 	"Logout": "Cerrar sesion",
 	"ClearCache": "Liberar datos",
 	"Locate": "Locate", // Untranslated
+	"ShowSessionCode": "Show session code", // Untranslated
 	
 	// Chats list commands
 	"Folders": "Carpetas",

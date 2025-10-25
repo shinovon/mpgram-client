@@ -82,6 +82,7 @@
 	"Logout": "Kirjaudu ulos",
 	"ClearCache": "Tyhjennä välimuisti",
 	"Locate": "Valitse",
+	"ShowSessionCode": "Show session code", // Untranslated
 	
 	// Chats list commands
 	"Folders": "Kansiot",

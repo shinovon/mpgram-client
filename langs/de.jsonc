@@ -82,6 +82,7 @@
 	"Logout": "Ausloggen",
 	"ClearCache": "Cache löschen",
 	"Locate": "Locate", // Untranslated
+	"ShowSessionCode": "Show session code", // Untranslated
 	
 	// Chats list commands
 	"Folders": "Ordner",

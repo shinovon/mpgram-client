@@ -82,6 +82,7 @@
 	"Logout": "Logout",
 	"ClearCache": "Clear cache",
 	"Locate": "Locate",
+	"ShowSessionCode": "Show session code",
 	
 	// Chats list commands
 	"Folders": "Folders",

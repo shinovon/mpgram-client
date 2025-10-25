@@ -82,6 +82,7 @@
 	"Logout": "Выйти",
 	"ClearCache": "Очистить кэш",
 	"Locate": "Указать путь",
+	"ShowSessionCode": "Показать код сессии",
 	
 	// Chats list commands
 	"Folders": "Папки",
@@ -246,7 +247,7 @@
 	"LoadAvatars": "Загружать аватарки",
 	"MultiThreadedLoading": "Многопоточная загрузка",
 	"RoundAvatars": "Круглые аватарки",
-	"LazyLoading": "Lazy loading", // Untranslated
+	"LazyLoading": "Постепенная прогрузка",
 	
 	// Cache settings
 	"AvatarsCaching": "Кэшироние аватарок",

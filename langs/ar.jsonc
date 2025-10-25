@@ -82,6 +82,7 @@
 	"Logout": "تسجيل خروج",
 	"ClearCache": "تفريغ التخزين المؤقت",
 	"Locate": "Locate", // Untranslated
+	"ShowSessionCode": "Show session code", // Untranslated
 	
 	// Chats list commands
 	"Folders": "مجلدات",

@@ -864,9 +864,9 @@ public class MP extends MIDlet
 		logoutCmd = new Command(L[LLogout], Command.ITEM, 1);
 		clearCacheCmd = new Command(L[LClearCache], Command.ITEM, 1);
 		downloadPathCmd = new Command(L[LLocate], Command.ITEM, 1);
-		keyboardLanguagesCmd = new Command("Select", Command.ITEM, 1); // TODO localize
+		keyboardLanguagesCmd = new Command(L[LSelect], Command.ITEM, 1);
 		saveLanguagesCmd = new Command(L[LBack], Command.BACK, 1);
-		exportSessionCmd = new Command("Show user code", Command.ITEM, 1);
+		exportSessionCmd = new Command(L[LShowSessionCode], Command.ITEM, 1);
 
 		foldersCmd = new Command(L[LFolders], Command.SCREEN, 4);
 		refreshCmd = new Command(L[LRefresh], Command.SCREEN, 5);

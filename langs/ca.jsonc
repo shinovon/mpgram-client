@@ -82,6 +82,7 @@
 	"Logout": "Tanca sessió",
 	"ClearCache": "Esborra memòria cau",
 	"Locate": "Localitza",
+	"ShowSessionCode": "Show session code", // Untranslated
 	
 	// Chats list commands
 	"Folders": "Carpetes",
