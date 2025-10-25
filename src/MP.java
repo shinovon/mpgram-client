@@ -3125,11 +3125,13 @@ public class MP extends MIDlet
 							L[LChatAutoUpdate],
 							L[LKeepSessionAlive],
 							L[LUseUnicode],
+							L[LLongpoll],
 //#ifndef NO_ZIP
 							L[LUseCompression],
 //#endif
-							L[LLongpoll],
+//#ifndef NO_FILE
 							L[LPartialUpload],
+//#endif
 					}, null);
 					behChoice.setSelectedIndex(i = 0, useLoadingForm);
 					behChoice.setSelectedIndex(++i, jsonStream);
@@ -4162,11 +4164,14 @@ public class MP extends MIDlet
 				.setLevel(playerVolume = playerVolumeGauge.getValue());
 			} catch (Throwable ignored) {}
 			needWriteConfig = true;
+			return;
 		}
 		if (item == behChoice) {
+			// label needs to be changed according to longpoll setting
 			try {
 				updateTimeoutGauge.setLabel(L[behChoice.isSelected(7) ? LUpdatesTimeout : LUpdatesInterval]);
 			} catch (Exception ignored) {}
+			return;
 		}
 	}
 	
