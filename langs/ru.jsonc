@@ -241,6 +241,12 @@
 	"InApp": "В приложении",
 	"WithBrowser": "В браузере",
 	"PartialUpload": "Отправка по частям",
+	"PlaybackMethod": "Метод проигрывания",
+	"Stream": "Онлайн",
+	"CacheToFile": "Кэшировать в файл",
+	"PlayerCreationMethod": "Метод создания плеера",
+	"PassURL": "Передать URL",
+	"PassConnectionStream": "Передать поток",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Загружать медиа",

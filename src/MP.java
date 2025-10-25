@@ -109,6 +109,7 @@ public class MP extends MIDlet
 	static final int RUN_CANCEL_UPDATES = 25;
 	static final int RUN_DOWNLOAD_DOCUMENT = 26;
 	static final int RUN_LOGOUT = 27;
+	static final int RUN_START_PLAYER = 28;
 	
 	static final long ZERO_CHANNEL_ID = -1000000000000L;
 	
@@ -248,7 +249,8 @@ public class MP extends MIDlet
 	static boolean compress;
 	static boolean fileRewrite;
 	static int blackberryNetwork = -1; // -1: undefined, 0: data, 1: wifi
-	static int playerHttpMethod = 1; // 0 - pass url, 1 - pass connection stream
+	static int playMethod; // 0: stream, 1: write to file
+	static int playerCreateMethod = 0; // 0: auto, 1: pass url, 2: pass connection stream
 	static boolean reopenChat;
 	static boolean fullPlayerCover;
 	static boolean notifications;
@@ -443,6 +445,8 @@ public class MP extends MIDlet
 	private static ChoiceGroup langChoice;
 	private static ChoiceGroup chatsFontSizeCoice;
 	private static ChoiceGroup networkChoice;
+	private static ChoiceGroup playMethodChoice;
+	private static ChoiceGroup playerCreateMethodChoice;
 	private static Gauge avaCacheGauge;
 	private static Gauge photoSizeGauge;
 	private static Gauge profileCacheGauge;
@@ -496,6 +500,7 @@ public class MP extends MIDlet
 	private static String updateUrl;
 	private static long lastType;
 	private static String[] downloadMessage;
+	private static String downloadCurrentPath;
 	
 	static int confirmationTask;
 	static Object confirmationParam;
@@ -627,39 +632,14 @@ public class MP extends MIDlet
 		if (symbian && systemName == null) {
 			systemName = "Symbian";
 		}
-		
+
 		boolean s40 = false;
-		
-		// check media capabilities
 		try {
 			// s40 check
 			Class.forName("com.nokia.mid.impl.isa.jam.Jam");
-			s40 = true;
-			series40 = true;
+			series40 = s40 = true;
 			systemName = "Series 40";
-			try {
-				Class.forName("com.sun.mmedia.protocol.CommonDS");
-				// s40v1 uses sun impl for media and i/o so it should work fine
-				playerHttpMethod = 0;
-			} catch (Exception e) {
-				// s40v2+ breaks http locator parsing
-				playerHttpMethod = 1;
-			}
-		} catch (Exception e) {
-			playerHttpMethod = 0;
-			if (symbian) {
-				if (symbianJrt &&
-						(p.indexOf("java_build_version=2.") != -1
-						|| p.indexOf("java_build_version=1.4") != -1)) {
-					// emc (s60v5+), supports mp3 streaming
-				} else if (checkClass("com.symbian.mmapi.PlayerImpl")) {
-					// uiq
-				} else {
-					// mmf (s60v3.2-)
-					playerHttpMethod = 1;
-				}
-			}
-		}
+		} catch (Exception ignored) {}
 		
 		if (systemName == null && (p = System.getProperty("os.name")) != null) {
 			if ((v = System.getProperty("os.version")) != null) {
@@ -815,6 +795,9 @@ public class MP extends MIDlet
 //#endif
 			longpoll = j.getBoolean("longpoll", longpoll);
 			playlistDirection = j.getBoolean("playlistDirection", playlistDirection);
+			playerVolume = j.getInt("playerVolume", playerVolume);
+			playMethod = j.getInt("playMethod", playMethod);
+			playerCreateMethod = j.getInt("playerCreateMethod", playerCreateMethod);
 		} catch (Exception ignored) {}
 		
 		// load auth
@@ -1748,7 +1731,7 @@ public class MP extends MIDlet
 				JSONObject j;
 
 //#ifndef NO_NOTIFY
-				while (notifications) {
+				while (notifications && user != null) {
 					try {
 						j = ((JSONObject) api("getNotifySettings"));
 						muteUsers = j.getInt("users") != 0;
@@ -1763,10 +1746,10 @@ public class MP extends MIDlet
 				
 				int offset = 0;
 				boolean check = true;
-				while (keepAlive
+				while (user != null && (keepAlive
 //#ifndef NO_NOTIFY
 						|| notifications
-						|| globalUpdates
+						|| globalUpdates)
 //#endif
 						) {
 					Thread.sleep(globalUpdates ? 1 : wasShown ? pushInterval : pushBgInterval);
@@ -1806,7 +1789,7 @@ public class MP extends MIDlet
 						}
 					}
 					try {
-						while (check) {
+						while (check && user != null) {
 							try {
 								j = ((JSONObject) api("getLastUpdate")).getObject("res");
 								int off = j.getInt("update_id");
@@ -2113,17 +2096,18 @@ public class MP extends MIDlet
 				StringBuffer sb = new StringBuffer("searchMessages&filter=Music&media=1");
 				sb.append("&peer=").append(peer);
 				sb.append("&limit=").append(messagesLimit);
-				if (mode == 1) {
+				if (mode == 1 || mode == 4) {
 					sb.append("&offset_id=").append(playlist.getObject(playlist.size() - 1).getInt("id"));
-				} else if (mode == 2) {
+				} else if (mode == 2 || mode == 5) {
 					sb.append("&min_id=").append(playlist.getObject(0).getInt("id"));
 				} else if (mode == 3) {
 					sb.append("&offset_id=").append(((String[]) param)[2])
 					.append("&add_offset=-1");
 				}
-				
-				if (playlistList == null) {
-					List list = new List(L[LPlaylist_Title], List.IMPLICIT);
+
+				List list = playlistList;
+				if (list == null) {
+					list = new List(L[LPlaylist_Title], List.IMPLICIT);
 					list.addCommand(backCmd);
 					list.addCommand(nextPageCmd);
 					list.addCommand(prevPageCmd);
@@ -2147,7 +2131,7 @@ public class MP extends MIDlet
 						display(initPlayerForm());
 						startPlayer(currentMusic);
 					} else {
-						display(playlistList);
+						display(list);
 					}
 				} else if (mode == 1 || mode == 4) {
 					for (int i = 0; i < l; ++i) {
@@ -2164,8 +2148,14 @@ public class MP extends MIDlet
 					if (mode == 2) startNextMusic(!playlistDirection, playlistIndex);
 				}
 				
-				if (playlistList != null) {
-					playlistList.deleteAll();
+				if (list != null) {
+					boolean cur = false;
+					if (current == list) {
+						cur = true;
+						display(loadingAlert(null), current);
+					}
+
+					list.deleteAll();
 					l = playlist.size();
 					String t;
 					for (int i = 0; i < l; ++i) {
@@ -2179,9 +2169,11 @@ public class MP extends MIDlet
 						} else {
 							sb.append(media.getString("name", ""));
 						}
-						playlistList.append(sb.toString(), null);
+						list.append(sb.toString(), null);
 					}
-					playlistList.setSelectedIndex(playlistIndex, true);
+					list.setSelectedIndex(playlistIndex, true);
+
+					if (cur) display(list);
 				}
 			} catch (Exception e) {
 				display(errorAlert(e), current);
@@ -2223,71 +2215,15 @@ public class MP extends MIDlet
 				if (name == null) {
 					name = msg[0] + '_' + msg[1];
 				}
-				
-				FileConnection fc = (FileConnection) Connector.open("file:///".concat(downloadPath = downloadPath.concat(name)));
-				if (!fc.exists()) fc.create();
-				else {
-					// TODO ask rewrite permission
-				}
-				try {
-					OutputStream out = fc.openOutputStream();
-					try {
-						if (!downloading) throw cancelException;
-						HttpConnection hc = (HttpConnection) openHttpConnection(instanceUrl + FILE_URL + "?c=" + msg[0] + "&m=" + msg[1]);
-						try {
-							InputStream in = openInputStream(hc);
-							try {
-								Gauge gauge = null;
-								if (size != 0) {
-									alert.setIndicator(gauge = new Gauge(null, false, 100, 0));
-								}
-								alert.setString(L[LDownloading]);
-								
-								byte[] buf = new byte[4096];
-								int readTotal = 0;
-								int read;
-								while ((read = in.read(buf)) != -1) {
-									out.write(buf, 0, read);
-									if (gauge != null) {
-										gauge.setValue(Math.min((int) ((readTotal * 100) / size), 100));
-									}
-									if (!downloading) throw cancelException;
-									readTotal += read;
-								}
-								
-								// done
-								goBackToChat();
-								alert.addCommand(okDownloadCmd);
-								alert.removeCommand(cancelDownloadCmd);
-								alert.setIndicator(null);
-								alert.setString(L[LDownloadedTo] + downloadPath);
-								display(alert, current);
-								break;
-							} finally {
-								try {
-									in.close();
-								} catch (Exception ignored) {}
-							}
-						} finally {
-							try {
-								hc.close();
-							} catch (Exception ignored) {}
-						}
-					} catch (Exception e) {
-						if (e == cancelException) throw e;
-						// network error
-						e.printStackTrace();
-						error = e.toString();
-					} finally {
-						try {
-							out.close();
-						} catch (Exception ignored) {}
-					}
-				} finally {
-					try {
-						fc.close();
-					} catch (Exception ignored) {} // TODO: should I left it ignored?
-				}
+
+				downloadDocument(instanceUrl + FILE_URL + "?c=" + msg[0] + "&m=" + msg[1],
+						"file:///".concat(downloadPath.concat(name)),
+						alert,
+						null,
+						size,
+						true
+						);
+				return;
 			} catch (Exception e) {
 				if (e == cancelException) {
 					display(alert(null, L[LDownloadCanceled_Alert], AlertType.WARNING), current);
@@ -2310,7 +2246,171 @@ public class MP extends MIDlet
 			phone = null;
 			selfId = null;
 			display(mainDisplayable = authForm);
+			if (needWriteConfig) {
+				try {
+					writeConfig();
+				} catch (Exception ignored) {}
+			}
+			closePlayer();
 			writeAuth();
+			break;
+		}
+		case RUN_START_PLAYER: {
+			try {
+				JSONObject msg = (JSONObject) param;
+
+				playerTitleLabel.setText(L[LLoading]);
+				playerArtistLabel.setText("");
+				try {
+					playerProgress.setValue(Gauge.CONTINUOUS_RUNNING);
+					playerProgress.setMaxValue(Gauge.INDEFINITE);
+				} catch (Exception ignored) {}
+
+				StringBuffer url = new StringBuffer(instanceUrl);
+				String name;
+				if ((name = msg.getObject("media").getString("name", null)) != null && fileRewrite) {
+					appendUrl(url.append("file/"), name);
+				} else {
+					url.append(FILE_URL);
+				}
+				url.append("?c=").append(msg.getString("peer_id"))
+						.append("&m=").append(msg.getInt("id"))
+						.append("&user=").append(user);
+
+				JSONObject media = msg.getObject("media");
+
+				if (playlistList != null) {
+					try {
+						playlistList.setSelectedIndex(playlistIndex, true);
+					} catch (Exception ignored) {
+					}
+				}
+
+				if (loadThumbs && playerCover != null && media.getBoolean("thumb", false)) {
+					String q = "min";
+					int size;
+					if (fullPlayerCover && (size = Math.min(playerForm.getWidth(), playerForm.getHeight()) - 20) > 20) {
+						q = "prev&s=".concat(Integer.toString(size));
+					}
+					MP.queueImage(new String[] { msg.getString("peer_id"), msg.getString("id"), null, "thumbr".concat(q) }, playerCover);
+					playerForm.insert(0, playerCover);
+				}
+
+				Player p;
+				if (playMethod == 0) { // stream
+					int method = playerCreateMethod;
+					if (method == 0) { // auto
+						if (series40) {
+							try {
+								Class.forName("com.sun.mmedia.protocol.CommonDS");
+								// s40v1 uses sun impl for media and i/o so it should work fine
+								method = 1;
+							} catch (Exception e) {
+								// s40v2+ breaks http locator parsing
+								method = 2;
+							}
+						} else {
+							method = 1;
+							if (symbian) {
+								String platform = System.getProperty("microedition.platform");
+								if (symbianJrt &&
+										(platform.indexOf("java_build_version=2.") != -1
+												|| platform.indexOf("java_build_version=1.4") != -1)) {
+									// emc (s60v5+), supports mp3 streaming
+								} else if (checkClass("com.symbian.mmapi.PlayerImpl")) {
+									// uiq
+								} else {
+									// mmf (s60v3.2-)
+									method = 2;
+								}
+							}
+						}
+					}
+					if (method == 2) { // pass connector stream
+						p = Manager.createPlayer(openHttpConnection(url.toString()).openInputStream(),
+								media.getString("mime", "audio/mpeg"));
+					} else { // pass url
+						p = Manager.createPlayer(url.toString());
+					}
+				} else { // file
+					playerTitleLabel.setText(L[LDownloading]);
+					try {
+						playerProgress.setValue(0);
+						playerProgress.setMaxValue(100);
+					} catch (Exception ignored) {}
+
+					String fileUrl = System.getProperty("fileconn.dir.private");
+					if (fileUrl == null) {
+						fileUrl = System.getProperty("fileconn.dir.music");
+					}
+					if (fileUrl == null) {
+						fileUrl = "file:///C:/";
+					}
+					String ext = media.getString("name", "");
+					int i;
+					if ((i = ext.lastIndexOf('.')) != -1) {
+						ext = ext.substring(i + 1);
+					} else {
+						ext = "mp3";
+					}
+					MP.downloadDocument(url.toString(), fileUrl = fileUrl.concat("temp.".concat(ext)), null, playerProgress, media.getInt("size", 0), false);
+
+					try {
+						playerProgress.setValue(Gauge.CONTINUOUS_RUNNING);
+						playerProgress.setMaxValue(Gauge.INDEFINITE);
+					} catch (Exception ignored) {}
+
+					int method = playerCreateMethod;
+					if (method == 0) { // auto
+						if (series40) {
+							method = 2;
+						} else {
+							method = 1;
+						}
+					}
+					if (method == 2) { // pass connector stream
+						p = Manager.createPlayer(Connector.openInputStream(fileUrl), media.getString("mime", "audio/mpeg"));
+					} else { // pass url
+						p = Manager.createPlayer(fileUrl);
+					}
+				}
+
+				try {
+					playerProgress.setValue(0);
+					playerProgress.setMaxValue(100);
+				} catch (Exception ignored) {}
+
+				String t;
+				if (playerTitleLabel != null) {
+					if ((t = media.getObject("audio").getString("title", null)) == null) {
+						if ((t = name) == null) {
+							t = L[LUnknownTrack];
+						}
+					}
+					playerTitleLabel.setText(t);
+				}
+				if (playerArtistLabel != null) {
+					if ((t = media.getObject("audio").getString("artist", null)) == null) {
+						t = "";
+					}
+					playerArtistLabel.setText(t);
+				}
+
+				p.addPlayerListener(midlet);
+				currentPlayer = p;
+
+				p.realize();
+				try {
+					((VolumeControl) p.getControl("VolumeControl")).setLevel(playerVolume);
+				} catch (Throwable ignored) {}
+				p.prefetch();
+				p.start();
+				playerState = 1;
+			} catch (Exception e) {
+				display(errorAlert(e), current);
+				closePlayer();
+				playerState = 0;
+			}
 			break;
 		}
 		}
@@ -2880,7 +2980,7 @@ public class MP extends MIDlet
 							break;
 						}
 					}
-					langChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					langChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(langChoice);
 					
 					uiChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
@@ -2907,7 +3007,7 @@ public class MP extends MIDlet
 					uiChoice.setSelectedIndex(++i, legacyChatUI);
 					uiChoice.setSelectedIndex(++i, fastScrolling);
 //#endif
-					uiChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					uiChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(uiChoice);
 					
 //#ifndef NO_CHAT_CANVAS
@@ -2918,7 +3018,7 @@ public class MP extends MIDlet
 							break;
 						}
 					}
-					themeChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					themeChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(themeChoice);
 					
 					textMethodChoice = new ChoiceGroup(L[LKeyboard], Choice.POPUP, new String[] {
@@ -2927,27 +3027,27 @@ public class MP extends MIDlet
 							"j2mekeyboard",
 							L[LFullscreenTextBox]
 					}, null);
-					textMethodChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					textMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					textMethodChoice.setSelectedIndex(textMethod, true);
 					f.append(textMethodChoice);
 					
 					s = new StringItem(null, L[LInputLanguages], Item.BUTTON);
 					s.setDefaultCommand(keyboardLanguagesCmd);
 					s.setItemCommandListener(this);
-					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(s);
 //#endif
 					
 					photoSizeGauge = new Gauge(L[LThumbnailsSize], true, 64, Math.min(64, photoSize / 8));
-					photoSizeGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					photoSizeGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(photoSizeGauge);
 					
 					chatsGauge = new Gauge(L[LChatsCount], true, 50, chatsLimit);
-					chatsGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					chatsGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(chatsGauge);
 					
 					msgsGauge = new Gauge(L[LMessagesCount], true, 50, messagesLimit);
-					msgsGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					msgsGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(msgsGauge);
 					
 					chatsFontSizeCoice = new ChoiceGroup(L[LChatsListFontSize], Choice.POPUP, new String[] {
@@ -2972,7 +3072,7 @@ public class MP extends MIDlet
 					}, null);
 					notifyChoice.setSelectedIndex(0, notifications);
 					notifyChoice.setSelectedIndex(1, notifySound);
-					notifyChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					notifyChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(notifyChoice);
 					
 					notifyMethodChoice = new ChoiceGroup(L[LNotificationMethod], ChoiceGroup.POPUP, new String[] {
@@ -2984,19 +3084,19 @@ public class MP extends MIDlet
 //#endif
 					}, null);
 					notifyMethodChoice.setSelectedIndex(Math.min(notifyMethod, notifyMethodChoice.size() - 1), true);
-					notifyMethodChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					notifyMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(notifyMethodChoice);
 					
 					notificationVolumeGauge = new Gauge(L[LVolume], true, 100, notificationVolume);
-					notificationVolumeGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					notificationVolumeGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(notificationVolumeGauge);
 					
 					pushIntervalGauge = new Gauge(L[LPushInterval], true, 120, (int) (pushInterval / 1000));
-					pushIntervalGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					pushIntervalGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(pushIntervalGauge);
 					
 					pushBgIntervalGauge = new Gauge(L[LPushBackgroundInterval], true, 120, (int) (pushBgInterval / 1000));
-					pushBgIntervalGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					pushBgIntervalGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(pushBgIntervalGauge);
 //#endif
 					
@@ -3013,7 +3113,7 @@ public class MP extends MIDlet
 								L[LWiFi]
 						}, null);
 						networkChoice.setSelectedIndex(blackberryNetwork == -1 ? 0 : blackberryNetwork, true);
-						networkChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						networkChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 						f.append(networkChoice);
 					}
 					
@@ -3038,18 +3138,18 @@ public class MP extends MIDlet
 					behChoice.setSelectedIndex(++i, chatUpdates);
 					behChoice.setSelectedIndex(++i, keepAlive);
 					behChoice.setSelectedIndex(++i, utf);
+					behChoice.setSelectedIndex(++i, longpoll);
 //#ifndef NO_ZIP
 					behChoice.setSelectedIndex(++i, compress);
 //#endif
-					behChoice.setSelectedIndex(++i, longpoll);
 //#ifndef NO_FILE
 					behChoice.setSelectedIndex(++i, chunkedUpload);
 //#endif
-					behChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					behChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(behChoice);
 					
 					updateTimeoutGauge = new Gauge(L[longpoll ? LUpdatesTimeout : LUpdatesInterval], true, 20, updatesTimeout / 5);
-					updateTimeoutGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					updateTimeoutGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(updateTimeoutGauge);
 					
 					imagesChoice = new ChoiceGroup(L[LImages], Choice.MULTIPLE, new String[] {
@@ -3072,8 +3172,25 @@ public class MP extends MIDlet
 //#ifndef NO_CHAT_CANVAS
 					imagesChoice.setSelectedIndex(++i, lazyLoading);
 //#endif
-					imagesChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					imagesChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(imagesChoice);
+
+					playMethodChoice = new ChoiceGroup(L[LPlaybackMethod], Choice.POPUP, new String[] {
+							L[LStream],
+							L[LCacheToFile]
+					}, null);
+					playMethodChoice.setSelectedIndex(playMethod, true);
+					playMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(playMethodChoice);
+
+					playerCreateMethodChoice = new ChoiceGroup(L[LPlaybackMethod], Choice.POPUP, new String[] {
+							L[LAuto],
+							L[LPassURL],
+							L[LPassConnectionStream]
+					}, null);
+					playerCreateMethodChoice.setSelectedIndex(playerCreateMethod, true);
+					playerCreateMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(playerCreateMethodChoice);
 					
 					// cache
 
@@ -3085,22 +3202,22 @@ public class MP extends MIDlet
 							L[LHoldInRAMandStore]
 					}, null);
 					avaCacheChoice.setSelectedIndex(avatarsCache, true);
-					avaCacheChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					avaCacheChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(avaCacheChoice);
 					
 					avaCacheGauge = new Gauge(L[LAvatarsCacheThreshold], true, 20, avatarsCacheThreshold / 5);
-					avaCacheGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					avaCacheGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(avaCacheGauge);
 //#endif
 					
 					profileCacheGauge = new Gauge(L[LProfilesCacheThreshold], true, 30, peersCacheThreshold / 10);
-					profileCacheGauge.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					profileCacheGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(profileCacheGauge);
 					
 					s = new StringItem(null, L[LClearCache], Item.BUTTON);
 					s.setDefaultCommand(clearCacheCmd);
 					s.setItemCommandListener(this);
-					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(s);
 					
 //#ifndef NO_FILE
@@ -3111,12 +3228,12 @@ public class MP extends MIDlet
 							L[LInApp],
 							L[LWithBrowser]
 					}, null);
-					downloadMethodChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					downloadMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					downloadMethodChoice.setSelectedIndex(downloadMethod, true);
 					f.append(downloadMethodChoice);
 					
 					downloadPathField = new TextField(L[LDownloadPath], downloadPath, 500, TextField.ANY);
-					downloadPathField.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					downloadPathField.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(downloadPathField);
 					
 					s = new StringItem(null, "...", Item.BUTTON);
@@ -3133,7 +3250,7 @@ public class MP extends MIDlet
 					s.setFont(largePlainFont);
 					f.append(s);
 					
-					s = new StringItem(null, "Show user code", Item.BUTTON);
+					s = new StringItem(null, L[LShowSessionCode], Item.BUTTON);
 					s.setDefaultCommand(exportSessionCmd);
 					s.setItemCommandListener(this);
 					s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -3221,10 +3338,10 @@ public class MP extends MIDlet
 					chatUpdates = behChoice.isSelected(++i);
 					keepAlive = behChoice.isSelected(++i);
 					utf = behChoice.isSelected(++i);
+					longpoll = behChoice.isSelected(++i);
 //#ifndef NO_ZIP
 					compress = behChoice.isSelected(++i);
 //#endif
-					longpoll = behChoice.isSelected(++i);
 //#ifndef NO_FILE
 					chunkedUpload = behChoice.isSelected(++i);
 //#endif
@@ -3242,6 +3359,9 @@ public class MP extends MIDlet
 //#ifndef NO_CHAT_CANVAS
 					lazyLoading = imagesChoice.isSelected(++i);
 //#endif
+
+					playMethod = playMethodChoice.getSelectedIndex();
+					playerCreateMethod = playerCreateMethodChoice.getSelectedIndex();
 				
 //#ifndef NO_AVATARS
 					avatarsCache = avaCacheChoice.getSelectedIndex();
@@ -3597,7 +3717,7 @@ public class MP extends MIDlet
 					goBackTo(settingsForm);
 				} else if (!downloading) {
 					// download
-					start(RUN_DOWNLOAD_DOCUMENT, path);
+					start(RUN_DOWNLOAD_DOCUMENT, downloadCurrentPath = path);
 				}
 			}
 //#endif
@@ -3618,11 +3738,15 @@ public class MP extends MIDlet
 //#endif
 		if (d == playlistList) {
 			if (c == nextPageCmd) {
-				start(RUN_LOAD_PLAYLIST, new String[] {null, "4"});
+				if (playlist.size() != playlistSize) {
+					start(RUN_LOAD_PLAYLIST, new String[] { null, "4" });
+				}
 				return;
 			}
 			if (c == prevPageCmd) {
-				start(RUN_LOAD_PLAYLIST, new String[] {null, "5"});
+				if (playlistOffset != 0) {
+					start(RUN_LOAD_PLAYLIST, new String[] { null, "5" });
+				}
 				return;
 			}
 		}
@@ -4037,10 +4161,13 @@ public class MP extends MIDlet
 				((VolumeControl) currentPlayer.getControl("VolumeControl"))
 				.setLevel(playerVolume = playerVolumeGauge.getValue());
 			} catch (Throwable ignored) {}
+			needWriteConfig = true;
 		}
-		// TODO update updateTimeoutGauge label when longpoll is changed
-//		if (item == behChoice) {
-//		}
+		if (item == behChoice) {
+			try {
+				updateTimeoutGauge.setLabel(L[behChoice.isSelected(7) ? LUpdatesTimeout : LUpdatesInterval]);
+			} catch (Exception ignored) {}
+		}
 	}
 	
 	public void sendTyping(boolean cancel) {
@@ -4085,6 +4212,9 @@ public class MP extends MIDlet
 				playerPlaypauseBtn.removeCommand(playlistPauseCmd);
 				playerPlaypauseBtn.setDefaultCommand(playlistPlayCmd);
 			}
+		} else if (PlayerListener.ERROR.equals(event)) {
+			closePlayer();
+			return;
 		}
 		
 		if (playerProgress != null) {
@@ -4097,7 +4227,7 @@ public class MP extends MIDlet
 				if (progress > 100) progress = 100;
 				
 				playerProgress.setValue(progress);
-			} catch (Exception e) {}
+			} catch (Exception ignored) {}
 		}
 	}
 	
@@ -4132,6 +4262,7 @@ public class MP extends MIDlet
 						/*&& !"audio/m4a".equals(t)*/)
 					continue;
 				playlistIndex = idx;
+				playerState = 0;
 				startPlayer(currentMusic = msg);
 				return;
 			}
@@ -4140,74 +4271,11 @@ public class MP extends MIDlet
 	}
 
 	static void startPlayer(JSONObject msg) {
+		if (playerState == 3) return;
 		closePlayer();
-		try {
-			playerState = 3;
+		playerState = 3;
 			
-			StringBuffer url = new StringBuffer(instanceUrl);
-			String name;
-			if ((name = msg.getObject("media").getString("name", null)) != null && fileRewrite) {
-				appendUrl(url.append("file/"), name);
-			} else {
-				url.append(FILE_URL);
-			}
-			url.append("?c=").append(msg.getString("peer_id"))
-			.append("&m=").append(msg.getInt("id"))
-			.append("&user=").append(user);
-			
-			JSONObject media = msg.getObject("media");
-			String t;
-			if (playerTitleLabel != null) {
-				if ((t = media.getObject("audio").getString("title", null)) == null) {
-					if ((t = name) == null) {
-						t = L[LUnknownTrack];
-					}
-				}
-				playerTitleLabel.setText(t);
-			}
-			if (playerArtistLabel != null) {
-				if ((t = media.getObject("audio").getString("artist", null)) == null) {
-					t = "";
-				}
-				playerArtistLabel.setText(t);
-			}
-			
-			if (playlistList != null) {
-				try {
-					playlistList.setSelectedIndex(playlistIndex, true);
-				} catch (Exception ignored) {}
-			}
-			
-			if (loadThumbs && playerCover != null && media.getBoolean("thumb", false)) {
-				String q = "min";
-				int size;
-				if (fullPlayerCover && (size = Math.min(playerForm.getWidth(), playerForm.getHeight()) - 20) > 20) {
-					q = "prev&s=".concat(Integer.toString(size));
-				}
-				MP.queueImage(new String[] {msg.getString("peer_id"), msg.getString("id"), null, "thumbr".concat(q)}, playerCover);
-				playerForm.insert(0, playerCover);
-			}
-			
-			// TODO
-			Player p;
-			if (playerHttpMethod == 1) {
-				p = Manager.createPlayer(openHttpConnection(url.toString()).openInputStream(), media.getString("mime", "audio/mpeg"));
-			} else {
-				p = Manager.createPlayer(url.toString());
-			}
-			p.addPlayerListener(midlet);
-			currentPlayer = p;
-			
-			p.realize();
-			try { 
-				((VolumeControl) p.getControl("VolumeControl")).setLevel(playerVolume);
-			} catch (Throwable ignored) {}
-			p.prefetch();
-			p.start();
-			playerState = 1;
-		} catch (Exception e) {
-			display(errorAlert(e), current);
-		}
+		MP.midlet.start(RUN_START_PLAYER, msg);
 	}
 	
 	static void closePlayer() {
@@ -4228,7 +4296,10 @@ public class MP extends MIDlet
 			playerArtistLabel.setText("");
 		}
 		if (playerProgress != null) {
-			playerProgress.setValue(0);
+			try {
+				playerProgress.setValue(0);
+				playerProgress.setMaxValue(100);
+			} catch (Exception ignored) {}
 		}
 		while (playerForm != null && playerForm.get(0) == playerCover) {
 			playerForm.delete(0);
@@ -4740,7 +4811,7 @@ public class MP extends MIDlet
 					openFilePicker("", false);
 					return;
 				} else {
-					start(RUN_DOWNLOAD_DOCUMENT, downloadPath);
+					start(RUN_DOWNLOAD_DOCUMENT, downloadCurrentPath = downloadPath);
 					return;
 				}
 			}
@@ -5612,6 +5683,83 @@ public class MP extends MIDlet
 		}
 		return sb;
 	}
+
+	private static void downloadDocument(String url, String dest, Alert alert, Gauge gauge, int size, boolean chat) throws Exception {
+		downloading = true;
+		FileConnection fc = (FileConnection) Connector.open(dest);
+		try {
+			if (!fc.exists()) fc.create();
+			else if (chat && downloadCurrentPath != null) {
+				// file already exists, ask overwrite permission
+				confirmationTask = RUN_DOWNLOAD_DOCUMENT;
+				confirmationParam = downloadCurrentPath;
+				downloadCurrentPath = null;
+
+				alert.setIndicator(null);
+				alert.addCommand(confirmCmd);
+				display(alert, current);
+				return;
+			} else {
+				fc.delete();
+				fc.create();
+			}
+			OutputStream out = fc.openOutputStream();
+			try {
+				if (!downloading) throw cancelException;
+				HttpConnection hc = (HttpConnection) openHttpConnection(url);
+				try {
+					InputStream in = openInputStream(hc);
+					try {
+						if (alert != null) {
+							if (gauge != null && size != 0) {
+								alert.setIndicator(gauge = new Gauge(null, false, 100, 0));
+							}
+							alert.setString(L[LDownloading]);
+						}
+
+						byte[] buf = new byte[4096];
+						int readTotal = 0;
+						int read;
+						int c = 0;
+						while ((read = in.read(buf)) != -1) {
+							out.write(buf, 0, read);
+							if (gauge != null && (c++ % 4) == 0) {
+								gauge.setValue(Math.min((int) ((readTotal * 100) / size), 100));
+							}
+							if (!downloading) throw cancelException;
+							readTotal += read;
+						}
+
+						// done
+						if (chat) {
+							goBackToChat();
+							alert.setIndicator(null);
+							alert.addCommand(okDownloadCmd);
+							alert.removeCommand(cancelDownloadCmd);
+							alert.setString(L[LDownloadedTo] + downloadPath);
+							display(alert, current);
+						}
+					} finally {
+						try {
+							in.close();
+						} catch (Exception ignored) {}
+					}
+				} finally {
+					try {
+						hc.close();
+					} catch (Exception ignored) {}
+				}
+			} finally {
+				try {
+					out.close();
+				} catch (Exception ignored) {}
+			}
+		} finally {
+			try {
+				fc.close();
+			} catch (Exception ignored) {} // TODO: should I left it ignored?
+		}
+	}
 	
 	// endregion
 	
@@ -5984,6 +6132,9 @@ public class MP extends MIDlet
 //#endif
 		j.put("longpoll", longpoll);
 		j.put("playlistDirection", playlistDirection);
+		j.put("playerVolume", playerVolume);
+		j.put("playMethod", playMethod);
+		j.put("playerCreateMethod", playerCreateMethod);
 
 		byte[] b = j.toString().getBytes("UTF-8");
 		RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);

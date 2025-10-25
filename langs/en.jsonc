@@ -241,6 +241,12 @@
 	"InApp": "In app",
 	"WithBrowser": "With browser",
 	"PartialUpload": "Partial upload",
+	"PlaybackMethod": "Playback method",
+	"Stream": "Stream",
+	"CacheToFile": "Cache to file",
+	"PlayerCreationMethod": "Player creation method",
+	"PassURL": "Pass URL",
+	"PassConnectionStream": "Pass connection stream",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Load media thumbnails",

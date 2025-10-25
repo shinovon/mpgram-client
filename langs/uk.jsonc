@@ -241,6 +241,12 @@
 	"InApp": "In app", // Untranslated
 	"WithBrowser": "With browser", // Untranslated
 	"PartialUpload": "Partial upload", // Untranslated
+	"PlaybackMethod": "Playback method", // Untranslated
+	"Stream": "Stream", // Untranslated
+	"CacheToFile": "Cache to file", // Untranslated
+	"PlayerCreationMethod": "Player creation method", // Untranslated
+	"PassURL": "Pass URL", // Untranslated
+	"PassConnectionStream": "Pass connection stream", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "Завантажувати медіа",

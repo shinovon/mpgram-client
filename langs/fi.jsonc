@@ -241,6 +241,12 @@
 	"InApp": "Sovelluksessa",
 	"WithBrowser": "Selaimessa",
 	"PartialUpload": "Osittainen lataus",
+	"PlaybackMethod": "Playback method", // Untranslated
+	"Stream": "Stream", // Untranslated
+	"CacheToFile": "Cache to file", // Untranslated
+	"PlayerCreationMethod": "Player creation method", // Untranslated
+	"PassURL": "Pass URL", // Untranslated
+	"PassConnectionStream": "Pass connection stream", // Untranslated
 	
 	// Images settings
 	"LoadMediaThumbnails": "Kuvien esikatselu",
