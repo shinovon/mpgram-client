@@ -246,6 +246,7 @@
 	"LoadAvatars": "Завантажувати аватарки",
 	"MultiThreadedLoading": "Багатопоточне завантаження",
 	"RoundAvatars": "Rounded avatars", // Untranslated
+	"LazyLoading": "Lazy loading", // Untranslated
 	
 	// Cache settings
 	"AvatarsCaching": "Кешування аватарок",

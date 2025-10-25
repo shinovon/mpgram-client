@@ -246,6 +246,7 @@
 	"LoadAvatars": "تحميل الصور الرمزية",
 	"MultiThreadedLoading": "تحميل متعدد الخيوط",
 	"RoundAvatars": "صور رمزية دائرية", 
+	"LazyLoading": "Lazy loading", // Untranslated
 	
 	// Cache settings
 	"AvatarsCaching": "تخزين الصور الرمزية مؤقتا",

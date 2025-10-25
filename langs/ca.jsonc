@@ -246,6 +246,7 @@
 	"LoadAvatars": "Carrega avatars",
 	"MultiThreadedLoading": "Càrrega multifils",
 	"RoundAvatars": "Avatars arrodonits",
+	"LazyLoading": "Lazy loading", // Untranslated
 	
 	// Cache settings
 	"AvatarsCaching": "Avatars a memòria cau",

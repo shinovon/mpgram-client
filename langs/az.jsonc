@@ -246,6 +246,7 @@
 	"LoadAvatars": "Avatarları yükləyin",
 	"MultiThreadedLoading": "Çox yivli yükləmə",
 	"RoundAvatars": "Rounded avatars", // Untranslated
+	"LazyLoading": "Lazy loading", // Untranslated
 	
 	// Cache settings
 	"AvatarsCaching": "Avatar keşləmə",

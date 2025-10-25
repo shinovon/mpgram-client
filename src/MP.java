@@ -3024,9 +3024,6 @@ public class MP extends MIDlet
 //#endif
 							L[LLongpoll],
 							L[LPartialUpload],
-//#ifndef NO_CHAT_CANVAS
-							"Lazy loading",
-//#endif
 					}, null);
 					behChoice.setSelectedIndex(i = 0, useLoadingForm);
 					behChoice.setSelectedIndex(++i, jsonStream);
@@ -3042,9 +3039,6 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 					behChoice.setSelectedIndex(++i, chunkedUpload);
 //#endif
-//#ifndef NO_CHAT_CANVAS
-					behChoice.setSelectedIndex(++i, lazyLoading);
-//#endif
 					behChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(behChoice);
 					
@@ -3059,7 +3053,8 @@ public class MP extends MIDlet
 							L[LRoundAvatars],
 //#endif
 							L[LMultiThreadedLoading],
-//#ifndef NO_AVATARS
+//#ifndef NO_CHAT_CANVAS
+							L[LLazyLoading],
 //#endif
 					}, null);
 					imagesChoice.setSelectedIndex(i = 0, loadThumbs);
@@ -3068,6 +3063,9 @@ public class MP extends MIDlet
 					imagesChoice.setSelectedIndex(++i, roundAvatars);
 //#endif
 					imagesChoice.setSelectedIndex(++i, threadedImages);
+//#ifndef NO_CHAT_CANVAS
+					imagesChoice.setSelectedIndex(++i, lazyLoading);
+//#endif
 					imagesChoice.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(imagesChoice);
 					
@@ -3224,9 +3222,6 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 					chunkedUpload = behChoice.isSelected(++i);
 //#endif
-//#ifndef NO_CHAT_CANVAS
-					lazyLoading = behChoice.isSelected(++i);
-//#endif
 					
 					if ((updatesTimeout = updateTimeoutGauge.getValue() * 5) < 5) {
 						updateTimeoutGauge.setValue((updatesTimeout = 5) / 5);
@@ -3238,6 +3233,9 @@ public class MP extends MIDlet
 					roundAvatars = imagesChoice.isSelected(++i);
 //#endif
 					threadedImages = imagesChoice.isSelected(++i);
+//#ifndef NO_CHAT_CANVAS
+					lazyLoading = imagesChoice.isSelected(++i);
+//#endif
 				
 //#ifndef NO_AVATARS
 					avatarsCache = avaCacheChoice.getSelectedIndex();

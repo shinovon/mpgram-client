@@ -246,6 +246,7 @@
 	"LoadAvatars": "Cargar avatares",
 	"MultiThreadedLoading": "Carga multihilo",
 	"RoundAvatars": "Avatares redondeados",
+	"LazyLoading": "Lazy loading", // Untranslated
 	
 	// Cache settings
 	"AvatarsCaching": "Almacenar cache de avatares",

@@ -246,6 +246,7 @@
 	"LoadAvatars": "Profiilikuvat",
 	"MultiThreadedLoading": "Monisäikeinen lataus",
 	"RoundAvatars": "Pyöreät prof.kuvat",
+	"LazyLoading": "Lazy loading", // Untranslated
 	
 	// Cache settings
 	"AvatarsCaching": "Prof.kuvien välimuisti",

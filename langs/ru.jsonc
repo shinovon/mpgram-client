@@ -246,6 +246,7 @@
 	"LoadAvatars": "Загружать аватарки",
 	"MultiThreadedLoading": "Многопоточная загрузка",
 	"RoundAvatars": "Круглые аватарки",
+	"LazyLoading": "Lazy loading", // Untranslated
 	
 	// Cache settings
 	"AvatarsCaching": "Кэшироние аватарок",
