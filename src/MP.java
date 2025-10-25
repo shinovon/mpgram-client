@@ -2119,6 +2119,8 @@ public class MP extends MIDlet
 				if (playlistList == null) {
 					List list = new List(L[LPlaylist_Title], List.IMPLICIT);
 					list.addCommand(backCmd);
+					list.addCommand(nextPageCmd);
+					list.addCommand(prevPageCmd);
 					list.addCommand(List.SELECT_COMMAND);
 					list.setCommandListener(midlet);
 					
@@ -2141,19 +2143,19 @@ public class MP extends MIDlet
 					} else {
 						display(playlistList);
 					}
-				} else if (mode == 1) {
+				} else if (mode == 1 || mode == 4) {
 					for (int i = 0; i < l; ++i) {
 						playlist.add(messages.getObject(i));
 					}
-					startNextMusic(playlistDirection, playlistIndex);
-				} else if (mode == 2) {
+					if (mode == 1) startNextMusic(playlistDirection, playlistIndex);
+				} else if (mode == 2 || mode == 5) {
 					playlistIndex += l;
 					playlistOffset -= l;
 					if (playlistOffset < 0) playlistOffset = 0;
 					for (int i = l - 1; i >= 0; --i) {
 						playlist.put(0, messages.getObject(i));
 					}
-					startNextMusic(!playlistDirection, playlistIndex);
+					if (mode == 2) startNextMusic(!playlistDirection, playlistIndex);
 				}
 				
 				if (playlistList != null) {
@@ -3687,6 +3689,16 @@ public class MP extends MIDlet
 			return;
 		}
 //#endif
+		if (d == playlistList) {
+			if (c == nextPageCmd) {
+				start(RUN_LOAD_PLAYLIST, new String[] {null, "4"});
+				return;
+			}
+			if (c == prevPageCmd) {
+				start(RUN_LOAD_PLAYLIST, new String[] {null, "5"});
+				return;
+			}
+		}
 		if (c == goCmd) { // url dialog submit
 			commandAction(backCmd, d);
 			
@@ -3732,7 +3744,9 @@ public class MP extends MIDlet
 						e.printStackTrace();
 					}
 				}
-			} else if (c == playlistPauseCmd) {
+				return;
+			}
+			if (c == playlistPauseCmd) {
 				if (currentPlayer != null) {
 					try {
 						currentPlayer.stop();
@@ -3740,20 +3754,31 @@ public class MP extends MIDlet
 						e.printStackTrace();
 					}
 				}
-			} else if (c == playlistNextCmd) {
+				return;
+			}
+			if (c == playlistNextCmd) {
 				if (playerState == 3) return;
 				startNextMusic(true, playlistIndex);
-			} else if (c == playlistPrevCmd) {
+				return;
+			}
+			if (c == playlistPrevCmd) {
 				if (playerState == 3) return;
 				startNextMusic(false, playlistIndex);
-			} else if (c == playlistCmd) {
+				return;
+			}
+			if (c == playlistCmd) {
 				if (playlistList == null) return;
 				display(playlistList);
-			} else if (c == playerCmd) {
+				return;
+			}
+			if (c == playerCmd) {
 				display(initPlayerForm());
-			} else if (c == togglePlaylistOrderCmd) {
+				return;
+			}
+			if (c == togglePlaylistOrderCmd) {
 				playlistDirection = !playlistDirection;
 				// TODO save
+				return;
 			}
 		}
 //#ifndef NO_NOKIAUI
