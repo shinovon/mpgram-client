@@ -1632,7 +1632,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						focusItem(pointedItem, 0);
 						pointedItem.tap(x,
 								reverse ? y - (scroll - bottom - pointedItem.y + height - pointedItem.contentHeight)
-										: y - pointedItem.y - top - scroll,
+										: y - pointedItem.y - top + scroll,
 										false);
 					}
 				} else if (draggingHorizontally && selected == 0) {
