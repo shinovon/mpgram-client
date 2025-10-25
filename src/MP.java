@@ -3020,22 +3020,6 @@ public class MP extends MIDlet
 					}
 					themeChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(themeChoice);
-					
-					textMethodChoice = new ChoiceGroup(L[LKeyboard], Choice.POPUP, new String[] {
-							L[LAuto],
-							"Nokia UI",
-							"j2mekeyboard",
-							L[LFullscreenTextBox]
-					}, null);
-					textMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					textMethodChoice.setSelectedIndex(textMethod, true);
-					f.append(textMethodChoice);
-					
-					s = new StringItem(null, L[LInputLanguages], Item.BUTTON);
-					s.setDefaultCommand(keyboardLanguagesCmd);
-					s.setItemCommandListener(this);
-					s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(s);
 //#endif
 					
 					photoSizeGauge = new Gauge(L[LThumbnailsSize], true, 64, Math.min(64, photoSize / 8));
@@ -3057,6 +3041,24 @@ public class MP extends MIDlet
 					}, null);
 					chatsFontSizeCoice.setSelectedIndex(chatsListFontSize, true);
 					f.append(chatsFontSizeCoice);
+					
+//#ifndef NO_CHAT_CANVAS
+					textMethodChoice = new ChoiceGroup(L[LKeyboard], Choice.POPUP, new String[] {
+							L[LAuto],
+							"Nokia UI",
+							"j2mekeyboard",
+							L[LFullscreenTextBox]
+					}, null);
+					textMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					textMethodChoice.setSelectedIndex(textMethod, true);
+					f.append(textMethodChoice);
+					
+					s = new StringItem(null, L[LInputLanguages], Item.BUTTON);
+					s.setDefaultCommand(keyboardLanguagesCmd);
+					s.setItemCommandListener(this);
+					s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(s);
+//#endif
 					
 //#ifndef NO_NOTIFY
 					// notifications
@@ -3154,6 +3156,8 @@ public class MP extends MIDlet
 					updateTimeoutGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(updateTimeoutGauge);
 					
+					// images
+					
 					imagesChoice = new ChoiceGroup(L[LImages], Choice.MULTIPLE, new String[] {
 							L[LLoadMediaThumbnails],
 //#ifndef NO_AVATARS
@@ -3176,23 +3180,6 @@ public class MP extends MIDlet
 //#endif
 					imagesChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(imagesChoice);
-
-					playMethodChoice = new ChoiceGroup(L[LPlaybackMethod], Choice.POPUP, new String[] {
-							L[LStream],
-							L[LCacheToFile]
-					}, null);
-					playMethodChoice.setSelectedIndex(playMethod, true);
-					playMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(playMethodChoice);
-
-					playerCreateMethodChoice = new ChoiceGroup(L[LPlayerCreationMethod], Choice.POPUP, new String[] {
-							L[LAuto],
-							L[LPassURL],
-							L[LPassConnectionStream]
-					}, null);
-					playerCreateMethodChoice.setSelectedIndex(playerCreateMethod, true);
-					playerCreateMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(playerCreateMethodChoice);
 					
 					// cache
 
@@ -3221,6 +3208,25 @@ public class MP extends MIDlet
 					s.setItemCommandListener(this);
 					s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(s);
+					
+					// player
+
+					playMethodChoice = new ChoiceGroup(L[LPlaybackMethod], Choice.POPUP, new String[] {
+							L[LStream],
+							L[LCacheToFile]
+					}, null);
+					playMethodChoice.setSelectedIndex(playMethod, true);
+					playMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(playMethodChoice);
+
+					playerCreateMethodChoice = new ChoiceGroup(L[LPlayerCreationMethod], Choice.POPUP, new String[] {
+							L[LAuto],
+							L[LPassURL],
+							L[LPassConnectionStream]
+					}, null);
+					playerCreateMethodChoice.setSelectedIndex(playerCreateMethod, true);
+					playerCreateMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(playerCreateMethodChoice);
 					
 //#ifndef NO_FILE
 					// downloads
@@ -3294,7 +3300,6 @@ public class MP extends MIDlet
 					legacyChatUI = uiChoice.isSelected(++i);
 					fastScrolling = uiChoice.isSelected(++i);
 					
-					textMethod = textMethodChoice.getSelectedIndex();
 					String prevTheme = theme;
 					theme = THEMES[0][Math.max(0, themeChoice.getSelectedIndex())];
 					if (!theme.equals(prevTheme)) {
@@ -3313,6 +3318,10 @@ public class MP extends MIDlet
 					}
 					
 					chatsListFontSize = chatsFontSizeCoice.getSelectedIndex();
+					
+//#ifndef NO_CHAT_CANVAS
+					textMethod = textMethodChoice.getSelectedIndex();
+//#endif
 				
 //#ifndef NO_NOTIFY
 					notifications = notifyChoice.isSelected(0);
@@ -3361,15 +3370,15 @@ public class MP extends MIDlet
 //#ifndef NO_CHAT_CANVAS
 					lazyLoading = imagesChoice.isSelected(++i);
 //#endif
-
-					playMethod = playMethodChoice.getSelectedIndex();
-					playerCreateMethod = playerCreateMethodChoice.getSelectedIndex();
 				
 //#ifndef NO_AVATARS
 					avatarsCache = avaCacheChoice.getSelectedIndex();
 					avatarsCacheThreshold = avaCacheGauge.getValue() * 5;
 //#endif
 					peersCacheThreshold = profileCacheGauge.getValue() * 10;
+
+					playMethod = playMethodChoice.getSelectedIndex();
+					playerCreateMethod = playerCreateMethodChoice.getSelectedIndex();
 
 //#ifndef NO_FILE
 					downloadMethod = downloadMethodChoice.getSelectedIndex();
