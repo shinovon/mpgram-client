@@ -128,8 +128,9 @@ public class UIMessage extends UIItem implements LangConstants {
 
 	String[][][] replyMarkup;
 	Object[][] replyMarkupRender;
-	int replyMarkupHeight;
+	int replyMarkupHeight, replyMarkupPos;
 	Object focusedButton;
+	int focusedButtonRow, focusedButtonCol;
 	
 	UIMessage(JSONObject message, ChatCanvas chat) {
 		focusable = true;
@@ -1107,7 +1108,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			}
 
 			touchZones[order ++] = MARGIN_WIDTH;
-			touchZones[order ++] = h + y + PADDING_HEIGHT;
+			touchZones[order ++] = replyMarkupPos = h + y + PADDING_HEIGHT;
 			touchZones[order ++] = maxW + PADDING_WIDTH * 2;
 			touchZones[order ++] = (h += by) + y + PADDING_HEIGHT;
 			touchZones[order ++] = FOCUS_REPLY_MARKUP;
@@ -1154,10 +1155,10 @@ public class UIMessage extends UIItem implements LangConstants {
 		case FOCUS_REPLY_MARKUP:
 			if (focusedButton == null && dir != 0 && replyMarkup != null) {
 				if (dir == Canvas.UP) {
-					Object[][] r = replyMarkup[replyMarkup.length - 1];
-					focusedButton = r[r.length - 1];
+					Object[][] r = replyMarkup[focusedButtonRow = replyMarkup.length - 1];
+					focusedButton = r[focusedButtonCol = r.length - 1];
 				} else {
-					focusedButton = replyMarkup[0][0];
+					focusedButton = replyMarkup[focusedButtonRow = 0][focusedButtonCol = 0];
 				}
 			}
 			break;
@@ -1195,28 +1196,56 @@ public class UIMessage extends UIItem implements LangConstants {
 				} else if (subFocusCurrent == -1) {
 					subFocusCurrent = 0;
 				}
+				ChatCanvas chat = (ChatCanvas) container;
+				int t = (chat.reverse ? chat.height - chat.bottom + chat.scroll - (this.y + contentHeight)
+						: chat.top - chat.scroll);
+
 				if (dir == Canvas.UP) {
+					if (subFocus[subFocusCurrent] == FOCUS_REPLY_MARKUP && replyMarkup != null) {
+						if (replyMarkupRender != null) {
+							if (t + replyMarkupPos + getReplyMarkupY(focusedButton) <= chat.top) {
+								return 0;
+							}
+						}
+						if (focusedButtonRow != 0 || focusedButtonCol != 0) {
+							if (focusedButtonCol-- == 0) {
+								focusedButtonCol = replyMarkup[--focusedButtonRow].length - 1;
+							}
+
+							focusedButton = replyMarkup[focusedButtonRow][focusedButtonCol];
+							return Integer.MAX_VALUE;
+						}
+					}
 					if (subFocusCurrent == 0)
 						return Integer.MIN_VALUE;
 					if (subFocusCurrent == 1 && subFocus[0] == FOCUS_SENDER && hideName)
 						return Integer.MIN_VALUE;
-					if (subFocus[subFocusCurrent] == FOCUS_REPLY_MARKUP) {
-						// TODO
-					}
 					subFocus(--subFocusCurrent, dir);
 					if (focusChild != null) {
-						if (!focusChild.grabFocus(dir)) focusChild = null;
+						if (!focusChild.grabFocus(-1)) focusChild = null;
 					}
 					return Integer.MAX_VALUE;
 				} else if (dir == Canvas.DOWN) {
+					if (subFocus[subFocusCurrent] == FOCUS_REPLY_MARKUP && replyMarkup != null) {
+						if (focusedButtonRow != replyMarkup.length - 1 || focusedButtonCol != replyMarkup[replyMarkup.length - 1].length - 1) {
+							if (replyMarkupRender != null) {
+								if (t + replyMarkupPos + getReplyMarkupY(focusedButton) >= chat.height - chat.bottom) {
+									return 0;
+								}
+							}
+							if (++focusedButtonCol == replyMarkup[focusedButtonRow].length) {
+								++focusedButtonRow;
+								focusedButtonCol = 0;
+							}
+							focusedButton = replyMarkup[focusedButtonRow][focusedButtonCol];
+							return Integer.MAX_VALUE;
+						}
+					}
 					if (subFocusCurrent == subFocusLength - 1)
 						return Integer.MIN_VALUE;
-					if (subFocus[subFocusCurrent] == FOCUS_REPLY_MARKUP) {
-						// TODO
-					}
 					subFocus(++subFocusCurrent, dir);
 					if (focusChild != null) {
-						if (!focusChild.grabFocus(dir)) focusChild = null;
+						if (!focusChild.grabFocus(1)) focusChild = null;
 					}
 					return Integer.MAX_VALUE;
 				}
@@ -1227,6 +1256,14 @@ public class UIMessage extends UIItem implements LangConstants {
 			return Integer.MAX_VALUE;
 		}
 		return Integer.MIN_VALUE;
+	}
+
+	private int getReplyMarkupY(Object btn) {
+		for (int i = 0; i < replyMarkupRender.length; i++) {
+			Object[] r = replyMarkupRender[i];
+			if (r[2] == btn) return ((int[]) r[1])[1];
+		}
+		return 0;
 	}
 	
 	boolean action() {
