@@ -64,8 +64,8 @@ public class UILabel extends UIItem {
 		
 		UIItem root = (UIItem) container;
 		ChatCanvas chat = (ChatCanvas) root.container;
-		int t = !chat.reverse ? chat.top - chat.scroll + this.y + root.y
-				: chat.height - chat.bottom + chat.scroll - (root.y + root.contentHeight) + this.y;
+		int t = (chat.reverse ? chat.height - chat.bottom + chat.scroll - (root.y + root.contentHeight)
+				: chat.top - chat.scroll + root.y) + this.y;
 		
 		for (int i = 0; i < l; ++i) {
 			Object[] obj = (Object[]) render.elementAt(i);
@@ -297,10 +297,10 @@ public class UILabel extends UIItem {
 	private int getVisibility(int[] pos) {
 		UIItem root = (UIItem) container;
 		ChatCanvas chat = (ChatCanvas) root.container;
-		int screenTop = !chat.reverse ? chat.top - chat.scroll + this.y + root.y + pos[1]
-				: chat.height - chat.bottom + chat.scroll - (root.y + root.contentHeight) + this.y + pos[1];
+		int t = (chat.reverse ? chat.height - chat.bottom + chat.scroll - (root.y + root.contentHeight)
+				: chat.top - chat.scroll + root.y) + this.y + pos[1];
 
-		return (screenTop + pos[3]) <= chat.top ? 1 : screenTop >= chat.height - chat.bottom ? -1 : 0;
+		return (t + pos[3]) <= chat.top ? 1 : t >= chat.height - chat.bottom ? -1 : 0;
 	}
 	
 	static String ellipsis(String text, Font font, int width) {

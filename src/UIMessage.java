@@ -128,7 +128,7 @@ public class UIMessage extends UIItem implements LangConstants {
 
 	String[][][] replyMarkup;
 	Object[][] replyMarkupRender;
-	int replyMarkupHeight, replyMarkupPos;
+	int replyMarkupHeight, replyMarkupPos, replyMarkupButtonHeight;
 	Object focusedButton;
 	int focusedButtonRow, focusedButtonCol;
 	
@@ -1028,7 +1028,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			Font f = MP.smallBoldFont;
 
 			int by = -BUTTON_GRID_VGAP;
-			int bh = f.getHeight() + BUTTON_GRID_VGAP * 2 + BUTTON_PADDING_HEIGHT * 2;
+			int bh = replyMarkupButtonHeight = f.getHeight() + BUTTON_GRID_VGAP * 2 + BUTTON_PADDING_HEIGHT * 2;
 			int count = 0;
 			Vector v = new Vector();
 			for (int i = 0; i < replyMarkup.length; ++i) {
@@ -1196,26 +1196,54 @@ public class UIMessage extends UIItem implements LangConstants {
 				} else if (subFocusCurrent == -1) {
 					subFocusCurrent = 0;
 				}
-				ChatCanvas chat = (ChatCanvas) container;
-				int t = (chat.reverse ? chat.height - chat.bottom + chat.scroll - (this.y + contentHeight)
-						: chat.top - chat.scroll);
 
-				if (dir == Canvas.UP) {
-					if (subFocus[subFocusCurrent] == FOCUS_REPLY_MARKUP && replyMarkup != null) {
-						if (replyMarkupRender != null) {
-							if (t + replyMarkupPos + getReplyMarkupY(focusedButton) <= chat.top) {
+				if (subFocus[subFocusCurrent] == FOCUS_REPLY_MARKUP && replyMarkup != null) {
+					if (replyMarkupRender != null) {
+						ChatCanvas chat = (ChatCanvas) container;
+						int t = (chat.reverse ? chat.height - chat.bottom + chat.scroll - (this.y + contentHeight)
+								: chat.top - chat.scroll) + replyMarkupPos;
+
+						switch (dir) {
+						case Canvas.UP:
+						case Canvas.LEFT:
+							if (t + getReplyMarkupY(focusedButton) <= chat.top) {
 								return 0;
 							}
-						}
-						if (focusedButtonRow != 0 || focusedButtonCol != 0) {
-							if (focusedButtonCol-- == 0) {
-								focusedButtonCol = replyMarkup[--focusedButtonRow].length - 1;
-							}
+							if (focusedButtonRow != 0 || focusedButtonCol != 0) {
+								if (focusedButtonCol-- == 0) {
+									focusedButtonCol = replyMarkup[--focusedButtonRow].length - 1;
+								}
+								focusedButton = replyMarkup[focusedButtonRow][focusedButtonCol];
 
-							focusedButton = replyMarkup[focusedButtonRow][focusedButtonCol];
-							return Integer.MAX_VALUE;
+								if (t + getReplyMarkupY(focusedButton) <= chat.top) {
+									return 0;
+								}
+								return Integer.MAX_VALUE;
+							}
+							break;
+						case Canvas.DOWN:
+						case Canvas.RIGHT:
+							if ((t += replyMarkupButtonHeight) + getReplyMarkupY(focusedButton) >= chat.height - chat.bottom) {
+								return 0;
+							}
+							if (focusedButtonRow != replyMarkup.length - 1 || focusedButtonCol != replyMarkup[replyMarkup.length - 1].length - 1) {
+								if (++focusedButtonCol == replyMarkup[focusedButtonRow].length) {
+									++focusedButtonRow;
+									focusedButtonCol = 0;
+								}
+								focusedButton = replyMarkup[focusedButtonRow][focusedButtonCol];
+
+								if (t + getReplyMarkupY(focusedButton) >= chat.height - chat.bottom) {
+									return 0;
+								}
+								return Integer.MAX_VALUE;
+							}
+							break;
 						}
 					}
+				}
+
+				if (dir == Canvas.UP) {
 					if (subFocusCurrent == 0)
 						return Integer.MIN_VALUE;
 					if (subFocusCurrent == 1 && subFocus[0] == FOCUS_SENDER && hideName)
@@ -1226,21 +1254,6 @@ public class UIMessage extends UIItem implements LangConstants {
 					}
 					return Integer.MAX_VALUE;
 				} else if (dir == Canvas.DOWN) {
-					if (subFocus[subFocusCurrent] == FOCUS_REPLY_MARKUP && replyMarkup != null) {
-						if (focusedButtonRow != replyMarkup.length - 1 || focusedButtonCol != replyMarkup[replyMarkup.length - 1].length - 1) {
-							if (replyMarkupRender != null) {
-								if (t + replyMarkupPos + getReplyMarkupY(focusedButton) >= chat.height - chat.bottom) {
-									return 0;
-								}
-							}
-							if (++focusedButtonCol == replyMarkup[focusedButtonRow].length) {
-								++focusedButtonRow;
-								focusedButtonCol = 0;
-							}
-							focusedButton = replyMarkup[focusedButtonRow][focusedButtonCol];
-							return Integer.MAX_VALUE;
-						}
-					}
 					if (subFocusCurrent == subFocusLength - 1)
 						return Integer.MIN_VALUE;
 					subFocus(++subFocusCurrent, dir);
@@ -1263,7 +1276,16 @@ public class UIMessage extends UIItem implements LangConstants {
 			Object[] r = replyMarkupRender[i];
 			if (r[2] == btn) return ((int[]) r[1])[1];
 		}
-		return 0;
+		return -1;
+	}
+
+	private int getFocusY(int focus) {
+		for (int i = 0; i < touchZones.length; i += 5) {
+			if (touchZones[i + 4] == focus) {
+				return touchZones[i + 1];
+			}
+		}
+		return -1;
 	}
 	
 	boolean action() {

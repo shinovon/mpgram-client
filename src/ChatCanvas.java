@@ -1500,8 +1500,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				}
 			}
 		} else if (game == Canvas.LEFT || game == Canvas.RIGHT) {
-			if (focusedItem != null) {
-				focusedItem.traverse(game);
+			if (focusedItem != null && focusedItem.traverse(game) == Integer.MAX_VALUE) {
+				repaint = true;
 			}
 		} else if (game == -10) {
 			send();
