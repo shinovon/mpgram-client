@@ -1644,15 +1644,17 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					}
 				} else {
 					int move = 0;
-					long moveTime = 0, lastTime = 0, prevTime = 0;
+					long moveTime = 0, lastTime = 0;
 					for (int i = 0; i < moveSamples; i++) {
 						int idx = (movesIdx + moveSamples - 1 - i) % moveSamples;
 						long time = moveTimes[idx];
-						if (time < prevTime) {
+						if (time == 0) {
 							break;
 						}
-						prevTime = time;
-						if ((time = now - (lastTime = time)) > 200) {
+						if (i == 0) {
+							lastTime = time;
+						}
+						if ((time = now - time) > 200) {
 							break;
 						}
 						move += moves[idx];
@@ -1664,7 +1666,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						// release kinetic velocity
 						float res = (130f * move) / moveTime;
 						if (holdTime > 28) {
-							if (res > move)
+							if (Math.abs(res) > Math.abs(move))
 								res = move;
 							res *= 25f / (holdTime - 10);
 						}
