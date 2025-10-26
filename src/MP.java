@@ -6701,11 +6701,11 @@ public class MP extends MIDlet
 			if (last != '"')
 				throw new RuntimeException("JSON: Unexpected end of text");
 			if (str.indexOf('\\') != -1) {
-				char[] chars = str.substring(1, length).toCharArray();
+				char[] chars = str.toCharArray();
 				str = null;
-				int l = chars.length;
+				int l = chars.length - 1;
 				StringBuffer sb = new StringBuffer();
-				int i = 0;
+				int i = 1;
 				// parse escaped chars in string
 				loop: {
 					while (i < l) {
