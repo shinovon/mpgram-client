@@ -594,7 +594,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			// postLoad
 			loading = false;
 			if (hasInput && (canWrite || left) && mediaFilter == null && query == null) {
-				inputFieldHeight = Math.max(MP.medPlainFontHeight + 16, 40);
+				inputFieldHeight = Math.max(MP.medPlainFontHeight + 20, 48);
 				if (forwardMsgs != null || forwardMsg != null) {
 					bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
 					if (!touch) inputFocused = true;
