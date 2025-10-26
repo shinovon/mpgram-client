@@ -816,8 +816,9 @@ public class UIMessage extends UIItem implements LangConstants {
 //					break date;
 				}
 				showDate = true;
-				h += MARGIN_TOP + DATE_PADDING_HEIGHT * 2 + MP.smallBoldFontHeight;
-				if (!reverse) y -= h;
+				int d = MARGIN_TOP + DATE_PADDING_HEIGHT * 2 + MP.smallBoldFontHeight;
+				h += d;
+				if (!reverse) y -= d;
 			}
 			if (!chat.broadcast) {
 				boolean group = false;
@@ -980,7 +981,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		
 		// text
 		if (text != null) {
-			text.y = h - MARGIN_TOP - PADDING_HEIGHT;
+			text.y = h + y - MARGIN_TOP - PADDING_HEIGHT;
 			h += text.layout(cw - 6);
 			int l = text.render.size();
 			int tw = 0;
@@ -1201,7 +1202,7 @@ public class UIMessage extends UIItem implements LangConstants {
 					if (replyMarkupRender != null) {
 						ChatCanvas chat = (ChatCanvas) container;
 						int t = (chat.reverse ? chat.height - chat.bottom + chat.scroll - (this.y + contentHeight)
-								: chat.top - chat.scroll) + replyMarkupPos;
+								: chat.top - chat.scroll + this.y) + replyMarkupPos;
 
 						switch (dir) {
 						case Canvas.UP:
