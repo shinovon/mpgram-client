@@ -281,8 +281,11 @@ public class MP extends MIDlet
 	static int downloadMethod; // 0 - always ask, 1 - in app, 2 - browser
 	static String downloadPath;
 	static boolean chunkedUpload;
+	private static String lastDownloadPath;
+	private static String lastUploadPath;
 //#endif
 	private static boolean playlistDirection = true;
+
 	private static boolean needWriteConfig;
 	
 	// platform
@@ -792,6 +795,8 @@ public class MP extends MIDlet
 			downloadPath = j.getString("downloadPath", downloadPath);
 			chunkedUpload = j.getBoolean("uploadChunked", chunkedUpload);
 			downloadMethod = j.getInt("downloadMethod", downloadMethod);
+			lastDownloadPath = j.getString("lastDownloadPath", lastDownloadPath);
+			lastUploadPath = j.getString("lastUploadPath", lastUploadPath);
 //#endif
 			longpoll = j.getBoolean("longpoll", longpoll);
 			playlistDirection = j.getBoolean("playlistDirection", playlistDirection);
@@ -3433,7 +3438,7 @@ public class MP extends MIDlet
 			if (c == downloadPathCmd) {
 				downloadMessage = null;
 				try {
-					openFilePicker("", false);
+					openFilePicker(downloadPath, false);
 				} catch (Throwable ignored) {}
 				return;
 			}
@@ -3514,7 +3519,7 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 			if (c == chooseFileCmd) {
 				try {
-					openFilePicker("", true);
+					openFilePicker(lastUploadPath, true);
 				} catch (Throwable ignored) {}
 				return;
 			}
@@ -3707,7 +3712,15 @@ public class MP extends MIDlet
 			String name = ((List) d).getString(i);
 			String path = d.getTitle();
 			
-			if ("/".equals(path)) path = "";
+			if ("/".equals(path)) {
+				path = "";
+			} else if (L[LBack].equals(name) && i == 0) {
+				path = path.substring(0, path.lastIndexOf('/', path.lastIndexOf('/') - 1) + 1);
+
+				commandAction(backCmd, d);
+				openFilePicker(path, fileMode);
+				return;
+			}
 			
 			if (dir) {
 				openFilePicker(path.concat(name).concat("/"), fileMode);
@@ -3718,19 +3731,20 @@ public class MP extends MIDlet
 				// file selected
 				path = path.concat(name);
 				commandAction(cancelCmd, d);
-				sendFile = "file:///".concat(path);
+				sendFile = "file:///".concat(lastUploadPath = path);
 				fileLabel.setText(L[LFile_Prefix].concat(path));
 			} else {
 				// folder selected
 				if (downloadMessage == null) {
 					// default download path selected in settings
-					downloadPathField.setString(path);
+					downloadPathField.setString(lastDownloadPath = path);
 					goBackTo(settingsForm);
 				} else if (!downloading) {
 					// download
-					start(RUN_DOWNLOAD_DOCUMENT, downloadCurrentPath = path);
+					start(RUN_DOWNLOAD_DOCUMENT, downloadCurrentPath = lastDownloadPath = path);
 				}
 			}
+			needWriteConfig = true;
 //#endif
 			return;
 		}
@@ -4626,48 +4640,60 @@ public class MP extends MIDlet
 			}
 			
 			List list = new List(path, List.IMPLICIT);
-			list.addCommand(backCmd);
 			list.addCommand(cancelCmd);
 			list.addCommand(List.SELECT_COMMAND);
 			list.setSelectCommand(List.SELECT_COMMAND);
 			list.setCommandListener(midlet);
-			
-			if ("/".equals(path)) {
-				// roots
-				if (rootsList == null) {
-					rootsList = new Vector();
-					Enumeration roots = FileSystemRegistry.listRoots();
-					while (roots.hasMoreElements()) {
-						String s = (String) roots.nextElement();
-						if (s.startsWith("file:///")) s = s.substring("file:///".length());
-						rootsList.addElement(s);
-					}
-				}
-				
-				int l = rootsList.size();
-				for (int i = 0; i < l; i++) {
-					String s = (String) rootsList.elementAt(i);
-					if (s.startsWith("file:///")) s = s.substring("file:///".length());
-					if (s.endsWith("/")) s = s.substring(0, s.length() - 1);
-					list.append(s, folderImg);
-				}
-			} else {
-				if (!file) {
-					list.append(L[LSaveHere], null);
-				}
-				FileConnection fc = (FileConnection) Connector.open("file:///".concat(path));
-				try {
-					Enumeration en = fc.list();
-					while (en.hasMoreElements()) {
-						String s = (String) en.nextElement();
-						if (s.endsWith("/")) {
-							list.append(s.substring(0, s.length() - 1), folderImg);
-						} else if (file) {
-							list.append(s, fileImg);
+
+			int fails = 0;
+			for (;;) {
+				if ("/".equals(path)) {
+					// roots
+					if (rootsList == null) {
+						rootsList = new Vector();
+						Enumeration roots = FileSystemRegistry.listRoots();
+						while (roots.hasMoreElements()) {
+							String s = (String) roots.nextElement();
+							if (s.startsWith("file:///")) s = s.substring("file:///".length());
+							rootsList.addElement(s);
 						}
 					}
-				} finally {
-					fc.close();
+
+					int l = rootsList.size();
+					for (int i = 0; i < l; i++) {
+						String s = (String) rootsList.elementAt(i);
+						if (s.startsWith("file:///")) s = s.substring("file:///".length());
+						if (s.endsWith("/")) s = s.substring(0, s.length() - 1);
+						list.append(s, folderImg);
+					}
+					break;
+				} else {
+					list.append(L[LBack], null);
+					if (!file) {
+						list.append(L[LSaveHere], null);
+					}
+					try {
+						FileConnection fc = (FileConnection) Connector.open("file:///".concat(path));
+						try {
+							Enumeration en = fc.list();
+							while (en.hasMoreElements()) {
+								String s = (String) en.nextElement();
+								if (s.endsWith("/")) {
+									list.append(s.substring(0, s.length() - 1), folderImg);
+								} else if (file) {
+									list.append(s, fileImg);
+								}
+							}
+						} finally {
+							fc.close();
+						}
+						break;
+					} catch (IOException e) {
+						if (fails++ != 0) throw e;
+						list.deleteAll();
+						path = "/";
+						continue;
+					}
 				}
 			}
 			display(list);
@@ -4822,7 +4848,7 @@ public class MP extends MIDlet
 			Class.forName("javax.microedition.io.file.FileConnection");
 			if (state == 1) {
 				if (downloadPath == null || downloadPath.trim().length() == 0) {
-					openFilePicker("", false);
+					openFilePicker(lastDownloadPath, false);
 					return;
 				} else {
 					start(RUN_DOWNLOAD_DOCUMENT, downloadCurrentPath = downloadPath);
@@ -6143,6 +6169,8 @@ public class MP extends MIDlet
 		j.put("downloadPath", downloadPath);
 		j.put("uploadChunked", chunkedUpload);
 		j.put("downloadMethod", downloadMethod);
+		j.put("lastDownloadPath", lastDownloadPath);
+		j.put("lastUploadPath", lastUploadPath);
 //#endif
 		j.put("longpoll", longpoll);
 		j.put("playlistDirection", playlistDirection);
