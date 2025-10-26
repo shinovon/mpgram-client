@@ -82,7 +82,7 @@
 	"Logout": "Tanca sessió",
 	"ClearCache": "Esborra memòria cau",
 	"Locate": "Localitza",
-	"ShowSessionCode": "Show session code", // Untranslated
+	"ShowSessionCode": "Mostra codi de sessió",
 	
 	// Chats list commands
 	"Folders": "Carpetes",
@@ -213,7 +213,7 @@
 	"BuiltinImageViewer": "Visualitzador d'imatges integrat",
 	"LargeMusicCover": "Coberta de reproductor gran",
 	"LegacyUI": "IU antiga",
-	"FastScrolling": "Disable animations", // Untranslated
+	"FastScrolling": "Desactiva animacions",
 	"Keyboard": "Teclat",
 	"Auto": "Auto",
 	"FullscreenTextBox": "Quadre de pantalla completa",
@@ -241,19 +241,19 @@
 	"InApp": "A aplicació",
 	"WithBrowser": "Amb navegador",
 	"PartialUpload": "Càrrega parcial",
-	"PlaybackMethod": "Playback method", // Untranslated
-	"Stream": "Stream", // Untranslated
-	"CacheToFile": "Cache to file", // Untranslated
-	"PlayerCreationMethod": "Player creation method", // Untranslated
-	"PassURL": "Pass URL", // Untranslated
-	"PassConnectionStream": "Pass connection stream", // Untranslated
+	"PlaybackMethod": "Mètode de reproducció",
+	"Stream": "Flux",
+	"CacheToFile": "Memòria cau a fitxer",
+	"PlayerCreationMethod": "Mètode de creació de reproductor",
+	"PassURL": "Passa URL",
+	"PassConnectionStream": "Passa flux de connexió",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Carrega miniatures mèdia",
 	"LoadAvatars": "Carrega avatars",
 	"MultiThreadedLoading": "Càrrega multifils",
 	"RoundAvatars": "Avatars arrodonits",
-	"LazyLoading": "Lazy loading", // Untranslated
+	"LazyLoading": "Càrrega diferida",
 	
 	// Cache settings
 	"AvatarsCaching": "Avatars a memòria cau",
@@ -319,7 +319,7 @@
 	"PinMessage_Alert": "Fixa missatge?",
 	"BanMember_Alert": "Prohibir membre?",
 	"Logout_Alert": "Segur que vols tancar sessió?",
-	"RewriteFile_Alert": "File already exists, rewrite?", // Untranslated
+	"RewriteFile_Alert": "Fitxer ja existeix, reescriu-lo?",
 	
 	// Chat form
 	"ChatMedia_Title": "Mèdia",
