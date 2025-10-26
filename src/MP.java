@@ -2121,6 +2121,12 @@ public class MP extends MIDlet
 					
 					playlistList = list;
 				}
+
+				boolean cur = false;
+				if (current == list) {
+					cur = true;
+					display(loadingAlert(null), current);
+				}
 				
 				JSONObject j = (JSONObject) MP.api(sb.toString());
 				JSONArray messages = j.getArray("messages");
@@ -2153,33 +2159,25 @@ public class MP extends MIDlet
 					if (mode == 2) startNextMusic(!playlistDirection, playlistIndex);
 				}
 				
-				if (list != null) {
-					boolean cur = false;
-					if (current == list) {
-						cur = true;
-						display(loadingAlert(null), current);
+				list.deleteAll();
+				l = playlist.size();
+				String t;
+				for (int i = 0; i < l; ++i) {
+					JSONObject media = playlist.getObject(i).getObject("media");
+					sb.setLength(0);
+					if ((t = media.getObject("audio").getString("artist", null)) != null) {
+						sb.append(t).append(" - ");
 					}
-
-					list.deleteAll();
-					l = playlist.size();
-					String t;
-					for (int i = 0; i < l; ++i) {
-						JSONObject media = playlist.getObject(i).getObject("media");
-						sb.setLength(0);
-						if ((t = media.getObject("audio").getString("artist", null)) != null) {
-							sb.append(t).append(" - ");
-						}
-						if ((t = media.getObject("audio").getString("title", null)) != null) {
-							sb.append(t);
-						} else {
-							sb.append(media.getString("name", ""));
-						}
-						list.append(sb.toString(), null);
+					if ((t = media.getObject("audio").getString("title", null)) != null) {
+						sb.append(t);
+					} else {
+						sb.append(media.getString("name", ""));
 					}
-					list.setSelectedIndex(playlistIndex, true);
-
-					if (cur) display(list);
+					list.append(sb.toString(), null);
 				}
+				list.setSelectedIndex(playlistIndex, true);
+
+				if (cur) display(list);
 			} catch (Exception e) {
 				display(errorAlert(e), current);
 			}
