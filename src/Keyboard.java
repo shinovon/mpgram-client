@@ -1087,10 +1087,11 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 	}
 	
 	void _flushKeyBuffer() {
-		if(keyBuffer != 0) {
-			type(keyBuffer);
-		}
+		char c = keyBuffer;
 		keyRepeatTicks = keyVarIdx = keyBuffer = 0;
+		if (c != 0) {
+			type(c);
+		}
 	}
 	
 	private boolean handleKey(int key, boolean repeated) {

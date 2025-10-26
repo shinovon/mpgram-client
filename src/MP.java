@@ -3880,7 +3880,11 @@ public class MP extends MIDlet
 			}
 			if (c == cancelDownloadCmd) {
 				downloading = false;
-				return;
+				if (confirmationTask == RUN_DOWNLOAD_DOCUMENT) {
+					 c = backCmd;
+				} else {
+					return;
+				}
 			}
 			if (c == cancelUploadCmd) {
 				sending = false;
