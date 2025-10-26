@@ -319,6 +319,7 @@
 	"PinMessage_Alert": "Fixa missatge?",
 	"BanMember_Alert": "Prohibir membre?",
 	"Logout_Alert": "Segur que vols tancar sessió?",
+	"RewriteFile_Alert": "File already exists, rewrite?", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Mèdia",

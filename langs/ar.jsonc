@@ -319,6 +319,7 @@
 	"PinMessage_Alert": "Pin message?", // Untranslated
 	"BanMember_Alert": "Ban member?", // Untranslated
 	"Logout_Alert": "Are you sure you want to log out?", // Untranslated
+	"RewriteFile_Alert": "File already exists, rewrite?", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "الوسائط",

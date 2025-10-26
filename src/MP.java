@@ -5738,6 +5738,7 @@ public class MP extends MIDlet
 				downloadCurrentPath = null;
 
 				alert.setIndicator(null);
+				alert.setString(L[LRewriteFile_Alert]);
 				alert.addCommand(confirmCmd);
 				display(alert, current);
 				return;

@@ -319,6 +319,7 @@
 	"PinMessage_Alert": "Kiinnitetäänkö viesti?",
 	"BanMember_Alert": "Estetäänkö jäsen?",
 	"Logout_Alert": "Haluatko varmasti kirjautua ulos?",
+	"RewriteFile_Alert": "File already exists, rewrite?", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Media",
