@@ -3727,9 +3727,10 @@ public class MP extends MIDlet
 			
 			if (fileMode) {
 				// file selected
+				lastUploadPath = path;
 				path = path.concat(name);
 				commandAction(cancelCmd, d);
-				sendFile = "file:///".concat(lastUploadPath = path);
+				sendFile = "file:///".concat(path);
 				fileLabel.setText(L[LFile_Prefix].concat(path));
 			} else {
 				// folder selected
@@ -4650,6 +4651,7 @@ public class MP extends MIDlet
 			int fails = 0;
 			for (;;) {
 				if ("/".equals(path)) {
+					list.setTitle("/");
 					// roots
 					if (rootsList == null) {
 						rootsList = new Vector();
