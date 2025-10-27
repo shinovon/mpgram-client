@@ -1496,6 +1496,9 @@ public class MP extends MIDlet
 //#endif
 					api(appendUrl(sb.append("&text="), text).toString());
 				}
+
+				display(current);
+				Thread.sleep(10);
 				
 				// go back to chat screen
 				if (!(current instanceof MPChat)) {
@@ -1503,12 +1506,12 @@ public class MP extends MIDlet
 				} else {
 					((MPChat) current).sent();
 				}
-				
+
 				if ((reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) && !globalUpdates) {
 					// load latest messages
 					commandAction(latestCmd, current);
-				} else if (display.getCurrent() != current) {
-					display(current);
+//				} else if (display.getCurrent() != current) {
+//					display(current);
 				}
 //				display(infoAlert(L[LMessageSent_Alert]), current);
 			} catch (Exception e) {
