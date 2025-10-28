@@ -2167,7 +2167,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		MP.confirm(MP.RUN_DELETE_MESSAGE,
 				msgs,
 				null,
-				MP.localizeFormattedPlural(MP.LDeleteNMessage_Alert, msgs.length));
+				MP.localizeFormattedPlural(msgs.length, MP.LDeleteNMessage_Alert));
 	}
 	
 	private void forwardSelected() {

@@ -1497,6 +1497,7 @@ public class MP extends MIDlet
 					api(appendUrl(sb.append("&text="), text).toString());
 				}
 
+				// cancel alerts
 				display(current);
 				Thread.sleep(10);
 				
@@ -1510,6 +1511,7 @@ public class MP extends MIDlet
 				if ((reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) && !globalUpdates) {
 					// load latest messages
 					commandAction(latestCmd, current);
+					// for some reason these commented lines cause weird crash on nokia e52
 //				} else if (display.getCurrent() != current) {
 //					display(current);
 				}
