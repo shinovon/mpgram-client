@@ -249,7 +249,6 @@ public class MP extends MIDlet
 	static boolean compress;
 	static boolean fileRewrite;
 	static int blackberryNetwork = -1; // -1: undefined, 0: data, 1: wifi
-	static int playMethod; // 0: stream, 1: write to file
 	static int playerCreateMethod = 0; // 0: auto, 1: pass url, 2: pass connection stream
 	static boolean reopenChat;
 	static boolean fullPlayerCover;
@@ -283,6 +282,7 @@ public class MP extends MIDlet
 	static boolean chunkedUpload;
 	private static String lastDownloadPath;
 	private static String lastUploadPath;
+	static int playMethod; // 0: stream, 1: write to file
 //#endif
 	private static boolean playlistDirection = true;
 
@@ -797,11 +797,11 @@ public class MP extends MIDlet
 			downloadMethod = j.getInt("downloadMethod", downloadMethod);
 			lastDownloadPath = j.getString("lastDownloadPath", lastDownloadPath);
 			lastUploadPath = j.getString("lastUploadPath", lastUploadPath);
+			playMethod = j.getInt("playMethod", playMethod);
 //#endif
 			longpoll = j.getBoolean("longpoll", longpoll);
 			playlistDirection = j.getBoolean("playlistDirection", playlistDirection);
 			playerVolume = j.getInt("playerVolume", playerVolume);
-			playMethod = j.getInt("playMethod", playMethod);
 			playerCreateMethod = j.getInt("playerCreateMethod", playerCreateMethod);
 		} catch (Exception ignored) {}
 		
@@ -1756,12 +1756,13 @@ public class MP extends MIDlet
 				
 				int offset = 0;
 				boolean check = true;
-				while (user != null && (keepAlive
+				while (user != null
+						&& (keepAlive
 //#ifndef NO_NOTIFY
 						|| notifications
-						|| globalUpdates)
+						|| globalUpdates
 //#endif
-						) {
+						)) {
 					Thread.sleep(globalUpdates ? 1 : wasShown ? pushInterval : pushBgInterval);
 					if (
 //#ifndef NO_NOTIFY
@@ -2305,42 +2306,8 @@ public class MP extends MIDlet
 				}
 
 				Player p;
-				if (playMethod == 0) { // stream
-					int method = playerCreateMethod;
-					if (method == 0) { // auto
-						if (series40) {
-							try {
-								Class.forName("com.sun.mmedia.protocol.CommonDS");
-								// s40v1 uses sun impl for media and i/o so it should work fine
-								method = 1;
-							} catch (Exception e) {
-								// s40v2+ breaks http locator parsing
-								method = 2;
-							}
-						} else {
-							method = 1;
-							if (symbian) {
-								String platform = System.getProperty("microedition.platform");
-								if (symbianJrt &&
-										(platform.indexOf("java_build_version=2.") != -1
-												|| platform.indexOf("java_build_version=1.4") != -1)) {
-									// emc (s60v5+), supports mp3 streaming
-								} else if (checkClass("com.symbian.mmapi.PlayerImpl")) {
-									// uiq
-								} else {
-									// mmf (s60v3.2-)
-									method = 2;
-								}
-							}
-						}
-					}
-					if (method == 2) { // pass connector stream
-						p = Manager.createPlayer(openHttpConnection(url.toString()).openInputStream(),
-								media.getString("mime", "audio/mpeg"));
-					} else { // pass url
-						p = Manager.createPlayer(url.toString());
-					}
-				} else { // file
+//#ifndef NO_FILE
+				if (playMethod == 1) { // file
 					playerTitleLabel.setText(L[LDownloading]);
 					try {
 						playerProgress.setValue(0);
@@ -2380,6 +2347,43 @@ public class MP extends MIDlet
 						p = Manager.createPlayer(Connector.openInputStream(fileUrl), media.getString("mime", "audio/mpeg"));
 					} else { // pass url
 						p = Manager.createPlayer(fileUrl);
+					}
+				} else
+//#endif
+				{ // stream
+					int method = playerCreateMethod;
+					if (method == 0) { // auto
+						if (series40) {
+							try {
+								Class.forName("com.sun.mmedia.protocol.CommonDS");
+								// s40v1 uses sun impl for media and i/o so it should work fine
+								method = 1;
+							} catch (Exception e) {
+								// s40v2+ breaks http locator parsing
+								method = 2;
+							}
+						} else {
+							method = 1;
+							if (symbian) {
+								String platform = System.getProperty("microedition.platform");
+								if (symbianJrt &&
+										(platform.indexOf("java_build_version=2.") != -1
+												|| platform.indexOf("java_build_version=1.4") != -1)) {
+									// emc (s60v5+), supports mp3 streaming
+								} else if (checkClass("com.symbian.mmapi.PlayerImpl")) {
+									// uiq
+								} else {
+									// mmf (s60v3.2-)
+									method = 2;
+								}
+							}
+						}
+					}
+					if (method == 2) { // pass connector stream
+						p = Manager.createPlayer(openHttpConnection(url.toString()).openInputStream(),
+								media.getString("mime", "audio/mpeg"));
+					} else { // pass url
+						p = Manager.createPlayer(url.toString());
 					}
 				}
 
@@ -3218,7 +3222,7 @@ public class MP extends MIDlet
 					f.append(s);
 					
 					// player
-
+//#ifndef NO_FILE
 					playMethodChoice = new ChoiceGroup(L[LPlaybackMethod], Choice.POPUP, new String[] {
 							L[LStream],
 							L[LCacheToFile]
@@ -3226,6 +3230,7 @@ public class MP extends MIDlet
 					playMethodChoice.setSelectedIndex(playMethod, true);
 					playMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(playMethodChoice);
+//#endif
 
 					playerCreateMethodChoice = new ChoiceGroup(L[LPlayerCreationMethod], Choice.POPUP, new String[] {
 							L[LAuto],
@@ -3385,7 +3390,9 @@ public class MP extends MIDlet
 //#endif
 					peersCacheThreshold = profileCacheGauge.getValue() * 10;
 
+//#ifndef NO_FILE
 					playMethod = playMethodChoice.getSelectedIndex();
+//#endif
 					playerCreateMethod = playerCreateMethodChoice.getSelectedIndex();
 
 //#ifndef NO_FILE
@@ -5421,8 +5428,6 @@ public class MP extends MIDlet
 
 //#ifndef NO_FILE
 	static Object postMessage(String url, String fileUrl, String text, Alert alert) throws IOException {
-		Object res;
-
 		HttpConnection http = null;
 		InputStream httpIn = null;
 		
@@ -5733,6 +5738,7 @@ public class MP extends MIDlet
 		return sb;
 	}
 
+//#ifndef NO_FILE
 	private static void downloadDocument(String url, String dest, Alert alert, Gauge gauge, int size, boolean chat) throws Exception {
 		downloading = true;
 		FileConnection fc = (FileConnection) Connector.open(dest);
@@ -5810,6 +5816,7 @@ public class MP extends MIDlet
 			} catch (Exception ignored) {} // TODO: should I left it ignored?
 		}
 	}
+//#endif
 	
 	// endregion
 	
@@ -6181,11 +6188,11 @@ public class MP extends MIDlet
 		j.put("downloadMethod", downloadMethod);
 		j.put("lastDownloadPath", lastDownloadPath);
 		j.put("lastUploadPath", lastUploadPath);
+		j.put("playMethod", playMethod);
 //#endif
 		j.put("longpoll", longpoll);
 		j.put("playlistDirection", playlistDirection);
 		j.put("playerVolume", playerVolume);
-		j.put("playMethod", playMethod);
 		j.put("playerCreateMethod", playerCreateMethod);
 
 		byte[] b = j.toString().getBytes("UTF-8");
