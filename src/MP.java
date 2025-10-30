@@ -408,6 +408,7 @@ public class MP extends MIDlet
 	static Command downloadBrowserCmd;
 	static Command cancelDownloadCmd;
 	static Command okDownloadCmd;
+	static Command openDownloadedCmd;
 	static Command cancelUploadCmd;
 	static Command confirmCmd;
 	
@@ -505,6 +506,7 @@ public class MP extends MIDlet
 	private static long lastType;
 	private static String[] downloadMessage;
 	private static String downloadCurrentPath;
+	private static String downloadedPath;
 	
 	static int confirmationTask;
 	static Object confirmationParam;
@@ -919,7 +921,8 @@ public class MP extends MIDlet
 		downloadInappCmd = new Command(L[LInApp], Command.OK, 0);
 		downloadBrowserCmd = new Command(L[LWithBrowser], Command.CANCEL, 1);
 		cancelDownloadCmd = new Command(L[LCancel], Command.CANCEL, 1);
-		okDownloadCmd = new Command(L[LOk], Command.OK, 1);
+		okDownloadCmd = new Command(L[LOk], Command.CANCEL, 1);
+		openDownloadedCmd = new Command("Open", Command.SCREEN, 2); // TODO unlocalized
 		cancelUploadCmd = new Command(L[LCancel], Command.CANCEL, 1);
 		confirmCmd = new Command(L[LOk], Command.OK, 1);
 
@@ -3919,6 +3922,10 @@ public class MP extends MIDlet
 				}
 				return;
 			}
+			if (c == openDownloadedCmd) {
+				browse(downloadedPath);
+				return;
+			}
 		}
 //#endif
 		if (c == confirmCmd) {
@@ -5809,9 +5816,11 @@ public class MP extends MIDlet
 
 						// done
 						if (chat) {
+							downloadedPath = dest;
 							goBackToChat();
 							alert.setIndicator(null);
 							alert.addCommand(okDownloadCmd);
+							if (!series40) alert.addCommand(openDownloadedCmd);
 							alert.removeCommand(cancelDownloadCmd);
 							alert.setString(L[LDownloadedTo] + downloadPath);
 							display(alert, current);
