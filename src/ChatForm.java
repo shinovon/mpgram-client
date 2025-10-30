@@ -402,7 +402,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 		}
 		
 		if (j.has("url")) {
-			MP.openUrl(j.getString("url"));
+			MP.openUrl(j.getString("url"), true);
 		}
 	}
 	

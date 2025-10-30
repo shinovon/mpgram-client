@@ -2232,15 +2232,17 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (!touch && !inputFocused) {
 			focusInput();
 		} else if ((text != null && text.trim().length() != 0) || file != null || forwardMsgs != null || forwardMsg != null) {
-			if (!MP.sending) {
-				MP.sending = true;
-				MP.midlet.start(MP.RUN_SEND_MESSAGE, new Object[] {
-						text, id,
-						replyMsgId == 0 ? null : Integer.toString(replyMsgId),
-						editMsgId == 0 ? null : Integer.toString(editMsgId),
-						file,
-						null, forwardPeer, forwardMsg, forwardMsgs
-						});
+			synchronized (this) {
+				if (!MP.sending) {
+					MP.sending = true;
+					MP.midlet.start(MP.RUN_SEND_MESSAGE, new Object[] {
+							text, id,
+							replyMsgId == 0 ? null : Integer.toString(replyMsgId),
+							editMsgId == 0 ? null : Integer.toString(editMsgId),
+							file,
+							null, forwardPeer, forwardMsg, forwardMsgs
+					});
+				}
 			}
 		} else {
 			showMenu(null, new int[] { LSendSticker, LWriteMessage });
@@ -2513,7 +2515,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		}
 		
 		if (j.has("url")) {
-			MP.openUrl(j.getString("url"));
+			MP.openUrl(j.getString("url"), true);
 		}
 	}
 

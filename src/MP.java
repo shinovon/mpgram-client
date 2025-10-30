@@ -110,6 +110,7 @@ public class MP extends MIDlet
 	static final int RUN_DOWNLOAD_DOCUMENT = 26;
 	static final int RUN_LOGOUT = 27;
 	static final int RUN_START_PLAYER = 28;
+	static final int RUN_OPEN_URL = 29;
 	
 	static final long ZERO_CHANNEL_ID = -1000000000000L;
 	
@@ -2425,6 +2426,14 @@ public class MP extends MIDlet
 			}
 			break;
 		}
+		case RUN_OPEN_URL: {
+			if (((String) param).startsWith("tel:")) {
+				browse((String) param);
+				break;
+			}
+			openUrl((String) param, false);
+			break;
+		}
 		}
 //		running--;
 	}
@@ -3789,7 +3798,7 @@ public class MP extends MIDlet
 		if (c == goCmd) { // url dialog submit
 			commandAction(backCmd, d);
 			
-			openUrl(((TextBox) d).getString());
+			openUrl(((TextBox) d).getString(), false);
 			return;
 		}
 		if (c == refreshCmd) {
@@ -4111,7 +4120,7 @@ public class MP extends MIDlet
 			} catch (Exception ignored) {}
 			if (url == null) url = ((StringItem) item).getText();
 			
-			openUrl(url);
+			openUrl(url, true);
 			return;
 		}
 		if (c == callItemCmd) {
@@ -5114,10 +5123,15 @@ public class MP extends MIDlet
 		}
 	}
 	
-	static void openUrl(String url) {
-		if (selfId == null || !handleDeepLink(url)) {
-			midlet.browse(url);
+	static void openUrl(String url, boolean ask) {
+		if (selfId != null && handleDeepLink(url)) {
+			return;
 		}
+		if (ask) {
+			MP.confirm(RUN_OPEN_URL, url, null, url); // TODO unlocalized
+			return;
+		}
+		midlet.browse(url);
 	}
 	
 	static boolean handleDeepLink(String url) {
@@ -5306,7 +5320,14 @@ public class MP extends MIDlet
 								(domain.equals(((MPChat) current).id())
 								|| domain.equals(((MPChat) current).username()))) {
 							((MPChat) current).openMessage(messageId, topMsg);
+							if (start != null) {
+								((MPChat) current).setStartBot(start);
+							}
 						} else {
+							if (start != null) {
+								MP.confirm(RUN_OPEN_URL, url, null, url); // TODO unlocalized
+								return true;
+							}
 							MPChat chat;
 //#ifndef NO_CHAT_CANVAS
 							if (!legacyChatUI) {

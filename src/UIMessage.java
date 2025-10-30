@@ -1348,7 +1348,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			if (((String[]) focusedButton).length == 3) {
 				MP.midlet.start(MP.RUN_BOT_CALLBACK, new String[] { this.peerId, Integer.toString(this.id), ((String[]) focusedButton)[2]});
 			} else {
-				MP.openUrl(((String[]) focusedButton)[1]);
+				MP.openUrl(((String[]) focusedButton)[1], true);
 			}
 			return true;
 		}

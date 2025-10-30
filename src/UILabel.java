@@ -258,7 +258,7 @@ public class UILabel extends UIItem {
 	
 	boolean action() {
 		if (!focusable || selectedUrl == null) return false;
-		MP.openUrl(selectedUrl);
+		MP.openUrl(selectedUrl, true);
 		return true;
 	}
 	
