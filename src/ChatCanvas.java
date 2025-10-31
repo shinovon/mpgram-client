@@ -2396,6 +2396,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		focusItem(null, 0);
 		firstItem = lastItem = null;
 		kineticScroll = scroll = 0;
+		skipRender = false;
+		menuFocused = false;
+		inputFocused = false;
+		funcWasFocused = false;
+		funcFocused = false;
 	}
 
 	public void openMessage(String msg, int topMsg) {
