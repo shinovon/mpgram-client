@@ -252,11 +252,14 @@ public class ChatInfoForm extends MPForm {
 		
 		if (!isUser && !topic) {
 			boolean left = rawPeer.getBoolean("left", false);
-			s = new StringItem(null, left ? MP.L[LJoinGroup] : MP.L[LLeaveGroup], Item.BUTTON);
-			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-			s.setDefaultCommand(left ? MP.joinChatCmd : MP.leaveChatCmd);
-			s.setItemCommandListener(MP.midlet);
-			append(s);
+			// there is no method for leaving a group in telegram api
+			if (left || rawPeer.has("username")) {
+				s = new StringItem(null, MP.L[left ? LJoinGroup : LLeaveGroup], Item.BUTTON);
+				s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+				s.setDefaultCommand(left ? MP.joinChatCmd : MP.leaveChatCmd);
+				s.setItemCommandListener(MP.midlet);
+				append(s);
+			}
 		}
 	}
 
