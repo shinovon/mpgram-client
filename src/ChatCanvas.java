@@ -2207,7 +2207,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		}
 		if (text == null) text = "";
 		if (!touch) {
-			this.bottomAnimTarget = h + MP.smallBoldFontHeight + 4;
+			bottomAnimTarget = h + MP.smallBoldFontHeight + 4;
 			keyGuide = false;
 			inputFocused = true;
 			funcWasFocused = funcFocused;
@@ -2255,7 +2255,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		replyMsgId = 0;
 		editMsgId = 0;
 		file = null;
-		if (touch) bottom = inputFieldHeight;
+		bottomAnimTarget = inputFieldHeight + MP.smallBoldFontHeight + 4;
 		forwardPeer = null;
 		forwardMsg = null;
 		forwardMsgs = null;
