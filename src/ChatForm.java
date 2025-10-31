@@ -709,7 +709,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 							s = new StringItem(null, sb.toString());
 							s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 							s.setFont(MP.smallItalicFont);
-							if (voice) {
+							if (voice && MP.voiceConversion) {
 								s.addCommand(MP.documentCmd);
 								s.setDefaultCommand(MP.playVoiceCmd);
 							} else if (playable) {

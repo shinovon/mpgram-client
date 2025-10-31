@@ -854,7 +854,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			return contentHeight = h += PADDING_HEIGHT;
 		}
 		
-		int minW = PADDING_WIDTH * 2 + MARGIN_WIDTH * 2 + MARGIN_SIDE, maxW = minW;
+		int minW = PADDING_WIDTH * 2 + MARGIN_WIDTH * 2 + MARGIN_SIDE, maxW = minW, lastW = minW;
 		int cw = Math.min(MAX_WIDTH, width) - PADDING_WIDTH * 2 - MARGIN_WIDTH * 2 - MARGIN_SIDE;
 		int x = MARGIN_WIDTH + PADDING_WIDTH;
 		
@@ -862,7 +862,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (!hideName) {
 			nameRender = UILabel.ellipsis(name, MP.smallBoldFont, cw - PADDING_WIDTH * 2);
 			senderWidth = MP.smallBoldFont.stringWidth(nameRender);
-			maxW = Math.max(maxW, minW + senderWidth);
+			maxW = Math.max(maxW, lastW = minW + senderWidth);
 			
 			touchZones[order ++] = x;
 			touchZones[order ++] = h + y;
@@ -875,7 +875,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (fwd) {
 			forwardRender = UILabel.ellipsis(forwardName, MP.smallBoldFont, cw - PADDING_WIDTH * 2 - forwardedFromWidth);
 			forwardNameWidth = MP.smallBoldFont.stringWidth(forwardRender);
-			maxW = Math.max(maxW, minW + forwardNameWidth + forwardedFromWidth);
+			maxW = Math.max(maxW, lastW = minW + forwardNameWidth + forwardedFromWidth);
 			
 			int tx = x + forwardedFromWidth;
 			touchZones[order ++] = tx;
@@ -891,16 +891,16 @@ public class UIMessage extends UIItem implements LangConstants {
 			if (replyName != null) {
 				replyNameRender = UILabel.ellipsis(replyName, MP.smallBoldFont, cw - 10);
 				h += MP.smallBoldFontHeight;
-				maxW = Math.max(maxW, minW + MP.smallBoldFont.stringWidth(replyNameRender) + 10);
+				maxW = Math.max(maxW, lastW = minW + MP.smallBoldFont.stringWidth(replyNameRender) + 10);
 			}
 			int rw = cw - 10;
 			if (replyPrefix != null) {
 				rw -= replyPrefixWidth + MP.smallPlainFontSpaceWidth;
-				maxW = Math.max(maxW, minW + replyPrefixWidth + 10);
+				maxW = Math.max(maxW, lastW = minW + replyPrefixWidth + 10);
 			}
 			if (replyText != null) {
 				replyTextRender = UILabel.ellipsis(replyText, MP.smallPlainFont, rw);
-				maxW = Math.max(maxW, minW + MP.smallPlainFont.stringWidth(replyTextRender) + replyPrefixWidth + MP.smallPlainFontSpaceWidth + 10);
+				maxW = Math.max(maxW, lastW = minW + MP.smallPlainFont.stringWidth(replyTextRender) + replyPrefixWidth + MP.smallPlainFontSpaceWidth + 10);
 			}
 			h += 4 + MP.smallPlainFontHeight;
 			
@@ -946,7 +946,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				} else {
 					ph = pw = photoRenderWidth = photoRenderHeight = Math.min(cw, MP.photoSize);
 				}
-				maxW = Math.max(maxW, minW + pw);
+				maxW = Math.max(maxW, lastW = minW + pw);
 				
 				touchZones[order ++] = x;
 				touchZones[order ++] = h + y;
@@ -958,16 +958,16 @@ public class UIMessage extends UIItem implements LangConstants {
 				if (mediaThumb) {
 					mx += MP.smallBoldFontHeight + MP.smallPlainFontHeight + 2;
 				}
-				maxW = Math.max(maxW, minW + mx);
+				maxW = Math.max(maxW, lastW = minW + mx);
 				int mh = 0;
 				if (mediaTitle != null) {
 					mediaTitleRender = UILabel.ellipsis(mediaTitle, MP.smallBoldFont, cw - mx);
-					maxW = Math.max(maxW, minW + MP.smallBoldFont.stringWidth(mediaTitleRender) + mx);
+					maxW = Math.max(maxW, lastW = minW + MP.smallBoldFont.stringWidth(mediaTitleRender) + mx);
 					mh += MP.smallBoldFontHeight;
 				}
 				if (mediaSubtitle != null) {
 					mediaSubtitleRender = UILabel.ellipsis(mediaSubtitle, MP.smallPlainFont, cw - mx);
-					maxW = Math.max(maxW, minW + MP.smallBoldFont.stringWidth(mediaSubtitleRender) + mx);
+					maxW = Math.max(maxW, lastW = minW + MP.smallBoldFont.stringWidth(mediaSubtitleRender) + mx);
 					mh += MP.smallPlainFontHeight;
 				}
 				
@@ -988,11 +988,11 @@ public class UIMessage extends UIItem implements LangConstants {
 			if (l != 0) {
 				int[] pos = (int[]) ((Object[]) text.render.elementAt(l - 1))[3];
 				timeBreak = (tw = pos[0] + pos[2] + timeWidth) >= cw;
-				maxW = Math.max(maxW, minW + tw);
+				maxW = Math.max(maxW, lastW = minW + tw);
 			}
 			maxW = Math.max(maxW, minW + text.contentWidth);
-		} else if (!(timeBreak = maxW + timeWidth >= cw)) {
-			maxW += timeWidth;
+		} else if (!(timeBreak = lastW + timeWidth >= cw) && lastW + timeWidth >= maxW) {
+			maxW = Math.max(maxW, lastW + timeWidth);
 		}
 
 		// reacts
