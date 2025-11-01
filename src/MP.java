@@ -5136,7 +5136,7 @@ public class MP extends MIDlet
 	}
 	
 	static void openUrl(String url, boolean ask) {
-		if (selfId != null && handleDeepLink(url)) {
+		if (selfId != null && handleDeepLink(url, ask)) {
 			return;
 		}
 		if (ask) {
@@ -5146,7 +5146,7 @@ public class MP extends MIDlet
 		midlet.browse(url);
 	}
 	
-	static boolean handleDeepLink(String url) {
+	static boolean handleDeepLink(String url, boolean ask) {
 		if (url.startsWith("@")) {
 			openChat(url.substring(1), -1);
 			return true;
@@ -5336,7 +5336,7 @@ public class MP extends MIDlet
 								((MPChat) current).setStartBot(start);
 							}
 						} else {
-							if (start != null) {
+							if (start != null && ask) {
 								MP.confirm(RUN_OPEN_URL, url, null, L[LOpenThisLink_Alert] + " \n\n" + url);
 								return true;
 							}
