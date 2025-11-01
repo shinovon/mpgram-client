@@ -321,6 +321,7 @@
 	"BanMember_Alert": "Ban member?",
 	"Logout_Alert": "Are you sure you want to log out?",
 	"RewriteFile_Alert": "File already exists, rewrite?",
+	"OpenThisLink_Alert": "Open this link?",
 	
 	// Chat form
 	"ChatMedia_Title": "Media",

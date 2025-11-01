@@ -321,6 +321,7 @@
 	"BanMember_Alert": "Заблокировать участника?",
 	"Logout_Alert": "Вы действительно хотите выйти?",
 	"RewriteFile_Alert": "Файл уже существует, перезаписать",
+	"OpenThisLink_Alert": "Перейти по ссылке?",
 	
 	// Chat form
 	"ChatMedia_Title": "Медиафайлы",

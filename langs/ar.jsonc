@@ -321,6 +321,7 @@
 	"BanMember_Alert": "Ban member?", // Untranslated
 	"Logout_Alert": "Are you sure you want to log out?", // Untranslated
 	"RewriteFile_Alert": "File already exists, rewrite?", // Untranslated
+	"OpenThisLink_Alert": "Open this link?", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "الوسائط",

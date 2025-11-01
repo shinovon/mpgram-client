@@ -321,6 +321,7 @@
 	"BanMember_Alert": "Estetäänkö jäsen?",
 	"Logout_Alert": "Haluatko varmasti kirjautua ulos?",
 	"RewriteFile_Alert": "File already exists, rewrite?", // Untranslated
+	"OpenThisLink_Alert": "Open this link?", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Media",

@@ -5140,7 +5140,7 @@ public class MP extends MIDlet
 			return;
 		}
 		if (ask) {
-			MP.confirm(RUN_OPEN_URL, url, null, url); // TODO unlocalized
+			MP.confirm(RUN_OPEN_URL, url, null, L[LOpenThisLink_Alert] + " \n\n" + url);
 			return;
 		}
 		midlet.browse(url);
@@ -5337,7 +5337,7 @@ public class MP extends MIDlet
 							}
 						} else {
 							if (start != null) {
-								MP.confirm(RUN_OPEN_URL, url, null, url); // TODO unlocalized
+								MP.confirm(RUN_OPEN_URL, url, null, L[LOpenThisLink_Alert] + " \n\n" + url);
 								return true;
 							}
 							MPChat chat;
