@@ -144,6 +144,7 @@
 	"Videos": "Видео",
 	"Files": "Файлы",
 	"AudioFiles": "Музыка",
+	"VoiceMessages": "Голосовые сообщ.",
 	
 	// Dialog commands
 	"Ok": "ОК",

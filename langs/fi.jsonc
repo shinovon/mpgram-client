@@ -144,6 +144,7 @@
 	"Videos": "Videot",
 	"Files": "Tiedostot",
 	"AudioFiles": "Musiikki",
+	"VoiceMessages": "Voice messages", // Untranslated
 	
 	// Dialog commands
 	"Ok": "OK",

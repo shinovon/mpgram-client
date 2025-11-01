@@ -248,6 +248,12 @@ public class ChatInfoForm extends MPForm {
 			s.setDefaultCommand(MP.chatMusicCmd);
 			s.setItemCommandListener(MP.midlet);
 			append(s);
+
+			s = new StringItem(null, MP.L[LVoiceMessages], Item.BUTTON);
+			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+			s.setDefaultCommand(MP.chatVoiceCmd);
+			s.setItemCommandListener(MP.midlet);
+			append(s);
 		}
 		
 		if (!isUser && !topic) {

@@ -144,6 +144,7 @@
 	"Videos": "Videos",
 	"Files": "Files",
 	"AudioFiles": "Music",
+	"VoiceMessages": "Voice messages",
 	
 	// Dialog commands
 	"Ok": "Ok",

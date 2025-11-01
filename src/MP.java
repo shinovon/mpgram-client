@@ -394,6 +394,7 @@ public class MP extends MIDlet
 	static Command chatVideosCmd;
 	static Command chatFilesCmd;
 	static Command chatMusicCmd;
+	static Command chatVoiceCmd;
 	static Command gotoPinnedMsgCmd;
 	static Command chatMembersCmd;
 	
@@ -908,6 +909,7 @@ public class MP extends MIDlet
 		chatVideosCmd = new Command(L[LVideos], Command.ITEM, 2);
 		chatFilesCmd = new Command(L[LFiles], Command.ITEM, 3);
 		chatMusicCmd = new Command(L[LAudioFiles], Command.ITEM, 4);
+		chatVoiceCmd = new Command(L[LVoiceMessages], Command.ITEM, 5);
 		gotoPinnedMsgCmd = new Command(L[LGoTo], Command.ITEM, 1);
 		chatMembersCmd = new Command(L[LMembers], Command.SCREEN, 6);
 		
@@ -2794,7 +2796,7 @@ public class MP extends MIDlet
 				return;
 			}
 			// Chat media categories
-			if (c == chatPhotosCmd || c == chatVideosCmd || c == chatFilesCmd || c == chatMusicCmd) {
+			if (c == chatPhotosCmd || c == chatVideosCmd || c == chatFilesCmd || c == chatMusicCmd || c == chatVoiceCmd) {
 				String mediaFilter;
 				switch (c.getPriority()) {
 				case 1:
@@ -2808,6 +2810,9 @@ public class MP extends MIDlet
 					break;
 				case 4:
 					mediaFilter = "Music";
+					break;
+				case 5:
+					mediaFilter = "Voice";
 					break;
 				default:
 					return;

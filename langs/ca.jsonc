@@ -144,6 +144,7 @@
 	"Videos": "Vídeos",
 	"Files": "Fitxers",
 	"AudioFiles": "Música",
+	"VoiceMessages": "Voice messages", // Untranslated
 	
 	// Dialog commands
 	"Ok": "D'acord",

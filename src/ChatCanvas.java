@@ -941,7 +941,27 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				if (selected != 0 || mediaFilter != null || loading) {
 					g.setFont(medfont ? MP.medPlainFont : MP.smallPlainFont);
 					g.setColor(colors[COLOR_CHAT_PANEL_FG]);
-					g.drawString(loading ? MP.L[LLoading] : selected != 0 ? Integer.toString(selected) : mediaFilter /* TODO unlocalized */, tx, medfont ? ((th - MP.medPlainFontHeight) >> 1) : 2, 0);
+					String s;
+					if (loading) {
+						s = MP.L[LLoading];
+					} else if (selected != 0) {
+						s = Integer.toString(selected);
+					} else /*if (mediaFilter != null)*/ {
+						if ("Photo".equals(mediaFilter)) {
+							s = MP.L[LPhotos];
+						} else if ("Video".equals(mediaFilter)) {
+							s = MP.L[LVideos];
+						} else if ("Document".equals(mediaFilter)) {
+							s = MP.L[LFiles];
+						} else if ("Music".equals(mediaFilter)) {
+							s = MP.L[LAudioFiles];
+						} else if ("Voice".equals(mediaFilter)) {
+							s = MP.L[LVoiceMessages];
+						} else {
+							s = mediaFilter;
+						}
+					}
+					g.drawString(s, tx, medfont ? ((th - MP.medPlainFontHeight) >> 1) : 2, 0);
 				} else {
 					boolean hideStatus = medfont && (selfChat || postId != null || query != null);
 					if (title != null) {

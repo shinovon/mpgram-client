@@ -144,6 +144,7 @@
 	"Videos": "Videos", // Untranslated
 	"Files": "Files", // Untranslated
 	"AudioFiles": "Music", // Untranslated
+	"VoiceMessages": "Voice messages", // Untranslated
 	
 	// Dialog commands
 	"Ok": "OK",

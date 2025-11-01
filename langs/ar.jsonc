@@ -144,6 +144,7 @@
 	"Videos": "الفيديوهات",
 	"Files": "الملفات",
 	"AudioFiles": "موسيقى",
+	"VoiceMessages": "Voice messages", // Untranslated
 	
 	// Dialog commands
 	"Ok": "تأكيد",
