@@ -23,15 +23,7 @@ SOFTWARE.
 import java.io.DataInputStream;
 import java.util.Hashtable;
 
-import javax.microedition.lcdui.Alert;
-import javax.microedition.lcdui.AlertType;
-import javax.microedition.lcdui.Canvas;
-import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Font;
-import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.TextBox;
-import javax.microedition.lcdui.TextField;
-import javax.microedition.lcdui.Ticker;
+import javax.microedition.lcdui.*;
 
 public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnable {
 	
@@ -51,10 +43,13 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	static final int COLOR_CHAT_INPUT_ICON = 12;
 	static final int COLOR_CHAT_SEND_ICON = 13;
 	static final int COLOR_CHAT_INPUT_BORDER = 14;
-	
+
 	static int[] colors = new int[40];
 	static int[] colorsCopy;
 	static int[] style = new int[20];
+	static boolean bg;
+	static Image bgImg;
+	static int bgWidth, bgHeight;
 	
 //	static Image attachIcon;
 
@@ -243,7 +238,22 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			colorsCopy = new int[colors.length];
 			System.arraycopy(colors, 0, colorsCopy, 0, colors.length);
 		}
-		
+
+		if (bgImg == null) {
+			try {
+				bgImg = Image.createImage("/bg.png");
+
+				int i = Math.max(bgWidth = bgImg.getWidth(), bgHeight = bgImg.getHeight());
+//				int s = Math.max(getWidth(), getHeight());
+//				if (i > s) {
+//					bgImg = MP.resize(bgImg, s, s);
+//				}
+				bg = true;
+			} catch (Exception e) {
+				bg = false;
+			}
+		}
+
 		if (touch) {
 			top = MP.smallBoldFontHeight + MP.smallPlainFontHeight + 8;
 		} else {
@@ -852,6 +862,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			// background
 			g.setColor(colors[COLOR_CHAT_BG]);
 			g.fillRect(0, 0, w, h);
+			if (bgImg != null) {
+				g.drawImage(bgImg, (w - bgWidth) >> 1, (h - bgHeight) >> 1, 0);
+			}
 			g.setColor(colors[COLOR_CHAT_FG]);
 			
 			// render items

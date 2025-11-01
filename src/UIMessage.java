@@ -577,7 +577,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		} else if (sticker) {
 		} else if (ChatCanvas.style[STYLE_MESSAGE_BORDER] != 0) {
 			g.drawRect(x, y, cw - 1, h - 1);
-		} else if (ChatCanvas.style[STYLE_MESSAGE_ROUND] != 0) {
+		} else if (ChatCanvas.style[STYLE_MESSAGE_ROUND] != 0 && !ChatCanvas.bg) {
 			// fake rounding
 			g.setColor(ChatCanvas.colors[ChatCanvas.COLOR_CHAT_BG]);
 			g.drawLine(x, y, x, y);
