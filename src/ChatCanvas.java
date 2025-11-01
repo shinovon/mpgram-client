@@ -1726,7 +1726,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 								resetInput();
 							} else {
 								replyMsgId = 0;
-								bottom = inputFieldHeight;
+								bottomAnimTarget = inputFieldHeight;
 							}
 						}
 					} else if (x > width - 48) {

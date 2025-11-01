@@ -43,6 +43,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	static final int COLOR_MESSAGE_OUT_TIME = 34;
 	static final int COLOR_ACTION_BG = 35;
 	static final int COLOR_MESSAGE_OUT_READ = 36;
+	static final int COLOR_MESSAGE_VOICE_WAVEFORM = 37;
 	
 	static final int STYLE_MESSAGE_FILL = 0;
 	static final int STYLE_MESSAGE_ROUND = 1;
@@ -109,6 +110,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	int photoRawWidth, photoRawHeight;
 	long fileSize;
 	boolean voice;
+	byte[] waveform, waveformRender;
 	
 	String time, nameRender, dateRender;
 	String replyNameRender, replyTextRender, forwardRender;
@@ -219,10 +221,29 @@ public class UIMessage extends UIItem implements LangConstants {
 		time = MP.appendTime(sb, date).toString();
 		timeWidth = MP.smallPlainFont.stringWidth(time);
 	}
-	
-	private void init(JSONObject message, ChatCanvas chat) {
+
+	private void resetMessage() {
 		subFocusCurrent = -1;
 		layoutWidth = 0;
+		focusedButton = null;
+		replyMarkup = null;
+		replyMarkupRender = null;
+		reactsText = null;
+		waveform = null;
+		mediaTitle = null;
+		mediaTitleRender = null;
+		mediaSubtitle = null;
+		mediaSubtitleRender = null;
+		text = null;
+		origText = null;
+		media = false;
+		mediaUrl = null;
+		mediaDownload = false;
+		mediaPlayable = false;
+	}
+	
+	private void init(JSONObject message, ChatCanvas chat) {
+		resetMessage();
 		
 		int order = 0;
 		
@@ -346,8 +367,17 @@ public class UIMessage extends UIItem implements LangConstants {
 									sb.append(time / 60).append(':').append(MP.n(time % 60));
 									mediaSubtitle = sb.toString();
 									sb.setLength(0);
-									
-									sb.append(MP.L[LVoiceMessage]);
+
+									if (audio.has("wave")) {
+										JSONArray wave = audio.getArray("wave");
+										int l;
+										waveform = new byte[l = wave.size()];
+										for (int i = 0; i < l; ++i) {
+											waveform[i] = (byte) wave.getInt(i);
+										}
+									} else {
+										sb.append(MP.L[LVoiceMessage]);
+									}
 									voice = true;
 									break name;
 								} else {
@@ -409,7 +439,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		} else {
 			this.media = false;
 		}
-		
+
 		if (chat.mediaFilter == null) {
 			// text
 			String text = origText = message.getString("text", null);
@@ -474,13 +504,8 @@ public class UIMessage extends UIItem implements LangConstants {
 							}
 						}
 					}
-				} else {
-					replyMarkup = null;
 				}
-			} else {
-				replyMarkup = null;
 			}
-			focusedButton = null;
 			read = id <= chat.readOutboxId;
 		}
 		
@@ -677,8 +702,16 @@ public class UIMessage extends UIItem implements LangConstants {
 					}
 					px += s + 2;
 				}
-				if (mediaTitleRender != null) {
-					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_FG]);
+				if (waveformRender != null) {
+					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_VOICE_WAVEFORM]);
+					int fh = MP.medBoldFontHeight;
+					for (int i = 0; i < waveformRender.length; ++i) {
+						int sh = waveformRender[i];
+						g.fillRect(px + i * 2, y + ((fh - sh) >> 1), 1, sh);
+					}
+					y += fh;
+				} else if (mediaTitleRender != null) {
+					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_TITLE]);
 					g.setFont(MP.smallBoldFont);
 					g.drawString(mediaTitleRender, px, y, 0);
 					y += MP.smallBoldFontHeight;
@@ -960,7 +993,48 @@ public class UIMessage extends UIItem implements LangConstants {
 				}
 				maxW = Math.max(maxW, lastW = minW + mx);
 				int mh = 0;
-				if (mediaTitle != null) {
+				if (waveform != null) {
+					final int sw = 2;
+					int aw = cw - minW - mx;
+					int l = waveform.length;
+					int pw = l * sw;
+					int fh = MP.medBoldFontHeight;
+					byte[] res;
+					if (aw == 0) {
+						res = new byte[0];
+					} else if (pw > aw) {
+						res = new byte[aw /= sw];
+						int d = l / aw, r = l % aw;
+						int s = 0;
+
+						for (int i = 0; i < aw; ++i) {
+							int end = s + d + (i < r ? 1 : 0);
+							if (end > l) end = l;
+
+							int t = 0;
+							while (s < end) {
+								int v = waveform[s++];
+								if (v > t) t = v;
+							}
+
+							t = ((t * fh) / 32);
+							if ((t & 1) == 0) ++t;
+							if (t < 1) t = 1;
+							res[i] = (byte) t;
+						}
+					} else {
+						res = new byte[l];
+						for (int i = 0; i < l; ++i) {
+							int t = ((waveform[i] * fh) / 32);
+							if ((t % 2) == 0) ++t;
+							if (t < 1) t = 1;
+							res[i] = (byte) t;
+						}
+					}
+					waveformRender = res;
+					mh += fh;
+					maxW = Math.max(maxW, Math.min(cw, minW + mx + pw));
+				} else if (mediaTitle != null) {
 					mediaTitleRender = UILabel.ellipsis(mediaTitle, MP.smallBoldFont, cw - mx);
 					maxW = Math.max(maxW, lastW = minW + MP.smallBoldFont.stringWidth(mediaTitleRender) + mx);
 					mh += MP.smallBoldFontHeight;
@@ -1113,8 +1187,6 @@ public class UIMessage extends UIItem implements LangConstants {
 			touchZones[order ++] = maxW + PADDING_WIDTH * 2;
 			touchZones[order ++] = (h += by) + y + PADDING_HEIGHT;
 			touchZones[order ++] = FOCUS_REPLY_MARKUP;
-		} else {
-			replyMarkupRender = null;
 		}
 		
 		touchZones[order] = Integer.MIN_VALUE;
@@ -1329,7 +1401,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			MP.openChat(replyPeer, replyMsgId);
 			return true;
 		case FOCUS_MEDIA:
-			if (mediaPlayable) {
+			if (mediaPlayable || voice) {
 				menuAction(LPlay_Item);
 			} else if (photo) {
 				menuAction(LViewImage);
@@ -1409,6 +1481,12 @@ public class UIMessage extends UIItem implements LangConstants {
 			MP.midlet.downloadDocument(peerId, idStr, name, Long.toString(fileSize));
 			break;
 		case LPlay_Item:
+			if (voice) {
+				if (!MP.voiceConversion) break;
+
+				// TODO
+				break;
+			}
 			MP.display(MP.loadingAlert(MP.L[LLoading]), MP.current);
 			MP.midlet.start(MP.RUN_LOAD_PLAYLIST, new String[] {peerId, "3", idStr});
 			break;
@@ -1434,7 +1512,9 @@ public class UIMessage extends UIItem implements LangConstants {
 	private int[] subMenu(int focus) {
 		switch (focus) {
 		case FOCUS_MEDIA:
-			if (mediaPlayable) {
+			if (voice && MP.voiceConversion) {
+				return new int[] { LPlay_Item };
+			} else if (mediaPlayable) {
 				return new int[] { LPlay_Item, LDownload };
 			} else if (photo) {
 				return new int[] { LViewImage, LDownload };
