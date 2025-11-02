@@ -144,12 +144,12 @@
 	"Videos": "Vídeos",
 	"Files": "Fitxers",
 	"AudioFiles": "Música",
-	"VoiceMessages": "Voice messages", // Untranslated
+	"VoiceMessages": "Missatges de veu",
 	
 	// Dialog commands
 	"Ok": "D'acord",
 	"Cancel": "Canceŀla",
-	"Open": "Open", // Untranslated
+	"Open": "Obre",
 	
 	// Pagination commands
 	"NextPage": "Pàgina següent",
@@ -322,7 +322,7 @@
 	"BanMember_Alert": "Prohibir membre?",
 	"Logout_Alert": "Segur que vols tancar sessió?",
 	"RewriteFile_Alert": "Fitxer ja existeix, reescriu-lo?",
-	"OpenThisLink_Alert": "Open this link?", // Untranslated
+	"OpenThisLink_Alert": "Obre aquest enllaç?",
 	
 	// Chat form
 	"ChatMedia_Title": "Mèdia",
