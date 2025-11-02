@@ -28,7 +28,7 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
 public class UILabel extends UIItem {
-	
+
 	Vector parsed = new Vector(); // Object[] {text, font, url }
 	Vector render; // Object[] { text, font, url, int[] {x, y, width, height} }
 	Vector urls; // Object[] { url, Vector(elements of render) }
@@ -36,16 +36,16 @@ public class UILabel extends UIItem {
 
 	int color = -1, bgColor, linkColor = 0x0000FF, focusColor = 0xABABAB;
 	boolean center, ellipsis, background;
-	
+
 	int focusIndex;
-	
+
 	public UILabel() {}
-	
+
 	public UILabel(String text, Font font, String url) {
 		(this.parsed = new Vector())
 		.addElement(new Object[] { text, font, url });
 	}
-	
+
 	public UILabel(String text, JSONArray entities) {
 		parsed = new Vector();
 		MP.wrapRichText(this, null, text, entities, 0);
@@ -61,12 +61,12 @@ public class UILabel extends UIItem {
 		if (render == null) return;
 		int l = render.size();
 		g.setColor(color);
-		
+
 		UIItem root = (UIItem) container;
 		ChatCanvas chat = (ChatCanvas) root.container;
 		int t = (chat.reverse ? chat.height - chat.bottom + chat.scroll - (root.y + root.contentHeight)
 				: chat.top - chat.scroll + root.y) + this.y;
-		
+
 		for (int i = 0; i < l; ++i) {
 			Object[] obj = (Object[]) render.elementAt(i);
 			int[] pos = (int[]) obj[3];
@@ -106,19 +106,19 @@ public class UILabel extends UIItem {
 		}
 		layoutWidth = width;
 		width -= 4;
-		
+
 		if (render == null) {
 			render = new Vector();
 		} else render.removeAllElements();
 		if (urls == null) {
 			urls = new Vector();
 		} else urls.removeAllElements();
-		
+
 		Vector res = render;
 		int x = 0, y = 0, idx = 0, mw = 0;
-		
+
 		boolean center = this.center;
-		
+
 		int fh = 0;
 		int l = parsed.size();
 		boolean ellipsis = this.ellipsis;
@@ -129,7 +129,7 @@ public class UILabel extends UIItem {
 			String text = (String) e[0];
 			Font font = (Font) e[1];
 			String url = (String) e[2];
-			
+
 			fh = font.getHeight();
 			if (text == null || "\n".equals(text)) {
 				if (ellipsis) {
@@ -140,7 +140,7 @@ public class UILabel extends UIItem {
 				}
 				continue;
 			}
-			
+
 			int ch = 0;
 			int sl = text.length();
 			char c;
@@ -154,7 +154,7 @@ public class UILabel extends UIItem {
 					y += fh;
 				}
 			}
-			
+
 			if (ellipsis) {
 				int tw;
 				boolean end = false;
@@ -182,7 +182,7 @@ public class UILabel extends UIItem {
 					x = out[0]; y = out[1]; idx = out[2]; mw = out[3];
 				}
 			}
-			
+
 			if (url != null) {
 				Vector v = new Vector();
 				for (int i = startIdx; i < idx; ++i) {
@@ -192,11 +192,11 @@ public class UILabel extends UIItem {
 			}
 		}
 		if (center) centerRow(width, 0, x, y, res);
-		
+
 		contentWidth = y == 0 ? x : mw;
 		return contentHeight = y + fh;
 	}
-	
+
 	boolean grabFocus(int dir) {
 		if (!focusable) return false;
 		focus = true;
@@ -206,18 +206,18 @@ public class UILabel extends UIItem {
 		focusLink(focusIndex);
 		return true;
 	}
-	
+
 	void focusLink(int idx) {
 		Object[] o = (Object[]) urls.elementAt(idx);
 		selectedUrl = (String) o[0];
 		selectedParts = (Vector) o[1];
 	}
-	
+
 	int traverse(int dir) {
 		if (!focusable || urls.size() == 0) return 0;
-		
+
 		int next;
-		
+
 		if (dir == Canvas.UP) {
 			if (focusIndex <= 0) {
 				focusLink(focusIndex = 0);
@@ -226,7 +226,7 @@ public class UILabel extends UIItem {
 				}
 				return Integer.MIN_VALUE;
 			}
-			
+
 			next = -1;
 		} else if (dir == Canvas.DOWN) {
 			if (focusIndex >= urls.size() - 1) {
@@ -241,27 +241,27 @@ public class UILabel extends UIItem {
 		} else {
 			return Integer.MIN_VALUE;
 		}
-		
+
 		int[] pos = getLinkPos(focusIndex, next == 1 ? selectedParts.size() - 1 : 0);
 		if (getVisibility(pos) == -next) {
 			return 0;
 		}
 
 		focusLink(focusIndex = focusIndex + next);
-		
+
 		pos = getLinkPos(focusIndex, next == 1 ? selectedParts.size() - 1 : 0);
 		if (getVisibility(pos) == -next) {
 			return 0;
 		}
 		return Integer.MAX_VALUE;
 	}
-	
+
 	boolean action() {
 		if (!focusable || selectedUrl == null) return false;
 		MP.openUrl(selectedUrl, true);
 		return true;
 	}
-	
+
 	boolean tap(int x, int y, boolean longTap) {
 		if (longTap) return false;
 		int idx = getUrlAt(x, y);
@@ -272,7 +272,7 @@ public class UILabel extends UIItem {
 		}
 		return false;
 	}
-	
+
 	synchronized int getUrlAt(int x, int y) {
 		int l = urls.size();
 		for (int i = 0; i < l; ++i) {
@@ -289,11 +289,11 @@ public class UILabel extends UIItem {
 		}
 		return -1;
 	}
-	
+
 	int[] getLinkPos(int idx, int partIdx) {
 		return (int[]) ((Object[]) ((Vector) ((Object[]) urls.elementAt(idx))[1]).elementAt(partIdx))[3];
 	}
-	
+
 	private int getVisibility(int[] pos) {
 		UIItem root = (UIItem) container;
 		ChatCanvas chat = (ChatCanvas) root.container;
@@ -302,7 +302,7 @@ public class UILabel extends UIItem {
 
 		return (t + pos[3]) <= chat.top ? 1 : t >= chat.height - chat.bottom ? -1 : 0;
 	}
-	
+
 	static String ellipsis(String text, Font font, int width) {
 		if (text.indexOf('\n') != -1) {
 			text = text.replace('\n', ' ');
@@ -317,7 +317,7 @@ public class UILabel extends UIItem {
 		}
 		return "...";
 	}
-	
+
 	private static void split(String text, Font font, String url, int width, int x, int y, int idx, int mw, int ch, int sl, int fh, Vector res, boolean center, int[] out) {
 		int dy = 0;
 		if (res.size() != 0 && x != 0) {
@@ -357,7 +357,7 @@ public class UILabel extends UIItem {
 									}
 									mw = Math.max(mw, x + tw);
 									x = 0; y += fh;
-									
+			
 									i = ch = j;
 									break w;
 								}
@@ -392,7 +392,7 @@ public class UILabel extends UIItem {
 		}
 		out[0] = x; out[1] = y; out[2] = idx; out[3] = mw;
 	}
-	
+
 	private static int centerRow(int width, int t, int x, int y, Vector res) {
 		int rw = (width - (x + t)) / 2;
 		x += rw;
@@ -404,6 +404,6 @@ public class UILabel extends UIItem {
 		}
 		return x;
 	}
-	
+
 }
 //#endif
