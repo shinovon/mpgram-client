@@ -460,7 +460,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							int l = topics.size();
 							for (int i = 0; i < l; i++) {
 								JSONObject topic = topics.getObject(i);
-								// TODO
 								list.append(topic.getString("title", "General"), null);
 							}
 

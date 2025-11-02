@@ -1981,7 +1981,7 @@ public class MP extends MIDlet
 		case RUN_BOT_CALLBACK: {
 			MPChat form = (MPChat) current;
 			Ticker ticker;
-			form.setTicker(ticker = new Ticker(MP.L[LSending]));
+			form.setTicker(ticker = new Ticker(L[LSending]));
 
 			try {
 				StringBuffer sb = new StringBuffer("sendBotCallback&timeout=1&r=")
@@ -3436,7 +3436,7 @@ public class MP extends MIDlet
 				MP.confirm(RUN_LOGOUT,
 						null,
 						null,
-						MP.L[MP.LLogout_Alert]);
+						L[LLogout_Alert]);
 				return;
 			}
 			if (c == clearCacheCmd) {
@@ -3649,7 +3649,7 @@ public class MP extends MIDlet
 
 			f.append(new Spacer(2, 2));
 
-			s = new StringItem(null, MP.L[LDonate].concat("\n"));
+			s = new StringItem(null, L[LDonate].concat("\n"));
 			s.setFont(smallPlainFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
@@ -3663,7 +3663,7 @@ public class MP extends MIDlet
 
 			f.append(new Spacer(2, 2));
 
-			s = new StringItem(null, MP.L[LChat].concat("\n"));
+			s = new StringItem(null, L[LChat].concat("\n"));
 			s.setFont(smallPlainFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
@@ -4049,7 +4049,7 @@ public class MP extends MIDlet
 				MP.confirm(MP.RUN_DELETE_MESSAGE | 0x100 | 0x200,
 						s,
 						null,
-						MP.L[MP.LDeleteMessage_Alert]);
+						L[LDeleteMessage_Alert]);
 				return;
 			}
 			if (c == documentCmd) {
@@ -4109,7 +4109,7 @@ public class MP extends MIDlet
 				MP.confirm(RUN_BAN_MEMBER | 0x100,
 						s,
 						null,
-						MP.L[LBanMember_Alert]);
+						L[LBanMember_Alert]);
 				return;
 			}
 			if (c == pinMsgCmd) {
@@ -4119,7 +4119,7 @@ public class MP extends MIDlet
 				MP.confirm(RUN_PIN_MESSAGE | 0x100 | 0x200,
 						s,
 						null,
-						MP.L[LPinMessage_Alert]);
+						L[LPinMessage_Alert]);
 				return;
 			}
 		}
@@ -6049,17 +6049,17 @@ public class MP extends MIDlet
 			sb.append(MP.localizeDate(message.getLong("date"), 2)).append(' ');
 			if (!peer.getBoolean("c", false)) {
 				if (message.getBoolean("out", false) && !id.equals(selfId)) {
-					sb.append(MP.L[LYou_Prefix]);
+					sb.append(L[LYou_Prefix]);
 				} else if (id.charAt(0) == '-' && message.has("from_id")) {
 					MP.appendOneLine(sb, MP.getName(message.getString("from_id"), true)).append(": ");
 				}
 			}
 			if (message.has("media")) {
-				sb.append(MP.L[LMedia]);
+				sb.append(L[LMedia]);
 			} else if (message.has("fwd")) {
-				sb.append(MP.L[LForwardedMessage]);
+				sb.append(L[LForwardedMessage]);
 			} else  if (message.has("act")) {
-				sb.append(MP.L[LAction]);
+				sb.append(L[LAction]);
 			} else {
 				MP.appendOneLine(sb, message.getString("text"));
 			}

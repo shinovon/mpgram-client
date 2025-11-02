@@ -208,7 +208,6 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 						int l = topics.size();
 						for (int i = 0; i < l; i++) {
 							JSONObject topic = topics.getObject(i);
-							// TODO
 							list.append(topic.getString("title", "General"), null);
 						}
 						
