@@ -821,6 +821,11 @@ public class MP extends MIDlet
 			instancePassword = j.getString("instPass", instancePassword);
 		} catch (Exception ignored) {}
 
+		if (user == null) {
+			try {
+				user = getAppProperty("MPGram-User");
+			} catch (Exception ignored) {}
+		}
 
 		// load locale
 		(L = new String[LLocaleStrings + 2])[Lmpgram] = "MPGram";
