@@ -921,6 +921,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 
 		// reply
+		int rw = 0;
 		if (reply) {
 			int ry = h;
 			if (replyName != null) {
@@ -928,15 +929,15 @@ public class UIMessage extends UIItem implements LangConstants {
 				h += MP.smallBoldFontHeight;
 				maxW = Math.max(maxW, lastW = minW + MP.smallBoldFont.stringWidth(replyNameRender) + 10);
 			}
-			int rw = cw - 10;
+			rw = 10;
 			if (replyPrefix != null) {
-				rw -= replyPrefixWidth + MP.smallPlainFontSpaceWidth;
+				rw += replyPrefixWidth + MP.smallPlainFontSpaceWidth;
 				maxW = Math.max(maxW, lastW = minW + replyPrefixWidth + 10);
 			}
-			if (replyText != null) {
-				replyTextRender = UILabel.ellipsis(replyText, MP.smallPlainFont, rw);
-				maxW = Math.max(maxW, lastW = minW + MP.smallPlainFont.stringWidth(replyTextRender) + replyPrefixWidth + MP.smallPlainFontSpaceWidth + 10);
-			}
+//			if (replyText != null) {
+//				replyTextRender = UILabel.ellipsis(replyText, MP.smallPlainFont, rw);
+//				maxW = Math.max(maxW, lastW = minW + MP.smallPlainFont.stringWidth(replyTextRender) + replyPrefixWidth + MP.smallPlainFontSpaceWidth + 10);
+//			}
 			h += 4 + MP.smallPlainFontHeight;
 
 			touchZones[order ++] = x + 2;
@@ -1061,9 +1062,11 @@ public class UIMessage extends UIItem implements LangConstants {
 			h += text.layout(cw - 6);
 			int l = text.render.size();
 			int tw;
-			if (l != 0) {
+			if (l != 0 && reactsText == null) {
 				int[] pos = (int[]) ((Object[]) text.render.elementAt(l - 1))[3];
-				timeBreak = (tw = pos[0] + pos[2] + timeWidth) >= cw;
+				if (!(timeBreak = (tw = pos[0] + pos[2]) + timeWidth >= cw)) {
+					tw += timeWidth;
+				}
 				maxW = Math.max(maxW, minW + tw);
 			}
 			maxW = Math.max(maxW, minW + text.contentWidth);
@@ -1192,7 +1195,11 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 
 		touchZones[order] = Integer.MIN_VALUE;
-		contentWidth = Math.min(maxW, Math.min(MAX_WIDTH, width));
+		contentWidth = maxW = Math.min(maxW, Math.min(MAX_WIDTH, width));
+
+		if (replyText != null) {
+			replyTextRender = UILabel.ellipsis(replyText, MP.smallPlainFont, maxW - minW - rw);
+		}
 		return contentHeight = h + PADDING_HEIGHT;
 	}
 
