@@ -164,7 +164,7 @@ public class UIMessage extends UIItem implements LangConstants {
 //			label.background = true;
 			label.center = true;
 			
-			String t = null;
+			String t/* = null*/;
 			l: {
 				if ("ChatCreate".equals(type)) {
 					t = MP.L[LGroupCreated_Action];
@@ -256,7 +256,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			if (message.has("fwd")) {
 				fwd = true;
 				JSONObject fwd = message.getObject("fwd");
-				String t = null;
+				String t/* = null*/;
 				fwdFromId = fwd.getString("from_id", null);
 				if ((t = fwd.getString("from_name", null)) == null) {
 					t = MP.getName(fwdFromId, true);
@@ -282,7 +282,7 @@ public class UIMessage extends UIItem implements LangConstants {
 						this.reply = true;
 						JSONObject replyMsg = reply.getObject("msg");
 						JSONObject replyFwd;
-						String t = null;
+						String t/* = null*/;
 						if ((t = MP.getName(replyMsg.getString("from_id", null), true, true)) == null
 								&& replyMsg.has("fwd") && (replyFwd = replyMsg.getObject("fwd")).getBoolean("s", false)) {
 							if ((t = replyFwd.getString("from_name", null)) == null) {
@@ -819,7 +819,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			g.setFont(MP.smallBoldFont);
 			g.fillRect(x - PADDING_WIDTH + (w - dateWidth - x) >> 1, y, dateWidth + PADDING_WIDTH * 2, MP.smallBoldFontHeight + DATE_PADDING_HEIGHT * 2);
 			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_FG]);
-			g.drawString(dateRender, x + (w - dateWidth - x) >> 1, y += DATE_PADDING_HEIGHT, 0);
+			g.drawString(dateRender, x + (w - dateWidth - x) >> 1, y + DATE_PADDING_HEIGHT, 0);
 //			y += DATE_MARGIN_HEIGHT + DATE_PADDING_HEIGHT + MP.smallBoldFontHeight;
 		}
 	}
@@ -884,7 +884,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			}
 			
 			touchZones[order] = Integer.MIN_VALUE;
-			return contentHeight = h += PADDING_HEIGHT;
+			return contentHeight = h + PADDING_HEIGHT;
 		}
 		
 		int minW = PADDING_WIDTH * 2 + MARGIN_WIDTH * 2 + MARGIN_SIDE, maxW = minW, lastW = minW;
@@ -1058,11 +1058,11 @@ public class UIMessage extends UIItem implements LangConstants {
 			text.y = h + y - MARGIN_TOP - PADDING_HEIGHT;
 			h += text.layout(cw - 6);
 			int l = text.render.size();
-			int tw = 0;
+			int tw;
 			if (l != 0) {
 				int[] pos = (int[]) ((Object[]) text.render.elementAt(l - 1))[3];
 				timeBreak = (tw = pos[0] + pos[2] + timeWidth) >= cw;
-				maxW = Math.max(maxW, lastW = minW + tw);
+				maxW = Math.max(maxW, minW + tw);
 			}
 			maxW = Math.max(maxW, minW + text.contentWidth);
 		} else if (!(timeBreak = lastW + timeWidth >= cw) && lastW + timeWidth >= maxW) {
@@ -1352,14 +1352,14 @@ public class UIMessage extends UIItem implements LangConstants {
 		return -1;
 	}
 
-	private int getFocusY(int focus) {
-		for (int i = 0; i < touchZones.length; i += 5) {
-			if (touchZones[i + 4] == focus) {
-				return touchZones[i + 1];
-			}
-		}
-		return -1;
-	}
+//	private int getFocusY(int focus) {
+//		for (int i = 0; i < touchZones.length; i += 5) {
+//			if (touchZones[i + 4] == focus) {
+//				return touchZones[i + 1];
+//			}
+//		}
+//		return -1;
+//	}
 	
 	boolean action() {
 		if (selected) {
@@ -1510,8 +1510,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	}
 	
 	private int[] subMenu(int focus) {
-		switch (focus) {
-		case FOCUS_MEDIA:
+		if (focus == FOCUS_MEDIA) {
 			if (voice && MP.voiceConversion) {
 				return new int[] { LPlay_Item };
 			} else if (mediaPlayable) {

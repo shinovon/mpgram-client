@@ -22,14 +22,14 @@ SOFTWARE.
 import javax.microedition.lcdui.Ticker;
 
 // extends Displayable
-interface MPChat {
+public interface MPChat {
 	
-	static final int UPDATE_USER_STATUS = 1;
-	static final int UPDATE_USER_TYPING = 2;
-	static final int UPDATE_NEW_MESSAGE = 3;
-	static final int UPDATE_DELETE_MESSAGES = 4;
-	static final int UPDATE_EDIT_MESSAGE = 5;
-	static final int UPDATE_READ_OUTBOX = 6;
+	int UPDATE_USER_STATUS = 1;
+	int UPDATE_USER_TYPING = 2;
+	int UPDATE_NEW_MESSAGE = 3;
+	int UPDATE_DELETE_MESSAGES = 4;
+	int UPDATE_EDIT_MESSAGE = 5;
+	int UPDATE_READ_OUTBOX = 6;
 	
 	// getters
 	String id();

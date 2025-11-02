@@ -37,7 +37,6 @@ import java.util.Vector;
 import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
-import javax.microedition.io.StreamConnection;
 //#ifndef NO_FILE
 import javax.microedition.io.file.FileConnection;
 import javax.microedition.io.file.FileSystemRegistry;
@@ -304,8 +303,8 @@ public class MP extends MIDlet
 	private static Object runParam;
 //	private static int running;
 	static Thread updatesThread, updatesThreadCopy;
-	static Hashtable threadConnections = new Hashtable();
-	static Vector closingConnections = new Vector();
+	static final Hashtable threadConnections = new Hashtable();
+	static final Vector closingConnections = new Vector();
 	static boolean sending;
 	static boolean updatesRunning;
 	static boolean updatesSleeping;
@@ -531,7 +530,7 @@ public class MP extends MIDlet
 	// notifications
 //#ifndef NO_NOTIFY
 //#ifndef NO_NOKIAUI
-	static Hashtable notificationMessages = new Hashtable();
+	static final Hashtable notificationMessages = new Hashtable();
 //#endif
 	static Player notificationPlayer;
 //#endif
@@ -590,7 +589,7 @@ public class MP extends MIDlet
 			d = p;
 			if ((symbianJrt = p.indexOf("platform=S60") != -1)) {
 				int i;
-				v = p.substring(i = p.indexOf("platform_version=") + 17, i = p.indexOf(';', i));
+				v = p.substring(i = p.indexOf("platform_version=") + 17, /*i = */p.indexOf(';', i));
 				if (v.charAt(0) == '5') {
 					switch (v.charAt(2)) {
 					case '2':
@@ -1755,7 +1754,7 @@ public class MP extends MIDlet
 						muteBroadcasts = j.getInt("broadcasts") != 0;
 						break;
 					} catch (Exception ignored) {
-						continue;
+//						continue;
 					}
 				}
 //#endif
@@ -1992,7 +1991,7 @@ public class MP extends MIDlet
 				.append("&data=").append(((String[]) param)[2])
 				;
 				
-				JSONObject j = null;
+				JSONObject j/* = null*/;
 				
 				try {
 					j = (JSONObject) api(sb.toString());
@@ -3336,7 +3335,6 @@ public class MP extends MIDlet
 						ChatCanvas.colorsCopy = null;
 					}
 //#endif
-				
 					if ((photoSize = (photoSizeGauge.getValue() * 8)) < 16) {
 						photoSizeGauge.setValue((photoSize = 16) / 8);
 					}
@@ -4230,7 +4228,7 @@ public class MP extends MIDlet
 			try {
 				updateTimeoutGauge.setLabel(L[behChoice.isSelected(7) ? LUpdatesTimeout : LUpdatesInterval]);
 			} catch (Exception ignored) {}
-			return;
+//			return;
 		}
 	}
 	
@@ -4283,12 +4281,14 @@ public class MP extends MIDlet
 		
 		if (playerProgress != null) {
 			try {
-				int progress = 0;
 				final long duration = currentMusic.getObject("media").getObject("audio").getInt("time", 0) * 1000000L;
-				progress = (int) ((player.getMediaTime() * 100) / duration);
+				int progress = (int) ((player.getMediaTime() * 100) / duration);
 	
-				if (progress < 0) progress = 0;
-				if (progress > 100) progress = 100;
+				if (progress < 0) {
+					progress = 0;
+				} else if (progress > 100) {
+					progress = 100;
+				}
 				
 				playerProgress.setValue(progress);
 			} catch (Exception ignored) {}
@@ -4430,7 +4430,7 @@ public class MP extends MIDlet
 			try {
 				Notifier.updateImage((String) target, img);
 			} catch (Throwable ignored) {}
-			return;
+//			return;
 		}
 //#endif
 //#endif
@@ -4729,7 +4729,7 @@ public class MP extends MIDlet
 						if (fails++ != 0) throw e;
 						list.deleteAll();
 						path = "/";
-						continue;
+//						continue;
 					}
 				}
 			}
@@ -4886,11 +4886,10 @@ public class MP extends MIDlet
 			if (state == 1) {
 				if (downloadPath == null || downloadPath.trim().length() == 0) {
 					openFilePicker(lastDownloadPath, false);
-					return;
 				} else {
 					start(RUN_DOWNLOAD_DOCUMENT, downloadCurrentPath = downloadPath);
-					return;
 				}
+				return;
 			}
 		} catch (Throwable ignored) {
 			// no jsr 75
@@ -5297,7 +5296,7 @@ public class MP extends MIDlet
 						}
 						if (query[n].startsWith("post=")) {
 							messageId = query[n].substring(5);
-							continue;
+//							continue;
 						}
 					}
 				}
@@ -5306,7 +5305,7 @@ public class MP extends MIDlet
 					if (phone) {
 						//  resolve number
 						openProfile(domain, null, 2);
-						
+
 						return true;
 					} else {
 						if (profile) {
@@ -6705,9 +6704,6 @@ public class MP extends MIDlet
 	// parse all nested elements once
 	static final boolean parse_members = false;
 	
-	// identation for formatting
-	static final String FORMAT_TAB = "  ";
-	
 	// used for storing nulls, get methods must return real null
 	public static final Object json_null = new Object();
 	
@@ -6914,7 +6910,6 @@ public class MP extends MIDlet
 					}
 					// decimal
 					if (str.indexOf('.') != -1 || str.indexOf('E') != -1 || "-0".equals(str))
-//						return new Double(Double.parseDouble(str));
 						return str;
 					if (first == '-') length--;
 					if (length > 8) // (str.length() - (str.charAt(0) == '-' ? 1 : 0)) >= 10
@@ -6923,12 +6918,7 @@ public class MP extends MIDlet
 				} catch (Exception e) {}
 			}
 			throw new RuntimeException("JSON: Couldn't be parsed: ".concat(str));
-//			return new JSONString(str);
 		}
-	}
-	
-	public static boolean isNull(Object obj) {
-		return obj == json_null || obj == null;
 	}
 
 	// transforms string for exporting
@@ -6975,20 +6965,6 @@ public class MP extends MIDlet
 		return sb.toString();
 	}
 
-//	static double getDouble(Object o) {
-//		try {
-//			if (o instanceof String[])
-//				return Double.parseDouble(((String[]) o)[0]);
-//			if (o instanceof Integer)
-//				return ((Integer) o).intValue();
-//			if (o instanceof Long)
-//				return ((Long) o).longValue();
-//			if (o instanceof Double)
-//				return ((Double) o).doubleValue();
-//		} catch (Throwable e) {}
-//		throw new RuntimeException("JSON: Cast to double failed: " + o);
-//	}
-
 	static int getInt(Object o) {
 		try {
 			if (o instanceof String[])
@@ -6997,8 +6973,6 @@ public class MP extends MIDlet
 				return ((Integer) o).intValue();
 			if (o instanceof Long)
 				return (int) ((Long) o).longValue();
-//			if (o instanceof Double)
-//				return ((Double) o).intValue();
 		} catch (Throwable e) {}
 		throw new RuntimeException("JSON: Cast to int failed: " + o);
 	}
@@ -7011,8 +6985,6 @@ public class MP extends MIDlet
 				return ((Integer) o).longValue();
 			if (o instanceof Long)
 				return ((Long) o).longValue();
-//			if (o instanceof Double)
-//				return ((Double) o).longValue();
 		} catch (Throwable e) {}
 		throw new RuntimeException("JSON: Cast to long failed: " + o);
 	}
@@ -7068,18 +7040,6 @@ public class MP extends MIDlet
 	public static JSONStream getJSONStream(InputStream in) throws IOException {
 		JSONStream json = new JSONStream();
 		json.init(in);
-		char c = json.nextTrim();
-		if (c != '{' && c != '[')
-			throw new RuntimeException("JSON: getStream: Not json");
-		json.isObject = c == '{';
-		json.usePrev = true;
-		return json;
-	}
-	
-	public static JSONStream getJSONStream(StreamConnection sc) throws IOException {
-		JSONStream json = new JSONStream();
-		json.connection = sc;
-		json.init(sc.openInputStream());
 		char c = json.nextTrim();
 		if (c != '{' && c != '[')
 			throw new RuntimeException("JSON: getStream: Not json");

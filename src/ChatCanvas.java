@@ -151,7 +151,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	boolean loading;
 	
-	boolean touch = !MP.forceKeyUI && hasPointerEvents();
+	final boolean touch = !MP.forceKeyUI && hasPointerEvents();
 	
 	// menu
 	boolean menuFocused;
@@ -243,7 +243,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			try {
 				bgImg = Image.createImage("/bg.png");
 
-				int i = Math.max(bgWidth = bgImg.getWidth(), bgHeight = bgImg.getHeight());
+				/*int i = */Math.max(bgWidth = bgImg.getWidth(), bgHeight = bgImg.getHeight());
 //				int s = Math.max(getWidth(), getHeight());
 //				if (i > s) {
 //					bgImg = MP.resize(bgImg, s, s);
@@ -588,7 +588,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 								: (i == 0 ? ((endReached && dir == 0) || dir == -1) : (i == l - 1 && dir == 1)));
 					} catch (OutOfMemoryError e) {
 						MP.gc();
-						continue;
+						// continue;
 					}
 				} while (false);
 			}
@@ -1311,7 +1311,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	
 	protected void keyReleased(int key) {
 		if (keyboard != null && keyboard.isVisible() && keyboard.keyReleased(key)) {
-			return;
+			// return;
 		}
 	}
 	
@@ -1347,7 +1347,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	private void key(int key, boolean repeat) {
 		int game = mapGameAction(key);
 		key = mapKey(key);
-		String s = null;
+		String s/* = null*/;
 		try {
 			s = getKeyName(key).toLowerCase();
 			if (s.equals("send") || s.equals("call")
@@ -1486,7 +1486,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				}
 				if (focusedItem != null) {
 					int t = focusedItem.traverse(game);
-					repaint = true;
 					if (t != Integer.MIN_VALUE) {
 						repaint = true;
 						if (t != Integer.MAX_VALUE) {
@@ -1608,18 +1607,18 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						|| dragYHold + dY > 2 || dragYHold + dY < -2
 						|| dX > 1 || dX < -1
 						|| dragXHold + dX > 2 || dragXHold + dX < -2) {
-					int dx2 = dX;
+//					int dx2 = dX;
 					int dy2 = dY;
 					if (now - pressTime < 100) {
 //						dx2 += dragXHold;
 						dy2 += dragYHold;
 					}
-					if (draggingHorizontally || (!dragging && Math.abs(dx2) > Math.abs(dy2))) {
+					if (draggingHorizontally || (!dragging && Math.abs(/*dy2*/dX) > Math.abs(dy2))) {
 						if (!draggingHorizontally) {
 							focusItem(pointedItem, 0);
 						}
 						draggingHorizontally = true;
-					} else if (!draggingHorizontally) {
+					} else {
 						if (reverse) dy2 = -dy2;
 						scroll += dy2;
 						if (kineticScroll * dy2 < 0) kineticScroll = 0;

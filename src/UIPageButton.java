@@ -24,7 +24,7 @@ import javax.microedition.lcdui.Graphics;
 
 public class UIPageButton extends UIItem {
 	
-	private int dir;
+	private final int dir;
 
 	public UIPageButton(int dir) {
 		this.dir = dir;

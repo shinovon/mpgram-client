@@ -30,7 +30,7 @@ public class ChatInfoForm extends MPForm {
 	String phone;
 	String invite;
 	MPChat chatForm;
-	int mode; // 0 - chat info or profile by id, 1 - phone, 2 - invite peek, 3 - invite
+	final int mode; // 0 - chat info or profile by id, 1 - phone, 2 - invite peek, 3 - invite
 	int pinnedMessageId;
 	boolean canBan;
 	
@@ -53,7 +53,7 @@ public class ChatInfoForm extends MPForm {
 	void loadInternal(Thread thread) throws Exception {
 		StringBuffer sb = new StringBuffer();
 		JSONObject rawPeer = null;
-		String name = null;
+		String name/* = null*/;
 		boolean broadcast = false;
 		if (mode == 0) {
 			JSONObject peer = MP.getPeer(id, true);

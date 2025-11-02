@@ -34,7 +34,7 @@ import java.util.Hashtable;
  */
 public class JSONObject {
 
-	protected Hashtable table;
+	protected final Hashtable table;
 
 	public JSONObject() {
 		table = new Hashtable();
@@ -166,19 +166,6 @@ public class JSONObject {
 			return def;
 		}
 	}
-	
-//	public double getDouble(String name) {
-//		return getDouble(get(name));
-//	}
-
-//	public double getDouble(String name, double def) {
-//		if (!has(name)) return def;
-//		try {
-//			return getDouble(name);
-//		} catch (Exception e) {
-//			return def;
-//		}
-//	}
 	
 	public boolean getBoolean(String name) {
 		Object o = get(name);

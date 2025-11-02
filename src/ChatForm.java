@@ -67,7 +67,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 	int lastDay;
 	boolean space;
 	long group;
-	Vector loadedMsgs = new Vector();
+	final Vector loadedMsgs = new Vector();
 
 	long typing;
 	private final Object typingLock = new Object();
@@ -789,7 +789,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 			String type = act.getString("_");
 			String user = act.getString("user", null);
 			
-			t = null;
+//			t = null;
 			l: {
 				if ("ChatCreate".equals(type)) {
 					t = MP.L[LGroupCreated_Action];

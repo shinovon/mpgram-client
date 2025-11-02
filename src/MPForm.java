@@ -99,11 +99,6 @@ public abstract class MPForm extends Form implements LangConstants {
 		append(item);
 	}
 
-	void safeAppend(Thread thread, String item) {
-		if (thread != this.thread) throw MP.cancelException;
-		append(item);
-	}
-
 	void safeInsert(Thread thread, int n, Item item) {
 		if (thread != this.thread) throw MP.cancelException;
 		insert(n, item);

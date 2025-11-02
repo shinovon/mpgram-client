@@ -2,7 +2,7 @@ import javax.microedition.lcdui.List;
 
 public class ChatTopicsList extends List {
 	
-	MPChat chatForm;
+	final MPChat chatForm;
 
 	ChatTopicsList(MPChat chatForm, String title) {
 		super(title, List.IMPLICIT);

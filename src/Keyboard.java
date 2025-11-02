@@ -47,7 +47,6 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 	private int[] layoutTypes;
 
 	private int[][][] widths;
-	private int[][][] positions;
 	private int[][] offsets;
 	private char[][][] customShift;
 
@@ -102,7 +101,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 	private boolean wasHoldingShift;
 
 	private Thread repeatThread;
-	Object pressLock = new Object();
+	final Object pressLock = new Object();
 
 	private int keyTextY;
 	
@@ -1869,13 +1868,11 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 		//keyMarginY = 2;
 		int w1 = screenWidth / 10;
 		widths = new int[layouts.length][][];
-		positions = new int[layouts.length][][];
 		offsets = new int[layouts.length][];
 		for(int l = 0; l < layouts.length; l++) {
 			int m = 0;
 			int rows = layouts[l].length;
 			widths[l] = new int[rows][];
-			positions[l] = new int[rows][];
 			offsets[l] = new int[rows];
 			for (int j = 0; j < layouts[l].length; j++) {
 				if (layouts[l][j].length > layouts[l][m].length) m = j;
@@ -1892,7 +1889,6 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 				int x = 0;
 				int c1 = layouts[l][row].length;
 				widths[l][row] = new int[c1];
-				positions[l][row] = new int[c1];
 				for(int col = 0; col < c1; col++) {
 					int key = layouts[l][row][col];
 					int kw = w;
@@ -1908,7 +1904,6 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 						break;
 					}
 					widths[l][row][col] = kw;
-					positions[l][row][col] = x;
 					x+=kw;
 				}
 				offsets[l][row] = (screenWidth - x) >> 1;
@@ -1954,7 +1949,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 			o.write(buf, 0, i);
 		}
 		is.close();
-		String s = new String(o.toByteArray(), "UTF-8"); 
+		String s = new String(o.toByteArray(), "UTF-8");
 		o.close();
 		if(s.charAt(0) == '{')
 			return MP.parseObject(s);
@@ -2008,31 +2003,28 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 		int i = 0;
 		int w = 0;
 
-		while (true) {
-			while (i < arr.length) {
-				if ((w += font.charWidth(arr[i])) > maxWidth) {
-					int j = i;
+		while (i < arr.length) {
+			if ((w += font.charWidth(arr[i])) > maxWidth) {
+				int j = i;
 
-					while (arr[j] != ' ') {
-						--j;
-						if (j < k) {
-							j = i;
-							break;
-						}
+				while (arr[j] != ' ') {
+					--j;
+					if (j < k) {
+						j = i;
+						break;
 					}
-
-					list.addElement(new String(arr, k, j - k));
-					k = arr[j] != ' ' && arr[j] != '\n' ? j : j + 1;
-					w = 0;
-					i = k;
-				} else {
-					++i;
 				}
-			}
 
-			list.addElement(new String(arr, k, i - k));
-			return;
+				list.addElement(new String(arr, k, j - k));
+				k = arr[j] != ' ' && arr[j] != '\n' ? j : j + 1;
+				w = 0;
+				i = k;
+			} else {
+				++i;
+			}
 		}
+
+		list.addElement(new String(arr, k, i - k));
 	}
 	
 	private static String[] split(String s, char c) {

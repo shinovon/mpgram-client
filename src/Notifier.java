@@ -31,8 +31,6 @@ import org.pigler.api.PiglerAPI;
 import com.nokia.mid.ui.SoftNotification;
 import com.nokia.mid.ui.SoftNotificationListener;
 
-// TODO: rewrite this mess
-
 public class Notifier implements SoftNotificationListener {
 
 	private static Image icon;

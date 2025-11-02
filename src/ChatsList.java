@@ -42,7 +42,7 @@ public class ChatsList extends MPList {
 //#ifndef NO_CHAT_CANVAS
 	UIMessage[] msgs;
 //#endif
-	Object lock = new Object();
+	final Object lock = new Object();
 
 	// main mode
 	public ChatsList(String title, int folder) {

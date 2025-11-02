@@ -160,18 +160,6 @@ public class JSONArray {
 		}
 	}
 	
-//	public double getDouble(int index) {
-//		return MP.getDouble(get(index));
-//	}
-
-//	public double getDouble(int index, double def) {
-//		try {
-//			return getDouble(index);
-//		} catch (Exception e) {
-//			return def;
-//		}
-//	}
-	
 	public boolean getBoolean(int index) {
 		Object o = get(index);
 		if (o == MP.TRUE) return true;
@@ -221,10 +209,6 @@ public class JSONArray {
 	public void add(long l) {
 		addElement(new Long(l));
 	}
-
-//	public void add(double d) {
-//		addElement(new Double(d));
-//	}
 	
 	public void add(boolean b) {
 		addElement(b ? MP.TRUE : MP.FALSE);
@@ -268,13 +252,6 @@ public class JSONArray {
 		}
 		elements[index] = new Long(l);
 	}
-
-//	public void set(int index, double d) {
-//		if (index < 0 || index >= count) {
-//			throw new RuntimeException("JSON: Index out of bounds: " + index);
-//		}
-//		elements[index] = new Double(d);
-//	}
 	
 	public void set(int index, boolean b) {
 		if (index < 0 || index >= count) {
@@ -307,10 +284,6 @@ public class JSONArray {
 		insertElementAt(new Long(l), index);
 	}
 
-//	public void put(int index, double d) {
-//		insertElementAt(new Double(d), index);
-//	}
-
 	public void put(int index, boolean b) {
 		insertElementAt(b ? MP.TRUE : MP.FALSE, index);
 	}
@@ -326,10 +299,6 @@ public class JSONArray {
 	public boolean has(long l) {
 		return _indexOf(new Long(l), 0) != -1;
 	}
-
-//	public boolean has(double d) {
-//		return _indexOf(new Double(d), 0) != -1;
-//	}
 	
 	public boolean has(boolean b) {
 		return _indexOf(b ? MP.TRUE : MP.FALSE, 0) != -1;

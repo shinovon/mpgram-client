@@ -25,8 +25,8 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 	private boolean resizing;
 	private boolean rotate;
 	
-	private String peer;
-	private String id;
+	private final String peer;
+	private final String id;
 
 
 	/**
@@ -72,7 +72,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 				Thread.sleep(100);
 			} catch (Exception ignored) {}
 			MP.display(MP.errorAlert(MP.L[LNotEnoughMemory_Alert]), this);
-			return;
+//			return;
 		}
 	}
 
@@ -116,7 +116,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 			resizing = false;
 			error = true;
 			toDraw = null;
-			return;
+//			return;
 		}
 	}
 	
