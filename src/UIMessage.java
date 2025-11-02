@@ -927,17 +927,18 @@ public class UIMessage extends UIItem implements LangConstants {
 			if (replyName != null) {
 				replyNameRender = UILabel.ellipsis(replyName, MP.smallBoldFont, cw - 10);
 				h += MP.smallBoldFontHeight;
-				maxW = Math.max(maxW, lastW = minW + MP.smallBoldFont.stringWidth(replyNameRender) + 10);
+				maxW = Math.max(maxW, minW + MP.smallBoldFont.stringWidth(replyNameRender) + 10);
 			}
 			rw = 10;
 			if (replyPrefix != null) {
 				rw += replyPrefixWidth + MP.smallPlainFontSpaceWidth;
-				maxW = Math.max(maxW, lastW = minW + replyPrefixWidth + 10);
+				maxW = Math.max(maxW, minW + replyPrefixWidth + 10);
 			}
-//			if (replyText != null) {
-//				replyTextRender = UILabel.ellipsis(replyText, MP.smallPlainFont, rw);
-//				maxW = Math.max(maxW, lastW = minW + MP.smallPlainFont.stringWidth(replyTextRender) + replyPrefixWidth + MP.smallPlainFontSpaceWidth + 10);
-//			}
+			if (replyText != null) {
+				maxW = Math.max(maxW, minW + Math.min(120, MP.smallPlainFont.stringWidth(replyTextRender))
+						+ replyPrefixWidth + MP.smallPlainFontSpaceWidth + 10);
+				// replyTextRender is calculated in last order
+			}
 			h += 4 + MP.smallPlainFontHeight;
 
 			touchZones[order ++] = x + 2;
@@ -1200,6 +1201,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		if (replyText != null) {
 			replyTextRender = UILabel.ellipsis(replyText, MP.smallPlainFont, maxW - minW - rw);
 		}
+
 		return contentHeight = h + PADDING_HEIGHT;
 	}
 
