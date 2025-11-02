@@ -935,7 +935,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				maxW = Math.max(maxW, minW + replyPrefixWidth + 10);
 			}
 			if (replyText != null) {
-				maxW = Math.max(maxW, minW + Math.min(120, MP.smallPlainFont.stringWidth(replyTextRender))
+				maxW = Math.max(maxW, minW + Math.min(120, MP.smallPlainFont.stringWidth(replyText))
 						+ replyPrefixWidth + MP.smallPlainFontSpaceWidth + 10);
 				// replyTextRender is calculated in last order
 			}
@@ -1500,7 +1500,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			if (voice) {
 				if (!MP.voiceConversion) break;
 
-				// TODO
+				// TODO voice player
 				MP.midlet.browse(MP.instanceUrl + "voice.php?c=" + peerId + "&m=" + idStr);
 				break;
 			}
