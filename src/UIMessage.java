@@ -368,7 +368,9 @@ public class UIMessage extends UIItem implements LangConstants {
 									mediaSubtitle = sb.toString();
 									sb.setLength(0);
 
-									if (audio.has("wave")) {
+									if (chat.mediaFilter != null) {
+										sb.append(name);
+									} else if (audio.has("wave")) {
 										JSONArray wave = audio.getArray("wave");
 										int l;
 										waveform = new byte[l = wave.size()];

@@ -608,8 +608,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				if (forwardMsgs != null || forwardMsg != null) {
 					bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
 					if (!touch) inputFocused = true;
-				} else if (touch) {
-					bottom = inputFieldHeight;
+				} else {
+					bottom = touch ? inputFieldHeight : 0;
 				}
 			} else {
 				bottom = 0;
@@ -949,7 +949,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						g.fillRect(w - 22, bty + 6, 3, 3);
 					}
 				}
-				boolean medfont = (MP.chatStatus && mediaFilter == null) || touch;
+				boolean medfont = MP.chatStatus || touch;
 				if (selected != 0 || mediaFilter != null || loading) {
 					g.setFont(medfont ? MP.medPlainFont : MP.smallPlainFont);
 					g.setColor(colors[COLOR_CHAT_PANEL_FG]);
