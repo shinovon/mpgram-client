@@ -4193,6 +4193,7 @@ public class MP extends MIDlet
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 
+			browse(instanceUrl + "voice.php?c=" + s[0] + "&m=" + s[1]);
 			return;
 		}
 		if (c == postCommentsCmd) {
