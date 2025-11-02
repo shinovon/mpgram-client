@@ -149,6 +149,7 @@
 	// Dialog commands
 	"Ok": "OK",
 	"Cancel": "Peruuta",
+	"Open": "Open", // Untranslated
 	
 	// Pagination commands
 	"NextPage": "Seuraava sivu",

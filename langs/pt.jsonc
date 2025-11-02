@@ -149,6 +149,7 @@
 	// Dialog commands
 	"Ok": "OK",
 	"Cancel": "Cancelar",
+	"Open": "Open", // Untranslated
 	
 	// Pagination commands
 	"NextPage": "Próxima página",

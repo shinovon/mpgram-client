@@ -923,7 +923,7 @@ public class MP extends MIDlet
 		downloadBrowserCmd = new Command(L[LWithBrowser], Command.CANCEL, 1);
 		cancelDownloadCmd = new Command(L[LCancel], Command.CANCEL, 1);
 		okDownloadCmd = new Command(L[LOk], Command.CANCEL, 1);
-		openDownloadedCmd = new Command("Open", Command.SCREEN, 2); // TODO unlocalized
+		openDownloadedCmd = new Command(L[LOpen], Command.SCREEN, 2); // TODO unlocalized
 		cancelUploadCmd = new Command(L[LCancel], Command.CANCEL, 1);
 		confirmCmd = new Command(L[LOk], Command.OK, 1);
 

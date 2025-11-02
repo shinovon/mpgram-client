@@ -149,6 +149,7 @@
 	// Dialog commands
 	"Ok": "Ок",
 	"Cancel": "Скасувати",
+	"Open": "Open", // Untranslated
 	
 	// Pagination commands
 	"NextPage": "Наст. Стор",

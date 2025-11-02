@@ -149,6 +149,7 @@
 	// Dialog commands
 	"Ok": "ОК",
 	"Cancel": "Отмена",
+	"Open": "Открыть",
 	
 	// Pagination commands
 	"NextPage": "След. стр.",
