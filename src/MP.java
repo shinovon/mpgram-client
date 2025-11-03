@@ -4043,7 +4043,7 @@ public class MP extends MIDlet
 				if (useView) {
 					display(new ViewCanvas(s[0], s[1]));
 				} else {
-					browse(instanceUrl + FILE_URL + "?c=" + s[0] + "&m=" + s[1] + "&user=" + user);
+					browseUser(FILE_URL + "?c=" + s[0] + "&m=" + s[1]);
 				}
 				return;
 			}
@@ -4193,7 +4193,7 @@ public class MP extends MIDlet
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 
-			browse(instanceUrl + "voice.php?c=" + s[0] + "&m=" + s[1]);
+			browseUser("voice.php?c=" + s[0] + "&m=" + s[1]);
 			return;
 		}
 		if (c == postCommentsCmd) {
@@ -4905,9 +4905,9 @@ public class MP extends MIDlet
 		String msgId = downloadMessage[1];
 		String fileName = downloadMessage[2];
 		if (fileRewrite && fileName != null) {
-			browse(instanceUrl + "file/" + url(fileName) + "?c=" + peerId + "&m=" + msgId + "&user=" + user);
+			browseUser("file/" + url(fileName) + "?c=" + peerId + "&m=" + msgId );
 		} else {
-			browse(instanceUrl + FILE_URL + "?c=" + peerId + "&m=" + msgId + "&user=" + user);
+			browseUser(FILE_URL + "?c=" + peerId + "&m=" + msgId);
 		}
 	}
 
@@ -5138,6 +5138,10 @@ public class MP extends MIDlet
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	void browseUser(String url) {
+		browse(instanceUrl + url + "&user=" + user);
 	}
 
 	static void openUrl(String url, boolean ask) {

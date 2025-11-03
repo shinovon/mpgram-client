@@ -1501,7 +1501,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				if (!MP.voiceConversion) break;
 
 				// TODO voice player
-				MP.midlet.browse(MP.instanceUrl + "voice.php?c=" + peerId + "&m=" + idStr);
+				MP.midlet.browseUser("voice.php?c=" + peerId + "&m=" + idStr);
 				break;
 			}
 			MP.display(MP.loadingAlert(MP.L[LLoading]), MP.current);
