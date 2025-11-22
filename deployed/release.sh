@@ -18,6 +18,7 @@ cd ../Lite || exit 1
 rm mpgram_lite.jar
 mkdir META-INF
 unzip -p mpgram.jar META-INF/MANIFEST.MF > META-INF/MANIFEST.MF && \
+dos2unix META-INF/MANIFEST.MF && \
 sed -i "/Nokia-Scalable-Icon: \/m.svg/d" META-INF/MANIFEST.MF && \
 sed -i "/Nokia-Scalable-Icon-MIDlet-1: \/m.svg/d" META-INF/MANIFEST.MF && \
 unix2dos META-INF/MANIFEST.MF && \
@@ -26,6 +27,7 @@ mv mpgram.jar mpgram_lite.jar && \
 cp mpgram_lite.jar "$MPGRAM_DEPLOY_DIR/mpgram_lite.jar"
 
 # lite jad
+dos2unix mpgram.jad && \
 sed -i "/Nokia-Scalable-Icon: \/m.svg/d" mpgram.jad && \
 sed -i "/Nokia-Scalable-Icon-MIDlet-1: \/m.svg/d" mpgram.jad && \
 sed -i "/MIDlet-Jar-Size: /d" mpgram.jad && \

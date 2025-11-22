@@ -190,6 +190,9 @@
 	"InvalidInstancePassword_Alert": "Mot de pas d'instància no vàlid!",
 	"InvalidSessionCode_Alert": "Codi de sessió no vàlid!",
 	"Retry": "Reintenta",
+	"Login_Btn": "Log in using phone number", // Untranslated
+	"LoginWithQR_Btn": "Log in using QR code", // Untranslated
+	"Advanced": "Advanced", // Untranslated
 	
 	// Settings sections
 	"UI": "IU",

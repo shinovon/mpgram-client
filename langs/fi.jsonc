@@ -190,6 +190,9 @@
 	"InvalidInstancePassword_Alert": "Väärä palvelimen salasana!",
 	"InvalidSessionCode_Alert": "Väärä istuntokoodi!",
 	"Retry": "Uudell.",
+	"Login_Btn": "Log in using phone number", // Untranslated
+	"LoginWithQR_Btn": "Log in using QR code", // Untranslated
+	"Advanced": "Advanced", // Untranslated
 	
 	// Settings sections
 	"UI": "Käyttöliittymä",

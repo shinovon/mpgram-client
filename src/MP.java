@@ -336,6 +336,7 @@ public class MP extends MIDlet
 	private static Command authNewSessionCmd;
 	private static Command authImportSessionCmd;
 	private static Command authRetryCmd;
+	private static Command authQrCmd;
 
 	private static Command logoutCmd;
 	private static Command clearCacheCmd;
@@ -853,9 +854,10 @@ public class MP extends MIDlet
 		authNextCmd = new Command(L[LNext], Command.OK, 1);
 		authCodeCmd = new Command(L[LNext], Command.OK, 1);
 		authPasswordCmd = new Command(L[LNext], Command.OK, 1);
-		authNewSessionCmd = new Command(L[LNewSession], Command.SCREEN, 1);
-		authImportSessionCmd = new Command(L[LImportSession], Command.SCREEN, 2);
+		authNewSessionCmd = new Command(L[LNewSession], Command.ITEM, 1);
+		authImportSessionCmd = new Command(L[LImportSession], Command.ITEM, 2);
 		authRetryCmd = new Command(L[LRetry], Command.OK, 1);
+		authQrCmd = new Command(L[LNewSession], Command.ITEM, 1);
 
 		logoutCmd = new Command(L[LLogout], Command.ITEM, 1);
 		clearCacheCmd = new Command(L[LClearCache], Command.ITEM, 1);
@@ -981,6 +983,38 @@ public class MP extends MIDlet
 		f.addCommand(settingsCmd);
 		f.setCommandListener(midlet);
 
+		StringItem s;
+
+		s = new StringItem(null, L[Lmpgram]);
+		s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+		s.setFont(largePlainFont);
+		f.append(s);
+
+		s = new StringItem(null, L[LLogin_Btn], StringItem.BUTTON);
+		s.setDefaultCommand(authNewSessionCmd);
+		s.setItemCommandListener(midlet);
+		s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+		f.append(s);
+
+		s = new StringItem(null, L[LLoginWithQR_Btn], StringItem.BUTTON);
+		s.setDefaultCommand(authQrCmd);
+		s.setItemCommandListener(midlet);
+		s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+		f.append(s);
+
+		f.append(new Spacer(8, 8));
+
+		s = new StringItem(null, L[LAdvanced]);
+		s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+		s.setFont(medBoldFont);
+		f.append(s);
+
+		s = new StringItem(null, L[LImportSession_Btn], StringItem.BUTTON);
+		s.setDefaultCommand(authImportSessionCmd);
+		s.setItemCommandListener(midlet);
+		s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+		f.append(s);
+
 		TextField t = new TextField(L[LInstanceURL], instanceUrl, 200, TextField.URL);
 		t.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 		instanceField = t;
@@ -990,24 +1024,9 @@ public class MP extends MIDlet
 		t.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 		instancePasswordField = t;
 		f.append(t);
-
-		StringItem s;
-
 		s = new StringItem(null, L[LAuth_Hint1]);
 		s.setFont(smallPlainFont);
 		s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-		f.append(s);
-
-		s = new StringItem(null, L[LCreateNewSession_Btn], StringItem.BUTTON);
-		s.setDefaultCommand(authNewSessionCmd);
-		s.setItemCommandListener(midlet);
-		s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-		f.append(s);
-
-		s = new StringItem(null, L[LImportSession_Btn], StringItem.BUTTON);
-		s.setDefaultCommand(authImportSessionCmd);
-		s.setItemCommandListener(midlet);
-		s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 		f.append(s);
 
 //#ifndef NO_NOTIFY
@@ -1284,12 +1303,14 @@ public class MP extends MIDlet
 			StringBuffer sb = new StringBuffer();
 			try {
 				if (param instanceof CaptchaForm) {
-					sb.append(user == null ? "initLogin" : "phoneLogin")
+					sb.append(((CaptchaForm) param).url)
 						.append("&captcha_id=").append(((CaptchaForm) param).id)
 						.append("&captcha_key=");
-					appendUrl(sb, ((CaptchaForm) param).field.getString())
-					.append("&phone=");
-					appendUrl(sb, phone);
+					appendUrl(sb, ((CaptchaForm) param).field.getString());
+
+					if (phone != null) {
+						appendUrl(sb.append("&phone="), phone);
+					}
 
 					JSONObject j = (JSONObject) api(sb.toString());
 					String res = j.getString("res");
@@ -1301,10 +1322,15 @@ public class MP extends MIDlet
 					}
 					if (res.indexOf("captcha") != -1) {
 						display(errorAlert(L[LInvalidCaptcha_Alert]), null);
+						((CaptchaForm) param).cancel();
 						((CaptchaForm) param).load();
 						break;
 					}
-					if (!"code_sent".equals(res)) {
+					if ("qr".equals(res)) {
+						writeAuth();
+						showQrLogin();
+						break;
+					} else if (!"code_sent".equals(res)) {
 						if ("phone_number_invalid".equals(res)) {
 							display(errorAlert(L[LInvalidPhoneNumber_Alert]), null);
 						} else {
@@ -1346,7 +1372,11 @@ public class MP extends MIDlet
 						}
 					} else {
 						// check code
-						sb.append("completePhoneLogin&code=").append((String) param);
+						if (param instanceof Alert) {
+							sb.append("qrLogin");
+						} else {
+							sb.append("completePhoneLogin&code=").append((String) param);
+						}
 
 						JSONObject j = (JSONObject) api(sb.toString());
 						String res = j.getString("res");
@@ -1362,7 +1392,10 @@ public class MP extends MIDlet
 							display(t);
 							break;
 						}
-						if (!"1".equals(res)) {
+						if ("qr".equals(res)) {
+							showQrLogin();
+							break;
+						} else if (!"1".equals(res)) {
 							if ("phone_code_invalid".equals(res)) {
 								if (phoneCodeHash != null) {
 									sb.setLength(0);
@@ -1597,7 +1630,7 @@ public class MP extends MIDlet
 				if (j.getBoolean("update_available", false) && checkUpdates) {
 					updateUrl = j.getString("download_url");
 					Alert a = new Alert("", "", null, AlertType.INFO);
-					a.setTimeout(-2);
+					a.setTimeout(Alert.FOREVER);
 					a.setString(j.getString("message", L[LUpdateAvailable_Alert]));
 					a.addCommand(cancelCmd);
 					a.addCommand(updateCmd);
@@ -2893,7 +2926,7 @@ public class MP extends MIDlet
 //				display(a, null);
 //				return;
 			}
-			if (c == authImportSessionCmd || c == authNewSessionCmd) {
+			if (c == authImportSessionCmd || c == authNewSessionCmd || c == authQrCmd) {
 				// set instance password
 				if ((instancePassword = instancePasswordField.getString()).length() == 0) {
 					instancePassword = null;
@@ -2924,6 +2957,13 @@ public class MP extends MIDlet
 				// new session
 				user = null;
 				userState = 0;
+				phone = null;
+
+				if (c == authQrCmd) {
+					display(loadingAlert(L[LWaitingForServerResponse]), null);
+					openLoad(new CaptchaForm("initLogin&qr=1"));
+					return;
+				}
 
 				TextBox t = new TextBox(L[LPhoneNumber], phone == null ? "" : phone, 30, TextField.PHONENUMBER);
 				t.addCommand(cancelCmd);
@@ -2944,7 +2984,7 @@ public class MP extends MIDlet
 					writeAuth();
 
 					display(loadingAlert(L[LWaitingForServerResponse]), null);
-					openLoad(new CaptchaForm());
+					openLoad(new CaptchaForm("phoneLogin"));
 					return;
 				}
 				if (d instanceof CaptchaForm) {
@@ -2954,6 +2994,12 @@ public class MP extends MIDlet
 						display(errorAlert(L[LInvalidCaptcha_Alert]), null);
 						return;
 					}
+					display(loadingAlert(L[LWaitingForServerResponse]), null);
+					start(RUN_AUTH, d);
+					return;
+				}
+				if (d instanceof Alert) {
+					// qr code check
 					display(loadingAlert(L[LWaitingForServerResponse]), null);
 					start(RUN_AUTH, d);
 					return;
@@ -3003,7 +3049,7 @@ public class MP extends MIDlet
 
 					s = new StringItem(null, L[LUI]);
 					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					s.setFont(largePlainFont);
+					s.setFont(medBoldFont);
 					f.append(s);
 
 					langChoice = new ChoiceGroup(L[LLanguage], Choice.POPUP, LANGS[1], null);
@@ -3098,7 +3144,8 @@ public class MP extends MIDlet
 
 					s = new StringItem(null, L[LNotifications]);
 					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					s.setFont(largePlainFont);
+					s.setFont(medBoldFont);
+					f.append(new Spacer(8, 8));
 					f.append(s);
 
 					notifyChoice = new ChoiceGroup("", ChoiceGroup.MULTIPLE, new String[] {
@@ -3139,7 +3186,8 @@ public class MP extends MIDlet
 
 					s = new StringItem(null, L[LBehaviour]);
 					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					s.setFont(largePlainFont);
+					s.setFont(medBoldFont);
+					f.append(new Spacer(8, 8));
 					f.append(s);
 
 					if (blackberry) {
@@ -3289,7 +3337,8 @@ public class MP extends MIDlet
 
 					s = new StringItem(null, L[LAuthorization]);
 					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					s.setFont(largePlainFont);
+					s.setFont(medBoldFont);
+					f.append(new Spacer(8, 8));
 					f.append(s);
 
 					s = new StringItem(null, L[LShowSessionCode], Item.BUTTON);
@@ -4920,6 +4969,15 @@ public class MP extends MIDlet
 		d.addCommand(MP.confirmCmd);
 		d.setCommandListener(MP.midlet);
 		display(d, current);
+	}
+
+	static void showQrLogin() {
+		// TODO
+		Alert a = new Alert(L[Lmpgram]);
+		a.setCommandListener(midlet);
+		a.setString("TODO!");
+		a.setTimeout(Alert.FOREVER);
+		display(a, null);
 	}
 
 	static Alert errorAlert(Exception e) {
@@ -6747,6 +6805,7 @@ public class MP extends MIDlet
 	}
 
 	public static Object parseJSON(String str) {
+		if (str.length() == 0) throw new RuntimeException("JSON: Empty text");
 		char first = str.charAt(0);
 		if (first <= ' ')
 			first = (str = str.trim()).charAt(0);

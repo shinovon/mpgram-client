@@ -190,6 +190,9 @@
 	"InvalidInstancePassword_Alert": "Неправильный пароль инстанса!",
 	"InvalidSessionCode_Alert": "Неправильный код сессии!",
 	"Retry": "Повторить",
+	"Login_Btn": "Log in using phone number", // Untranslated
+	"LoginWithQR_Btn": "Log in using QR code", // Untranslated
+	"Advanced": "Advanced", // Untranslated
 	
 	// Settings sections
 	"UI": "Вид интерфейса",

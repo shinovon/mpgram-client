@@ -28,9 +28,11 @@ public class CaptchaForm extends MPForm {
 	
 	TextField field;
 	String id;
+	String url;
 
-	public CaptchaForm() {
+	public CaptchaForm(String url) {
 		super(MP.L[LCaptcha]);
+		this.url = url;
 		addCommand(MP.backCmd);
 		addCommand(MP.authNextCmd);
 	}
@@ -38,7 +40,7 @@ public class CaptchaForm extends MPForm {
 	void loadInternal(Thread thread) throws Exception {
 		deleteAll();
 		
-		id = ((JSONObject) MP.api("initLogin")).getString("captcha_id");
+		id = ((JSONObject) MP.api(url)).getString("captcha_id");
 		
 		Image img = MP.getImage(MP.instanceUrl.concat(MP.API_URL + "?v=" + MP.API_VERSION
 				+ "&method=getCaptchaImg&captcha_id=".concat(id)));

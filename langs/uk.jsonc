@@ -190,6 +190,9 @@
 	"InvalidInstancePassword_Alert": "Invalid instance password!", // Untranslated
 	"InvalidSessionCode_Alert": "Invalid session code!", // Untranslated
 	"Retry": "Retry", // Untranslated
+	"Login_Btn": "Log in using phone number", // Untranslated
+	"LoginWithQR_Btn": "Log in using QR code", // Untranslated
+	"Advanced": "Advanced", // Untranslated
 	
 	// Settings sections
 	"UI": "Вигляд інтерфейсу",

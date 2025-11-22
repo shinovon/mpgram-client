@@ -190,6 +190,9 @@
 	"InvalidInstancePassword_Alert": "Senha da instância inválida!",
 	"InvalidSessionCode_Alert": "Invalid session code!", // Untranslated
 	"Retry": "Tentar novamente",
+	"Login_Btn": "Log in using phone number", // Untranslated
+	"LoginWithQR_Btn": "Log in using QR code", // Untranslated
+	"Advanced": "Advanced", // Untranslated
 	
 	// Settings sections
 	"UI": "Interface",

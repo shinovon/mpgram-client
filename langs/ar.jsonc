@@ -190,6 +190,9 @@
 	"InvalidInstancePassword_Alert": "كلمة مرور النموذج غير صالحة!",
 	"InvalidSessionCode_Alert": "Invalid session code!", // Untranslated
 	"Retry": "إعادة المحاولة",
+	"Login_Btn": "Log in using phone number", // Untranslated
+	"LoginWithQR_Btn": "Log in using QR code", // Untranslated
+	"Advanced": "Advanced", // Untranslated
 	
 	// Settings sections
 	"UI": "واجهة المستخدم",

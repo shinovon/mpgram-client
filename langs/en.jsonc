@@ -190,6 +190,9 @@
 	"InvalidInstancePassword_Alert": "Invalid instance password!",
 	"InvalidSessionCode_Alert": "Invalid session code!",
 	"Retry": "Retry",
+	"Login_Btn": "Log in using phone number",
+	"LoginWithQR_Btn": "Log in using QR code",
+	"Advanced": "Advanced",
 	
 	// Settings sections
 	"UI": "UI",
