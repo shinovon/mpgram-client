@@ -77,6 +77,8 @@
 	"Next": "Next",
 	"NewSession": "New session",
 	"ImportSession": "Import session",
+	"Show": "Show",
+	"Check": "Check",
 	
 	// Settings commands
 	"Logout": "Logout",
@@ -193,6 +195,7 @@
 	"Login_Btn": "Log in using phone number",
 	"LoginWithQR_Btn": "Log in using QR code",
 	"Advanced": "Advanced",
+	"QrCode_Alert": "QR code is ready",
 	
 	// Settings sections
 	"UI": "UI",

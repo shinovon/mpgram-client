@@ -337,6 +337,8 @@ public class MP extends MIDlet
 	private static Command authImportSessionCmd;
 	private static Command authRetryCmd;
 	private static Command authQrCmd;
+	private static Command authShowQrCmd;
+	private static Command authCheckQrCmd;
 
 	private static Command logoutCmd;
 	private static Command clearCacheCmd;
@@ -508,6 +510,7 @@ public class MP extends MIDlet
 	private static String[] downloadMessage;
 	private static String downloadCurrentPath;
 	private static String downloadedPath;
+	private static String qrText;
 
 	static int confirmationTask;
 	static Object confirmationParam;
@@ -858,6 +861,8 @@ public class MP extends MIDlet
 		authImportSessionCmd = new Command(L[LImportSession], Command.ITEM, 2);
 		authRetryCmd = new Command(L[LRetry], Command.OK, 1);
 		authQrCmd = new Command(L[LNewSession], Command.ITEM, 1);
+		authShowQrCmd = new Command(L[LShow], Command.SCREEN, 2);
+		authCheckQrCmd = new Command(L[LCheck], Command.OK, 1);
 
 		logoutCmd = new Command(L[LLogout], Command.ITEM, 1);
 		clearCacheCmd = new Command(L[LClearCache], Command.ITEM, 1);
@@ -2969,7 +2974,7 @@ public class MP extends MIDlet
 				display(t);
 				return;
 			}
-			if (c == authNextCmd) { // continue auth
+			if (c == authNextCmd || c == authCheckQrCmd) { // continue auth
 				if (d instanceof TextBox) {
 					// phone number entered
 					phone = ((TextBox) d).getString();
@@ -3028,6 +3033,10 @@ public class MP extends MIDlet
 			}
 			if (c == authRetryCmd) {
 				start(RUN_VALIDATE_AUTH, mainDisplayable);
+				return;
+			}
+			if (c == authShowQrCmd) {
+				browse(instanceUrl + "qrcode.php?t=" + qrText);
 				return;
 			}
 		}
@@ -4968,10 +4977,12 @@ public class MP extends MIDlet
 	}
 
 	static void showQrLogin(String text) {
-		// TODO
+		qrText = text;
 		Alert a = new Alert(L[Lmpgram]);
 		a.setCommandListener(midlet);
-		a.setString("TODO!");
+		a.addCommand(authCheckQrCmd);
+		a.addCommand(authShowQrCmd);
+		a.setString(L[LQrCode_Alert]);
 		a.setTimeout(Alert.FOREVER);
 		display(a, null);
 	}

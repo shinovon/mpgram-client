@@ -77,6 +77,8 @@
 	"Next": "Далее",
 	"NewSession": "Новая сессия",
 	"ImportSession": "Импортировать сессию",
+	"Show": "Показать",
+	"Check": "Проверить",
 	
 	// Settings commands
 	"Logout": "Выйти",
@@ -190,9 +192,10 @@
 	"InvalidInstancePassword_Alert": "Неправильный пароль инстанса!",
 	"InvalidSessionCode_Alert": "Неправильный код сессии!",
 	"Retry": "Повторить",
-	"Login_Btn": "Log in using phone number", // Untranslated
-	"LoginWithQR_Btn": "Log in using QR code", // Untranslated
-	"Advanced": "Advanced", // Untranslated
+	"Login_Btn": "Войти по номеру телефона",
+	"LoginWithQR_Btn": "Войти через QR-код",
+	"Advanced": "Дополнительно",
+	"QrCode_Alert": "QR-код готов.",
 	
 	// Settings sections
 	"UI": "Вид интерфейса",

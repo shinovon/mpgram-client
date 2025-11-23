@@ -77,6 +77,8 @@
 	"Next": "Sonrakı",
 	"NewSession": "Yeni sessiya",
 	"ImportSession": "İdxal Sessiya",
+	"Show": "Show", // Untranslated
+	"Check": "Check", // Untranslated
 	
 	// Settings commands
 	"Logout": "Çıxış",
@@ -193,6 +195,7 @@
 	"Login_Btn": "Log in using phone number", // Untranslated
 	"LoginWithQR_Btn": "Log in using QR code", // Untranslated
 	"Advanced": "Advanced", // Untranslated
+	"QrCode_Alert": "QR code is ready", // Untranslated
 	
 	// Settings sections
 	"UI": "İnterfeys görünüşü",
