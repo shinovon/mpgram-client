@@ -337,7 +337,6 @@ public class MP extends MIDlet
 	private static Command authImportSessionCmd;
 	private static Command authRetryCmd;
 	private static Command authQrCmd;
-	private static Command authShowQrCmd;
 	private static Command authCheckQrCmd;
 
 	private static Command logoutCmd;
@@ -861,7 +860,6 @@ public class MP extends MIDlet
 		authImportSessionCmd = new Command(L[LImportSession], Command.ITEM, 2);
 		authRetryCmd = new Command(L[LRetry], Command.OK, 1);
 		authQrCmd = new Command(L[LNewSession], Command.ITEM, 1);
-		authShowQrCmd = new Command(L[LShow], Command.SCREEN, 2);
 		authCheckQrCmd = new Command(L[LCheck], Command.OK, 1);
 
 		logoutCmd = new Command(L[LLogout], Command.ITEM, 1);
@@ -990,13 +988,20 @@ public class MP extends MIDlet
 
 		StringItem s;
 
+		s = new StringItem(null, L[Lmpgram]);
+		s.setFont(largePlainFont);
+		s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+		f.append(s);
+
 		s = new StringItem(null, L[LLogin_Btn], StringItem.BUTTON);
+		s.setFont(smallPlainFont);
 		s.setDefaultCommand(authNewSessionCmd);
 		s.setItemCommandListener(midlet);
 		s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 		f.append(s);
 
 		s = new StringItem(null, L[LLoginWithQR_Btn], StringItem.BUTTON);
+		s.setFont(smallPlainFont);
 		s.setDefaultCommand(authQrCmd);
 		s.setItemCommandListener(midlet);
 		s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -1010,6 +1015,7 @@ public class MP extends MIDlet
 		f.append(s);
 
 		s = new StringItem(null, L[LImportSession_Btn], StringItem.BUTTON);
+		s.setFont(smallPlainFont);
 		s.setDefaultCommand(authImportSessionCmd);
 		s.setItemCommandListener(midlet);
 		s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -3035,10 +3041,6 @@ public class MP extends MIDlet
 				start(RUN_VALIDATE_AUTH, mainDisplayable);
 				return;
 			}
-			if (c == authShowQrCmd) {
-				browse(instanceUrl + "qrcode.php?t=" + qrText);
-				return;
-			}
 		}
 		{ // settings
 			if (c == settingsCmd) {
@@ -4977,14 +4979,17 @@ public class MP extends MIDlet
 	}
 
 	static void showQrLogin(String text) {
+		// TODO: check by timer
 		qrText = text;
 		Alert a = new Alert(L[Lmpgram]);
 		a.setCommandListener(midlet);
 		a.addCommand(authCheckQrCmd);
-		a.addCommand(authShowQrCmd);
 		a.setString(L[LQrCode_Alert]);
 		a.setTimeout(Alert.FOREVER);
 		display(a, null);
+		try {
+			MP.midlet.browse(instanceUrl + "qrcode.php?t=" + text);
+		} catch (Throwable ignored) {}
 	}
 
 	static Alert errorAlert(Exception e) {
