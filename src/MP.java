@@ -985,11 +985,6 @@ public class MP extends MIDlet
 
 		StringItem s;
 
-		s = new StringItem(null, L[Lmpgram]);
-		s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-		s.setFont(largePlainFont);
-		f.append(s);
-
 		s = new StringItem(null, L[LLogin_Btn], StringItem.BUTTON);
 		s.setDefaultCommand(authNewSessionCmd);
 		s.setItemCommandListener(midlet);
@@ -1029,6 +1024,8 @@ public class MP extends MIDlet
 		s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 		f.append(s);
 
+		authForm = f;
+
 //#ifndef NO_NOTIFY
 //#ifndef NO_NOKIAUI
 		// init notifications api wrapper
@@ -1038,7 +1035,6 @@ public class MP extends MIDlet
 //#endif
 //#endif
 
-		authForm = f;
 		// load main form
 		if (user == null || userState < 3) {
 			display(mainDisplayable = authForm);
@@ -1328,7 +1324,7 @@ public class MP extends MIDlet
 					}
 					if ("qr".equals(res)) {
 						writeAuth();
-						showQrLogin();
+						showQrLogin(j.getString("text"));
 						break;
 					} else if (!"code_sent".equals(res)) {
 						if ("phone_number_invalid".equals(res)) {
@@ -1393,7 +1389,7 @@ public class MP extends MIDlet
 							break;
 						}
 						if ("qr".equals(res)) {
-							showQrLogin();
+							showQrLogin(j.getString("text"));
 							break;
 						} else if (!"1".equals(res)) {
 							if ("phone_code_invalid".equals(res)) {
@@ -4971,7 +4967,7 @@ public class MP extends MIDlet
 		display(d, current);
 	}
 
-	static void showQrLogin() {
+	static void showQrLogin(String text) {
 		// TODO
 		Alert a = new Alert(L[Lmpgram]);
 		a.setCommandListener(midlet);

@@ -77,7 +77,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 	}
 
 	/**
-	 * Called when image must change it's zoom.
+	 * Called when image must change its zoom.
 	 * 
 	 * @param size New zoom to apply.
 	 */
