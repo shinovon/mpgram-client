@@ -1,13 +1,16 @@
 {
+	// About this locale file
 	"LocaleInfo": "Türkçe, by symbuzzer",
 	"LocaleSlavicPlurals": "",
 	"LocaleCustomPlurals": "",
 
+	// Common commands
 	"Exit": "Çıkış",
 	"Back": "Geri",
 	"Settings": "Ayarlar",
 	"About": "Hakkında",
 
+	// Date offsets
 	"_secondAgo": " saniye önce",
 	"_secondsAgo": " saniye önce",
 	"_secondsAgo2": "",
@@ -37,10 +40,10 @@
 	"LastMonth": "geçen ay",
 	"ALongTimeAgo": "uzun zaman önce",
 	"Recently": "yakınlarda",
-
+	// Date suffixes
 	"on_Date": "tarihinde ",
 	"at_Time": " saat ",
-
+	// Months
 	"Jan": "Oca",
 	"Feb": "Şub",
 	"Mar": "Mar",
@@ -53,7 +56,7 @@
 	"Oct": "Eki",
 	"Nov": "Kas",
 	"Dec": "Ara",
-
+	// Days of week
 	"Sun": "Paz",
 	"Mon": "Pzt",
 	"Tue": "Sal",
@@ -69,6 +72,7 @@
 	"Friday": "Cuma",
 	"Saturday": "Cumartesi",
 
+	// Auth commands
 	"Auth": "Yetkilendirme",
 	"Next": "İleri",
 	"NewSession": "Yeni oturum",
@@ -76,11 +80,13 @@
 	"Show": "Göster",
 	"Check": "Kontrol et",
 
+	// Settings commands
 	"Logout": "Çıkış yap",
 	"ClearCache": "Önbelleği temizle",
 	"Locate": "Konum bul",
 	"ShowSessionCode": "Oturum kodunu göster",
 
+	// Chats list commands
 	"Folders": "Klasörler",
 	"Refresh": "Yenile",
 	"ArchivedChats": "Arşivlenmiş sohbetler",
@@ -88,6 +94,7 @@
 	"Search": "Ara",
 	"OpenByLink": "Bağlantıyla aç",
 
+	// Message commands
 	"OpenChat": "Sohbeti aç",
 	"Profile": "Profil",
 	"Reply": "Yanıtla",
@@ -104,6 +111,7 @@
 	"CopyLink": "Bağlantıyı kopyala",
 	"Select": "Seç",
 
+	// Item commands
 	"Link_Cmd": "Bağlantı",
 	"ViewImage": "Resmi görüntüle",
 	"Call": "Ara",
@@ -112,6 +120,7 @@
 	"RunBotAction": "Çalıştır",
 	"SaveHere": "Buraya kaydet",
 
+	// Chat form commands
 	"WriteMessage": "Mesaj yaz",
 	"LatestMessages_Cmd": "Yenile",
 	"ChatInfo": "Sohbet bilgisi",
@@ -121,10 +130,12 @@
 	"Menu": "Menü",
 	"Write": "Yaz",
 
+	// Message writing form commands
 	"Send": "Gönder",
 	"OpenTextBox": "Metin kutusunu aç",
 	"ChooseFile": "Dosya seç",
 
+	// Profile/chat info commands
 	"Join": "Katıl",
 	"JoinGroup": "Gruba katıl",
 	"LeaveGroup": "Gruptan ayrıl",
@@ -137,13 +148,16 @@
 	"AudioFiles": "Müzik",
 	"VoiceMessages": "Sesli mesajlar",
 
+	// Dialog commands
 	"Ok": "Tamam",
 	"Cancel": "İptal",
 	"Open": "Aç",
 
+	// Pagination commands
 	"NextPage": "Sonraki sayfa",
 	"PrevPage": "Önceki sayfa",
 
+	// Loading states
 	"Loading": "Yükleniyor",
 	"Authorizing": "Yetkilendiriliyor...",
 	"WaitingForServerResponse": "Sunucu yanıtı bekleniyor...",
@@ -151,6 +165,7 @@
 	"WaitingForPrevChat": "Önceki sohbetin kapanması bekleniyor...",
 	"Downloading": "İndiriliyor",
 
+	// Authorization process
 	"Auth_Title": "Yetkilendirme",
 	"InstanceURL": "Sunucu URL’si",
 	"InstancePassword": "Sunucu Şifresi",
@@ -182,12 +197,14 @@
 	"Advanced": "Gelişmiş",
 	"QrCode_Alert": "QR kod hazır",
 
+	// Settings sections
 	"UI": "Arayüz",
 	"Behaviour": "Davranış",
 	"Images": "Resimler",
 	"Authorization": "Yetkilendirme",
 	"Notifications": "Bildirimler",
 
+	// UI Settings
 	"Language": "Dil",
 	"ReversedChat": "Ters sohbet",
 	"ShowMedia": "Medyayı göster",
@@ -211,6 +228,7 @@
 	"Theme": "Tema",
 	"InputLanguages": "Giriş dilleri",
 
+	// Behaviour settings
 	"WaitForPageToLoad": "Sayfa yüklenmesini bekle",
 	"UseJSONStream": "JSONStream kullan",
 	"FormatText": "Metni biçimlendir",
@@ -238,12 +256,14 @@
 	"PassURL": "URL gönder",
 	"PassConnectionStream": "Bağlantı akışını gönder",
 
+	// Images settings
 	"LoadMediaThumbnails": "Medya küçük resimlerini yükle",
 	"LoadAvatars": "Avatarları yükle",
 	"MultiThreadedLoading": "Çoklu iş parçacığı ile yükleme",
 	"RoundAvatars": "Yuvarlak avatarlar",
 	"LazyLoading": "Gecikmeli yükleme",
 
+	// Cache settings
 	"AvatarsCaching": "Avatar önbellekleme",
 	"Disabled": "Devre dışı",
 	"HoldInRAM": "RAM'de tut",
@@ -253,6 +273,7 @@
 	"ProfilesCacheThreshold": "Profil önbellek sınırı",
 	"RMSCacheCount": "Saklanan önbellek sayısı: ",
 
+	// Notifications settings
 	"EnableNotifications": "Bildirimleri aç",
 	"EnableSound": "Ses",
 	"NotificationMethod": "Bildirim yöntemi",
@@ -261,12 +282,14 @@
 	"PushInterval": "Bildirim aralığı",
 	"PushBackgroundInterval": "Arka plan bildirim aralığı",
 
+	// About
 	"AboutText": "J2ME için sunucu destekli Telegram istemcisi (MPGram Web API tabanlı).",
 	"Developer": "Geliştirici",
 	"Author": "Yazar",
 	"Donate": "Bağış yap",
 	"Chat": "Sohbet",
 
+	// Write form
 	"Reply_Title": "Yanıtla",
 	"Write_Title": "Yaz",
 	"Edit_Title": "Düzenle",
@@ -282,13 +305,14 @@
 	"TextField_Hint": "Mesaj yaz...",
 	"Clear": "Temizle",
 
+	// Alert messages
 	"MessageSent_Alert": "Mesaj gönderildi",
 	"MessageDeleted_Alert": "Mesaj silindi",
 	"UpdateAvailable_Alert": "Yeni sürüm mevcut",
 	"MemberBanned_Alert": "Üye yasaklandı",
 	"StickersAdded_Alert": "Çıkartmalar eklendi",
 	"ChooseNetwork_Alert": "Ağ noktası seçin",
-	"FailedToLoadImage": "Resim yüklenemedi",
+	"FailedToLoadImage": "Resim yüklenemedi", // unwrapped, should be short
 	"TextCopied_Alert": "Metin kopyalandı",
 	"NotEnoughMemory_Alert": "Yetersiz hafıza",
 	"DownloadCanceled_Alert": "İndirme iptal edildi",
@@ -306,6 +330,7 @@
 	"RewriteFile_Alert": "Dosya zaten mevcut, üzerine yazılsın mı?",
 	"OpenThisLink_Alert": "Bu bağlantı açılsın mı?",
 
+	// Chat form
 	"ChatMedia_Title": "Medya",
 	"Search_TitlePrefix": "Arama - ",
 	"OlderMessages": "Eski mesajlar",
@@ -314,6 +339,7 @@
 	"SomeoneIsTyping": "Biri yazıyor...",
 	"Typing": "yazıyor...",
 
+	// Message
 	"ForwardedFrom": "İletilen: ",
 	"You": "Sen",
 	"You_Prefix": "Sen: ",
@@ -328,6 +354,7 @@
 	"_reacts": " tepki",
 	"_reacts2": "",
 
+	// Message media
 	"Media": "Medya",
 	"Poll": "Anket",
 	"Geo": "Konum: ",
@@ -335,6 +362,7 @@
 	"Video": "Video",
 	"VoiceMessage": "Sesli mesaj",
 
+	// Chat actions
 	"PinnedMessage_Action": " mesajı sabitledi",
 	"Joined_Action": " gruba katıldı",
 	"Added_Action": " ekledi",
@@ -348,13 +376,16 @@
 	"PhotoUpdated_Action": "Fotoğraf güncellendi",
 	"NameChanged_Action": "İsim şu şekilde değiştirildi: ",
 
+	// Folders
 	"AllChats": "Tüm sohbetler",
 	"Archive": "Arşiv",
 
+	// Stickers
 	"Stickers_Title": "Çıkartmalar",
 	"Sticker": "Çıkartma",
 	"AddStickers": "Çıkartma ekle",
 
+	// Music player
 	"Player_Title": "Müzik oynatıcı",
 	"OpenPlayer": "Oynatıcı",
 	"OpenPlaylist": "Çalma listesi",
@@ -367,6 +398,7 @@
 	"Volume": "Ses",
 	"TogglePlaylistOrder": "Sıralamayı değiştir",
 
+	// Profile/chat info
 	"Online": "çevrimiçi",
 	"Offline": "çevrimdışı",
 	"LastSeen": "son görülme ",
