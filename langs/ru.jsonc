@@ -319,7 +319,7 @@
 	"DownloadedTo": "Скачано в ",
 	"ChooseDownloadMethod_Alert": "Выберите способ скачивания",
 	"FailedToSaveSettings_Alert": "Не удалось сохранить настройки",
-	"PiglerNotAvailable_Alert": "Pigler API is selected but not available, \ndownload it from https://nnproject.cc/pna", // Untranslated
+	"PiglerNotAvailable_Alert": "Pigler API отсутствует в системе, \nзагрузите его на https://nnproject.cc/pna",
 	"DeleteNMessage_Alert": "Удалить % сообщение?",
 	"DeleteNMessages_Alert": "Удалить % сообщения?",
 	"DeleteNMessages_Alert_2": "Удалить % сообщений?",
