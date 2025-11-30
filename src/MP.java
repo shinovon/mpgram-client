@@ -127,6 +127,7 @@ public class MP extends MIDlet
 
 	static final String API_VERSION = "10";
 
+//#ifndef NO_LANGS
 	static final String[][] LANGS = {
 		{
 			"az",
@@ -153,6 +154,7 @@ public class MP extends MIDlet
 			"العربية",
 		}
 	};
+//#endif
 
 //#ifndef NO_CHAT_CANVAS
 	static final String[][] THEMES = {
@@ -645,9 +647,10 @@ public class MP extends MIDlet
 		boolean s40 = false;
 		try {
 			// s40 check
-			Class.forName("com.nokia.mid.impl.isa.jam.Jam");
-			series40 = s40 = true;
-			systemName = "Series 40";
+			if (Class.forName("com.nokia.mid.impl.isa.jam.Jam") != null) {
+				series40 = s40 = true;
+				systemName = "Series 40";
+			}
 		} catch (Exception ignored) {}
 
 		if (systemName == null && (p = System.getProperty("os.name")) != null) {
@@ -683,6 +686,7 @@ public class MP extends MIDlet
 			}
 		}
 
+//#ifndef NO_LANGS
 		// get system language
 		if ((p = System.getProperty("user.language")) == null) {
 			p = System.getProperty("microedition.locale");
@@ -691,6 +695,7 @@ public class MP extends MIDlet
 		if (p != null) {
 			lang = (p.length() > 2 ? p.substring(0, 2) : p).toLowerCase();
 		}
+//#endif
 
 		// init platform dependent settings
 		useLoadingForm = !symbianJrt;
@@ -3059,6 +3064,7 @@ public class MP extends MIDlet
 					s.setFont(medBoldFont);
 					f.append(s);
 
+//#ifndef NO_LANGS
 					langChoice = new ChoiceGroup(L[LLanguage], Choice.POPUP, LANGS[1], null);
 					for (i = 0; i < LANGS[0].length; ++i) {
 						if (lang.equals(LANGS[0][i])) {
@@ -3068,6 +3074,7 @@ public class MP extends MIDlet
 					}
 					langChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(langChoice);
+//#endif
 
 					uiChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
 							L[LReversedChat],
@@ -3377,7 +3384,9 @@ public class MP extends MIDlet
 				// apply and save settings
 				try {
 					int i;
+//#ifndef NO_LANGS
 					lang = LANGS[0][Math.max(0, langChoice.getSelectedIndex())];
+//#endif
 
 					reverseChat = uiChoice.isSelected(i = 0);
 					showMedia = uiChoice.isSelected(++i);

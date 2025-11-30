@@ -61,6 +61,7 @@
             <symbol name="JSR135" value="1.2"/>
             <symbol name="JSR179" value="1.0"/>
             <symbol name="filemanagerapi.jar" value="1.0"/>
+            <symbol name="NO_LANGS" value="true"/>
             <symbol name="notificationapi.jar" value="1.0"/>
             <symbol name="CLDC" value="1.1"/>
             <symbol name="JSR211" value="1.0"/>
