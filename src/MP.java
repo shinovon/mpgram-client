@@ -275,7 +275,7 @@ public class MP extends MIDlet
 	static String theme = "tint";
 	static int textMethod; // 0 - auto, 1 - nokiaui, 2 - j2mekeyboard, 3 - fullscreen textbox
 	static boolean fastScrolling; // disable animations
-	static final boolean forceKeyUI = false;
+	static boolean forceKeyUI = false;
 	static String[] inputLanguages = new String[] { "en", "ru" };
 	static boolean pngStickers;
 	static boolean lazyLoading = true;
@@ -803,6 +803,7 @@ public class MP extends MIDlet
 			}
 			lazyLoading = j.getBoolean("lazyLoading", lazyLoading);
 			fastScrolling = j.getBoolean("fastScrolling", fastScrolling);
+			forceKeyUI = j.getBoolean("forceKeyUI", forceKeyUI);
 //#endif
 //#ifndef NO_FILE
 			downloadPath = j.getString("downloadPath", downloadPath);
@@ -6306,6 +6307,7 @@ public class MP extends MIDlet
 		}
 		j.put("lazyLoading", lazyLoading);
 		j.put("fastScrolling", fastScrolling);
+		j.put("forceKeyUI", forceKeyUI);
 //#endif
 //#ifndef NO_FILE
 		j.put("downloadPath", downloadPath);
@@ -6330,8 +6332,7 @@ public class MP extends MIDlet
 
 	private static boolean checkClass(String s) {
 		try {
-			Class.forName(s);
-			return true;
+			return Class.forName(s) != null;
 		} catch (Exception e) {
 			return false;
 		}

@@ -169,7 +169,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 		this.keyboardType = keyboardType;
 		if (canvas != null) {
 			this.hasRepeatEvents = canvas.hasRepeatEvents();
-			this.hasPointerEvents = canvas.hasPointerEvents();
+			this.hasPointerEvents = !MP.forceKeyUI && canvas.hasPointerEvents();
 			this.canvas = canvas;
 		}
 
