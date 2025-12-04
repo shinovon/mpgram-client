@@ -591,7 +591,7 @@ public class MP extends MIDlet
 //		} catch (Exception ignored) {}
 //#endif
 		// get device name
-		String p, v, d;
+		String p, v, d = null;
 		if ((p = System.getProperty("microedition.platform")) != null) {
 			d = p;
 			if ((symbianJrt = p.indexOf("platform=S60") != -1)) {
@@ -731,6 +731,13 @@ public class MP extends MIDlet
 		if (blackberry) textMethod = 3;
 		else if (s40 && System.getProperty("com.nokia.mid.ui.version") == null) {
 			textMethod = 2;
+		}
+//#endif
+
+//#ifndef NO_CHAT_CANVAS
+		if (d != null &&
+				(d.toLowerCase().indexOf("fastbcc") != -1 || d.toLowerCase().indexOf("itel") != -1) || d.indexOf("S7350") != -1) {
+			forceKeyUI = true;
 		}
 //#endif
 
