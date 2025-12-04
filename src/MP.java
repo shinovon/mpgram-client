@@ -736,7 +736,7 @@ public class MP extends MIDlet
 
 //#ifndef NO_CHAT_CANVAS
 		if (d != null &&
-				(d.toLowerCase().indexOf("fastbcc") != -1 || d.toLowerCase().indexOf("itel") != -1) || d.indexOf("S7350") != -1) {
+				(d.toLowerCase().indexOf("fastbcc") != -1 || d.toLowerCase().indexOf("itel") != -1 || d.indexOf("S7350") != -1)) {
 			forceKeyUI = true;
 		}
 //#endif
