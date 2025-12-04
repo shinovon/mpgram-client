@@ -227,6 +227,7 @@
 	"FullscreenTextBox": "Koko näyttö",
 	"Theme": "Teema",
 	"InputLanguages": "Kirjoituskielet",
+	"ForceKeyInput": "Force keypad input", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Odota sivun latausta",

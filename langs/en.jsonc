@@ -227,6 +227,7 @@
 	"FullscreenTextBox": "Fullscreen text-box",
 	"Theme": "Theme",
 	"InputLanguages": "Input languages",
+	"ForceKeyInput": "Force keypad input",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Wait for page to load",

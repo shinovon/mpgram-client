@@ -227,6 +227,7 @@
 	"FullscreenTextBox": "Quadre de pantalla completa",
 	"Theme": "Tema",
 	"InputLanguages": "Idiomes d'entrada",
+	"ForceKeyInput": "Force keypad input", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Espera que pàgina es carregui",

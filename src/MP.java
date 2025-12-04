@@ -3090,6 +3090,7 @@ public class MP extends MIDlet
 //#ifndef NO_CHAT_CANVAS
 							L[LLegacyUI],
 							L[LFastScrolling],
+							L[LForceKeyInput],
 //#endif
 					}, null);
 					uiChoice.setSelectedIndex(i = 0, reverseChat);
@@ -3102,6 +3103,7 @@ public class MP extends MIDlet
 //#ifndef NO_CHAT_CANVAS
 					uiChoice.setSelectedIndex(++i, legacyChatUI);
 					uiChoice.setSelectedIndex(++i, fastScrolling);
+					uiChoice.setSelectedIndex(++i, forceKeyUI);
 //#endif
 					uiChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(uiChoice);
@@ -3401,6 +3403,7 @@ public class MP extends MIDlet
 //#ifndef NO_CHAT_CANVAS
 					legacyChatUI = uiChoice.isSelected(++i);
 					fastScrolling = uiChoice.isSelected(++i);
+					forceKeyUI = uiChoice.isSelected(++i);
 
 					String prevTheme = theme;
 					theme = THEMES[0][Math.max(0, themeChoice.getSelectedIndex())];

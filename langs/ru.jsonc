@@ -227,6 +227,7 @@
 	"FullscreenTextBox": "Полноэкр. ввод",
 	"Theme": "Тема",
 	"InputLanguages": "Языки ввода",
+	"ForceKeyInput": "Исп. кнопочный ввод",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Ждать полной загрузки",
