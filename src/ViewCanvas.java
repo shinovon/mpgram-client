@@ -224,7 +224,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 		} catch (Exception e) {
 			e.printStackTrace();
 			try {
-				MP.display(new Alert("Repaint error", e.toString(), null, AlertType.ERROR));
+				MP.display(new Alert("Repaint error", e.toString(), null, AlertType.ERROR), null);
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}

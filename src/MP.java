@@ -513,7 +513,6 @@ public class MP extends MIDlet
 	private static String[] downloadMessage;
 	private static String downloadCurrentPath;
 	private static String downloadedPath;
-	private static String qrText;
 
 	static int confirmationTask;
 	static Object confirmationParam;
@@ -735,8 +734,8 @@ public class MP extends MIDlet
 //#endif
 
 //#ifndef NO_CHAT_CANVAS
-		if (d != null &&
-				(d.toLowerCase().indexOf("fastbcc") != -1 || d.toLowerCase().indexOf("itel") != -1 || d.indexOf("S7350") != -1)) {
+		if (d != null && (d.toLowerCase().indexOf("fastbcc") != -1 || d.toLowerCase().indexOf("itel") != -1
+				|| d.indexOf("S7350") != -1)) {
 			forceKeyUI = true;
 		}
 //#endif
@@ -5002,7 +5001,6 @@ public class MP extends MIDlet
 
 	static void showQrLogin(String text) {
 		// TODO: check by timer
-		qrText = text;
 		Alert a = new Alert(L[Lmpgram]);
 		a.setCommandListener(midlet);
 		a.addCommand(authCheckQrCmd);
