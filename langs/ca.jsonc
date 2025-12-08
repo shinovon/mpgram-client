@@ -77,8 +77,8 @@
 	"Next": "Següent",
 	"NewSession": "Nova sessió",
 	"ImportSession": "Importa sessió",
-	"Show": "Show", // Untranslated
-	"Check": "Check", // Untranslated
+	"Show": "Mostra",
+	"Check": "Comprova",
 	
 	// Settings commands
 	"Logout": "Tanca sessió",
@@ -192,10 +192,10 @@
 	"InvalidInstancePassword_Alert": "Mot de pas d'instància no vàlid!",
 	"InvalidSessionCode_Alert": "Codi de sessió no vàlid!",
 	"Retry": "Reintenta",
-	"Login_Btn": "Log in using phone number", // Untranslated
-	"LoginWithQR_Btn": "Log in using QR code", // Untranslated
-	"Advanced": "Advanced", // Untranslated
-	"QrCode_Alert": "QR code is ready", // Untranslated
+	"Login_Btn": "Inicia sessió amb número de telèfon",
+	"LoginWithQR_Btn": "Inicia sessió amb codi QR",
+	"Advanced": "Avançat",
+	"QrCode_Alert": "Codi QR està llest",
 	
 	// Settings sections
 	"UI": "IU",
@@ -227,7 +227,7 @@
 	"FullscreenTextBox": "Quadre de pantalla completa",
 	"Theme": "Tema",
 	"InputLanguages": "Idiomes d'entrada",
-	"ForceKeyInput": "Force keypad input", // Untranslated
+	"ForceKeyInput": "Forçar entrada de teclat",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Espera que pàgina es carregui",
