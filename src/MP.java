@@ -3764,7 +3764,8 @@ public class MP extends MIDlet
 					+ "Spanish: Jazmin Rocio\n"
 					+ "Finnish: gtrxAC\n"
 					+ "Portuguese: kefelili\n"
-					+ "Ukrainian: karusel33, PhantomHorror\n");
+					+ "Ukrainian: karusel33, PhantomHorror\n"
+					+ "Turkish: symbuzzer\n");
 			s.setFont(smallPlainFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
