@@ -1419,7 +1419,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			} else if (mediaDownload) {
 				menuAction(LDownload);
 			} else if (mediaUrl != null) {
-				MP.midlet.browse(mediaUrl);
+				MP.openUrl(mediaUrl, true);
 			}
 			return true;
 		case FOCUS_COMMENT:
