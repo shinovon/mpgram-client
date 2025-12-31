@@ -109,7 +109,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 
 	// boundaries
 	int width, height;
-	int clipHeight, top, bottom;
+	int clipHeight;
+	int top;
+	int bottom;
 	int contentHeight;
 
 	// scroll
@@ -608,10 +610,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				if (forwardMsgs != null || forwardMsg != null) {
 					bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
 					if (!touch) inputFocused = true;
-				} else {
+				} else if (!keyGuide) {
 					bottom = touch ? inputFieldHeight : 0;
 				}
-			} else {
+			} else if (!keyGuide) {
 				bottom = 0;
 			}
 			layoutStart = firstItem;
@@ -1286,6 +1288,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			forwardMsg = null;
 			forwardMsgs = null;
 			inputFocused = false;
+			keyGuide = false;
 			if ((funcFocused = funcWasFocused)) {
 				bottomAnimTarget = MP.smallBoldFontHeight + 4;
 			} else {
@@ -1433,6 +1436,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		} else if (funcFocused && game >= 0) {
 			if (game == Canvas.UP) {
 				funcFocused = false;
+				keyGuide = false;
 				bottomAnimTarget = 0;
 				repaint = true;
 			} else if (key == -5 || game == Canvas.FIRE) {
@@ -1758,6 +1762,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							} else {
 								replyMsgId = 0;
 								bottomAnimTarget = inputFieldHeight;
+								keyGuide = false;
 							}
 						}
 					} else if (x > width - 48) {
@@ -2287,6 +2292,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		editMsgId = 0;
 		file = null;
 		bottomAnimTarget = inputFieldHeight + MP.smallBoldFontHeight + 4;
+		keyGuide = false;
 		forwardPeer = null;
 		forwardMsg = null;
 		forwardMsgs = null;
