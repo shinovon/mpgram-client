@@ -32,9 +32,10 @@ Telegram client for J2ME platform based on [MPGram Web API](https://github.com/s
 
 Does not work on most Samsung phones.
 
-### Platform-specific variants
+### Platform-specific versions
 
-- If it fails on installation with verification error, use Blackberry version.
+- If you want to hide virtual keyboard on Samsung or LG touchscreen phones, use Samsung version.
+- If installation fails with verification error, use BlackBerry version.
 - If your device does not support CLDC 1.1 or JSR-75, use Lite version.
 
 ### Lite version limitations
