@@ -1364,6 +1364,7 @@ public class MP extends MIDlet
 					writeAuth();
 					TextBox t = new TextBox(L[LCode], "", 6, TextField.NUMERIC);
 					t.addCommand(authCodeCmd);
+					t.addCommand(cancelCmd);
 					t.setCommandListener(this);
 					display(t);
 				} else {
