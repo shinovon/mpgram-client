@@ -2,8 +2,8 @@
 
 Telegram client for J2ME platform based on [MPGram Web API](https://github.com/shinovon/mpgram-web), which is based on MadelineProto
 
-![img](/img/chat.png) ![img](/img/image_viewer.png) ![img](/img/music_player.png)
-![img](/img/notification.png) ![img](/img/chat_info.png) ![img](/img/bot.png)
+![img](/img/chat.jpg) ![img](/img/image_viewer.jpg) ![img](/img/music_player.jpg)
+![img](/img/notification.jpg) ![img](/img/chat_info.jpg) ![img](/img/bot.jpg)
 
 ## Features
 
