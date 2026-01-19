@@ -2956,7 +2956,7 @@ public class MP extends MIDlet
 
 				// set and check instance url
 				if ((instanceUrl = instanceField.getString()) == null
-						|| instanceUrl.length() < 6 || !instanceUrl.startsWith("http")) {
+						|| instanceUrl.length() < 6 || !instanceUrl.startsWith("http") || instanceUrl.indexOf(":") == -1) {
 					display(errorAlert(L[LInvalidInstance_Alert]), null);
 					return;
 				}
