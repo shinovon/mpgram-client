@@ -2272,9 +2272,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			synchronized (this) {
 				if (!MP.sending) {
 					MP.sending = true;
+					int r = Math.max(replyMsgId, topMsgId);
 					MP.midlet.start(MP.RUN_SEND_MESSAGE, new Object[] {
 							text, id,
-							replyMsgId == 0 ? null : Integer.toString(replyMsgId),
+							r == 0 ? null : Integer.toString(r),
 							editMsgId == 0 ? null : Integer.toString(editMsgId),
 							file,
 							null, forwardPeer, forwardMsg, forwardMsgs

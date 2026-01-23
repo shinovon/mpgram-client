@@ -246,7 +246,8 @@ public class ChatsList extends MPList {
 				return;
 			}
 //#endif
-			
+
+			// TODO topics
 			MP.openChat(id, 0);
 			MP.display(MP.writeForm(id, null, "", null, peerId, msgId));
 			return;
