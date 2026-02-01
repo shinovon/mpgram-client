@@ -1040,7 +1040,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						bh -= 1;
 						g.drawString(MP.L[LMenu], 2, h - bh, Graphics.TOP | Graphics.LEFT);
 						g.drawString(MP.L[LEdit], w >> 1, h - bh, Graphics.TOP | Graphics.HCENTER);
-						g.drawString(MP.L[keyboard != null && text != null && text.length() != 0 ? LClear : LCancel], w - 2, h - bh, Graphics.TOP | Graphics.RIGHT);
+						g.drawString(MP.L[keyboard != null && text != null && text.length() != 0
+								&& keyboard.getPhysicalKeyboardType() == Keyboard.PHYSICAL_KEYBOARD_PHONE_KEYPAD ?
+								LClear : LCancel], w - 2, h - bh, Graphics.TOP | Graphics.RIGHT);
 					}
 					if (bottomAnimTarget != -1) {
 						// don't draw input field when animation is in progress
@@ -1355,7 +1357,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			if (s.equals("send") || s.equals("call")
 					|| (MP.symbian && key == -10)) {
 				game = -10;
-			} else if (s.indexOf("back") != -1) {
+			} else if (s.indexOf("back") != -1 && s.indexOf("backspace") == -1) {
 				game = -11;
 			}
 		} catch (Exception ignored) {}
