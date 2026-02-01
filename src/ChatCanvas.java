@@ -2624,6 +2624,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 
 	public void onKeyboardDone() {
+		if (!touch) {
+			send();
+			return;
+		}
 		skipRender = false;
 		keyboard.hide();
 		queueRepaint();
