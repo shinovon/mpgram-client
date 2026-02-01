@@ -5252,6 +5252,14 @@ public class MP extends MIDlet
 			openChat(url.substring(1), -1);
 			return true;
 		}
+		if (url.startsWith("#")) {
+			// search in current chat
+			if (!(current instanceof MPChat)) return true;
+			((MPChat) current).resetChat();
+			((MPChat) current).setQuery(url);
+			midlet.start(RUN_LOAD_FORM, current);
+			return true;
+		}
 		int i;
 		String[] query = null;
 		boolean tg = false;
@@ -6418,7 +6426,7 @@ public class MP extends MIDlet
 			boolean skipEntity = false;
 			String entityText = text.substring(entity.getInt("offset"), entity.getInt("offset") + entity.getInt("length"));
 			String type = entity.getString("_");
-			if ("messageEntityUrl".equals(type) || "messageEntityMention".equals(type)) {
+			if ("messageEntityUrl".equals(type) || "messageEntityMention".equals(type) || "messageEntityHashtag".equals(type)) {
 				state[RT_URL] ++;
 				insert = flush(form, thread, richTextUrl = entityText, insert, state);
 				state[RT_URL] --;
