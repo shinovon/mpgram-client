@@ -119,7 +119,7 @@ public class MP extends MIDlet
 	private static final String AVATAR_RECORD_PREFIX = "mcA";
 
 	// URLs
-	private static final String DEFAULT_INSTANCE_URL = "http://mp.nnchan.ru/";
+	private static final String DEFAULT_INSTANCE_URL = "http://mp.wunderwungiel.pl/";
 	static final String API_URL = "api.php";
 	static final String AVA_URL = "ava.php";
 	static final String FILE_URL = "file.php";
