@@ -22,7 +22,7 @@ dos2unix META-INF/MANIFEST.MF && \
 sed -i "/Nokia-Scalable-Icon: \/m.svg/d" META-INF/MANIFEST.MF && \
 sed -i "/Nokia-Scalable-Icon-MIDlet-1: \/m.svg/d" META-INF/MANIFEST.MF && \
 unix2dos META-INF/MANIFEST.MF && \
-7z a mpgram.jar META-INF/ && \
+zip -u mpgram.jar META-INF/* && \
 mv mpgram.jar mpgram_lite.jar && \
 cp mpgram_lite.jar "$MPGRAM_DEPLOY_DIR/mpgram_lite.jar"
 
@@ -47,7 +47,7 @@ sed -i "/Nokia-Scalable-Icon: \/m.svg/d" META-INF/MANIFEST.MF && \
 sed -i "/Nokia-Scalable-Icon-MIDlet-1: \/m.svg/d" META-INF/MANIFEST.MF && \
 sed -i "s/Nokia-MIDlet-Splash-Screen-Image: suppress/mpgram-blackberry-build: true/g" META-INF/MANIFEST.MF && \
 unix2dos META-INF/MANIFEST.MF && \
-7z a mpgram.jar META-INF/ && \
+zip -u mpgram.jar META-INF/* && \
 mv mpgram.jar mpgram_bb.jar && \
 cp mpgram_bb.jar "$MPGRAM_DEPLOY_DIR/mpgram_bb.jar"
 
@@ -61,5 +61,5 @@ sed -i "s/Nokia-Scalable-Icon: \/m.svg/MIDlet-Touch-Support: True/g" META-INF/MA
 sed -i "s/Nokia-Scalable-Icon-MIDlet-1: \/m.svg/MIDlet-Landscape-Support: True/g" META-INF/MANIFEST.MF && \
 sed -i "s/Nokia-MIDlet-Splash-Screen-Image: suppress/mpgram-samsung-build: true/g" META-INF/MANIFEST.MF && \
 unix2dos META-INF/MANIFEST.MF && \
-7z a mpgram_samsung.jar META-INF/ && \
+zip -u mpgram.jar META-INF/* && \
 cp mpgram_samsung.jar "$MPGRAM_DEPLOY_DIR/mpgram_samsung.jar"
