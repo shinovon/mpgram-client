@@ -81,6 +81,8 @@ public class MP extends MIDlet
 {
 
 	// region Constants
+
+	// threading tasks
 	static final int RUN_SEND_MESSAGE = 1;
 	static final int RUN_VALIDATE_AUTH = 2;
 	static final int RUN_IMAGES = 3;
@@ -182,7 +184,8 @@ public class MP extends MIDlet
 //#else
 	static final boolean MINI_BUILD = false;
 //#endif
-	// endregion
+
+	// endregion Constants
 
 	// Fonts
 	static final Font largePlainFont = Font.getFont(0, 0, Font.SIZE_LARGE);
@@ -212,10 +215,8 @@ public class MP extends MIDlet
 
 	private static String version;
 
-	// localization
-	static String[] L;
-
 	// region Settings
+
 	static String instanceUrl = DEFAULT_INSTANCE_URL;
 	private static String instancePassword;
 	private static int tzOffset;
@@ -300,24 +301,8 @@ public class MP extends MIDlet
 	static boolean blackberry;
 	static boolean symbian;
 	static boolean series40;
-	// endregion
 
-	// threading
-	private static int run;
-	private static Object runParam;
-//	private static int running;
-	static Thread updatesThread, updatesThreadCopy;
-	static final Hashtable threadConnections = new Hashtable();
-	static final Vector closingConnections = new Vector();
-	static boolean sending;
-	static boolean updatesRunning;
-	static boolean updatesSleeping;
-//#ifndef NO_FILE
-	static boolean downloading;
-//#endif
-
-	private static final Object imagesLoadLock = new Object();
-	private static final Vector imagesToLoad = new Vector(); // TODO hashtable?
+	// endregion Settings
 
 	// auth
 	private static String user;
@@ -1086,6 +1071,20 @@ public class MP extends MIDlet
 	// endregion
 
 	// region Threading
+
+	// threading
+	private static int run;
+	private static Object runParam;
+	//	private static int running;
+	static Thread updatesThread, updatesThreadCopy;
+	static final Hashtable threadConnections = new Hashtable();
+	static final Vector closingConnections = new Vector();
+	static boolean sending;
+	static boolean updatesRunning;
+	static boolean updatesSleeping;
+//#ifndef NO_FILE
+	static boolean downloading;
+//#endif
 
 	public void run() {
 		int run;
@@ -4459,6 +4458,9 @@ public class MP extends MIDlet
 
 	// region Image queue
 
+	private static final Object imagesLoadLock = new Object();
+	private static final Vector imagesToLoad = new Vector(); // TODO hashtable?
+
 	static void queueAvatar(String id, Object target) {
 //#ifndef NO_AVATARS
 		if (target == null || id == null || !loadAvatars) return;
@@ -5965,6 +5967,8 @@ public class MP extends MIDlet
 	// endregion
 
 	// region Localizations
+
+	static String[] L;
 
 	private void loadLocale(String lang) throws IOException {
 		InputStreamReader r = new InputStreamReader(getClass().getResourceAsStream("/l/".concat(lang)), "UTF-8");
