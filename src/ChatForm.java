@@ -136,6 +136,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 			
 			MP.cancel(MP.updatesThreadCopy, true);
 			while (MP.updatesThread != null || MP.updatesRunning) {
+				//noinspection BusyWait
 				Thread.sleep(1000L);
 			}
 			
@@ -1179,6 +1180,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 							typingLock.wait(60000);
 						}
 					}
+					//noinspection BusyWait
 					Thread.sleep(5000);
 					typing = 0;
 				} catch (Exception e) {}

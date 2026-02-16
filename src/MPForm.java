@@ -65,8 +65,8 @@ public abstract class MPForm extends Form implements LangConstants {
 			}
 			postLoad(true);
 			return;
-		} catch (InterruptedException e) {
-		} catch (InterruptedIOException e) {
+		} catch (InterruptedException ignored) {
+		} catch (InterruptedIOException ignored) {
 		} catch (Exception e) {
 			if (e == MP.cancelException || canceled || this.thread != thread) {
 				// ignore exception if cancel detected

@@ -42,6 +42,7 @@ public class FoldersList extends MPList {
 		} else {
 			safeAppend(thread, MP.L[LAllChats], null);
 		}
+		//noinspection AssignmentUsedAsCondition
 		if (hasArchive = j.getBoolean("archive", false)) {
 			safeAppend(thread, MP.L[LArchive], null);
 		}

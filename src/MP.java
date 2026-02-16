@@ -578,6 +578,7 @@ public class MP extends MIDlet
 		String p, v, d = null;
 		if ((p = System.getProperty("microedition.platform")) != null) {
 			d = p;
+			//noinspection AssignmentUsedAsCondition
 			if ((symbianJrt = p.indexOf("platform=S60") != -1)) {
 				int i;
 				v = p.substring(i = p.indexOf("platform_version=") + 17, /*i = */p.indexOf(';', i));
@@ -1145,10 +1146,12 @@ public class MP extends MIDlet
 		}
 		case RUN_IMAGES: { // avatars loading loop
 			try {
+				//noinspection InfiniteLoopStatement // intended use
 				while (true) {
 					synchronized (imagesLoadLock) {
 						imagesLoadLock.wait();
 					}
+					//noinspection BusyWait
 					Thread.sleep(200);
 					while (imagesToLoad.size() > 0) {
 						Object[] o;
@@ -1678,10 +1681,12 @@ public class MP extends MIDlet
 						if (!form.updating() || updatesThread != thread) break;
 						if (!form.isShown() || paused) {
 							updatesSleeping = true;
+							//noinspection BusyWait
 							Thread.sleep(updatesDelay);
 							updatesSleeping = false;
 							continue;
 						}
+						//noinspection BusyWait
 						Thread.sleep(10);
 						if (check) {
 							sb.setLength(0);
@@ -1750,6 +1755,7 @@ public class MP extends MIDlet
 
 						if (!longpoll) {
 							updatesSleeping = true;
+							//noinspection BusyWait
 							Thread.sleep(updatesTimeout * 1000L);
 							updatesSleeping = false;
 						}
@@ -1769,6 +1775,7 @@ public class MP extends MIDlet
 							break;
 						}
 						updatesSleeping = true;
+						//noinspection BusyWait
 						Thread.sleep(updatesDelay);
 						updatesSleeping = false;
 					}
@@ -1827,6 +1834,7 @@ public class MP extends MIDlet
 						|| globalUpdates
 //#endif
 						)) {
+					//noinspection BusyWait
 					Thread.sleep(globalUpdates ? 1 : wasShown ? pushInterval : pushBgInterval);
 					if (
 //#ifndef NO_NOTIFY
@@ -2257,6 +2265,7 @@ public class MP extends MIDlet
 			try {
 				while (currentPlayer != null && playerState == 1) {
 					playerUpdate(currentPlayer, null, null);
+					//noinspection BusyWait
 					Thread.sleep(500L);
 				}
 			} catch (Exception ignored) {}
@@ -5502,6 +5511,7 @@ public class MP extends MIDlet
 			try {
 				while (closingConnections.size() != 0) {
 					System.out.println("wait " + closingConnections);
+					//noinspection BusyWait
 					Thread.sleep(1000);
 				}
 			} catch (InterruptedException e) {
@@ -6873,6 +6883,7 @@ public class MP extends MIDlet
 				loop: {
 					while (i < l) {
 						char c = chars[i];
+						//noinspection SwitchStatementWithTooFewBranches
 						switch (c) {
 						case '\\': {
 							next: {

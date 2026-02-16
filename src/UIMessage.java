@@ -151,6 +151,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		peerId = chat.id;
 		showReadMark = out && !chat.selfChat;
 
+		//noinspection AssignmentUsedAsCondition
 		if ((action = message.has("act"))) {
 			JSONObject act = message.getObject("act");
 			String type = act.getString("_");

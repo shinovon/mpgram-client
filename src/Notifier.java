@@ -39,6 +39,7 @@ public class Notifier implements SoftNotificationListener {
 	static Hashtable piglerIds = new Hashtable();
 	
 	private static Notifier inst;
+	/** @noinspection FieldCanBeLocal*/
 	private static Object piglerListener;
 	private static Object piglerApi;
 	

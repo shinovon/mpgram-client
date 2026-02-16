@@ -380,6 +380,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				// TODO check if cancel is already in progress
 				MP.cancel(MP.updatesThreadCopy, true);
 				while (MP.updatesThread != null || MP.updatesRunning) {
+					//noinspection BusyWait
 					Thread.sleep(1000L);
 				}
 
@@ -483,6 +484,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						user = true;
 						canPin = true;
 						canDelete = true;
+						//noinspection AssignmentUsedAsCondition
 						if (bot = info.getObject("User").getBoolean("bot", false)) {
 							defaultStatus = MP.L[LBot];
 						}
@@ -1291,6 +1293,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			forwardMsgs = null;
 			inputFocused = false;
 			keyGuide = false;
+			//noinspection AssignmentUsedAsCondition
 			if ((funcFocused = funcWasFocused)) {
 				bottomAnimTarget = MP.smallBoldFontHeight + 4;
 			} else {
@@ -2721,6 +2724,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							typingLock.wait(60000);
 						}
 					}
+					//noinspection BusyWait
 					Thread.sleep(5000);
 					typing = 0;
 				} catch (Exception e) {}
