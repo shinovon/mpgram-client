@@ -184,6 +184,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	boolean editorShown;
 	boolean funcWasFocused;
 
+	int topButtonWidth;
+
 	ChatCanvas() {
 		setFullScreenMode(true);
 
@@ -749,6 +751,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (width != w) {
 			layoutStart = firstItem;
 			titleRender = null;
+			topButtonWidth = 0;
 		}
 		width = w; height = h;
 
@@ -923,34 +926,43 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				int tw = w - 8;
 				if (touch) {
 					g.setColor(colors[COLOR_CHAT_PANEL_FG]);
-					tx = 40;
-					tw = w - 80;
+					tx = topButtonWidth;
+					if (tx == 0) {
+						tx = topButtonWidth = w < 320 ? 40 : 50;
+					}
+					tw = w - 100;
 					int bty = (th - 2) >> 1;
 					if (selected != 0) g.setColor(colors[COLOR_CHAT_PANEL_FG]);
 					// back button
-					g.drawLine(12, bty, 28, bty);
-					g.drawLine(12, bty, 20, bty-8);
-					g.drawLine(12, bty, 20, bty+8);
+					{
+						int bx = (tx - 16) >> 1;
+						g.drawLine(bx, bty, bx + 16, bty);
+						g.drawLine(bx, bty, bx + 8, bty-8);
+						g.drawLine(bx, bty, bx + 8, bty+8);
+					}
 
 					if (loading) { // do nothing
 					} else if (selected != 0) {
 						// selected messages options
 
 						// delete
-						g.drawLine(w - 29, bty - 8, w - 13, bty + 8);
-						g.drawLine(w - 29, bty + 8, w - 13, bty - 8);
+						int bx = w - tx + ((tx - 16) >> 1);
+						g.drawLine(bx, bty - 8, bx + 16, bty + 8);
+						g.drawLine(bx, bty + 8, bx + 16, bty - 8);
 
 						// forward
-						g.drawLine(w - 52, bty, w - 68, bty);
-						g.drawLine(w - 68, bty, w - 68, bty + 6);
-						g.drawLine(w - 58, bty - 6, w - 52, bty);
-						g.drawLine(w - 58, bty + 6, w - 52, bty);
+						bx = w - tx * 2 + ((tx - 16) >> 1);
+						g.drawLine(bx + 16, bty, bx, bty);
+						g.drawLine(bx, bty, bx, bty + 6);
+						g.drawLine(bx + 10, bty - 6, bx + 16, bty);
+						g.drawLine(bx + 10, bty + 6, bx + 16, bty);
 
 					} else if (/*query == null && */ mediaFilter == null) {
 						// menu button
-						g.fillRect(w - 22, bty - 6, 3, 3);
-						g.fillRect(w - 22, bty, 3, 3);
-						g.fillRect(w - 22, bty + 6, 3, 3);
+						int bx = w - tx + ((tx - 3) >> 1);
+						g.fillRect(bx, bty - 6, 3, 3);
+						g.fillRect(bx, bty, 3, 3);
+						g.fillRect(bx, bty + 6, 3, 3);
 					}
 				}
 				boolean medfont = MP.chatStatus || touch;
@@ -1134,8 +1146,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							int ty = iy + ((ih - 24) >> 1);
 
 							g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
-							g.fillRect(w - 40 + 12, ty + 12, 17, 1);
-							g.fillRect(w - 40 + 20, ty + 4, 1, 17);
+							int bw = topButtonWidth;
+							int bx = w - bw + ((bw - 17) >> 1);
+							g.fillRect(bx, ty + 12, 17, 1);
+							g.fillRect(bx + 8, ty + 4, 1, 17);
 						}
 					} else if (left) {
 						g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
@@ -1733,20 +1747,20 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			}
 		} else if (touch && now - pressTime < 300) {
 			if (y < top) {
-				if (x < 40) { // back button
+				if (x < topButtonWidth) { // back button
 					if (keyboard != null && keyboard.isVisible()) {
 						onKeyboardCancel();
 					} else {
 						keyPressed(-7);
 					}
 				} else if (selected != 0) { // selected messages actions
-					if (x > width - 40) {
+					if (x > width - topButtonWidth) {
 						deleteSelected();
-					} else if (x > width - 90) {
+					} else if (x > width - (topButtonWidth * 2)) {
 						forwardSelected();
 					}
 				} else if (loading) { // do nothing
-				} else if (x > width - 48) { // menu button
+				} else if (x > width - topButtonWidth) { // menu button
 					if (query != null) {
 						showMenu(null, new int[] { LSearchMessages });
 					} else if (mediaFilter == null) {
@@ -1761,7 +1775,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					MP.midlet.start(MP.RUN_JOIN_CHANNEL, id);
 				} else if (canWrite) {
 					if (y < height - inputFieldHeight) {
-						if (x > width - 48) {
+						if (x > width - topButtonWidth) {
 							if (editMsgId != 0 || forwardMsgs != null || forwardMsg != null) {
 								resetInput();
 							} else {

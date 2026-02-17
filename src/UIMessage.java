@@ -248,7 +248,7 @@ public class UIMessage extends UIItem implements LangConstants {
 
 		int order = 0;
 
-		if (!out && !hideName) {
+		if (!out && !hideName && !action) {
 			subFocus[order++] = FOCUS_SENDER;
 		}
 
@@ -856,7 +856,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				h += d;
 				if (!reverse) y -= d;
 			}
-			if (!chat.broadcast) {
+			if (!chat.broadcast && !action) {
 				boolean group = false;
 				if (this.next != null && this.next instanceof UIMessage) {
 					UIMessage next = (UIMessage) this.next;
