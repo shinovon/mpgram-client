@@ -1665,6 +1665,15 @@ public class MP extends MIDlet
 			break;
 		}
 		case RUN_CHAT_UPDATES: { // chat updates loop
+			if (!globalUpdates && (MP.updatesThread != null || MP.updatesRunning)) {
+				try {
+					while (MP.updatesThread != null || MP.updatesRunning) {
+						cancel(MP.updatesThread, true);
+						//noinspection BusyWait
+						Thread.sleep(1000L);
+					}
+				} catch (Exception ignored) {}
+			}
 			Thread thread;
 			updatesThread = updatesThreadCopy = thread = Thread.currentThread();
 			updatesRunning = true;
