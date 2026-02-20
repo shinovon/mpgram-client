@@ -221,7 +221,7 @@ public class MP extends MIDlet
 	private static String instancePassword;
 	private static int tzOffset;
 	static boolean useLoadingForm;
-	private static int avatarSize;
+	static int avatarSize;
 	static int photoSize = 120;
 	static boolean loadAvatars = true;
 	static boolean loadThumbs = true;
@@ -290,6 +290,7 @@ public class MP extends MIDlet
 	static int playMethod; // 0: stream, 1: write to file
 //#endif
 	private static boolean playlistDirection = true;
+	static boolean chatAvatar = true;
 
 	private static boolean needWriteConfig;
 
@@ -1665,10 +1666,10 @@ public class MP extends MIDlet
 			break;
 		}
 		case RUN_CHAT_UPDATES: { // chat updates loop
-			if (!globalUpdates && (MP.updatesThread != null || MP.updatesRunning)) {
+			if (!globalUpdates && MP.updatesThread != null) {
 				try {
+					cancel(MP.updatesThread, true);
 					while (MP.updatesThread != null || MP.updatesRunning) {
-						cancel(MP.updatesThread, true);
 						//noinspection BusyWait
 						Thread.sleep(1000L);
 					}
@@ -4525,6 +4526,12 @@ public class MP extends MIDlet
 			((UIMessage) target).mediaImage = img;
 			if (((UIMessage) target).photoRenderHeight == 0) ((UIMessage) target).layoutWidth = 0;
 			((UIMessage) target).requestPaint();
+			return;
+		}
+		if (target instanceof ChatCanvas) {
+			((ChatCanvas) target).photo = img;
+			((ChatCanvas) target).photoHeight = img.getHeight();
+			((ChatCanvas) target).queueRepaint();
 			return;
 		}
 //#endif

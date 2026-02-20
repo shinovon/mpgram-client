@@ -186,6 +186,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 
 	int topButtonWidth;
 
+	Image photo;
+	int photoHeight;
+	boolean showPhoto;
+
 	ChatCanvas() {
 		setFullScreenMode(true);
 
@@ -262,6 +266,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			top = MP.smallBoldFontHeight + MP.smallPlainFontHeight + 8;
 		} else {
 			top = MP.smallBoldFontHeight + 4 + (MP.chatStatus && mediaFilter == null ? MP.smallPlainFontHeight + 4 : 0);
+		}
+		if (MP.chatAvatar) {
+			top = Math.max(8 + MP.avatarSize, top);
 		}
 
 		// initialize keyboard
@@ -409,6 +416,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				}
 				if (dialog.has("read_outbox_max_id")) {
 					readOutboxId = dialog.getInt("read_outbox_max_id");
+				}
+				if (MP.chatAvatar && photo == null) {
+					MP.queueImage(id, this);
+					photoHeight = MP.avatarSize;
 				}
 			}
 
@@ -636,6 +647,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				botAnswer = null;
 				handleBotAnswer(b);
 			}
+			showPhoto = MP.chatAvatar && !selfChat && mediaFilter == null && query == null && postId == null;
 //#ifndef NO_NOTIFY
 //#ifndef NO_NOKIAUI
 			try {
@@ -940,6 +952,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						g.drawLine(bx, bty, bx + 8, bty-8);
 						g.drawLine(bx, bty, bx + 8, bty+8);
 					}
+					if (showPhoto) {
+						if (photo != null) g.drawImage(photo, tx, (th - photoHeight) >> 1, 0);
+					}
 
 					if (loading) { // do nothing
 					} else if (selected != 0) {
@@ -964,6 +979,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						g.fillRect(bx, bty, 3, 3);
 						g.fillRect(bx, bty + 6, 3, 3);
 					}
+				}
+				if (showPhoto) {
+					tx += photoHeight + (touch ? 8 : 4);
 				}
 				boolean medfont = MP.chatStatus || touch;
 				if (selected != 0 || mediaFilter != null || loading) {
@@ -992,6 +1010,13 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					g.drawString(s, tx, medfont ? ((th - MP.medPlainFontHeight) >> 1) : 2, 0);
 				} else {
 					boolean hideStatus = medfont && (selfChat || postId != null || query != null);
+					int tth = 0;
+
+					tth += (medfont ? MP.medPlainFontHeight : MP.smallPlainFontHeight);
+
+					if (medfont && !hideStatus) tth += 2 + MP.smallBoldFontHeight;
+
+					int ty = (th - tth) >> 1;
 					if (title != null) {
 						Font font = hideStatus ? MP.medPlainFont : MP.smallBoldFont;
 						if (titleRender == null) {
@@ -999,7 +1024,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						}
 						g.setColor(colors[COLOR_CHAT_PANEL_FG]);
 						g.setFont(font);
-						g.drawString(titleRender, tx, medfont ? (hideStatus ? (th - MP.medPlainFontHeight) >> 1 : 4) : 2, 0);
+						g.drawString(titleRender, tx, ty, 0);
 					}
 					// TODO status ellipsis
 					if (medfont && !hideStatus) {
@@ -1010,7 +1035,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							status = this.defaultStatus;
 						}
 						if (status != null) {
-							g.drawString(status, tx, 4 + MP.smallBoldFontHeight, 0);
+							g.drawString(status, tx, 2 + MP.smallBoldFontHeight + ty, 0);
 						}
 					}
 				}
