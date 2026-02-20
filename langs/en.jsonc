@@ -229,6 +229,7 @@
 	"InputLanguages": "Input languages",
 	"ForceKeyInput": "Force keypad input",
 	"ChatAvatar": "Show avatar in chat",
+	"ChatWallpaper": "Chat wallpaper",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Wait for page to load",

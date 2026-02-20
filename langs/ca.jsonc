@@ -229,6 +229,7 @@
 	"InputLanguages": "Idiomes d'entrada",
 	"ForceKeyInput": "Forçar entrada de teclat",
 	"ChatAvatar": "Show avatar in chat", // Untranslated
+	"ChatWallpaper": "Chat wallpaper", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Espera que pàgina es carregui",

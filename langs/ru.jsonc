@@ -229,6 +229,7 @@
 	"InputLanguages": "Языки ввода",
 	"ForceKeyInput": "Исп. кнопочный ввод",
 	"ChatAvatar": "Показ. аватарку в чате",
+	"ChatWallpaper": "Обои чата",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Ждать полной загрузки",

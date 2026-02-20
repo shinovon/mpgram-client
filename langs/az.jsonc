@@ -229,6 +229,7 @@
 	"InputLanguages": "Input languages", // Untranslated
 	"ForceKeyInput": "Force keypad input", // Untranslated
 	"ChatAvatar": "Show avatar in chat", // Untranslated
+	"ChatWallpaper": "Chat wallpaper", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Tam yükləməni gözləyin",
