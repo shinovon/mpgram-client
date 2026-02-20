@@ -3105,6 +3105,27 @@ public class MP extends MIDlet
 					langChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(langChoice);
 //#endif
+//#ifndef NO_CHAT_CANVAS
+					themeChoice = new ChoiceGroup(L[LTheme], Choice.POPUP, THEMES[1], null);
+					for (i = 0; i < THEMES[0].length; ++i) {
+						if (theme.equals(THEMES[0][i])) {
+							themeChoice.setSelectedIndex(i, true);
+							break;
+						}
+					}
+					themeChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(themeChoice);
+
+					wallpaperPathField = new TextField(L[LChatWallpaper], wallpaperPath, 500, TextField.ANY);
+					wallpaperPathField.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(wallpaperPathField);
+
+					s = new StringItem(null, "...", Item.BUTTON);
+					s.setDefaultCommand(wallpaperPathCmd);
+					s.setItemCommandListener(this);
+					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(s);
+//#endif
 
 					uiChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
 							L[LReversedChat],
@@ -3136,28 +3157,6 @@ public class MP extends MIDlet
 //#endif
 					uiChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(uiChoice);
-
-//#ifndef NO_CHAT_CANVAS
-					themeChoice = new ChoiceGroup(L[LTheme], Choice.POPUP, THEMES[1], null);
-					for (i = 0; i < THEMES[0].length; ++i) {
-						if (theme.equals(THEMES[0][i])) {
-							themeChoice.setSelectedIndex(i, true);
-							break;
-						}
-					}
-					themeChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(themeChoice);
-
-					wallpaperPathField = new TextField(L[LChatWallpaper], wallpaperPath, 500, TextField.ANY);
-					wallpaperPathField.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(wallpaperPathField);
-
-					s = new StringItem(null, "...", Item.BUTTON);
-					s.setDefaultCommand(wallpaperPathCmd);
-					s.setItemCommandListener(this);
-					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(s);
-//#endif
 
 					photoSizeGauge = new Gauge(L[LThumbnailsSize], true, 64, Math.min(64, photoSize / 8));
 					photoSizeGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
