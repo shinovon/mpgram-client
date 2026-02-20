@@ -3148,7 +3148,7 @@ public class MP extends MIDlet
 					themeChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(themeChoice);
 
-					wallpaperPathField = new TextField(L[ChatWallpaper], wallpaperPath, 500, TextField.ANY);
+					wallpaperPathField = new TextField(L[LChatWallpaper], wallpaperPath, 500, TextField.ANY);
 					wallpaperPathField.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(wallpaperPathField);
 
