@@ -228,6 +228,7 @@
 	"Theme": "Theme", // Untranslated
 	"InputLanguages": "Input languages", // Untranslated
 	"ForceKeyInput": "Force keypad input", // Untranslated
+	"ChatAvatar": "Show avatar in chat", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Espere a que se cargue la pagina",

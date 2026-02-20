@@ -228,6 +228,7 @@
 	"Theme": "Тема",
 	"InputLanguages": "Языки ввода",
 	"ForceKeyInput": "Исп. кнопочный ввод",
+	"ChatAvatar": "Показ. аватарку в чате",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Ждать полной загрузки",

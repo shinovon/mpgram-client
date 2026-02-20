@@ -228,6 +228,7 @@
 	"Theme": "Theme",
 	"InputLanguages": "Input languages",
 	"ForceKeyInput": "Force keypad input",
+	"ChatAvatar": "Show avatar in chat",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Wait for page to load",

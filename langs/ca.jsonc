@@ -228,6 +228,7 @@
 	"Theme": "Tema",
 	"InputLanguages": "Idiomes d'entrada",
 	"ForceKeyInput": "Forçar entrada de teclat",
+	"ChatAvatar": "Show avatar in chat", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Espera que pàgina es carregui",
