@@ -189,6 +189,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	Image photo;
 	int photoHeight;
 	boolean showPhoto;
+	boolean photoQueued;
 
 	ChatCanvas() {
 		setFullScreenMode(true);
@@ -417,9 +418,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				if (dialog.has("read_outbox_max_id")) {
 					readOutboxId = dialog.getInt("read_outbox_max_id");
 				}
-				if (MP.chatAvatar && photo == null) {
+				if (MP.chatAvatar && photo == null && !photoQueued) {
 					MP.queueImage(id, this);
 					photoHeight = MP.avatarSize;
+					photoQueued = true;
 				}
 			}
 
@@ -648,6 +650,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				handleBotAnswer(b);
 			}
 			showPhoto = MP.chatAvatar && !selfChat && mediaFilter == null && query == null && postId == null;
+			if (showPhoto && photo == null && !photoQueued) {
+				MP.queueImage(id, this);
+				photoHeight = MP.avatarSize;
+				photoQueued = true;
+			}
 //#ifndef NO_NOTIFY
 //#ifndef NO_NOKIAUI
 			try {
@@ -979,6 +986,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						g.fillRect(bx, bty, 3, 3);
 						g.fillRect(bx, bty + 6, 3, 3);
 					}
+				} else if (showPhoto) {
+					if (photo != null) g.drawImage(photo, tx, (th - photoHeight) >> 1, 0);
 				}
 				if (showPhoto) {
 					int p = photoHeight + (touch ? 8 : 4);
@@ -1009,13 +1018,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							s = mediaFilter;
 						}
 					}
-					g.drawString(s, tx, medfont ? ((th - MP.medPlainFontHeight) >> 1) : 2, 0);
+					g.drawString(s, tx, (th - (medfont ? MP.medPlainFontHeight : MP.smallPlainFontHeight)) >> 1, 0);
 				} else {
 					boolean hideStatus = medfont && (selfChat || postId != null || query != null);
+
 					int tth = 0;
-
-					tth += (medfont ? MP.medPlainFontHeight : MP.smallPlainFontHeight);
-
+					tth += medfont ? MP.medPlainFontHeight : MP.smallPlainFontHeight;
 					if (medfont && !hideStatus) tth += 2 + MP.smallBoldFontHeight;
 
 					int ty = (th - tth) >> 1;
