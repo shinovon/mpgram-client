@@ -1073,7 +1073,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				maxW = Math.max(maxW, minW + tw);
 			}
 			maxW = Math.max(maxW, minW + text.contentWidth);
-		} else if (!(timeBreak = photo || lastW + timeWidth >= cw) && lastW + timeWidth >= maxW) {
+		} else if (!(timeBreak = lastW + timeWidth >= (photo ? maxW : cw)) && lastW + timeWidth >= maxW) {
 			maxW = Math.max(maxW, lastW + timeWidth);
 		}
 

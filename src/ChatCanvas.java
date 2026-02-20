@@ -250,15 +250,22 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 
 		if (bgImg == null) {
 			try {
-				bgImg = Image.createImage("/bg.png");
-
-				/*int i = */Math.max(bgWidth = bgImg.getWidth(), bgHeight = bgImg.getHeight());
-//				int s = Math.max(getWidth(), getHeight());
-//				if (i > s) {
-//					bgImg = MP.resize(bgImg, s, s);
-//				}
-				bg = true;
-			} catch (Exception e) {
+				String s = MP.wallpaperPath;
+				if (s != null && s.length() != 0) {
+					if (s.indexOf(':') != -1) {
+						bgImg = MP.getImage(s);
+					} else {
+						bgImg = Image.createImage(s);
+					}
+	
+					/*int i = */Math.max(bgWidth = bgImg.getWidth(), bgHeight = bgImg.getHeight());
+	//				int s = Math.max(getWidth(), getHeight());
+	//				if (i > s) {
+	//					bgImg = MP.resize(bgImg, s, s);
+	//				}
+					bg = true;
+				}
+			} catch (Throwable e) {
 				bg = false;
 			}
 		}

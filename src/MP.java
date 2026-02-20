@@ -34,9 +34,7 @@ import java.util.Random;
 import java.util.TimeZone;
 import java.util.Vector;
 
-import javax.microedition.io.Connection;
-import javax.microedition.io.Connector;
-import javax.microedition.io.HttpConnection;
+import javax.microedition.io.*;
 //#ifndef NO_FILE
 import javax.microedition.io.file.FileConnection;
 import javax.microedition.io.file.FileSystemRegistry;
@@ -279,6 +277,7 @@ public class MP extends MIDlet
 	static boolean pngStickers;
 	static boolean lazyLoading = true;
 	static boolean chatAvatar;
+	static String wallpaperPath = "";
 //#endif
 //#ifndef NO_FILE
 	static int downloadMethod; // 0 - always ask, 1 - in app, 2 - browser
@@ -333,6 +332,7 @@ public class MP extends MIDlet
 	private static Command keyboardLanguagesCmd;
 	private static Command saveLanguagesCmd;
 	private static Command exportSessionCmd;
+	private static Command wallpaperPathCmd;
 
 	static Command refreshCmd;
 	static Command archiveCmd;
@@ -462,6 +462,7 @@ public class MP extends MIDlet
 //#ifndef NO_CHAT_CANVAS
 	private static ChoiceGroup textMethodChoice;
 	private static ChoiceGroup themeChoice;
+	private static TextField wallpaperPathField;
 //#endif
 
 	// write items
@@ -504,7 +505,7 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 	// file picker
 	private static Vector rootsList;
-	private static boolean fileMode;
+	private static int fileMode; // 0 - select directory for saving, 1 - select file for upload, 2 - select file for wallpaper
 //#endif
 
 	// music
@@ -796,6 +797,7 @@ public class MP extends MIDlet
 			fastScrolling = j.getBoolean("fastScrolling", fastScrolling);
 			forceKeyUI = j.getBoolean("forceKeyUI", forceKeyUI);
 			chatAvatar = j.getBoolean("chatAvatar", chatAvatar);
+			wallpaperPath = j.getString("wallpaperPath", wallpaperPath);
 //#endif
 //#ifndef NO_FILE
 			downloadPath = j.getString("downloadPath", downloadPath);
@@ -868,6 +870,7 @@ public class MP extends MIDlet
 		keyboardLanguagesCmd = new Command(L[LSelect], Command.ITEM, 1);
 		saveLanguagesCmd = new Command(L[LBack], Command.BACK, 1);
 		exportSessionCmd = new Command(L[LShowSessionCode], Command.ITEM, 1);
+		wallpaperPathCmd = new Command(L[LLocate], Command.ITEM, 1);
 
 		foldersCmd = new Command(L[LFolders], Command.SCREEN, 4);
 		refreshCmd = new Command(L[LRefresh], Command.SCREEN, 5);
@@ -3144,6 +3147,16 @@ public class MP extends MIDlet
 					}
 					themeChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(themeChoice);
+
+					wallpaperPathField = new TextField("Wallpaper path", wallpaperPath, 500, TextField.ANY);
+					wallpaperPathField.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(wallpaperPathField);
+
+					s = new StringItem(null, "...", Item.BUTTON);
+					s.setDefaultCommand(wallpaperPathCmd);
+					s.setItemCommandListener(this);
+					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(s);
 //#endif
 
 					photoSizeGauge = new Gauge(L[LThumbnailsSize], true, 64, Math.min(64, photoSize / 8));
@@ -3437,6 +3450,7 @@ public class MP extends MIDlet
 					if (!theme.equals(prevTheme)) {
 						ChatCanvas.colorsCopy = null;
 					}
+					wallpaperPath = wallpaperPathField.getString().trim();
 //#endif
 					if ((photoSize = (photoSizeGauge.getValue() * 8)) < 16) {
 						photoSizeGauge.setValue((photoSize = 16) / 8);
@@ -3566,7 +3580,7 @@ public class MP extends MIDlet
 			if (c == downloadPathCmd) {
 				downloadMessage = null;
 				try {
-					openFilePicker(downloadPath, false);
+					openFilePicker(downloadPath, 0);
 				} catch (Throwable ignored) {}
 				return;
 			}
@@ -3615,6 +3629,19 @@ public class MP extends MIDlet
 				copy("", user);
 				return;
 			}
+			if (c == wallpaperPathCmd) {
+				downloadMessage = null;
+				try {
+					String s = wallpaperPath;
+					if (s != null && s.startsWith("file:///")) {
+						s = s.substring(8);
+					} else {
+						s = "";
+					}
+					openFilePicker(s, 2);
+				} catch (Throwable ignored) {}
+				return;
+			}
 //#endif
 		}
 		{ // write form commands
@@ -3647,7 +3674,7 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 			if (c == chooseFileCmd) {
 				try {
-					openFilePicker(lastUploadPath, true);
+					openFilePicker(lastUploadPath, 1);
 				} catch (Throwable ignored) {}
 				return;
 			}
@@ -3856,7 +3883,15 @@ public class MP extends MIDlet
 				return;
 			}
 
-			if (fileMode) {
+//#ifndef NO_CHAT_CANVAS
+			if (fileMode == 2) {
+				// wallpaper selected
+				wallpaperPathField.setString(wallpaperPath = "file:///".concat(path.concat(name)));
+				ChatCanvas.bgImg = null;
+				goBackTo(settingsForm);
+			} else
+//#endif
+			if (fileMode == 1) {
 				// file selected
 				lastUploadPath = path;
 				path = path.concat(name);
@@ -3880,10 +3915,10 @@ public class MP extends MIDlet
 		}
 //#ifndef NO_FILE
 		if (c == cancelCmd && (d instanceof List) && !(d instanceof ChatsList)) {
-			if (fileMode) {
+			if (fileMode == 1) {
 				// go back to write form from file picker
 				goBackTo(writeForm);
-			} else if (downloadMessage == null) {
+			} else if (fileMode == 2 || downloadMessage == null) {
 				goBackTo(settingsForm);
 			} else {
 				goBackToChat();
@@ -4779,8 +4814,8 @@ public class MP extends MIDlet
 	}
 
 //#ifndef NO_FILE
-	static void openFilePicker(String path, boolean file) {
-		fileMode = file;
+	static void openFilePicker(String path, int mode) {
+		fileMode = mode;
 		if (path == null || path.length() == 0) path = "/";
 		display(loadingAlert(L[LLoading]), current);
 		try {
@@ -4820,7 +4855,7 @@ public class MP extends MIDlet
 					break;
 				} else {
 					list.append(L[LBack], null);
-					if (!file) {
+					if (mode == 0) {
 						list.append(L[LSaveHere], null);
 					}
 					try {
@@ -4831,7 +4866,12 @@ public class MP extends MIDlet
 								String s = (String) en.nextElement();
 								if (s.endsWith("/")) {
 									list.append(s.substring(0, s.length() - 1), folderImg);
-								} else if (file) {
+								} else if (mode != 0) {
+									if (mode == 2
+											&& !s.endsWith(".jpg") && !s.endsWith(".jpeg")
+											&& !s.endsWith(".png")) {
+										continue;
+									}
 									list.append(s, fileImg);
 								}
 							}
@@ -4999,7 +5039,7 @@ public class MP extends MIDlet
 			Class.forName("javax.microedition.io.file.FileConnection");
 			if (state == 1) {
 				if (downloadPath == null || downloadPath.trim().length() == 0) {
-					openFilePicker(lastDownloadPath, false);
+					openFilePicker(lastDownloadPath, 0);
 				} else {
 					start(RUN_DOWNLOAD_DOCUMENT, downloadCurrentPath = downloadPath);
 				}
@@ -5753,7 +5793,7 @@ public class MP extends MIDlet
 	}
 
 	static Image getImage(String url) throws IOException {
-		byte[] b = get(url);
+		byte[] b = getUniversal(url);
 		return Image.createImage(b, 0, b.length);
 	}
 
@@ -5808,6 +5848,38 @@ public class MP extends MIDlet
 			} catch (IOException e) {}
 			try {
 				if (hc != null) hc.close();
+			} catch (IOException e) {}
+		}
+	}
+
+	static byte[] getUniversal(String url) throws IOException {
+		if (url.charAt(0) == 'h') {
+			// http
+			return get(url);
+		}
+
+		InputConnection c = null;
+		InputStream in = null;
+		int len;
+		try {
+			// file and other
+			c = (InputConnection) Connector.open(url, Connector.READ);
+			in = c.openInputStream();
+//#ifndef NO_FILE
+			if (c instanceof FileConnection) {
+				len = (int) ((FileConnection) c).fileSize();
+			} else
+//#endif
+			{
+				len = -1;
+			}
+			return readBytes(in, len);
+		} finally {
+			try {
+				if (in != null) in.close();
+			} catch (IOException e) {}
+			try {
+				if (c != null) c.close();
 			} catch (IOException e) {}
 		}
 	}
@@ -6359,6 +6431,7 @@ public class MP extends MIDlet
 		j.put("fastScrolling", fastScrolling);
 		j.put("forceKeyUI", forceKeyUI);
 		j.put("chatAvatar", chatAvatar);
+		j.put("wallpaperPath", wallpaperPath);
 //#endif
 //#ifndef NO_FILE
 		j.put("downloadPath", downloadPath);
