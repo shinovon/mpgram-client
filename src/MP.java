@@ -266,13 +266,11 @@ public class MP extends MIDlet
 	static int notificationVolume = 100;
 //#endif
 	static boolean globalUpdates;
-//#ifndef NO_CHAT_CANVAS
-	static boolean legacyChatUI;
-//#endif
 	static boolean longpoll = true;
 	static int playerVolume = 50;
 	static boolean voiceConversion;
 //#ifndef NO_CHAT_CANVAS
+	static boolean legacyChatUI;
 	static String theme = "tint";
 	static int textMethod; // 0 - auto, 1 - nokiaui, 2 - j2mekeyboard, 3 - fullscreen textbox
 	static boolean fastScrolling; // disable animations
@@ -280,6 +278,7 @@ public class MP extends MIDlet
 	static String[] inputLanguages = new String[] { "en", "ru" };
 	static boolean pngStickers;
 	static boolean lazyLoading = true;
+	static boolean chatAvatar;
 //#endif
 //#ifndef NO_FILE
 	static int downloadMethod; // 0 - always ask, 1 - in app, 2 - browser
@@ -290,7 +289,6 @@ public class MP extends MIDlet
 	static int playMethod; // 0: stream, 1: write to file
 //#endif
 	private static boolean playlistDirection = true;
-	static boolean chatAvatar = true;
 
 	private static boolean needWriteConfig;
 
@@ -797,6 +795,7 @@ public class MP extends MIDlet
 			lazyLoading = j.getBoolean("lazyLoading", lazyLoading);
 			fastScrolling = j.getBoolean("fastScrolling", fastScrolling);
 			forceKeyUI = j.getBoolean("forceKeyUI", forceKeyUI);
+			chatAvatar = j.getBoolean("chatAvatar", chatAvatar);
 //#endif
 //#ifndef NO_FILE
 			downloadPath = j.getString("downloadPath", downloadPath);
@@ -3116,6 +3115,7 @@ public class MP extends MIDlet
 							L[LLegacyUI],
 							L[LFastScrolling],
 							L[LForceKeyInput],
+							"Chat avatar",
 //#endif
 					}, null);
 					uiChoice.setSelectedIndex(i = 0, reverseChat);
@@ -3129,6 +3129,7 @@ public class MP extends MIDlet
 					uiChoice.setSelectedIndex(++i, legacyChatUI);
 					uiChoice.setSelectedIndex(++i, fastScrolling);
 					uiChoice.setSelectedIndex(++i, forceKeyUI);
+					uiChoice.setSelectedIndex(++i, chatAvatar);
 //#endif
 					uiChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(uiChoice);
@@ -3429,6 +3430,7 @@ public class MP extends MIDlet
 					legacyChatUI = uiChoice.isSelected(++i);
 					fastScrolling = uiChoice.isSelected(++i);
 					forceKeyUI = uiChoice.isSelected(++i);
+					chatAvatar = uiChoice.isSelected(++i);
 
 					String prevTheme = theme;
 					theme = THEMES[0][Math.max(0, themeChoice.getSelectedIndex())];
@@ -6356,6 +6358,7 @@ public class MP extends MIDlet
 		j.put("lazyLoading", lazyLoading);
 		j.put("fastScrolling", fastScrolling);
 		j.put("forceKeyUI", forceKeyUI);
+		j.put("chatAvatar", chatAvatar);
 //#endif
 //#ifndef NO_FILE
 		j.put("downloadPath", downloadPath);
