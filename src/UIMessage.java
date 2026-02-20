@@ -1066,13 +1066,14 @@ public class UIMessage extends UIItem implements LangConstants {
 			int tw;
 			if (l != 0 && reactsText == null) {
 				int[] pos = (int[]) ((Object[]) text.render.elementAt(l - 1))[3];
-				if (!(timeBreak = (tw = pos[0] + pos[2]) + timeWidth >= cw)) {
+				tw = pos[0] + pos[2];
+				if (!(timeBreak = tw + timeWidth >= (photo ? maxW : cw))) {
 					tw += timeWidth;
 				}
 				maxW = Math.max(maxW, minW + tw);
 			}
 			maxW = Math.max(maxW, minW + text.contentWidth);
-		} else if (!(timeBreak = lastW + timeWidth >= cw) && lastW + timeWidth >= maxW) {
+		} else if (!(timeBreak = photo || lastW + timeWidth >= cw) && lastW + timeWidth >= maxW) {
 			maxW = Math.max(maxW, lastW + timeWidth);
 		}
 
