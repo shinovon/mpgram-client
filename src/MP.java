@@ -3115,7 +3115,7 @@ public class MP extends MIDlet
 							L[LLegacyUI],
 							L[LFastScrolling],
 							L[LForceKeyInput],
-							"Chat avatar",
+							L[LChatAvatar],
 //#endif
 					}, null);
 					uiChoice.setSelectedIndex(i = 0, reverseChat);
