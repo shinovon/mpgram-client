@@ -256,6 +256,19 @@ public class ChatsList extends MPList {
 		MP.openChat(id, -1);
 	}
 	
+	protected void sizeChanged(int w, int h) {
+		super.sizeChanged(w, h);
+		
+		if (!finished || ids == null) return;
+		for (int i = ids.size() - 1; i >= 0; i--) {
+			if (MP.chatsListFontSize != 0) {
+				try {
+					setFont(i, MP.chatsListFontSize == 1 ? MP.smallPlainFont : MP.medPlainFont);
+				} catch (Exception ignored) {}
+			}
+		}
+	}
+	
 	void changeFolder(int folderId, String title) {
 		cancel();
 		setTitle(title.concat(" - mpgram"));
@@ -281,7 +294,8 @@ public class ChatsList extends MPList {
 	}
 	
 	void shown() {
-		if (!finished || ids == null || noAvas) return;
+		if (!finished || ids == null || (noAvas && MP.chatsListFontSize == 0))
+			return;
 		for (int i = ids.size() - 1; i >= 0; i--) {
 			if (MP.chatsListFontSize != 0) {
 				try {
