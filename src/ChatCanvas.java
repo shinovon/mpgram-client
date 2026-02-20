@@ -981,7 +981,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					}
 				}
 				if (showPhoto) {
-					tx += photoHeight + (touch ? 8 : 4);
+					int p = photoHeight + (touch ? 8 : 4);
+					tx += p;
+					tw -= p;
 				}
 				boolean medfont = MP.chatStatus || touch;
 				if (selected != 0 || mediaFilter != null || loading) {
