@@ -69,7 +69,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 
 	boolean infoLoaded;
 	boolean left, broadcast, forum;
-	boolean canWrite, canDelete, canBan, canPin;
+	boolean canWrite, canDelete, canBan, canPin, canSeeRead;
 
 	int dir;
 	int firstMsgId, lastMsgId;
@@ -503,7 +503,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 						}
 
 						if (full != null && full.has("participants_count")) {
-							defaultStatus = MP.localizePlural(full.getInt("participants_count"),
+							int members = full.getInt("participants_count");
+							canSeeRead = !broadcast && members < 100;
+							defaultStatus = MP.localizePlural(members,
 									broadcast ? L_subscriber : L_member);
 						}
 					} else {

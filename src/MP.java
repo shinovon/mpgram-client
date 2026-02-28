@@ -2733,7 +2733,7 @@ public class MP extends MIDlet
 				return;
 			}
 			if (c == contactsCmd) {
-				openLoad(new ChatsList(L[LContacts], "getContacts&fields=status", null, null, false));
+				openLoad(new ChatsList(L[LContacts], "getContacts&fields=status", null, false));
 				return;
 			}
 			if (c == nextPageCmd) {
@@ -2841,7 +2841,7 @@ public class MP extends MIDlet
 			commandAction(backCmd, d);
 			openLoad(new ChatsList(L[LSearch],
 					appendUrl(new StringBuffer("searchChats&q="), ((TextBox) d).getString()).toString(),
-					"results", null, false));
+					null, false));
 			return;
 		}
 		if (d instanceof ChatInfoForm) { // profile commands
@@ -2922,7 +2922,6 @@ public class MP extends MIDlet
 			if (c == chatMembersCmd) {
 				openLoad(new ChatsList(L[LMembers],
 						"getParticipants&peer=" + ((ChatInfoForm) current).id + "&fields=status",
-						null,
 						((ChatInfoForm) d).id, ((ChatInfoForm) d).canBan));
 				return;
 			}
@@ -6596,13 +6595,17 @@ public class MP extends MIDlet
 		}
 		text = sb.toString();
 		Font f = getFont(state);
+//#ifndef NO_CHAT_CANVAS
 		int style = 0;
-		if (state[RT_STRIKE] != 0) {
-			style |= UILabel.STYLE_STRIKETHROUGH;
+		if (state != null) {
+			if (state[RT_STRIKE] != 0) {
+				style |= UILabel.STYLE_STRIKETHROUGH;
+			}
+			if (state[RT_SPOILER] != 0) {
+				style |= UILabel.STYLE_SPOILER;
+			}
 		}
-		if (state[RT_SPOILER] != 0) {
-			style |= UILabel.STYLE_SPOILER;
-		}
+//#endif
 		StringItem s;
 
 		// find links

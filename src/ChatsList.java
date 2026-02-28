@@ -33,7 +33,6 @@ public class ChatsList extends MPList {
 	int offset;
 	Vector/*<String>*/ ids;
 	String url;
-	String arrayName;
 	boolean users;
 	boolean noAvas;
 	boolean canBan;
@@ -58,10 +57,9 @@ public class ChatsList extends MPList {
 	}
 	
 	// contacts, members
-	public ChatsList(String title, String url, String arrayName, String peerId, boolean canBan) {
+	public ChatsList(String title, String url, String peerId, boolean canBan) {
 		super(title);
 		this.url = url;
-		this.arrayName = arrayName;
 		this.users = true;
 		this.noAvas = true;
 		this.peerId = peerId;
@@ -136,22 +134,30 @@ public class ChatsList extends MPList {
 				ids.addElement(id);
 
 				sb.setLength(0);
-				MP.appendOneLine(sb, MP.getName(user, false));
-				
-				if (user.getBoolean("b", false)) { // bot
-					sb.append('\n').append(MP.L[LBot]);
-				} else if (user.has("s")) { // status
-					long wasOnline;
-					if (user.getBoolean("s")) {
-						sb.append('\n').append(MP.L[LOnline]);
-					} else if ((wasOnline = user.getLong("w")) != 0) {
-						sb.append('\n').append(MP.L[LLastSeen]).append(MP.localizeDate(wasOnline, 4));
-					} else {
-						sb.append('\n').append(MP.L[LOffline]);
-					}
+				try {
+					MP.appendOneLine(sb, MP.getName(user, false));
+				} catch (Exception e) {
+					sb.append("");
 				}
-				if (user.getBoolean("a", false)) { // admin
-					sb.append(" (").append(MP.L[LAdmin]).append(')');
+
+				if (user.has("date")) {
+					sb.append('\n').append(MP.localizeDate(user.getLong("date"), 3));
+				} else {
+					if (user.getBoolean("b", false)) { // bot
+						sb.append('\n').append(MP.L[LBot]);
+					} else if (user.has("s")) { // status
+						long wasOnline;
+						if (user.getBoolean("s")) {
+							sb.append('\n').append(MP.L[LOnline]);
+						} else if ((wasOnline = user.getLong("w")) != 0) {
+							sb.append('\n').append(MP.L[LLastSeen]).append(MP.localizeDate(wasOnline, 4));
+						} else {
+							sb.append('\n').append(MP.L[LOffline]);
+						}
+					}
+					if (user.getBoolean("a", false)) { // admin
+						sb.append(" (").append(MP.L[LAdmin]).append(')');
+					}
 				}
 				
 				insert(thread, size(), sb.toString(), id);

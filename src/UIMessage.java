@@ -1523,6 +1523,11 @@ public class UIMessage extends UIItem implements LangConstants {
 			selected = true;
 			((ChatCanvas) container).selected(this);
 			break;
+		case LLastSeen: // TODO
+			MP.openLoad(new ChatsList("Read",
+					"getMessageReadParticipants&peer=" +((ChatCanvas) container).id + "&id=" + idStr,
+					null, false));
+			break;
 		}
 	}
 
@@ -1572,6 +1577,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			if (!chat.selfChat && !chat.user) general[count++] = LCopyMessageLink;
 			general[count++] = LForward;
 			if (chat.canDelete || out) general[count++] = LDelete;
+			if (out && chat.canSeeRead && read) general[count++] = LLastSeen; // TODO
 		}
 		general[count++] = LSelect;
 		general[count] = Integer.MIN_VALUE;
