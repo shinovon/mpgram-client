@@ -134,7 +134,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 				&& (MP.updatesThread != null || MP.updatesRunning)) {
 			MP.display(MP.loadingAlert(MP.L[LWaitingForPrevChat]), this);
 			
-			MP.cancel(MP.updatesThreadCopy, true);
+			MP.midlet.cancel(MP.updatesThreadCopy, true);
 			while (MP.updatesThread != null || MP.updatesRunning) {
 				//noinspection BusyWait
 				Thread.sleep(1000L);
@@ -995,7 +995,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 		if (update) {
 			update = false;
 			if (!MP.globalUpdates && (MP.updatesThread != null || MP.updatesRunning)) {
-				MP.cancel(MP.updatesThread, true);
+				MP.midlet.cancel(MP.updatesThread, true);
 			}
 		}
 		

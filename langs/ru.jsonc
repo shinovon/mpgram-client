@@ -129,6 +129,7 @@
 	"SendSticker": "Отправить стикер",
 	"Menu": "Опции",
 	"Write": "Написать",
+	"AttachFile": "Прикрепить файл",
 	
 	// Message writing form commands
 	"Send": "Отправить",
@@ -341,6 +342,12 @@
 	"SavedMessages": "Сохраненные сообщения",
 	"SomeoneIsTyping": "Кто-то печатает...",
 	"Typing": "печатает...",
+	"_isTyping": "% печатает...",
+	"_areTyping": "% и % печатают...",
+	"_peopleAreTyping": "",
+	"_peopleAreTyping_1": "% человек печатают...",
+	"_peopleAreTyping_2": "% людей печатают...",
+	"ManyPeopleAreTyping": "Много людей печатают...",
 	
 	// Message
 	"ForwardedFrom": "Переслано от ",

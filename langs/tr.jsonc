@@ -129,6 +129,7 @@
 	"SendSticker": "Çıkartma gönder",
 	"Menu": "Menü",
 	"Write": "Yaz",
+	"AttachFile": "Attach file", // Untranslated
 
 	// Message writing form commands
 	"Send": "Gönder",
@@ -341,6 +342,12 @@
 	"SavedMessages": "Kaydedilmiş mesajlar",
 	"SomeoneIsTyping": "Biri yazıyor...",
 	"Typing": "yazıyor...",
+	"_isTyping": "% is typing..", // Untranslated
+	"_areTyping": "% and % are typing...", // Untranslated
+	"_peopleAreTyping": "", // Untranslated
+	"_peopleAreTyping_1": "% people are typing...", // Untranslated
+	"_peopleAreTyping_2": "",
+	"ManyPeopleAreTyping": "Many people are typing...", // Untranslated
 
 	// Message
 	"ForwardedFrom": "İletilen: ",

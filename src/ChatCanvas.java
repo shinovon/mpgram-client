@@ -93,11 +93,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	ChatTopicsList topicsList;
 	JSONArray topics;
 
-	long typing;
+	final long[] typing = new long[11];
 	private final Object typingLock = new Object();
 	private Thread typingThread;
 	long wasOnline;
 	String status, defaultStatus;
+	String statusRender;
 
 	JSONObject botAnswer;
 
@@ -178,6 +179,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	int replyMsgId;
 	int editMsgId;
 	String file;
+	String fileRender;
 	static Keyboard keyboard;
 	Object nokiaEditor;
 	boolean updateEditor;
@@ -392,14 +394,17 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			firstItem = lastItem = null;
 			scrollCurrentItem = scrollTargetItem = focusedItem = null;
 			titleRender = null;
+			statusRender = null;
+			fileRender = null;
+			resetInput();
+			bottomAnimTarget = -1;
 
 			if (!MP.globalUpdates && (MP.reopenChat || (query == null && mediaFilter == null))
 					&& MP.chatUpdates
 					&& (MP.updatesThread != null || MP.updatesRunning)) {
 				MP.display(MP.loadingAlert(MP.L[LWaitingForPrevChat]), this);
 
-				// TODO check if cancel is already in progress
-				MP.cancel(MP.updatesThreadCopy, true);
+				MP.midlet.cancel(MP.updatesThreadCopy, true);
 				while (MP.updatesThread != null || MP.updatesRunning) {
 					//noinspection BusyWait
 					Thread.sleep(1000L);
@@ -507,6 +512,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							canSeeRead = !broadcast && members < 100;
 							defaultStatus = MP.localizePlural(members,
 									broadcast ? L_subscriber : L_member);
+							statusRender = null;
 						}
 					} else {
 						user = true;
@@ -638,13 +644,13 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				inputFieldHeight = touch ? Math.max(MP.medPlainFontHeight + 20, 48)
 						: Math.max(MP.medPlainFontHeight + 16, 40);
 				if (forwardMsgs != null || forwardMsg != null) {
-					bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
+					bottomAnimProgress = bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
 					if (!touch) inputFocused = true;
 				} else if (!keyGuide) {
-					bottom = touch ? inputFieldHeight : 0;
+					bottomAnimProgress = bottom = touch ? inputFieldHeight : 0;
 				}
 			} else if (!keyGuide) {
-				bottom = 0;
+				bottomAnimProgress = bottom = 0;
 			}
 			layoutStart = firstItem;
 			if (endReached && !hasOffset
@@ -744,7 +750,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (update) {
 			update = false;
 			if (!MP.globalUpdates && (MP.updatesThread != null || MP.updatesRunning)) {
-				MP.cancel(MP.updatesThread, true);
+				MP.midlet.cancel(MP.updatesThread, true);
 			}
 			if (typingThread != null) typingThread.interrupt();
 		}
@@ -753,7 +759,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		loaded = false;
 		if (finished || thread == null) return;
 		canceled = true;
-		MP.cancel(thread, false);
+		MP.midlet.cancel(thread, false);
 		thread = null;
 	}
 
@@ -783,6 +789,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (width != w) {
 			layoutStart = firstItem;
 			titleRender = null;
+			fileRender = null;
 			topButtonWidth = 0;
 			if (menuFocused) {
 				menuFitsOnScreen = h <= height;
@@ -1064,20 +1071,26 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					int ty = (th - tth) >> 1;
 					if (title != null) {
 						Font font = hideStatus ? MP.medPlainFont : MP.smallBoldFont;
-						if (titleRender == null) {
-							titleRender = UILabel.ellipsis(query != null ? MP.L[LSearch] : title, font, tw - 4);
+						String title = titleRender;
+						if (title == null) {
+							titleRender = title = UILabel.ellipsis(query != null ? MP.L[LSearch] : this.title, font, tw - 4);
 						}
 						g.setColor(colors[COLOR_CHAT_PANEL_FG]);
 						g.setFont(font);
-						g.drawString(titleRender, tx, ty, 0);
+						g.drawString(title, tx, ty, 0);
 					}
-					// TODO status ellipsis
 					if (medfont && !hideStatus) {
-						g.setColor(colors[typing != 0 ? COLOR_CHAT_STATUS_HIGHLIGHT_FG : COLOR_CHAT_STATUS_FG]);
+						g.setColor(colors[typing[0] != 0 ? COLOR_CHAT_STATUS_HIGHLIGHT_FG : COLOR_CHAT_STATUS_FG]);
 						g.setFont(MP.smallPlainFont);
-						String status = this.status;
+						String status = statusRender;
 						if (status == null) {
-							status = this.defaultStatus;
+							status = this.status;
+							if (status == null) {
+								status = this.defaultStatus;
+							}
+							if (status != null) {
+								statusRender = status = UILabel.ellipsis(status, MP.smallPlainFont, tw - 4);
+							}
 						}
 						if (status != null) {
 							g.drawString(status, tx, 2 + MP.smallBoldFontHeight + ty, 0);
@@ -1133,14 +1146,33 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					} else if (canWrite && hasInput) {
 						g.setFont(MP.smallBoldFont);
 						g.setColor(colors[COLOR_CHAT_SEND_ICON]);
+						int ry = h - bottom;
+						int c = 0;
+						int rh = MP.smallBoldFontHeight + 8;
 						if (replyMsgId != 0) {
-							g.drawString(MP.L[LReply], 2, iy - MP.smallBoldFontHeight - 4, 0);
+							g.drawString(MP.L[LReply], 2, ry + 4, 0);
+							ry += rh;
+							c++;
 						}
 						if (editMsgId != 0) {
-							g.drawString(MP.L[LEdit], 2, iy - MP.smallBoldFontHeight - 4, 0);
+							g.drawString(MP.L[LEdit], 2, ry + 4, 0);
+							ry += rh;
+							c++;
 						}
 						if (forwardMsgs != null || forwardMsg != null) {
-							g.drawString(MP.L[LForward], 2, iy - MP.smallBoldFontHeight - 4, 0);
+							g.drawString(MP.L[LForward], 2, ry + 4, 0);
+							ry += rh;
+							c++;
+						}
+						if (file != null) {
+							String file = fileRender;
+							if (file == null) {
+								String s = MP.L[LFile_Prefix].concat(this.file.substring(this.file.lastIndexOf('/') + 1));
+								fileRender = file = UILabel.ellipsis(s, MP.smallBoldFont, w - 28);
+							}
+							g.drawString(file, 2, ry + 4, 0);
+							ry += rh;
+							c++;
 						}
 						if (ih != bottom) {
 							g.setColor(colors[COLOR_CHAT_INPUT_BORDER]);
@@ -1148,10 +1180,14 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 
 							if (touch) {
 								// cancel icon
-								int ty = by + ((MP.smallBoldFontHeight + 8 - 12) >> 1);
 								g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
-								g.drawLine(w - 20, ty, w - 8, ty + 12);
-								g.drawLine(w - 20, ty + 12, w - 8, ty);
+								ry = h - bottom;
+								for (int i = 0; i < c; ++i) {
+									int ty = ry + ((rh - 12) >> 1);
+									g.drawLine(w - 20, ty, w - 8, ty + 12);
+									g.drawLine(w - 20, ty + 12, w - 8, ty);
+									ry += rh;
+								}
 							}
 						}
 						g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
@@ -1213,13 +1249,19 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							g.drawLine(w - 8 - 20, ty + 10, w - 8 - 10, ty + 10);
 						} else if (touch) {
 							// attach icon
-							int ty = iy + ((ih - 24) >> 1);
 
+							int aw = topButtonWidth;
+//							if (attachIcon != null) {
+//								int ax = w - aw + ((aw - 24) >> 1);
+//								int ay = iy + ((ih - 24) >> 1);
+//								g.drawImage(attachIcon, ax, ay, 0);
+//							} else {
 							g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
-							int bw = topButtonWidth;
-							int bx = w - bw + ((bw - 17) >> 1);
-							g.fillRect(bx, ty + 12, 17, 1);
-							g.fillRect(bx + 8, ty + 4, 1, 17);
+							int ax = w - aw + ((aw - 17) >> 1);
+							int ay = iy + ((ih - 24) >> 1);
+							g.fillRect(ax, ay + 12, 17, 1);
+							g.fillRect(ax + 8, ay + 4, 1, 17);
+//							}
 						}
 					} else if (left) {
 						g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
@@ -1490,15 +1532,14 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			if (menuFocused) {
 				closeMenu();
 			} else if (inputFocused) {
-				// TODO use LFullscreenTextBox instead of LEdit?
 				showMenu(null,
 						(text != null && text.trim().length() != 0) || file != null || forwardMsgs != null || forwardMsg != null ?
-						new int[] { LSend, LEdit, LClear, LCancel } :
-						new int[] { LEdit, LCancel });
+						new int[] { LSend, LFullscreenTextBox, LClear, LAttachFile, LCancel } :
+						new int[] { LFullscreenTextBox, LAttachFile, LCancel });
 			} else if (selected != 0) {
 				showMenu(null, new int[] { LDelete, LForward });
 			} else if (funcFocused) {
-				showMenu(null, canWrite && hasInput ? new int[] { LRefresh, LChatInfo, LSearchMessages, LSendSticker, LWriteMessage } : new int[] { LRefresh, LChatInfo, LSearchMessages });
+				showMenu(null, canWrite && hasInput ? new int[] { LRefresh, LChatInfo, LSearchMessages, LSendSticker, LAttachFile, LWriteMessage } : new int[] { LRefresh, LChatInfo, LSearchMessages });
 			} else {
 				if (focusedItem != null && focusedItem.focusable) {
 					int[] menu = focusedItem.menu();
@@ -1869,13 +1910,21 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					MP.midlet.start(MP.RUN_JOIN_CHANNEL, id);
 				} else if (canWrite) {
 					if (y < height - inputFieldHeight) {
-						if (x > width - topButtonWidth) {
+						boolean cancel = x > width - topButtonWidth;
+						if (file != null && y - height + inputFieldHeight + MP.medPlainFontHeight + 8 > 0) {
+							if (cancel) {
+								file = null;
+								focusInput();
+							} else {
+								// TODO file options
+							}
+						} else if (cancel) {
 							if (editMsgId != 0 || forwardMsgs != null || forwardMsg != null) {
 								resetInput();
 							} else {
 								replyMsgId = 0;
-								bottomAnimTarget = inputFieldHeight;
 								keyGuide = false;
+								focusInput();
 							}
 						}
 					} else if (x > width - 48) {
@@ -1984,6 +2033,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				}
 				case LSend: {
 					send();
+					break;
+				}
+				case LAttachFile: {
+					MP.openFilePicker(MP.lastUploadPath, 3);
 					break;
 				}
 				}
@@ -2343,6 +2396,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		focusInput();
 	}
 
+	public void setFile(String s) {
+		file = s;
+		fileRender = null;
+		focusInput();
+	}
+
 	public void startForward(String peer, String msg, UIMessage[] msgs) {
 		resetInput();
 		MP.display(this);
@@ -2357,6 +2416,9 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (replyMsgId != 0 || editMsgId != 0 || forwardMsgs != null || forwardMsg != null) {
 			h += MP.smallBoldFontHeight + 8;
 		}
+		if (file != null) {
+			h += MP.smallBoldFontHeight + 8;
+		}
 		if (text == null) text = "";
 		if (!touch) {
 			bottomAnimTarget = h + MP.smallBoldFontHeight + 4;
@@ -2369,9 +2431,11 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				NokiaAPI.TextEditor_setContent(nokiaEditor, text);
 				editorShown = true;
 				updateEditor = true;
-			}
+				bottomAnimProgress = bottom = h;
+			} else {
 //#endif
-			this.bottom = h;
+				bottomAnimTarget = h;
+			}
 		}
 
 		if (keyboard != null) {
@@ -2399,7 +2463,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				}
 			}
 		} else {
-			showMenu(null, new int[] { LSendSticker, LWriteMessage });
+			showMenu(null, new int[] { LSendSticker, LAttachFile, LWriteMessage });
 		}
 	}
 
@@ -2548,7 +2612,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		messageId = 0;
 		addOffset = 0;
 		offsetId = 0;
-		typing = 0;
+		typing[0] = 0;
 		query = null;
 		selected = 0;
 		if (table != null) table.clear();
@@ -2584,13 +2648,79 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (!MP.reopenChat && MP.longpoll && update) queueRepaint();
 	}
 
+	private void removeTyper(String id) {
+		if (user) {
+			typing[0] = 0;
+			return;
+		}
+
+		if (id == null) return;
+		long l = Long.parseLong(id);
+		synchronized (typing) {
+			for (int i = 0; i < 5; ++i) {
+				int idx = (i << 1) + 1;
+				if (typing[idx] != l) continue;
+				typing[idx] = 0;
+				typing[idx + 1] = 0;
+				typing[0]--;
+				if (i != 4) {
+					System.arraycopy(typing, idx + 2, typing, idx, typing.length - idx - 2);
+				}
+			}
+		}
+	}
+
+	private void updateTypingStatus() {
+		if (user) {
+			if (typing[0] != 0) {
+				this.status = MP.L[LTyping];
+			}
+			return;
+		}
+
+		long id1 = 0, id2 = 0;
+		int count = 0;
+		synchronized (typing) {
+			count = (int) typing[0];
+			for (int i = 0; i < 5; ++i) {
+				int idx = (i << 1) + 1;
+				if (typing[idx] == 0) continue;
+				if (id1 == 0) {
+					id1 = typing[idx];
+				} else {
+					id2 = typing[idx];
+				}
+			}
+		}
+
+		String name1 = id1 == 0 ? null : MP.getName(Long.toString(id1), true);
+		if (count == 1) {
+			String l = MP.L[L_isTyping];
+			int idx = l.indexOf('%');
+			this.status = l.substring(0, idx)
+					.concat(name1.concat(l.substring(idx + 1)));
+		} else if (count == 2) {
+			String l = MP.L[L_areTyping];
+			String name2 = MP.getName(Long.toString(id2), true);
+			int idx1 = l.indexOf('%');
+			int idx2 = l.indexOf('%', idx1 + 1);
+			this.status = l.substring(0, idx1).concat(name1)
+					.concat(l.substring(idx1 + 1, idx2).concat(name2).concat(l.substring(idx2 + 1))
+			);
+		} else if (count > 4) {
+			this.status = MP.L[LManyPeopleAreTyping];
+		} else {
+			this.status = MP.localizePlural(count, L_peopleAreTyping);
+		}
+	}
+
 	public void handleUpdate(int type, JSONObject update) {
 		if (!this.update) return;
 		switch (type) {
 		case UPDATE_USER_STATUS: {
 			if (MP.chatStatus) {
 				setStatus(update.getObject("status"));
-				typing = 0;
+				typing[0] = 0;
 				typingThread.interrupt();
 			}
 			break;
@@ -2598,14 +2728,46 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		case UPDATE_USER_TYPING: {
 			if ("sendMessageCancelAction".equals(update.getObject("action").getString("_"))) {
 				setStatus(null);
-				typing = 0;
+				if (user) {
+					typing[0] = 0;
+				} else {
+					removeTyper(update.getString("from_id"));
+				}
 				typingThread.interrupt();
 				break;
 			}
 			if (id.charAt(0) == '-' && update.has("top_msg_id") && topMsgId != update.getInt("top_msg_id"))
 				break;
-			this.status = user ? MP.L[LTyping] : MP.L[LSomeoneIsTyping]; // TODO
-			typing = System.currentTimeMillis();
+			statusRender = null;
+
+			long now = System.currentTimeMillis();
+			if (user) {
+				this.status = MP.L[LTyping];
+				typing[0] = now;
+			} else {
+				synchronized (typing) {
+					long fromid = Long.parseLong(update.getString("from_id"));
+					add: {
+						for (int i = 0; i < 5; ++i) {
+							int idx = (i << 1) + 1;
+							boolean replace = false;
+							if (typing[idx] != 0) {
+								if (now - typing[idx + 1] < 4000 && typing[idx] != fromid) {
+									continue;
+								} else replace = true;
+							}
+
+							typing[idx] = fromid;
+							typing[idx + 1] = now;
+							if (!replace) typing[0]++;
+							break add;
+						}
+						typing[1] = fromid;
+						typing[2] = now;
+					}
+				}
+				updateTypingStatus();
+			}
 			typingThread.interrupt();
 			synchronized (typingLock) {
 				typingLock.notify();
@@ -2615,10 +2777,15 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		}
 		case UPDATE_NEW_MESSAGE: {
 			// check for duplicate
-			if (update.getObject("message").getInt("id") == firstMsgId)
+			JSONObject msg = update.getObject("message");
+			if (msg.getInt("id") == firstMsgId)
 				break;
 
-			typing = 0;
+			if (user) {
+				typing[0] = 0;
+			} else if (typing[0] != 0) {
+				removeTyper(msg.getString("from_id", null));
+			}
 			typingThread.interrupt();
 
 			// delete old messages
@@ -2626,8 +2793,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				remove(lastItem instanceof UIPageButton ? lastItem.prev : lastItem);
 			}
 
-			safeAddFirst(null, new UIMessage(update.getObject("message"), this));
-			firstMsgId = update.getObject("message").getInt("id");
+			safeAddFirst(null, new UIMessage(msg, this));
+			firstMsgId = msg.getInt("id");
 			break;
 		}
 		case UPDATE_DELETE_MESSAGES: {
@@ -2643,10 +2810,15 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			break;
 		}
 		case UPDATE_EDIT_MESSAGE: {
-			typing = 0;
+			JSONObject msg = update.getObject("message");
+
+			if (user) {
+				typing[0] = 0;
+			} else if (typing[0] != 0) {
+				removeTyper(msg.getString("from_id", null));
+			}
 			typingThread.interrupt();
 
-			JSONObject msg = update.getObject("message");
 			UIMessage item = (UIMessage) table.get(msg.getString("id"));
 			if (item != null) {
 				item.edit(msg, this);
@@ -2807,6 +2979,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				}
 				if (s != this.status) {
 					this.status = s;
+					statusRender = null;
 					queueRepaint();
 				}
 			}
@@ -2822,6 +2995,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			wasOnline = 2;
 		}
 		this.status = s;
+		statusRender = null;
 		queueRepaint();
 	}
 
@@ -2830,22 +3004,42 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		try {
 			while (update) {
 				try {
-					if (typing == 0) {
+					if (typing[0] == 0) {
 						synchronized (typingLock) {
 							typingLock.wait(60000);
 						}
 					}
-					//noinspection BusyWait
-					Thread.sleep(5000);
-					typing = 0;
+					if (user) {
+						//noinspection BusyWait
+						Thread.sleep(5000);
+						typing[0] = 0;
+					} else {
+						long now = System.currentTimeMillis();
+						synchronized (typing) {
+							for (int i = 0; i < 5; ++i) {
+								int idx = (i << 1) + 1;
+								if (typing[idx] == 0) continue;
+								if (now - typing[idx + 1] < 5000) continue;
+								typing[idx] = 0;
+								typing[idx + 1] = 0;
+								typing[0]--;
+								if (i != 4) {
+									System.arraycopy(typing, idx + 2, typing, idx, typing.length - idx - 2);
+								}
+								updateTypingStatus();
+							}
+						}
+						//noinspection BusyWait
+						Thread.sleep(1000);
+					}
 				} catch (Exception e) {}
-				if (typing == 0) {
+				if (typing[0] == 0) {
 					setStatus(null);
 				}
 			}
 
 			setStatus(null);
-			typing = 0;
+			typing[0] = 0;
 		} catch (Exception ignored) {
 		} finally {
 			typingThread = null;

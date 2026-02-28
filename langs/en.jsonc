@@ -129,6 +129,7 @@
 	"SendSticker": "Send sticker",
 	"Menu": "Menu",
 	"Write": "Write",
+	"AttachFile": "Attach file",
 	
 	// Message writing form commands
 	"Send": "Send",
@@ -224,7 +225,7 @@
 	"FastScrolling": "Disable animations",
 	"Keyboard": "Keyboard",
 	"Auto": "Auto",
-	"FullscreenTextBox": "Fullscreen text-box",
+	"FullscreenTextBox": "Fullscreen editing",
 	"Theme": "Theme",
 	"InputLanguages": "Input languages",
 	"ForceKeyInput": "Force keypad input",
@@ -341,6 +342,12 @@
 	"SavedMessages": "Saved messages",
 	"SomeoneIsTyping": "Someone is typing...",
 	"Typing": "typing...",
+	"_isTyping": "% is typing..",
+	"_areTyping": "% and % are typing...",
+	"_peopleAreTyping": "",
+	"_peopleAreTyping_1": "% people are typing...",
+	"_peopleAreTyping_2": "",
+	"ManyPeopleAreTyping": "Many people are typing...",
 	
 	// Message
 	"ForwardedFrom": "Forwarded from ",

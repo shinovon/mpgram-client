@@ -129,6 +129,7 @@
 	"SendSticker": "Lähetä tarra",
 	"Menu": "Valikko",
 	"Write": "Kirjoita",
+	"AttachFile": "Attach file", // Untranslated
 	
 	// Message writing form commands
 	"Send": "Lähetä",
@@ -341,6 +342,12 @@
 	"SavedMessages": "Tallennetut viestit",
 	"SomeoneIsTyping": "Joku kirjoittaa...",
 	"Typing": "kirjoittaa...",
+	"_isTyping": "% is typing..", // Untranslated
+	"_areTyping": "% and % are typing...", // Untranslated
+	"_peopleAreTyping": "", // Untranslated
+	"_peopleAreTyping_1": "% people are typing...", // Untranslated
+	"_peopleAreTyping_2": "",
+	"ManyPeopleAreTyping": "Many people are typing...", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "Välitetty käyttäjältä ",

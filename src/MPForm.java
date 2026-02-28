@@ -90,7 +90,7 @@ public abstract class MPForm extends Form implements LangConstants {
 		loaded = false;
 		if (finished || thread == null) return;
 		canceled = true;
-		MP.cancel(thread, false);
+		MP.midlet.cancel(thread, false);
 		thread = null;
 	}
 

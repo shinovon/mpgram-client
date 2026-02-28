@@ -129,6 +129,7 @@
 	"SendSticker": "Envia adhesiu",
 	"Menu": "Menú",
 	"Write": "Escriu",
+	"AttachFile": "Attach file", // Untranslated
 	
 	// Message writing form commands
 	"Send": "Envia",
@@ -341,6 +342,12 @@
 	"SavedMessages": "Missatges desats",
 	"SomeoneIsTyping": "Algú està escrivint...",
 	"Typing": "escrivint...",
+	"_isTyping": "% is typing..", // Untranslated
+	"_areTyping": "% and % are typing...", // Untranslated
+	"_peopleAreTyping": "", // Untranslated
+	"_peopleAreTyping_1": "% people are typing...", // Untranslated
+	"_peopleAreTyping_2": "",
+	"ManyPeopleAreTyping": "Many people are typing...", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "Reenviat des ",

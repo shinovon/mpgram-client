@@ -284,7 +284,7 @@ public class MP extends MIDlet
 	static String downloadPath;
 	static boolean chunkedUpload;
 	private static String lastDownloadPath;
-	private static String lastUploadPath;
+	static String lastUploadPath;
 	static int playMethod; // 0: stream, 1: write to file
 //#endif
 	private static boolean playlistDirection = true;
@@ -1485,7 +1485,7 @@ public class MP extends MIDlet
 				String replyTo = (String) ((Object[]) param)[2];
 				String edit = (String) ((Object[]) param)[3];
 				String file = (String) ((Object[]) param)[4];
-				ChoiceGroup sendChoice = (ChoiceGroup) ((Object[]) param)[5];
+				boolean[] sendChoice = (boolean[]) ((Object[]) param)[5];
 				String fwdPeer = (String) ((Object[]) param)[6];
 				String fwdMsg = (String) ((Object[]) param)[7];
 //#ifndef NO_CHAT_CANVAS
@@ -1521,10 +1521,10 @@ public class MP extends MIDlet
 						sb.append("&reply=").append(replyTo);
 					}
 					if (sendChoice != null) {
-						if (sendChoice.isSelected(0)) {
+						if (sendChoice[0]) {
 							sb.append("&uncompressed=1");
 						}
-						if (sendChoice.isSelected(1)) {
+						if (sendChoice[1]) {
 							sb.append("&spoiler=1");
 						}
 					}
@@ -2299,7 +2299,7 @@ public class MP extends MIDlet
 			display(alert, current);
 
 			if (reopenChat && updatesThread != null) {
-				MP.cancel(MP.updatesThread, true);
+				cancel(MP.updatesThread, true);
 			}
 
 			String error;
@@ -2698,9 +2698,14 @@ public class MP extends MIDlet
 		return t;
 	}
 
-	static void cancel(Thread thread, boolean updates) {
+	void cancel(Thread thread, boolean updates) {
 		if (thread == null) return;
-		if (updates) updatesThread = null;
+		if (updates) {
+			synchronized (this) {
+				if (updatesThread == null) return;
+				updatesThread = null;
+			}
+		}
 		Connection c = (Connection) threadConnections.get(thread);
 		if (c == null) {
 			if (updates && updatesSleeping) {
@@ -3656,9 +3661,11 @@ public class MP extends MIDlet
 
 				display(loadingAlert(L[LSending]), d);
 				if ((reopenChat || !longpoll || sendFile != null) && MP.updatesThread != null) {
-					MP.cancel(MP.updatesThread, true);
+					cancel(MP.updatesThread, true);
 				}
-				start(RUN_SEND_MESSAGE, new Object[] { t, writeTo, replyTo, edit, sendFile, sendChoice, fwdPeer, fwdMsg });
+				boolean[] sel = new boolean[2];
+				sendChoice.getSelectedFlags(sel);
+				start(RUN_SEND_MESSAGE, new Object[] { t, writeTo, replyTo, edit, sendFile, sel, fwdPeer, fwdMsg });
 				return;
 			}
 			if (c == openTextBoxCmd) {
@@ -3887,6 +3894,12 @@ public class MP extends MIDlet
 				wallpaperPathField.setString(wallpaperPath = "file:///".concat(path.concat(name)));
 				ChatCanvas.bgImg = null;
 				goBackTo(settingsForm);
+			} else if (fileMode == 3) {
+				// file selected
+				lastUploadPath = path;
+				path = path.concat(name);
+				commandAction(cancelCmd, d);
+				((ChatCanvas) current).setFile("file:///".concat(path));
 			} else
 //#endif
 			if (fileMode == 1) {
@@ -3913,7 +3926,9 @@ public class MP extends MIDlet
 		}
 //#ifndef NO_FILE
 		if (c == cancelCmd && (d instanceof List) && !(d instanceof ChatsList)) {
-			if (fileMode == 1) {
+			if (fileMode == 3) {
+				goBackToChat();
+			} else if (fileMode == 1) {
 				// go back to write form from file picker
 				goBackTo(writeForm);
 			} else if (fileMode == 2 || downloadMessage == null) {
@@ -4075,7 +4090,7 @@ public class MP extends MIDlet
 			}
 			if ((confirmationTask & 0x200) != 0) {
 				if ((reopenChat || !longpoll) && MP.updatesThread != null) {
-					MP.cancel(MP.updatesThread, true);
+					cancel(MP.updatesThread, true);
 				}
 			}
 			start(confirmationTask & 0xFF, confirmationParam);
@@ -4233,7 +4248,7 @@ public class MP extends MIDlet
 				if ((reopenChat || !longpoll) && !globalUpdates) {
 					display(loadingAlert(L[LSending]), current);
 					if (MP.updatesThread != null) {
-						MP.cancel(MP.updatesThread, true);
+						cancel(MP.updatesThread, true);
 					}
 				}
 				start(RUN_BOT_CALLBACK, p);
@@ -4287,7 +4302,7 @@ public class MP extends MIDlet
 
 			display(loadingAlert(L[LSending]), current);
 			if ((reopenChat || !longpoll) && MP.updatesThread != null) {
-				MP.cancel(MP.updatesThread, true);
+				cancel(MP.updatesThread, true);
 			}
 			start(RUN_SEND_MESSAGE, new Object[] { t, ((ChatForm) current).id, null, null, null, null, null, null });
 			return;
@@ -4304,7 +4319,7 @@ public class MP extends MIDlet
 
 			display(loadingAlert(L[LSending]), current);
 			if ((reopenChat ||!longpoll) && MP.updatesThread != null) {
-				MP.cancel(MP.updatesThread, true);
+				cancel(MP.updatesThread, true);
 			}
 			imagesToLoad.removeAllElements();
 
@@ -5186,7 +5201,7 @@ public class MP extends MIDlet
 				Object d = formHistory.elementAt(i);
 				if (d instanceof MPChat) {
 					display((Displayable) d, true);
-					break;
+					return;
 				}
 				formHistory.removeElementAt(i);
 			}

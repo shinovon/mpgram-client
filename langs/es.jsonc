@@ -129,6 +129,7 @@
 	"SendSticker": "Enviar pegatina",
 	"Menu": "Menu", // Untranslated
 	"Write": "Write", // Untranslated
+	"AttachFile": "Attach file", // Untranslated
 	
 	// Message writing form commands
 	"Send": "Enviar",
@@ -224,7 +225,7 @@
 	"FastScrolling": "Disable animations", // Untranslated
 	"Keyboard": "Keyboard", // Untranslated
 	"Auto": "Auto", // Untranslated
-	"FullscreenTextBox": "Fullscreen text-box", // Untranslated
+	"FullscreenTextBox": "Fullscreen edit", // Untranslated
 	"Theme": "Theme", // Untranslated
 	"InputLanguages": "Input languages", // Untranslated
 	"ForceKeyInput": "Force keypad input", // Untranslated
@@ -341,6 +342,12 @@
 	"SavedMessages": "Saved messages", // Untranslated
 	"SomeoneIsTyping": "Someone is typing...", // Untranslated
 	"Typing": "typing...", // Untranslated
+	"_isTyping": "% is typing..", // Untranslated
+	"_areTyping": "% and % are typing...", // Untranslated
+	"_peopleAreTyping": "", // Untranslated
+	"_peopleAreTyping_1": "% people are typing...", // Untranslated
+	"_peopleAreTyping_2": "",
+	"ManyPeopleAreTyping": "Many people are typing...", // Untranslated
 	
 	// Message
 	"ForwardedFrom": "Reenviado desde ",
