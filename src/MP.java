@@ -3824,7 +3824,7 @@ public class MP extends MIDlet
 			f.append(s);
 
 			s = new StringItem(null, "\n\nReleased under the MIT license.\n"
-					+ "Copyright (C) 2022-2025 Arman Jussupgaliyev\n\n"
+					+ "Copyright (C) 2022-2026 Arman Jussupgaliyev\n\n"
 //#ifndef NO_AVATARS
 					+ "Contains parts of the TUBE42 imagelib, licensed under the LGPL.\n"
 					+ "Copyright (C) 2007 Free Software Foundation, Inc.\n\n"
