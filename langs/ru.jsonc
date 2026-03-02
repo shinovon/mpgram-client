@@ -346,8 +346,8 @@
 	"_isTyping": "% печатает...",
 	"_areTyping": "% и % печатают...",
 	"_peopleAreTyping": "",
-	"_peopleAreTyping_1": "% человек печатают...",
-	"_peopleAreTyping_2": "% людей печатают...",
+	"_peopleAreTyping_1": " человек печатают...",
+	"_peopleAreTyping_2": " людей печатают...",
 	"ManyPeopleAreTyping": "Много людей печатают...",
 	
 	// Message

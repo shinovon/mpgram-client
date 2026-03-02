@@ -62,7 +62,7 @@
 	"Tue": "Вівт",
 	"Wed": "Сер",
 	"Thu": "Чт",
-	"Fri": "Вт",
+	"Fri": "Пт",
 	"Sat": "Сб",
 	"Sunday": "Неділя",
 	"Monday": "Понеділок",
@@ -327,7 +327,7 @@
 	"PiglerNotAvailable_Alert": "Pigler API is selected but not available, \ndownload it from https://nnproject.cc/pna", // Untranslated
 	"DeleteNMessage_Alert": "Delete % message?", // Untranslated
 	"DeleteNMessages_Alert": "Delete % messages?", // Untranslated
-	"DeleteNMessages_Alert_2": "", // Untranslated
+	"DeleteNMessages_Alert_2": "Delete % messages?", // Untranslated
 	"DeleteMessage_Alert": "Delete message?", // Untranslated
 	"PinMessage_Alert": "Pin message?", // Untranslated
 	"BanMember_Alert": "Ban member?", // Untranslated
@@ -346,8 +346,8 @@
 	"_isTyping": "% is typing..", // Untranslated
 	"_areTyping": "% and % are typing...", // Untranslated
 	"_peopleAreTyping": "", // Untranslated
-	"_peopleAreTyping_1": "% people are typing...", // Untranslated
-	"_peopleAreTyping_2": "% people are typing...", // Untranslated
+	"_peopleAreTyping_1": " people are typing...", // Untranslated
+	"_peopleAreTyping_2": " people are typing...", // Untranslated
 	"ManyPeopleAreTyping": "Many people are typing...", // Untranslated
 	
 	// Message

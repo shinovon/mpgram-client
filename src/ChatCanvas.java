@@ -2710,7 +2710,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		} else if (count > 4) {
 			this.status = MP.L[LManyPeopleAreTyping];
 		} else {
-			this.status = MP.localizePlural(count, L_peopleAreTyping);
+			this.status = MP.localizeFormattedPlural(count, L_peopleAreTyping);
 		}
 	}
 
