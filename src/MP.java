@@ -123,6 +123,7 @@ public class MP extends MIDlet
 	static final String API_URL = "api.php";
 	static final String AVA_URL = "ava.php";
 	static final String FILE_URL = "file.php";
+	static final String VOICE_URL = "voice.php";
 	static final String OTA_URL = "http://nnproject.cc/mp/upd.php";
 
 	static final String API_VERSION = "11";
@@ -4340,7 +4341,7 @@ public class MP extends MIDlet
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 
-			browseUser("voice.php?c=" + s[0] + "&m=" + s[1]);
+			browseUser(VOICE_URL + "?c=" + s[0] + "&m=" + s[1]);
 			return;
 		}
 		if (c == postCommentsCmd) {
@@ -5652,7 +5653,7 @@ public class MP extends MIDlet
 	}
 
 //#ifndef NO_FILE
-	static Object postMessage(String url, String fileUrl, String text, Alert alert) throws IOException {
+	static void postMessage(String url, String fileUrl, String text, Alert alert) throws IOException {
 		HttpConnection http = null;
 		InputStream httpIn = null;
 
@@ -5763,7 +5764,7 @@ public class MP extends MIDlet
 			}
 			if (!sending) throw cancelException;
 
-			return readResponse(httpIn = openInputStream(http), http, http.getResponseCode(), url);
+			readResponse(httpIn = openInputStream(http), http, http.getResponseCode(), url);
 		} finally {
 			if (file != null) try {
 				file.close();

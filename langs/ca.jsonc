@@ -110,6 +110,7 @@
 	"Copy": "Copia",
 	"CopyLink": "Copia enllaç",
 	"Select": "Selecciona",
+	"SeenList": "Seen list", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "Enllaç", // assuming noun, if verb - Enllaça

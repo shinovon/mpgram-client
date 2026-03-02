@@ -110,6 +110,7 @@
 	"Copy": "Kopyala",
 	"CopyLink": "Bağlantıyı kopyala",
 	"Select": "Seç",
+	"SeenList": "Seen list", // Untranslated
 
 	// Item commands
 	"Link_Cmd": "Bağlantı",

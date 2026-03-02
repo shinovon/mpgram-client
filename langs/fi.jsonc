@@ -110,6 +110,7 @@
 	"Copy": "Kopioi",
 	"CopyLink": "Kopioi linkki",
 	"Select": "Valitse",
+	"SeenList": "Seen list", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "Linkki",

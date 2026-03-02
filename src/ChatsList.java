@@ -137,7 +137,8 @@ public class ChatsList extends MPList {
 				try {
 					MP.appendOneLine(sb, MP.getName(user, false));
 				} catch (Exception e) {
-					sb.append("");
+					// TODO add name placeholder
+//					sb.append("");
 				}
 
 				if (user.has("date")) {

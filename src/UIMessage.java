@@ -1502,7 +1502,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				if (!MP.voiceConversion) break;
 
 				// TODO voice player
-				MP.midlet.browseUser("voice.php?c=" + peerId + "&m=" + idStr);
+				MP.midlet.browseUser(MP.VOICE_URL + "?c=" + peerId + "&m=" + idStr);
 				break;
 			}
 			MP.display(MP.loadingAlert(MP.L[LLoading]), MP.current);
@@ -1524,9 +1524,9 @@ public class UIMessage extends UIItem implements LangConstants {
 			selected = true;
 			((ChatCanvas) container).selected(this);
 			break;
-		case LLastSeen: // TODO
+		case LSeenList:
 			MP.openLoad(new ChatsList("Read",
-					"getMessageReadParticipants&peer=" +((ChatCanvas) container).id + "&id=" + idStr,
+					"getMessageReadParticipants&peer=" + ((ChatCanvas) container).id + "&id=" + idStr,
 					null, false));
 			break;
 		}
@@ -1578,7 +1578,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			if (!chat.selfChat && !chat.user) general[count++] = LCopyMessageLink;
 			general[count++] = LForward;
 			if (chat.canDelete || out) general[count++] = LDelete;
-			if (out && chat.canSeeRead && read) general[count++] = LLastSeen; // TODO
+			if (out && chat.canSeeRead && read) general[count++] = LSeenList;
 		}
 		general[count++] = LSelect;
 		general[count] = Integer.MIN_VALUE;
