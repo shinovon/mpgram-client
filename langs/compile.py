@@ -95,6 +95,8 @@ if not err:
                         print(i, s.strip())
                         if k[0] == '_' and k[-1] == '2':
                             lines.insert(i, s)
+                        elif n == 'en_gb.jsonc':
+                            lines.insert(i, s)
                         else:
                             lines.insert(i, s[:-1] + " // Untranslated\n")
                         break

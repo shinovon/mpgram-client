@@ -334,6 +334,7 @@
 	"Logout_Alert": "Haluatko varmasti kirjautua ulos?",
 	"RewriteFile_Alert": "File already exists, rewrite?", // Untranslated
 	"OpenThisLink_Alert": "Open this link?", // Untranslated
+	"Remove_Alert": "Remove \"%\"?", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Media",
@@ -395,6 +396,7 @@
 	"Stickers_Title": "Tarrat",
 	"Sticker": "Tarra",
 	"AddStickers": "Lisää tarrat",
+	"Remove": "Remove", // Untranslated
 	
 	// Music player
 	"Player_Title": "Musiikkisoitin",

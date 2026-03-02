@@ -28,6 +28,7 @@ public class StickerPacksList extends MPList {
 		super(MP.L[LStickers_Title]);
 		this.chatForm = form;
 		addCommand(MP.backCmd);
+		addCommand(MP.removeStickerPackCmd);
 	}
 
 	void loadInternal(Thread thread) throws Exception {

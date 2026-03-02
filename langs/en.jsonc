@@ -334,6 +334,7 @@
 	"Logout_Alert": "Are you sure you want to log out?",
 	"RewriteFile_Alert": "File already exists, overwrite?",
 	"OpenThisLink_Alert": "Open this link?",
+	"Remove_Alert": "Remove \"%\"?",
 	
 	// Chat form
 	"ChatMedia_Title": "Media",
@@ -395,6 +396,7 @@
 	"Stickers_Title": "Stickers",
 	"Sticker": "Sticker",
 	"AddStickers": "Add stickers",
+	"Remove": "Remove",
 	
 	// Music player
 	"Player_Title": "Music player",

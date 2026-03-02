@@ -334,6 +334,7 @@
 	"Logout_Alert": "Are you sure you want to log out?", // Untranslated
 	"RewriteFile_Alert": "File already exists, rewrite?", // Untranslated
 	"OpenThisLink_Alert": "Open this link?", // Untranslated
+	"Remove_Alert": "Remove \"%\"?", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "الوسائط",
@@ -395,6 +396,7 @@
 	"Stickers_Title": "الملصقات", 
 	"Sticker": "ملصق",
 	"AddStickers": "اضافة ملصقات", 
+	"Remove": "Remove", // Untranslated
 	
 	// Music player
 	"Player_Title": "مشغل الموسيقى", 

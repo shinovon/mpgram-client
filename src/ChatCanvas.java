@@ -2695,10 +2695,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 
 		String name1 = id1 == 0 ? null : MP.getName(Long.toString(id1), true);
 		if (count == 1) {
-			String l = MP.L[L_isTyping];
-			int idx = l.indexOf('%');
-			this.status = l.substring(0, idx)
-					.concat(name1.concat(l.substring(idx + 1)));
+			this.status = MP.localizeFormatted(L_isTyping, name1);
 		} else if (count == 2) {
 			String l = MP.L[L_areTyping];
 			String name2 = MP.getName(Long.toString(id2), true);

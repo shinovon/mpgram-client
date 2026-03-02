@@ -334,6 +334,7 @@
 	"Logout_Alert": "Çıkış yapmak istediğine emin misin?",
 	"RewriteFile_Alert": "Dosya zaten mevcut, üzerine yazılsın mı?",
 	"OpenThisLink_Alert": "Bu bağlantı açılsın mı?",
+	"Remove_Alert": "Remove \"%\"?", // Untranslated
 
 	// Chat form
 	"ChatMedia_Title": "Medya",
@@ -395,6 +396,7 @@
 	"Stickers_Title": "Çıkartmalar",
 	"Sticker": "Çıkartma",
 	"AddStickers": "Çıkartma ekle",
+	"Remove": "Remove", // Untranslated
 
 	// Music player
 	"Player_Title": "Müzik oynatıcı",

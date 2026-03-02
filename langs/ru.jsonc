@@ -334,6 +334,7 @@
 	"Logout_Alert": "Вы действительно хотите выйти?",
 	"RewriteFile_Alert": "Файл уже существует, перезаписать?",
 	"OpenThisLink_Alert": "Перейти по ссылке?",
+	"Remove_Alert": "Удалить \"%\"?",
 	
 	// Chat form
 	"ChatMedia_Title": "Медиафайлы",
@@ -395,6 +396,7 @@
 	"Stickers_Title": "Стикеры",
 	"Sticker": "Стикер",
 	"AddStickers": "Добавить стикеры",
+	"Remove": "Удалить",
 	
 	// Music player
 	"Player_Title": "Плеер",

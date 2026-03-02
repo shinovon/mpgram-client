@@ -334,6 +334,7 @@
 	"Logout_Alert": "Are you sure you want to log out?", // Untranslated
 	"RewriteFile_Alert": "File already exists, rewrite?", // Untranslated
 	"OpenThisLink_Alert": "Open this link?", // Untranslated
+	"Remove_Alert": "Remove \"%\"?", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Медіафайли",
@@ -395,6 +396,7 @@
 	"Stickers_Title": "Stickers", // Untranslated
 	"Sticker": "Sticker", // Untranslated
 	"AddStickers": "Add stickers", // Untranslated
+	"Remove": "Remove", // Untranslated
 	
 	// Music player
 	"Player_Title": "Music player", // Untranslated

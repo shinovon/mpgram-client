@@ -334,6 +334,7 @@
 	"Logout_Alert": "Segur que vols tancar sessió?",
 	"RewriteFile_Alert": "Fitxer ja existeix, reescriu-lo?",
 	"OpenThisLink_Alert": "Obre aquest enllaç?",
+	"Remove_Alert": "Remove \"%\"?", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Mèdia",
@@ -395,6 +396,7 @@
 	"Stickers_Title": "Adhesius",
 	"Sticker": "Adhesiu",
 	"AddStickers": "Afegeix adhesius",
+	"Remove": "Remove", // Untranslated
 	
 	// Music player
 	"Player_Title": "Reproductor de música",

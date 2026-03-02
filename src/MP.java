@@ -110,6 +110,7 @@ public class MP extends MIDlet
 	static final int RUN_LOGOUT = 27;
 	static final int RUN_START_PLAYER = 28;
 	static final int RUN_OPEN_URL = 29;
+	static final int RUN_UNINSTALL_STICKER_SET = 30;
 
 	static final long ZERO_CHANNEL_ID = -1000000000000L;
 
@@ -357,6 +358,7 @@ public class MP extends MIDlet
 	static Command banMemberCmd;
 	static Command pinMsgCmd;
 	static Command postCommentsCmd;
+	static Command removeStickerPackCmd;
 
 	static Command richTextLinkCmd;
 	static Command openImageCmd;
@@ -894,7 +896,8 @@ public class MP extends MIDlet
 		botCallbackCmd = new Command(L[LRunBotAction], Command.ITEM, 1);
 		banMemberCmd = new Command(L[LBanMember], Command.ITEM, 11);
 		pinMsgCmd = new Command(L[LPin], Command.ITEM, 10);
-		postCommentsCmd = new Command(L[LComments], Command.ITEM, 1); 
+		postCommentsCmd = new Command(L[LComments], Command.ITEM, 1);
+		removeStickerPackCmd = new Command(L[LRemove], Command.ITEM, 1);
 
 		richTextLinkCmd = new Command(L[LLink_Cmd], Command.ITEM, 1);
 		openImageCmd = new Command(L[LViewImage], Command.ITEM, 1);
@@ -2521,6 +2524,17 @@ public class MP extends MIDlet
 			openUrl((String) param, false);
 			break;
 		}
+		case RUN_UNINSTALL_STICKER_SET: {
+			try {
+				JSONObject s = (JSONObject) param;
+				MP.api("uninstallStickerSet&id=".concat(s.getString("id").concat("&access_hash=").concat(s.getString("access_hash"))));
+
+				display(infoAlert(L[LStickersAdded_Alert]), current);
+			} catch (Exception e) {
+				display(errorAlert(e), current);
+			}
+			break;
+		}
 		}
 //		running--;
 	}
@@ -3709,6 +3723,15 @@ public class MP extends MIDlet
 		if (c == addStickerPackCmd) {
 			display(loadingAlert(L[LLoading]), current);
 			start(RUN_INSTALL_STICKER_SET, d);
+			return;
+		}
+		if (c == removeStickerPackCmd) {
+			int i = ((List) d).getSelectedIndex();
+			if (i == -1) return;
+
+			JSONObject set = ((StickerPacksList) d).sets.getObject(i);
+			display(loadingAlert(L[LLoading]), current);
+			confirm(RUN_UNINSTALL_STICKER_SET, set, null, MP.localizeFormatted(LRemove_Alert, set.getString("title")));
 			return;
 		}
 		if (c == aboutCmd) {
@@ -6265,6 +6288,16 @@ public class MP extends MIDlet
 		}
 
 		return sb.toString();
+	}
+
+	static String localizeFormatted(int i, String s) {
+		String l = L[i];
+
+		int idx;
+		if ((idx = l.indexOf('%')) != -1) {
+			return l.substring(0, idx).concat(s.concat(l.substring(idx + 1)));
+		}
+		return s.concat(l);
 	}
 
 	static String n(int n) {
