@@ -111,6 +111,7 @@ public class MP extends MIDlet
 	static final int RUN_START_PLAYER = 28;
 	static final int RUN_OPEN_URL = 29;
 	static final int RUN_UNINSTALL_STICKER_SET = 30;
+	static final int RUN_RESET_SETTINGS = 31;
 
 	static final long ZERO_CHANNEL_ID = -1000000000000L;
 
@@ -337,6 +338,7 @@ public class MP extends MIDlet
 	private static Command saveLanguagesCmd;
 	private static Command exportSessionCmd;
 	private static Command wallpaperPathCmd;
+	private static Command resetCmd;
 
 	static Command refreshCmd;
 	static Command archiveCmd;
@@ -876,6 +878,7 @@ public class MP extends MIDlet
 		saveLanguagesCmd = new Command(L[LBack], Command.BACK, 1);
 		exportSessionCmd = new Command(L[LShowSessionCode], Command.ITEM, 1);
 		wallpaperPathCmd = new Command(L[LLocate], Command.ITEM, 1);
+		resetCmd = new Command(L[LResetSettings], Command.ITEM, 1);
 
 		foldersCmd = new Command(L[LFolders], Command.SCREEN, 4);
 		refreshCmd = new Command(L[LRefresh], Command.SCREEN, 5);
@@ -2535,6 +2538,22 @@ public class MP extends MIDlet
 			}
 			break;
 		}
+		case RUN_RESET_SETTINGS: {
+			display(loadingAlert(L[LApplicationWillClose_Alert]));
+			try {
+				try {
+					String[] s = RecordStore.listRecordStores();
+					for (int i = 0; i < s.length; ++i) {
+						try {
+							RecordStore.deleteRecordStore(s[i]);
+						} catch (Exception ignored) {}
+					}
+				} catch (Exception ignored) {}
+				Thread.sleep(1000);
+			} catch (Exception ignored) {}
+			notifyDestroyed();
+			break;
+		}
 		}
 //		running--;
 	}
@@ -2702,17 +2721,15 @@ public class MP extends MIDlet
 	}
 //#endif
 
-	Thread start(int i, Object param) {
-		Thread t = null;
+	void start(int i, Object param) {
 		try {
 			synchronized (this) {
 				run = i;
 				runParam = param;
-				(t = new Thread(this)).start();
+				new Thread(this).start();
 				wait();
 			}
 		} catch (Exception e) {}
-		return t;
 	}
 
 	void cancel(Thread thread, boolean updates) {
@@ -2921,23 +2938,23 @@ public class MP extends MIDlet
 				MPChat form;
 //#ifndef NO_CHAT_CANVAS
 				if (!legacyChatUI) {
-					form = new ChatCanvas(((ChatInfoForm) current).id, mediaFilter, ((ChatInfoForm) current).chatForm.topMsgId());
+					form = new ChatCanvas(((ChatInfoForm) d).id, mediaFilter, ((ChatInfoForm) d).chatForm.topMsgId());
 				} else
 //#endif
 				{
-					form = new ChatForm(((ChatInfoForm) current).id, mediaFilter, ((ChatInfoForm) current).chatForm.topMsgId());
+					form = new ChatForm(((ChatInfoForm) d).id, mediaFilter, ((ChatInfoForm) d).chatForm.topMsgId());
 				}
-				form.setParent(((ChatInfoForm) current).chatForm);
+				form.setParent(((ChatInfoForm) d).chatForm);
 				openLoad((Displayable) form);
 				return;
 			}
 			if (c == gotoPinnedMsgCmd) {
-				int id = ((ChatInfoForm) current).pinnedMessageId;
+				int id = ((ChatInfoForm) d).pinnedMessageId;
 				if (((ChatInfoForm) d).chatForm != null) {
 					commandAction(backCmd, d);
 					((ChatInfoForm) d).chatForm.openMessage(Integer.toString(id), -1);
 				} else {
-					openChat(((ChatInfoForm) current).id, id);
+					openChat(((ChatInfoForm) d).id, id);
 				}
 				return;
 			}
@@ -3431,6 +3448,12 @@ public class MP extends MIDlet
 					s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(s);
 
+					s = new StringItem(null, L[LResetSettings], Item.BUTTON);
+					s.setDefaultCommand(resetCmd);
+					s.setItemCommandListener(this);
+					s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(s);
+
 					settingsForm = f;
 				} else {
 					updateTimeoutGauge.setLabel(L[longpoll ? LUpdatesTimeout : LUpdatesInterval]);
@@ -3649,6 +3672,11 @@ public class MP extends MIDlet
 				copy("", user);
 				return;
 			}
+			if (c == resetCmd) {
+				confirm(RUN_RESET_SETTINGS, null, null, L[LResetSettings_Alert]);
+				return;
+			}
+//#ifndef NO_FILE
 			if (c == wallpaperPathCmd) {
 				downloadMessage = null;
 				try {
@@ -3663,6 +3691,7 @@ public class MP extends MIDlet
 				return;
 			}
 //#endif
+//#endif /* NO_CHAT_CANVAS */
 		}
 		{ // write form commands
 			if (c == sendCmd) {

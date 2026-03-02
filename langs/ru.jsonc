@@ -85,6 +85,7 @@
 	"ClearCache": "Очистить кэш",
 	"Locate": "Указать путь",
 	"ShowSessionCode": "Показать код сессии",
+	"ResetSettings": "Сбросить настройки",
 	
 	// Chats list commands
 	"Folders": "Папки",
@@ -335,6 +336,8 @@
 	"RewriteFile_Alert": "Файл уже существует, перезаписать?",
 	"OpenThisLink_Alert": "Перейти по ссылке?",
 	"Remove_Alert": "Удалить \"%\"?",
+	"ResetSettings_Alert": "Сбросить настройки?",
+	"ApplicationWillClose_Alert": "Приложение будет закрыто...",
 	
 	// Chat form
 	"ChatMedia_Title": "Медиафайлы",

@@ -85,6 +85,7 @@
 	"ClearCache": "Clear cache",
 	"Locate": "Locate",
 	"ShowSessionCode": "Show session code",
+	"ResetSettings": "Reset settings",
 	
 	// Chats list commands
 	"Folders": "Folders",
@@ -335,6 +336,8 @@
 	"RewriteFile_Alert": "File already exists, overwrite?",
 	"OpenThisLink_Alert": "Open this link?",
 	"Remove_Alert": "Remove \"%\"?",
+	"ResetSettings_Alert": "Reset settings?",
+	"ApplicationWillClose_Alert": "Application will close...",
 	
 	// Chat form
 	"ChatMedia_Title": "Media",

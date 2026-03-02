@@ -85,6 +85,7 @@
 	"ClearCache": "تفريغ التخزين المؤقت",
 	"Locate": "Locate", // Untranslated
 	"ShowSessionCode": "Show session code", // Untranslated
+	"ResetSettings": "Reset settings", // Untranslated
 	
 	// Chats list commands
 	"Folders": "مجلدات",
@@ -335,6 +336,8 @@
 	"RewriteFile_Alert": "File already exists, rewrite?", // Untranslated
 	"OpenThisLink_Alert": "Open this link?", // Untranslated
 	"Remove_Alert": "Remove \"%\"?", // Untranslated
+	"ResetSettings_Alert": "Reset settings?", // Untranslated
+	"ApplicationWillClose_Alert": "Application will close...", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "الوسائط",
