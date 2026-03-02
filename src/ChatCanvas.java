@@ -197,6 +197,8 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	boolean showPhoto;
 	boolean photoQueued;
 
+	int focusedMessage;
+
 	ChatCanvas() {
 		setFullScreenMode(true);
 
@@ -1623,6 +1625,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		} else if (key >= Canvas.KEY_NUM0 && key <= Canvas.KEY_NUM9) {
 			// ignore
 		} else if (game == Canvas.DOWN || game == Canvas.UP) {
+			focusedMessage = -1;
 			scroll: {
 				int dir = game == Canvas.DOWN ? 1 : -1;
 				int dir2 = dir;
@@ -1876,6 +1879,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 							if (reverse) res = -res;
 							if (kineticScroll * res < 0) kineticScroll = 0;
 							kineticScroll += res;
+							focusedMessage = -1;
 						}
 					}
 				}
@@ -2107,7 +2111,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 		if (thread != this.thread) throw MP.cancelException;
 		table.put(Integer.toString(item.id), item);
 		add(item);
-		if (focus) nextFocusItem = item;
+		if (focus) {
+			nextFocusItem = item;
+			if (!endReached || firstMsgId != item.id) {
+				focusedMessage = item.id;
+			}
+		}
 	}
 
 	void safeAddFirst(Thread thread, UIMessage item) {
@@ -2630,15 +2639,17 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 
 	public void openMessage(String msg, int topMsg) {
+		int id = Integer.parseInt(msg);
 		if (table != null && table.containsKey(msg)) {
 			UIItem focus = (UIItem) table.get(msg);
 			if (focus != null) {
 				nextFocusItem = focus;
+				focusedMessage = id;
 				return;
 			}
 		}
 		resetChat();
-		this.messageId = Integer.parseInt(msg);
+		this.messageId = id;
 		if (topMsg != -1) this.topMsgId = topMsg;
 		MP.openLoad(this);
 	}

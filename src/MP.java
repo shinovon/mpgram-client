@@ -3730,8 +3730,7 @@ public class MP extends MIDlet
 			if (i == -1) return;
 
 			JSONObject set = ((StickerPacksList) d).sets.getObject(i);
-			display(loadingAlert(L[LLoading]), current);
-			confirm(RUN_UNINSTALL_STICKER_SET, set, null, MP.localizeFormatted(LRemove_Alert, set.getString("title")));
+			confirm(RUN_UNINSTALL_STICKER_SET | 0x100, set, null, MP.localizeFormatted(LRemove_Alert, set.getString("title")));
 			return;
 		}
 		if (c == aboutCmd) {

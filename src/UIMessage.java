@@ -517,7 +517,7 @@ public class UIMessage extends UIItem implements LangConstants {
 
 	void paint(Graphics g, int x, int y, int w) {
 		int h = contentHeight - replyMarkupHeight;
-		if (selected) {
+		if (selected || ((ChatCanvas) container).focusedMessage == id) {
 			g.setColor(ChatCanvas.colors[ChatCanvas.COLOR_CHAT_HIGHLIGHT_BG]);
 			g.fillRect(0, y, w, h);
 		}
