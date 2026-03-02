@@ -75,61 +75,11 @@ import zip.InflaterInputStream;
 //#endif
 
 public class MP extends MIDlet
-	implements CommandListener, ItemCommandListener, ItemStateListener, Runnable, LangConstants, PlayerListener
+	implements CommandListener, ItemCommandListener, ItemStateListener, Runnable, PlayerListener,
+		LangConstants, Constants
 {
 
 	// region Constants
-
-	// threading tasks
-	static final int RUN_SEND_MESSAGE = 1;
-	static final int RUN_VALIDATE_AUTH = 2;
-	static final int RUN_IMAGES = 3;
-	static final int RUN_LOAD_FORM = 4;
-	static final int RUN_LOAD_LIST = 5;
-	static final int RUN_AUTH = 6;
-	static final int RUN_DELETE_MESSAGE = 7;
-	static final int RUN_RESOLVE_INVITE = 8;
-	static final int RUN_IMPORT_INVITE = 9;
-	static final int RUN_JOIN_CHANNEL = 10;
-	static final int RUN_LEAVE_CHANNEL = 11;
-	static final int RUN_CHECK_OTA = 12;
-	static final int RUN_CHAT_UPDATES = 13;
-	static final int RUN_SET_TYPING = 14;
-	static final int RUN_KEEP_ALIVE = 15;
-	static final int RUN_CLOSE_CONNECTION = 16;
-	static final int RUN_BOT_CALLBACK = 17;
-	static final int RUN_BAN_MEMBER = 18;
-	static final int RUN_ZOOM_VIEW = 19;
-	static final int RUN_PIN_MESSAGE = 20;
-	static final int RUN_SEND_STICKER = 21;
-	static final int RUN_INSTALL_STICKER_SET = 22;
-	static final int RUN_LOAD_PLAYLIST = 23;
-	static final int RUN_PLAYER_LOOP = 24;
-	static final int RUN_CANCEL_UPDATES = 25;
-	static final int RUN_DOWNLOAD_DOCUMENT = 26;
-	static final int RUN_LOGOUT = 27;
-	static final int RUN_START_PLAYER = 28;
-	static final int RUN_OPEN_URL = 29;
-	static final int RUN_UNINSTALL_STICKER_SET = 30;
-	static final int RUN_RESET_SETTINGS = 31;
-
-	static final long ZERO_CHANNEL_ID = -1000000000000L;
-
-	// RMS
-	private static final String SETTINGS_RECORD_NAME = "mp4config";
-	private static final String AUTH_RECORD_NAME = "mp4user";
-	private static final String AVATAR_RECORD_PREFIX = "mcA";
-
-	// URLs
-	private static final String DEFAULT_INSTANCE_URL = "http://mp.wunderwungiel.pl/";
-	static final String API_URL = "api.php";
-	static final String AVA_URL = "ava.php";
-	static final String FILE_URL = "file.php";
-	static final String VOICE_URL = "voice.php";
-	static final String OTA_URL = "http://nnproject.cc/mp/upd.php";
-
-	static final String API_VERSION = "11";
-
 //#ifndef NO_LANGS
 	static final String[][] LANGS = {
 		{
@@ -180,12 +130,6 @@ public class MP extends MIDlet
 			"Desktop Light (nallion)",
 		}
 	};
-//#endif
-
-//#ifdef MINI
-//#	static final boolean MINI_BUILD = true;
-//#else
-	static final boolean MINI_BUILD = false;
 //#endif
 
 	// endregion Constants
@@ -570,17 +514,7 @@ public class MP extends MIDlet
 		Form f = new Form("MPGram");
 		f.append("Loading");
 		display.setCurrent(mainDisplayable = f);
-//#ifndef NO_J2ME_LOADER_CHECK
-//		try {
-//			// check for j2me loader
-//			Class.forName("javax.microedition.shell.MicroActivity");
-//			f.deleteAll();
-//			f.addCommand(exitCmd = new Command("Exit", Command.EXIT, 1));
-//			f.setCommandListener(midlet);
-//			f.append("J2ME Loader is not supported.");
-//			return;
-//		} catch (Exception ignored) {}
-//#endif
+
 		// get device name
 		String p, v, d = null;
 		if ((p = System.getProperty("microedition.platform")) != null) {
@@ -2033,7 +1967,7 @@ public class MP extends MIDlet
 						}
 						check = true;
 					}
-//#endif
+//#endif /* NO_NOTIFY */
 				}
 			} catch (Exception ignored) {}
 			break;
@@ -2342,7 +2276,7 @@ public class MP extends MIDlet
 			display(errorAlert(error), current);
 			break;
 		}
-//#endif
+//#endif /* NO_FILE */
 		case RUN_LOGOUT: {
 			userState = 0;
 			user = null;
@@ -2443,7 +2377,7 @@ public class MP extends MIDlet
 						p = Manager.createPlayer(fileUrl);
 					}
 				} else
-//#endif
+//#endif /* NO_FILE */
 				{ // stream
 					int method = playerCreateMethod;
 					if (method == 0) { // auto
@@ -2719,7 +2653,7 @@ public class MP extends MIDlet
 			}
 		}
 	}
-//#endif
+//#endif /* NO_NOTIFY */
 
 	void start(int i, Object param) {
 		try {
@@ -3154,6 +3088,7 @@ public class MP extends MIDlet
 					themeChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(themeChoice);
 
+//#ifndef NO_FILE
 					wallpaperPathField = new TextField(L[LChatWallpaper], wallpaperPath, 500, TextField.ANY);
 					wallpaperPathField.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(wallpaperPathField);
@@ -3164,6 +3099,7 @@ public class MP extends MIDlet
 					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(s);
 //#endif
+//#endif /* NO_CHAT_CANVAS */
 
 					uiChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
 							L[LReversedChat],
@@ -3275,7 +3211,7 @@ public class MP extends MIDlet
 					pushBgIntervalGauge = new Gauge(L[LPushBackgroundInterval], true, 120, (int) (pushBgInterval / 1000));
 					pushBgIntervalGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(pushBgIntervalGauge);
-//#endif
+//#endif /* NO_NOTIFY */
 
 					// behaviour
 
@@ -3447,6 +3383,8 @@ public class MP extends MIDlet
 					s.setItemCommandListener(this);
 					s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(s);
+
+					f.append(new Spacer(8, 8));
 
 					s = new StringItem(null, L[LResetSettings], Item.BUTTON);
 					s.setDefaultCommand(resetCmd);
@@ -3975,7 +3913,7 @@ public class MP extends MIDlet
 				}
 			}
 			needWriteConfig = true;
-//#endif
+//#endif /* NO_FILE */
 			return;
 		}
 //#ifndef NO_FILE
@@ -4960,7 +4898,7 @@ public class MP extends MIDlet
 			e.printStackTrace();
 		}
 	}
-//#endif
+//#endif /* NO_FILE */
 
 	static void openChat(String id, int msg) {
 		Displayable d = MP.current;
@@ -5830,7 +5768,7 @@ public class MP extends MIDlet
 			} catch (IOException e) {}
 		}
 	}
-//#endif
+//#endif /* NO_FILE */
 
 	private static Object readResponse(InputStream in, HttpConnection hc, int c, String url) throws IOException {
 		Object res;
@@ -6129,7 +6067,7 @@ public class MP extends MIDlet
 			} catch (Exception ignored) {} // TODO: should I left it ignored?
 		}
 	}
-//#endif
+//#endif /* NO_FILE */
 
 	// endregion
 
@@ -6999,7 +6937,7 @@ public class MP extends MIDlet
 	}
 
 	// endregion
-//#endif
+//#endif /* NO_AVATARS */
 
 	// region JSON
 

@@ -1536,12 +1536,35 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			} else if (inputFocused) {
 				showMenu(null,
 						(text != null && text.trim().length() != 0) || file != null || forwardMsgs != null || forwardMsg != null ?
-						new int[] { LSend, LFullscreenTextBox, LClear, LAttachFile, LCancel } :
-						new int[] { LFullscreenTextBox, LAttachFile, LCancel });
+						new int[] {
+								LSend,
+								LFullscreenTextBox,
+								LClear,
+//#ifndef NO_FILE
+								LAttachFile,
+//#endif
+								LCancel
+						} :
+						new int[] {
+								LFullscreenTextBox,
+//#ifndef NO_FILE
+								LAttachFile,
+//#endif
+								LCancel
+						});
 			} else if (selected != 0) {
 				showMenu(null, new int[] { LDelete, LForward });
 			} else if (funcFocused) {
-				showMenu(null, canWrite && hasInput ? new int[] { LRefresh, LChatInfo, LSearchMessages, LSendSticker, LAttachFile, LWriteMessage } : new int[] { LRefresh, LChatInfo, LSearchMessages });
+				showMenu(null, canWrite && hasInput ? new int[] {
+						LRefresh,
+						LChatInfo,
+						LSearchMessages,
+						LSendSticker,
+//#ifndef NO_FILE
+						LAttachFile,
+//#endif
+						LWriteMessage
+				} : new int[] { LRefresh, LChatInfo, LSearchMessages });
 			} else {
 				if (focusedItem != null && focusedItem.focusable) {
 					int[] menu = focusedItem.menu();
@@ -2039,10 +2062,12 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					send();
 					break;
 				}
+//#ifndef NO_FILE
 				case LAttachFile: {
 					MP.openFilePicker(MP.lastUploadPath, 3);
 					break;
 				}
+//#endif
 				}
 			} else {
 				menuItem.menuAction(menu[i]);
@@ -2472,7 +2497,13 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				}
 			}
 		} else {
-			showMenu(null, new int[] { LSendSticker, LAttachFile, LWriteMessage });
+			showMenu(null, new int[] {
+					LSendSticker,
+//#ifndef NO_FILE
+					LAttachFile,
+//#endif
+					LWriteMessage
+			});
 		}
 	}
 
