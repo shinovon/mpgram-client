@@ -62,7 +62,7 @@
 	"Tue": "Вт",
 	"Wed": "Ср",
 	"Thu": "Чт",
-	"Fri": "Вт",
+	"Fri": "Пт",
 	"Sat": "Сб",
 	"Sunday": "Воскресенье",
 	"Monday": "Понедельник",
@@ -204,7 +204,7 @@
 	"Behaviour": "Поведение",
 	"Images": "Картинки",
 	"Authorization": "Авторизация",
-	"Notifications": "Уведомлления",
+	"Notifications": "Уведомления",
 	
 	// UI Settings
 	"Language": "Язык",
@@ -238,7 +238,7 @@
 	"UseJSONStream": "Исп. JSONStream",
 	"FormatText": "Форматировать текст",
 	"ParseLinks": "Отображать ссылки",
-	"ChatAutoUpdate": "Авто-обновление чата",
+	"ChatAutoUpdate": "Автообновление чата",
 	"UpdatesTimeout": "Таймаут обновлений",
 	"KeepSessionAlive": "Держать сессию активной",
 	"UseUnicode": "Исп. Unicode",
@@ -269,7 +269,7 @@
 	"LazyLoading": "Постепенная прогрузка",
 	
 	// Cache settings
-	"AvatarsCaching": "Кэшироние аватарок",
+	"AvatarsCaching": "Кэширование аватарок",
 	"Disabled": "Выкл.",
 	"HoldInRAM": "Хранить в ОЗУ",
 	"Store": "Хранить в RMS",
@@ -400,8 +400,8 @@
 	"Player_Title": "Плеер",
 	"OpenPlayer": "Плеер",
 	"OpenPlaylist": "Плейлист",
-	"Play_Player": "Play",
-	"Pause_Player": "Pause",
+	"Play_Player": "Воспр.",
+	"Pause_Player": "Пауза",
 	"Prev_Player": "Пред.",
 	"Next_Player": "След.",
 	"UnknownTrack": "Без названия",
@@ -411,7 +411,7 @@
 	
 	// Profile/chat info
 	"Online": "в сети",
-	"Offline": "офлайн",
+	"Offline": "не в сети",
 	"LastSeen": "был(а) ",
 	"About_User": "О себе",
 	"About_Chat": "Описание",
@@ -438,7 +438,7 @@
 	"_subscribers2": " подписчиков",
 	
 	"_photo": " фотография",
-	"_photos": " фотографий",
+	"_photos": " фотографии",
 	"_photos2": " фотографий",
 	
 	"_video": " видео",
@@ -455,5 +455,5 @@
 	
 	"_voiceMessage": " голосовое сообщение",
 	"_voiceMessages": " голосовых сообщения",
-	"_voiceMessages2": " голосовый сообщений"
+	"_voiceMessages2": " голосовых сообщений"
 }

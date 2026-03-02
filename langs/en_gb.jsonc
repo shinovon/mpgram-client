@@ -1,6 +1,6 @@
 {
 	// About this locale file
-	"LocaleInfo": "English, by shinovon",
+	"LocaleInfo": "English (UK), by shinovon",
 	"LocaleSlavicPlurals": "",
 	"LocaleCustomPlurals": "",
 	
@@ -161,7 +161,7 @@
 	
 	// Loading states
 	"Loading": "Loading",
-	"Authorizing": "Authorizing...",
+	"Authorizing": "Authorising...",
 	"WaitingForServerResponse": "Waiting for server response...",
 	"Sending": "Sending...",
 	"WaitingForPrevChat": "Waiting for previous chat to disconnect...",
@@ -171,13 +171,13 @@
 	"Auth_Title": "Auth",
 	"InstanceURL": "Instance URL",
 	"InstancePassword": "Instance Password",
-	"ChooseAuthMethod": "Choose authorization method",
+	"ChooseAuthMethod": "Choose authorisation method",
 	"PhoneNumber": "Phone number",
 	"SessionCode": "Session code",
 	"Code": "Code",
 	"CloudPassword": "Cloud password",
 	"Captcha": "Captcha",
-	"Auth_Btn": "Authorize",
+	"Auth_Btn": "Authorise",
 	"InvalidCode_Alert": "Invalid code!",
 	"CodeExpired_Alert": "Code expired!",
 	"Auth_Hint1": "(leave empty if using mp.nnchan.ru or your instance doesn't have a password)",
@@ -201,9 +201,9 @@
 	
 	// Settings sections
 	"UI": "UI",
-	"Behaviour": "Behavior",
+	"Behaviour": "Behaviour",
 	"Images": "Images",
-	"Authorization": "Authorization",
+	"Authorization": "Authorisation",
 	"Notifications": "Notifications",
 	
 	// UI Settings
@@ -226,7 +226,7 @@
 	"FastScrolling": "Disable animations",
 	"Keyboard": "Keyboard",
 	"Auto": "Auto",
-	"FullscreenTextBox": "Fullscreen edit",
+	"FullscreenTextBox": "Full-screen edit",
 	"Theme": "Theme",
 	"InputLanguages": "Input languages",
 	"ForceKeyInput": "Force keypad input",
@@ -320,7 +320,7 @@
 	"FailedToLoadImage": "Failed to load image", // unwrapped, should be short
 	"TextCopied_Alert": "Text copied",
 	"NotEnoughMemory_Alert": "Not enough memory",
-	"DownloadCanceled_Alert": "Download canceled",
+	"DownloadCanceled_Alert": "Download cancelled",
 	"DownloadedTo": "Downloaded to ",
 	"ChooseDownloadMethod_Alert": "Choose download method",
 	"FailedToSaveSettings_Alert": "Failed to save settings",
