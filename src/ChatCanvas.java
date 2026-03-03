@@ -620,16 +620,20 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 				} else if (i == l - 1) {
 					lastMsgId = id;
 				}
+				int a = 0;
 				do {
 					try {
 						safeAdd(thread, new UIMessage(message, this),
 								this.messageId != 0 ? (messageId == id)
 								: (i == 0 ? ((endReached && dir == 0) || dir == -1) : (i == l - 1 && dir == 1)));
+						break;
 					} catch (OutOfMemoryError e) {
 						MP.gc();
-						// continue;
+						if (a++ == 0) continue;
+						MP.display(MP.errorAlert(MP.L[LNotEnoughMemory_Alert]), this);
+						return;
 					}
-				} while (false);
+				} while (true);
 			}
 
 			if (l == limit && j.has("count")) {
@@ -773,15 +777,6 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			h -= keyboard.paint(g, w, h);
 		}
 		g.setClip(0, 0, w, h);
-
-//		if (loading) {
-//			g.setColor(colors[COLOR_CHAT_BG]);
-//			g.fillRect(0, 0, w, h);
-//			g.setColor(colors[COLOR_CHAT_FG]);
-//			g.setFont(MP.medPlainFont);
-//			g.drawString(MP.L[LLoading], w >> 1, h >> 1, Graphics.TOP | Graphics.HCENTER);
-//			return;
-//		}
 
 		int contentHeight = this.contentHeight;
 
@@ -2022,7 +2017,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 					MP.midlet.commandAction(MP.sendStickerCmd, this);
 					break;
 				case LWriteMessage:
-					if (replyMsgId != 0 || editMsgId != 0) {
+					if (replyMsgId != 0 || editMsgId != 0 || topMsgId != 0) {
 						int r = Math.max(replyMsgId, topMsgId);
 						MP.display(MP.writeForm(id, r == 0 ? null : Integer.toString(r), text, editMsgId == 0 ? null : Integer.toString(editMsgId), null, null));
 						resetInput();
@@ -2480,6 +2475,7 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 	}
 
 	private void send() {
+		if (!canWrite || !hasInput) return;
 		if (!touch && !inputFocused) {
 			focusInput();
 		} else if ((text != null && text.trim().length() != 0) || file != null || forwardMsgs != null || forwardMsg != null) {
@@ -2498,11 +2494,10 @@ public class ChatCanvas extends Canvas implements MPChat, LangConstants, Runnabl
 			}
 		} else {
 			showMenu(null, new int[] {
-					LSendSticker,
 //#ifndef NO_FILE
 					LAttachFile,
 //#endif
-					LWriteMessage
+					LSendSticker,
 			});
 		}
 	}

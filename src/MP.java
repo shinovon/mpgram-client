@@ -305,6 +305,7 @@ public class MP extends MIDlet
 	static Command pinMsgCmd;
 	static Command postCommentsCmd;
 	static Command removeStickerPackCmd;
+	static Command shareStickerPackCmd;
 
 	static Command richTextLinkCmd;
 	static Command openImageCmd;
@@ -835,6 +836,7 @@ public class MP extends MIDlet
 		pinMsgCmd = new Command(L[LPin], Command.ITEM, 10);
 		postCommentsCmd = new Command(L[LComments], Command.ITEM, 1);
 		removeStickerPackCmd = new Command(L[LRemove], Command.ITEM, 1);
+		shareStickerPackCmd = new Command(L[LShare], Command.ITEM, 1);
 
 		richTextLinkCmd = new Command(L[LLink_Cmd], Command.ITEM, 1);
 		openImageCmd = new Command(L[LViewImage], Command.ITEM, 1);
@@ -1967,7 +1969,7 @@ public class MP extends MIDlet
 						}
 						check = true;
 					}
-//#endif /* NO_NOTIFY */
+//#endif
 				}
 			} catch (Exception ignored) {}
 			break;
@@ -2276,8 +2278,13 @@ public class MP extends MIDlet
 			display(errorAlert(error), current);
 			break;
 		}
-//#endif /* NO_FILE */
+//#endif
 		case RUN_LOGOUT: {
+			if (user != null && selfId != null) {
+				try {
+					MP.api("logout");
+				} catch (Throwable ignored) {}
+			}
 			userState = 0;
 			user = null;
 			phone = null;
@@ -2377,14 +2384,14 @@ public class MP extends MIDlet
 						p = Manager.createPlayer(fileUrl);
 					}
 				} else
-//#endif /* NO_FILE */
+//#endif
 				{ // stream
 					int method = playerCreateMethod;
 					if (method == 0) { // auto
 						if (series40) {
 							try {
 								Class.forName("com.sun.mmedia.protocol.CommonDS");
-								// s40v1 uses sun impl for media and i/o so it should work fine
+								// s40v1 uses sun impl for media and i/o, so it should work fine
 								method = 1;
 							} catch (Exception e) {
 								// s40v2+ breaks http locator parsing
@@ -2478,6 +2485,8 @@ public class MP extends MIDlet
 				try {
 					String[] s = RecordStore.listRecordStores();
 					for (int i = 0; i < s.length; ++i) {
+						if (AUTH_RECORD_NAME.equals(s[i])) continue;
+
 						try {
 							RecordStore.deleteRecordStore(s[i]);
 						} catch (Exception ignored) {}
@@ -2653,7 +2662,7 @@ public class MP extends MIDlet
 			}
 		}
 	}
-//#endif /* NO_NOTIFY */
+//#endif
 
 	void start(int i, Object param) {
 		try {
@@ -2921,24 +2930,6 @@ public class MP extends MIDlet
 					start(RUN_VALIDATE_AUTH, user);
 					return;
 				}
-//				instanceUrl = instanceField.getString();
-//				if ((instancePassword = instancePasswordField.getString()).length() == 0) {
-//					instancePassword = null;
-//				}
-//
-//				if (instanceUrl == null || instanceUrl.length() < 6 || !instanceUrl.startsWith("http")) {
-//					display(errorAlert(L[LInvalidInstance_Alert]), null);
-//					return;
-//				}
-//				writeAuth();
-//
-//				Alert a = new Alert("", L[LChooseAuthMethod], null, null);
-//				a.addCommand(authImportSessionCmd);
-//				a.addCommand(authNewSessionCmd);
-//				a.setCommandListener(this);
-//
-//				display(a, null);
-//				return;
 			}
 			if (c == authImportSessionCmd || c == authNewSessionCmd || c == authQrCmd) {
 				// set instance password
@@ -3099,7 +3090,7 @@ public class MP extends MIDlet
 					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(s);
 //#endif
-//#endif /* NO_CHAT_CANVAS */
+//#endif
 
 					uiChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
 							L[LReversedChat],
@@ -3211,7 +3202,7 @@ public class MP extends MIDlet
 					pushBgIntervalGauge = new Gauge(L[LPushBackgroundInterval], true, 120, (int) (pushBgInterval / 1000));
 					pushBgIntervalGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(pushBgIntervalGauge);
-//#endif /* NO_NOTIFY */
+//#endif
 
 					// behaviour
 
@@ -3531,7 +3522,7 @@ public class MP extends MIDlet
 			if (c == logoutCmd) {
 				if (userState == 0) return;
 
-				MP.confirm(RUN_LOGOUT,
+				MP.confirm(RUN_LOGOUT | 0x100,
 						null,
 						null,
 						L[LLogout_Alert]);
@@ -3629,7 +3620,7 @@ public class MP extends MIDlet
 				return;
 			}
 //#endif
-//#endif /* NO_CHAT_CANVAS */
+//#endif
 		}
 		{ // write form commands
 			if (c == sendCmd) {
@@ -3698,6 +3689,16 @@ public class MP extends MIDlet
 
 			JSONObject set = ((StickerPacksList) d).sets.getObject(i);
 			confirm(RUN_UNINSTALL_STICKER_SET | 0x100, set, null, MP.localizeFormatted(LRemove_Alert, set.getString("title")));
+			return;
+		}
+		if (c == shareStickerPackCmd) {
+			int i = ((List) d).getSelectedIndex();
+			if (i == -1) return;
+
+			JSONObject set = ((StickerPacksList) d).sets.getObject(i);
+			if (set.has("short_name")) {
+				copy(set.getString("title"), "https://t.me/addstickers/" + set.getString("short_name"));
+			}
 			return;
 		}
 		if (c == aboutCmd) {
@@ -3913,7 +3914,7 @@ public class MP extends MIDlet
 				}
 			}
 			needWriteConfig = true;
-//#endif /* NO_FILE */
+//#endif
 			return;
 		}
 //#ifndef NO_FILE
@@ -4272,7 +4273,7 @@ public class MP extends MIDlet
 			try {
 				url = (String) ((MPForm) current).urls.get(item);
 			} catch (Exception ignored) {}
-			if (url == null) url = ((StringItem) item).getText();
+			if (url == null) url = ((StringItem) item).getText().trim();
 
 			openUrl(url, true);
 			return;
@@ -4806,9 +4807,6 @@ public class MP extends MIDlet
 		s.setItemCommandListener(midlet);
 		f.append(s);
 
-//		t = new TextField("File", "file:///", 300, TextField.ANY);
-//		f.append(fileField = t);
-
 		f.append(sendChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
 				L[LSendUncompressed],
 				L[LHideWithSpoiler]
@@ -4898,7 +4896,7 @@ public class MP extends MIDlet
 			e.printStackTrace();
 		}
 	}
-//#endif /* NO_FILE */
+//#endif
 
 	static void openChat(String id, int msg) {
 		Displayable d = MP.current;
@@ -5768,7 +5766,7 @@ public class MP extends MIDlet
 			} catch (IOException e) {}
 		}
 	}
-//#endif /* NO_FILE */
+//#endif
 
 	private static Object readResponse(InputStream in, HttpConnection hc, int c, String url) throws IOException {
 		Object res;
@@ -5907,8 +5905,9 @@ public class MP extends MIDlet
 		if (blackberry && blackberryNetwork == 1) {
 			url = url.concat(";deviceside=true;interface=wifi");
 		}
-		boolean u = (url.indexOf("method=updates") != -1 || url.indexOf("method=notifications") != -1
-				|| url.indexOf(OTA_URL) != -1);
+		boolean u = url.indexOf("method=updates") != -1
+				|| url.indexOf("method=notifications") != -1
+				|| url.indexOf(OTA_URL) != -1;
 		HttpConnection hc = (HttpConnection) Connector.open(url, Connector.READ_WRITE, u);
 		hc.setRequestProperty("User-Agent", "mpgram4/".concat(version).concat(" (https://github.com/shinovon/mpgram-client)"));
 //#ifndef NO_ZIP
@@ -6067,7 +6066,7 @@ public class MP extends MIDlet
 			} catch (Exception ignored) {} // TODO: should I left it ignored?
 		}
 	}
-//#endif /* NO_FILE */
+//#endif
 
 	// endregion
 
@@ -6937,7 +6936,7 @@ public class MP extends MIDlet
 	}
 
 	// endregion
-//#endif /* NO_AVATARS */
+//#endif
 
 	// region JSON
 

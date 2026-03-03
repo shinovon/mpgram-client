@@ -478,7 +478,7 @@ public class JSONArray {
 	public void copyInto(Object[] arr, int offset, int length) {
 		int i = offset;
 		int j = 0;
-		while(i < arr.length && j < length && j < size()) {
+		while (i < arr.length && j < length && j < size()) {
 			arr[i++] = get(j++);
 		}
 	}
