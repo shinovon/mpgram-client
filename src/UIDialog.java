@@ -66,7 +66,7 @@ public class UIDialog extends UIItem implements LangConstants {
 
 		if (!peer.getBoolean("c", false)) {
 			if (msg.getBoolean("out", false) && !id.equals(MP.selfId)) {
-				sender = MP.L[LYou_Prefix];
+				sender = MP.L[LYou];
 			} else if (id.charAt(0) == '-' && msg.has("from_id")) {
 				sender = MP.getName(msg.getString("from_id"), true);
 			}
