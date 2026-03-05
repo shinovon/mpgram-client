@@ -554,6 +554,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			g.fillRect(0, 0, w, th);
 			g.setColor(colors[COLOR_CHAT_PANEL_BORDER]);
 			g.drawLine(0, th, w, th);
+			if (h > 240) g.drawLine(0, th - 1, w, th - 1);
 
 			int tx = 4;
 			int tw = w - 8;

@@ -1,13 +1,56 @@
+/*
+Copyright (c) 2026 Arman Jussupgaliyev
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+//#ifndef NO_CHAT_CANVAS
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
-public class UIDialog extends UIItem {
+public class UIDialog extends UIItem implements LangConstants {
+
+	static final int COLOR_CHATS_ITEM_HIGHLIGHT_BG = 41;
+	static final int COLOR_CHATS_ITEM_HIGHLIGHT_FG = 42;
+	static final int COLOR_CHATS_ITEM_TITLE = 43;
+	static final int COLOR_CHATS_ITEM_TEXT = 44;
+	static final int COLOR_CHATS_ITEM_MEDIA = 45;
+	static final int COLOR_CHATS_ITEM_SEPARATOR = 46;
 
 	String id;
-	Image image;
-	String name;
+	String title;
+	String time;
 	String text;
+	String sender;
+	boolean media;
+
+	String titleRender;
+	String textRender;
+	String senderRender;
+	int timeWidth;
+	int senderWidth;
+	
+	Image image;
+	boolean enableImage;
+	int imageWidth;
+
+	Font font;
 
 	UIDialog(JSONObject dialog) {
 		focusable = true;
@@ -15,30 +58,91 @@ public class UIDialog extends UIItem {
 		id = dialog.getString("id");
 
 		JSONObject peer = MP.getPeer(id, false);
-		name = MP.getName(peer, false);
+		title = MP.getName(peer, false);
 
-		StringBuffer sb = new StringBuffer();
-		MP.appendDialog(sb, peer, id, dialog.getObject("msg", null));
+		JSONObject msg = dialog.getObject("msg", null);
 
-		text = sb.toString();
+		time = MP.localizeDate(msg.getLong("date"), 2);
+
+		if (!peer.getBoolean("c", false)) {
+			if (msg.getBoolean("out", false) && !id.equals(MP.selfId)) {
+				sender = MP.L[LYou_Prefix];
+			} else if (id.charAt(0) == '-' && msg.has("from_id")) {
+				sender = MP.getName(msg.getString("from_id"), true);
+			}
+		}
+		
+		enableImage = MP.loadAvatars;
+
+		if (msg.has("media")) {
+			media = true;
+			text = MP.L[LMedia];
+		} else if (msg.has("fwd")) {
+			media = true;
+			text = MP.L[LForwardedMessage];
+		} else if (msg.has("act")) {
+			media = true;
+			text = MP.L[LAction];
+		} else {
+			text = msg.getString("text");
+		}
 	}
 
 	void paint(Graphics g, int x, int y, int w) {
 		int h = contentHeight;
 		if (focus) {
-			g.setColor(ChatCanvas.colors[ChatsCanvas.COLOR_CHATS_ITEM_HIGHLIGHT_BG]);
+			g.setColor(ChatCanvas.colors[COLOR_CHATS_ITEM_HIGHLIGHT_BG]);
 			g.fillRect(0, y, w, h);
+			g.setColor(ChatCanvas.colors[COLOR_CHATS_ITEM_HIGHLIGHT_FG]);
 		}
 
-		Font font = MP.chatsListFontSize < 2 ? MP.smallPlainFont : MP.medPlainFont;
 		int fontHeight = font.getHeight();
 		g.setFont(font);
 
-		g.setColor(ChatCanvas.colors[ChatsCanvas.COLOR_CHATS_ITEM_TITLE]);
-		g.drawString(name, x, y + 2, 0);
+		int tx = 4;
+		
+		if (enableImage) {
+			if (image != null) g.drawImage(image, x + tx, y + ((h - imageWidth) >> 1), 0);
+			tx += imageWidth + 4;
+		}
 
-		g.setColor(ChatCanvas.colors[ChatsCanvas.COLOR_CHATS_ITEM_TEXT]);
-		g.drawString(text, x, y + fontHeight + 4, 0);
+		if (title != null) {
+			String title = titleRender;
+			if (title == null) {
+				titleRender = title = UILabel.ellipsis(this.title, font, w - 8 - tx - timeWidth);
+			}
+			if (!focus) g.setColor(ChatCanvas.colors[COLOR_CHATS_ITEM_TITLE]);
+			g.drawString(title, x + tx, y + 2, 0);
+		}
+		if (time != null) {
+			if (!focus) g.setColor(ChatCanvas.colors[COLOR_CHATS_ITEM_TEXT]);
+			g.drawString(time, w - timeWidth - 6, y + 2, 0);
+		}
+
+		if (sender != null) {
+			String sender = senderRender;
+			if (sender == null) {
+				senderRender = sender = UILabel.ellipsis(this.sender, font, (w - tx) >> 1).concat(": ");
+				senderWidth = font.stringWidth(sender);
+			}
+			if (!focus) g.setColor(ChatCanvas.colors[COLOR_CHATS_ITEM_MEDIA]);
+			g.drawString(sender, x + tx, y + fontHeight + 4, 0);
+			tx += senderWidth;
+		}
+
+		if (text != null) {
+			String text = textRender;
+			if (text == null) {
+				textRender = text = UILabel.ellipsis(this.text, font, w - tx - 4);
+			}
+			if (!focus) g.setColor(ChatCanvas.colors[media ? COLOR_CHATS_ITEM_MEDIA : COLOR_CHATS_ITEM_TEXT]);
+			g.drawString(text, x + tx, y + fontHeight + 4, 0);
+		}
+
+		if (next != null && !focus) {
+			g.setColor(ChatCanvas.colors[COLOR_CHATS_ITEM_SEPARATOR]);
+			g.drawLine(x, y + contentHeight, w, y + contentHeight);
+		}
 	}
 
 	public synchronized int layout(int width) {
@@ -47,11 +151,16 @@ public class UIDialog extends UIItem {
 		}
 		contentWidth = layoutWidth = width;
 
-		Font font = MP.chatsListFontSize < 2 ? MP.smallPlainFont : MP.medPlainFont;
+		titleRender = null;
+		textRender = null;
+
+		font = MP.chatsListFontSize < 2 ? MP.smallPlainFont : MP.medPlainFont;
 		int fontHeight = font.getHeight();
 
-		if (MP.chatAvatar) {
-			MP.avatarSize = fontHeight * 2;
+		timeWidth = font.stringWidth(time);
+
+		if (enableImage) {
+			MP.avatarSize = imageWidth = fontHeight * 2;
 		}
 		return contentHeight = (fontHeight + 4) * 2;
 	}
@@ -66,3 +175,4 @@ public class UIDialog extends UIItem {
 	}
 
 }
+//#endif

@@ -99,8 +99,8 @@ public class UIItem {
 		
 		if (container instanceof UIItem) {
 			((UIItem) container).requestLayout();
-		} else if (container instanceof ChatCanvas) {
-			((ChatCanvas) container).requestLayout(this);
+		} else if (container instanceof MPCanvas) {
+			((MPCanvas) container).requestLayout(this);
 		}
 	}
 
@@ -113,8 +113,8 @@ public class UIItem {
 		
 		if (container instanceof UIItem) {
 			((UIItem) container).requestPaint();
-		} else if (container instanceof ChatCanvas) {
-			((ChatCanvas) container).requestPaint(this);
+		} else if (container instanceof MPCanvas) {
+			((MPCanvas) container).requestPaint(this);
 		}
 	}
 

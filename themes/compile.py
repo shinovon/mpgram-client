@@ -41,9 +41,11 @@ enum_colors = {
 
     "CHATS_BG": 40,
     "CHATS_ITEM_HIGHLIGHT_BG": 41,
-    "CHATS_ITEM_TITLE": 42,
-    "CHATS_ITEM_TEXT": 43,
-    "CHATS_ITEM_MEDIA": 44
+    "CHATS_ITEM_HIGHLIGHT_FG": 42,
+    "CHATS_ITEM_TITLE": 43,
+    "CHATS_ITEM_TEXT": 44,
+    "CHATS_ITEM_MEDIA": 45,
+    "CHATS_ITEM_SEPARATOR": 46
 }
 
 enum_style = {

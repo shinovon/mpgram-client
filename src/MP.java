@@ -677,7 +677,7 @@ public class MP extends MIDlet
 			reverseChat = j.getBoolean("reverseChat", reverseChat);
 //#ifndef NO_AVATARS
 			loadAvatars = j.getBoolean("loadAvatars", loadAvatars);
-			avatarSize = j.getInt("avatarSize", avatarSize);
+//			avatarSize = j.getInt("avatarSize", avatarSize);
 //#endif
 			showMedia = j.getBoolean("showMedia", showMedia);
 			photoSize = j.getInt("photoSize", photoSize);
@@ -905,6 +905,12 @@ public class MP extends MIDlet
 
 		// load resources
 //#ifndef NO_AVATARS
+//#ifndef NO_CHAT_CANVAS
+		if (!legacyChatUI) {
+			Font font = MP.chatsListFontSize < 2 ? MP.smallPlainFont : MP.medPlainFont;
+			avatarSize = font.getHeight() * 2;
+		}
+//#endif
 		if (loadAvatars) {
 			try {
 				userDefaultImg = resize(Image.createImage("/us.png"), avatarSize, avatarSize);
@@ -915,13 +921,6 @@ public class MP extends MIDlet
 				}
 			} catch (Throwable ignored) {}
 		}
-
-//#ifndef NO_CHAT_CANVAS
-		if (!legacyChatUI) {
-			Font font = MP.chatsListFontSize < 2 ? MP.smallPlainFont : MP.medPlainFont;
-			avatarSize = font.getHeight() * 2;
-		}
-//#endif
 //#endif
 
 		// start image loader threads
@@ -3991,8 +3990,8 @@ public class MP extends MIDlet
 				return;
 			}
 //#ifndef NO_CHAT_CANVAS
-			if (d instanceof ChatCanvas) {
-				((ChatCanvas) d).cancel();
+			if (d instanceof MPCanvas) {
+				((MPCanvas) d).cancel();
 				start(RUN_LOAD_FORM, d);
 				return;
 			}
@@ -4602,6 +4601,11 @@ public class MP extends MIDlet
 			((ChatCanvas) target).photo = img;
 			((ChatCanvas) target).photoHeight = img.getHeight();
 			((ChatCanvas) target).queueRepaint();
+			return;
+		}
+		if (target instanceof UIDialog) {
+			((UIDialog) target).image = img;
+			((UIDialog) target).requestPaint();
 			return;
 		}
 //#endif
@@ -6420,7 +6424,7 @@ public class MP extends MIDlet
 		j.put("reverseChat", reverseChat);
 //#ifndef NO_AVATARS
 		j.put("loadAvatars", loadAvatars);
-		j.put("avatarSize", avatarSize);
+//		j.put("avatarSize", avatarSize);
 //#endif
 		j.put("showMedia", showMedia);
 		j.put("photoSize", photoSize);

@@ -19,6 +19,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+//#ifndef NO_CHAT_CANVAS
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
@@ -101,6 +102,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 	int menuScroll;
 	int menuScrollTarget = -1;
 	boolean menuFitsOnScreen;
+	int menuItemHeight;
 
 	// pointer
 	int pressX, pressY, pointerX, pointerY;
@@ -163,10 +165,12 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 				colors[UIMessage.COLOR_ACTION_BG] = 0x1E2C3A;
 
 				colors[ChatsCanvas.COLOR_CHATS_BG] = 0x0E1621;
-				colors[ChatsCanvas.COLOR_CHATS_ITEM_HIGHLIGHT_BG] = 0x1A3756;
-				colors[ChatsCanvas.COLOR_CHATS_ITEM_TITLE] = 0xF5F5F5;
-				colors[ChatsCanvas.COLOR_CHATS_ITEM_TEXT] = 0x7F91A4;
-				colors[ChatsCanvas.COLOR_CHATS_ITEM_MEDIA] = 0x73B9F5;
+				colors[UIDialog.COLOR_CHATS_ITEM_HIGHLIGHT_BG] = 0x1A3756;
+				colors[UIDialog.COLOR_CHATS_ITEM_HIGHLIGHT_FG] = 0xF5F5F5;
+				colors[UIDialog.COLOR_CHATS_ITEM_TITLE] = 0xF5F5F5;
+				colors[UIDialog.COLOR_CHATS_ITEM_TEXT] = 0x7F91A4;
+				colors[UIDialog.COLOR_CHATS_ITEM_MEDIA] = 0x73B9F5;
+				colors[UIDialog.COLOR_CHATS_ITEM_SEPARATOR] = 0x0A121B;
 
 				style[UIMessage.STYLE_MESSAGE_FILL] = 1;
 				style[UIMessage.STYLE_MESSAGE_ROUND] = 1;
@@ -254,6 +258,8 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 			count = 0;
 			firstItem = lastItem = null;
 			scrollCurrentItem = scrollTargetItem = focusedItem = null;
+			kineticScroll = scroll = 0;
+			
 			loadInternal(thread);
 			MP.display(this);
 			queueRepaint();
@@ -492,15 +498,16 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 			if (menu != null) {
 				int[] menu = this.menu;
 				g.setFont(MP.medPlainFont);
+				int menuItemHeight = this.menuItemHeight;
 				for (int i = 0; i < menu.length; i++) {
 					if (menu[i] == Integer.MIN_VALUE) break;
 					if (i == menuCurrent && (!touch || menuCurrent != -1)) {
 						g.setColor(colors[COLOR_CHAT_MENU_HIGHLIGHT_BG]);
-						g.fillRect(0, my, w, MP.medPlainFontHeight + 8);
+						g.fillRect(0, my, w, menuItemHeight);
 					}
 					g.setColor(colors[COLOR_CHAT_MENU_FG]);
-					g.drawString(MP.L[menu[i]], 4, my + 4, 0);
-					my += MP.medPlainFontHeight + 8;
+					g.drawString(MP.L[menu[i]], 4, my + ((menuItemHeight - MP.medPlainFontHeight) >> 1), 0);
+					my += menuItemHeight;
 //					g.setColor(0x232F39);
 //					g.drawLine(0, my, w, my);
 				}
@@ -785,7 +792,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 					if (!menuFitsOnScreen) {
 						menuScrollTarget = menuHeight - height;
 					}
-				} else if (!menuFitsOnScreen && menuCurrent * (MP.medPlainFontHeight + 8) - menuScroll < 30) {
+				} else if (!menuFitsOnScreen && menuCurrent * (menuItemHeight) - menuScroll < 30) {
 					menuScrollTarget = menuScroll - height / 5;
 				}
 				repaint = true;
@@ -795,7 +802,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 					if (!menuFitsOnScreen) {
 						menuScrollTarget = 0;
 					}
-				} else if (!menuFitsOnScreen && menuCurrent * (MP.medPlainFontHeight + 8) - menuScroll > height - 30) {
+				} else if (!menuFitsOnScreen && menuCurrent * (menuItemHeight) - menuScroll > height - 30) {
 					menuScrollTarget = menuScroll + height / 5;
 				}
 				repaint = true;
@@ -1014,7 +1021,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 								closeMenu();
 								queueRepaint();
 							} else if (!longTap && now - pressTime < 300 && menuAnimTarget == -1) {
-								doMenuAction((y - my) / (MP.medPlainFontHeight + 8));
+								doMenuAction((y - my) / menuItemHeight);
 							}
 						} else if (pointedItem != null && pointedItem.focusable) {
 							focusItem(pointedItem, 0);
@@ -1105,13 +1112,14 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 			}
 		}
 		menuCount = len;
-		int h = (MP.medPlainFontHeight + 8) * len;
+		menuItemHeight = MP.medPlainFontHeight + (touch ? 16 : 8);
+		int h = menuItemHeight * len;
 		if (touch && h >= height - 20) {
 			this.menu = new int[len + 1];
 			System.arraycopy(menu, 0, this.menu, 0, len);
 			this.menu[len] = LBack;
 			menuCount++;
-			h += MP.medPlainFontHeight + 8;
+			h += menuItemHeight;
 		}
 		menuHeight = h;
 		menuFitsOnScreen = h <= height;
@@ -1341,3 +1349,4 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 	abstract void loadInternal(Thread thread) throws Exception;
 
 }
+//#endif
