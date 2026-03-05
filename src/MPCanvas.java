@@ -25,26 +25,16 @@ import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.TextField;
 import java.io.DataInputStream;
 
-abstract class UICanvas extends Canvas implements LangConstants {
+abstract class MPCanvas extends Canvas implements LangConstants {
 
-	// colors enum
 	static final int COLOR_CHAT_BG = 0;
 	static final int COLOR_CHAT_FG = 1;
-	static final int COLOR_CHAT_HIGHLIGHT_BG = 2;
-	static final int COLOR_CHAT_PANEL_BG = 3;
-	static final int COLOR_CHAT_PANEL_FG = 4;
-	static final int COLOR_CHAT_PANEL_BORDER = 5;
+
 	static final int COLOR_CHAT_MENU_BG = 6;
 	static final int COLOR_CHAT_MENU_HIGHLIGHT_BG = 7;
 	static final int COLOR_CHAT_MENU_FG = 8;
-	static final int COLOR_CHAT_STATUS_FG = 9;
-	static final int COLOR_CHAT_STATUS_HIGHLIGHT_FG = 10;
-	static final int COLOR_CHAT_POINTER_HOLD = 11;
-	static final int COLOR_CHAT_INPUT_ICON = 12;
-	static final int COLOR_CHAT_SEND_ICON = 13;
-	static final int COLOR_CHAT_INPUT_BORDER = 14;
 
-	static int[] colors = new int[40];
+	static int[] colors = new int[50];
 	static int[] colorsCopy;
 	static int[] style = new int[20];
 	static boolean bg;
@@ -126,12 +116,12 @@ abstract class UICanvas extends Canvas implements LangConstants {
 
 	final boolean touch = !MP.forceKeyUI && hasPointerEvents();
 
-	UICanvas() {
+	MPCanvas() {
 		if (colorsCopy == null) {
 			try {
 				DataInputStream d = new DataInputStream(getClass().getResourceAsStream("/c/".concat(MP.theme)));
 				d.readUTF();
-				for (int i = 0; i < 40; ++i) {
+				for (int i = 0; i < 50; ++i) {
 					colors[i] = d.readInt();
 				}
 				for (int i = 0; i < 20; ++i) {
@@ -139,21 +129,21 @@ abstract class UICanvas extends Canvas implements LangConstants {
 				}
 				d.close();
 			} catch (Exception e) {
-				colors[COLOR_CHAT_BG] = 0x0E1621;
-				colors[COLOR_CHAT_FG] = 0xFFFFFF;
-				colors[COLOR_CHAT_HIGHLIGHT_BG] = 0x1A3756;
-				colors[COLOR_CHAT_PANEL_BG] = 0x17212B;
-				colors[COLOR_CHAT_PANEL_FG] = 0xFFFFFF;
-				colors[COLOR_CHAT_PANEL_BORDER] = 0x0A121B;
-				colors[COLOR_CHAT_MENU_BG] = 0x17212B;
-				colors[COLOR_CHAT_MENU_HIGHLIGHT_BG] = 0x232E3C;
-				colors[COLOR_CHAT_MENU_FG] = 0xFFFFFF;
-				colors[COLOR_CHAT_STATUS_FG] = 0x708499;
-				colors[COLOR_CHAT_STATUS_HIGHLIGHT_FG] = 0x73B9F5;
-				colors[COLOR_CHAT_POINTER_HOLD] = 0xFFFFFF;
-				colors[COLOR_CHAT_INPUT_ICON] = 0x6A7580;
-				colors[COLOR_CHAT_SEND_ICON] = 0x5288C1;
-				colors[COLOR_CHAT_INPUT_BORDER] = 0x01C272D;
+				colors[ChatCanvas.COLOR_CHAT_BG] = 0x0E1621;
+				colors[ChatCanvas.COLOR_CHAT_FG] = 0xFFFFFF;
+				colors[ChatCanvas.COLOR_CHAT_HIGHLIGHT_BG] = 0x1A3756;
+				colors[ChatCanvas.COLOR_CHAT_PANEL_BG] = 0x17212B;
+				colors[ChatCanvas.COLOR_CHAT_PANEL_FG] = 0xFFFFFF;
+				colors[ChatCanvas.COLOR_CHAT_PANEL_BORDER] = 0x0A121B;
+				colors[ChatCanvas.COLOR_CHAT_MENU_BG] = 0x17212B;
+				colors[ChatCanvas.COLOR_CHAT_MENU_HIGHLIGHT_BG] = 0x232E3C;
+				colors[ChatCanvas.COLOR_CHAT_MENU_FG] = 0xFFFFFF;
+				colors[ChatCanvas.COLOR_CHAT_STATUS_FG] = 0x708499;
+				colors[ChatCanvas.COLOR_CHAT_STATUS_HIGHLIGHT_FG] = 0x73B9F5;
+				colors[ChatCanvas.COLOR_CHAT_POINTER_HOLD] = 0xFFFFFF;
+				colors[ChatCanvas.COLOR_CHAT_INPUT_ICON] = 0x6A7580;
+				colors[ChatCanvas.COLOR_CHAT_SEND_ICON] = 0x5288C1;
+				colors[ChatCanvas.COLOR_CHAT_INPUT_BORDER] = 0x01C272D;
 
 				colors[UIMessage.COLOR_MESSAGE_BG] = 0x182533;
 				colors[UIMessage.COLOR_MESSAGE_OUT_BG] = 0x2B5278;
@@ -171,6 +161,12 @@ abstract class UICanvas extends Canvas implements LangConstants {
 				colors[UIMessage.COLOR_MESSAGE_TIME] = 0x6D7F8F;
 				colors[UIMessage.COLOR_MESSAGE_OUT_TIME] = 0x7DA8D3;
 				colors[UIMessage.COLOR_ACTION_BG] = 0x1E2C3A;
+
+				colors[ChatsCanvas.COLOR_CHATS_BG] = 0x0E1621;
+				colors[ChatsCanvas.COLOR_CHATS_ITEM_HIGHLIGHT_BG] = 0x1A3756;
+				colors[ChatsCanvas.COLOR_CHATS_ITEM_TITLE] = 0xF5F5F5;
+				colors[ChatsCanvas.COLOR_CHATS_ITEM_TEXT] = 0x7F91A4;
+				colors[ChatsCanvas.COLOR_CHATS_ITEM_MEDIA] = 0x73B9F5;
 
 				style[UIMessage.STYLE_MESSAGE_FILL] = 1;
 				style[UIMessage.STYLE_MESSAGE_ROUND] = 1;
@@ -230,9 +226,9 @@ abstract class UICanvas extends Canvas implements LangConstants {
 					// do not use multiline in j2mekeyboard as it's too broken
 					keyboard = Keyboard.getKeyboard(this, false, getWidth(), getHeight());
 
-					keyboard.setTextColor(colors[COLOR_CHAT_PANEL_FG]);
-					keyboard.setTextHintColor(colors[COLOR_CHAT_INPUT_ICON]);
-					keyboard.setCaretColor(colors[COLOR_CHAT_PANEL_FG]);
+					keyboard.setTextColor(colors[ChatCanvas.COLOR_CHAT_PANEL_FG]);
+					keyboard.setTextHintColor(colors[ChatCanvas.COLOR_CHAT_INPUT_ICON]);
+					keyboard.setCaretColor(colors[ChatCanvas.COLOR_CHAT_PANEL_FG]);
 					keyboard.setTextHint(MP.L[LTextField_Hint]);
 					keyboard.setLanguages(MP.inputLanguages);
 				} else {
@@ -428,7 +424,7 @@ abstract class UICanvas extends Canvas implements LangConstants {
 
 		if (!skipRender || !menuFocused) {
 			// background
-			g.setColor(colors[COLOR_CHAT_BG]);
+			g.setColor(colors[ChatCanvas.COLOR_CHAT_BG]);
 			g.fillRect(0, 0, w, h);
 			if (bgImg != null) {
 				g.drawImage(bgImg, (w - bgWidth) >> 1, (h - bgHeight) >> 1, 0);
@@ -593,11 +589,11 @@ abstract class UICanvas extends Canvas implements LangConstants {
 	}
 
 	boolean isVisible(UIItem item) {
-		return item.y + item.contentHeight > scroll && item.y < scroll + clipHeight;
+		return item != null && item.y + item.contentHeight > scroll && item.y < scroll + clipHeight;
 	}
 
 	boolean isVisible(UIItem item, int offset) {
-		return item.y + item.contentHeight + offset > scroll && item.y < scroll + clipHeight - offset;
+		return item != null && item.y + item.contentHeight + offset > scroll && item.y < scroll + clipHeight - offset;
 	}
 
 	boolean isCornerVisible(UIItem item, int dir) {
@@ -693,17 +689,6 @@ abstract class UICanvas extends Canvas implements LangConstants {
 		return !MP.fastScrolling;
 	}
 
-	protected void keyRepeated(int key) {
-		// TODO own repeater thread
-		key(key, true);
-	}
-
-	protected void keyReleased(int key) {
-		if (keyboard != null && keyboard.isVisible() && keyboard.keyReleased(key)) {
-			// return;
-		}
-	}
-
 	private int mapGameAction(int key) {
 		switch (key) {
 		case -1:
@@ -731,6 +716,24 @@ abstract class UICanvas extends Canvas implements LangConstants {
 			return -7;
 		}
 		return key;
+	}
+
+	protected void keyPressed(int key) {
+		super.keyPressed(key);
+		key(key, false);
+	}
+
+	protected void keyRepeated(int key) {
+		super.keyRepeated(key);
+		// TODO own repeater thread
+		key(key, true);
+	}
+
+	protected void keyReleased(int key) {
+		super.keyReleased(key);
+		if (this instanceof ChatCanvas && keyboard != null && keyboard.isVisible() && keyboard.keyReleased(key)) {
+			// return;
+		}
 	}
 
 	void key(int key, boolean repeat) {
@@ -884,10 +887,6 @@ abstract class UICanvas extends Canvas implements LangConstants {
 		if (repaint) {
 			queueRepaint();
 		}
-	}
-
-	protected void keyPressed(int key) {
-		key(key, false);
 	}
 
 	protected void pointerPressed(int x, int y) {
@@ -1214,7 +1213,7 @@ abstract class UICanvas extends Canvas implements LangConstants {
 		}
 	}
 
-	void safeAdd(Thread thread, UIMessage item, boolean focus) {
+	void safeAdd(Thread thread, UIItem item, boolean focus) {
 		if (thread != this.thread) throw MP.cancelException;
 		add(item);
 		if (focus) {
@@ -1222,7 +1221,7 @@ abstract class UICanvas extends Canvas implements LangConstants {
 		}
 	}
 
-	void safeAddFirst(Thread thread, UIMessage item) {
+	void safeAddFirst(Thread thread, UIItem item) {
 		if (thread != this.thread) throw MP.cancelException;
 		addFirst(item);
 	}

@@ -20,12 +20,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 //#ifndef NO_CHAT_CANVAS
-import java.io.DataInputStream;
 import java.util.Hashtable;
 
 import javax.microedition.lcdui.*;
 
-public class ChatCanvas extends UICanvas implements MPChat, Runnable {
+public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
+
+	static final int COLOR_CHAT_HIGHLIGHT_BG = 2;
+	static final int COLOR_CHAT_PANEL_BG = 3;
+	static final int COLOR_CHAT_PANEL_FG = 4;
+	static final int COLOR_CHAT_PANEL_BORDER = 5;
+	static final int COLOR_CHAT_STATUS_FG = 9;
+	static final int COLOR_CHAT_STATUS_HIGHLIGHT_FG = 10;
+	static final int COLOR_CHAT_POINTER_HOLD = 11;
+	static final int COLOR_CHAT_INPUT_ICON = 12;
+	static final int COLOR_CHAT_SEND_ICON = 13;
+	static final int COLOR_CHAT_INPUT_BORDER = 14;
 
 //	static Image attachIcon;
 
@@ -1163,17 +1173,18 @@ public class ChatCanvas extends UICanvas implements MPChat, Runnable {
 		queueRepaint();
 	}
 
-	void safeAdd(Thread thread, UIMessage item, boolean focus) {
+	void safeAdd(Thread thread, UIItem item, boolean focus) {
 		super.safeAdd(thread, item, focus);
-		table.put(Integer.toString(item.id), item);
-		if (focus && (!endReached || firstMsgId != item.id)) {
-			focusedMessage = item.id;
+		UIMessage msg = (UIMessage) item;
+		table.put(Integer.toString(msg.id), item);
+		if (focus && (!endReached || firstMsgId != msg.id)) {
+			focusedMessage = msg.id;
 		}
 	}
 
-	void safeAddFirst(Thread thread, UIMessage item) {
+	void safeAddFirst(Thread thread, UIItem item) {
 		super.safeAddFirst(thread, item);
-		table.put(Integer.toString(item.id), item);
+		table.put(Integer.toString(((UIMessage) item).id), item);
 	}
 
 	void remove(UIItem item) {

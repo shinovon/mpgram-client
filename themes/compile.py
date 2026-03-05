@@ -19,7 +19,7 @@ enum_colors = {
     "CHAT_INPUT_ICON": 12,
     "CHAT_SEND_ICON": 13,
     "CHAT_INPUT_BORDER": 14,
-    
+
     "MESSAGE_BG": 20,
     "MESSAGE_OUT_BG": 21,
     "MESSAGE_FG": 22,
@@ -37,7 +37,13 @@ enum_colors = {
     "MESSAGE_OUT_TIME": 34,
     "ACTION_BG": 35,
     "MESSAGE_OUT_READ": 36,
-    "MESSAGE_VOICE_WAVEFORM": 37
+    "MESSAGE_VOICE_WAVEFORM": 37,
+
+    "CHATS_BG": 40,
+    "CHATS_ITEM_HIGHLIGHT_BG": 41,
+    "CHATS_ITEM_TITLE": 42,
+    "CHATS_ITEM_TEXT": 43,
+    "CHATS_ITEM_MEDIA": 44
 }
 
 enum_style = {
@@ -58,7 +64,7 @@ for n in listdir():
     with open(n, encoding="utf-8") as f:
         j = json.load(f)
     
-    theme = [0]*40
+    theme = [0]*50
     style = [0]*20
     name = j["name"]
     

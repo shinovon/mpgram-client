@@ -212,7 +212,7 @@ public class MP extends MIDlet
 	static boolean notifyAvas = true;
 	static int notificationVolume = 100;
 //#endif
-	static boolean globalUpdates;
+	static final boolean globalUpdates = false; // unused
 	static boolean longpoll = true;
 	static int playerVolume = 50;
 	static boolean voiceConversion;
@@ -371,7 +371,7 @@ public class MP extends MIDlet
 	// ui
 	private static Displayable mainDisplayable;
 	static Form loadingForm;
-	static ChatsList chatsList;
+	static Displayable chatsList;
 	static FoldersList foldersList;
 	private static Form settingsForm;
 	private static Form authForm;
@@ -915,6 +915,13 @@ public class MP extends MIDlet
 				}
 			} catch (Throwable ignored) {}
 		}
+
+//#ifndef NO_CHAT_CANVAS
+		if (!legacyChatUI) {
+			Font font = MP.chatsListFontSize < 2 ? MP.smallPlainFont : MP.medPlainFont;
+			avatarSize = font.getHeight() * 2;
+		}
+//#endif
 //#endif
 
 		// start image loader threads
@@ -1259,8 +1266,8 @@ public class MP extends MIDlet
 				((MPList) param).load();
 				break;
 			}
-			if (param instanceof MPChat) {
-				((MPChat) param).load();
+			if (param instanceof MPCanvas) {
+				((MPCanvas) param).load();
 				break;
 			}
 			((MPForm) param).load();
@@ -2589,24 +2596,32 @@ public class MP extends MIDlet
 				String title = sb.toString();
 
 				if (globalUpdates && chatsList != null) {
-					try {
-						synchronized (chatsList.lock) {
-							Vector ids = chatsList.ids;
-							int idx = ids.indexOf(peerId);
-							int newIdx;
-							if (idx != -1) {
-								ids.removeElementAt(idx);
-								Image img = chatsList.getImage(idx);
-								chatsList.delete(idx);
-								newIdx = Math.min(chatsList.size(), idx < chatsList.pinnedCount ? 0 : chatsList.pinnedCount);
+					if (chatsList instanceof ChatsList) {
+						ChatsList chatsList = (ChatsList) MP.chatsList;
+						try {
+							synchronized (chatsList.lock) {
+								Vector ids = chatsList.ids;
+								int idx = ids.indexOf(peerId);
+								int newIdx;
+								if (idx != -1) {
+									ids.removeElementAt(idx);
+									Image img = chatsList.getImage(idx);
+									chatsList.delete(idx);
+									newIdx = Math.min(chatsList.size(), idx < chatsList.pinnedCount ? 0 : chatsList.pinnedCount);
 
-								chatsList.insert(null, newIdx, sb.append('\n').append(text).toString(), peerId, img);
-								ids.insertElementAt(peerId, newIdx);
+									chatsList.insert(null, newIdx, sb.append('\n').append(text).toString(), peerId, img);
+									ids.insertElementAt(peerId, newIdx);
 //							} else {
 //								newIdx = Math.min(chatsList.size(), chatsList.pinnedCount);
+								}
 							}
-						}
-					} catch (Exception ignored) {}
+						} catch (Exception ignored) {}
+					}
+//#ifndef NO_CHAT_CANVAS
+					else {
+						// TODO
+					}
+//#endif
 				}
 
 				if (!paused && current instanceof MPChat && current.isShown() && peerId.equals(((MPChat) current).id())) {
@@ -2700,9 +2715,20 @@ public class MP extends MIDlet
 	// region UI Listeners
 
 	public void commandAction(Command c, Displayable d) {
-		if (d instanceof ChatsList) { // chats list commands
+		if (d instanceof ChatsList
+//#ifndef NO_CHAT_CANVAS
+				|| d instanceof ChatsCanvas
+//#endif
+		) { // chats list commands
 			if (c == archiveCmd) {
-				((ChatsList) d).changeFolder(1, L[LArchive]);
+//#ifndef NO_CHAT_CANVAS
+				if (d instanceof ChatCanvas) {
+					((ChatsCanvas) d).changeFolder(1, L[LArchive]);
+				} else
+//#endif
+				{
+					((ChatsList) d).changeFolder(1, L[LArchive]);
+				}
 				return;
 			}
 			if (c == foldersCmd) {
@@ -4753,8 +4779,16 @@ public class MP extends MIDlet
 
 	// region UI builders
 
-	static ChatsList mainChatsList() {
-		ChatsList l = chatsList = new ChatsList(L[Lmpgram], 0);
+	static Displayable mainChatsList() {
+		Displayable l;
+//#ifndef NO_CHAT_CANVAS
+		if (!legacyChatUI) {
+			l = chatsList = new ChatsCanvas(0);
+		} else
+//#endif
+		{
+			l = chatsList = new ChatsList(L[Lmpgram], 0);
+		}
 		if (symbian) {
 			l.addCommand(backCmd);
 		} else {

@@ -51,12 +51,26 @@ public class FoldersList extends MPList {
 	void select(int i) {
 		if (i == -1) return;
 		if (hasArchive && i == size() - 1) {
-			MP.chatsList.changeFolder(1, getString(i));
+			if (MP.chatsList instanceof ChatsList) {
+				((ChatsList) MP.chatsList).changeFolder(1, getString(i));
+			}
+//#ifndef NO_CHAT_CANVAS
+			else {
+				((ChatsCanvas) MP.chatsList).changeFolder(1, getString(i));
+			}
+//#endif
 			MP.midlet.commandAction(MP.backCmd, this);
 			return;
 		}
 		int folderId = folders == null ? 0 : folders.getObject(i).getInt("id", 0);
-		MP.chatsList.changeFolder(folderId, getString(i));
+		if (MP.chatsList instanceof ChatsList) {
+			((ChatsList) MP.chatsList).changeFolder(folderId, getString(i));
+		}
+//#ifndef NO_CHAT_CANVAS
+		else {
+			((ChatsCanvas) MP.chatsList).changeFolder(folderId, getString(i));
+		}
+//#endif
 		MP.midlet.commandAction(MP.backCmd, this);
 	}
 
