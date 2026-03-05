@@ -112,11 +112,11 @@ public class UIDialog extends UIItem implements LangConstants {
 				titleRender = title = UILabel.ellipsis(this.title, font, w - 8 - tx - timeWidth);
 			}
 			if (!focus) g.setColor(ChatCanvas.colors[COLOR_CHATS_ITEM_TITLE]);
-			g.drawString(title, x + tx, y + 2, 0);
+			g.drawString(title, x + tx, y + 4, 0);
 		}
 		if (time != null) {
 			if (!focus) g.setColor(ChatCanvas.colors[COLOR_CHATS_ITEM_TEXT]);
-			g.drawString(time, w - timeWidth - 6, y + 2, 0);
+			g.drawString(time, w - timeWidth - 6, y + 4, 0);
 		}
 
 		if (sender != null) {
@@ -126,7 +126,7 @@ public class UIDialog extends UIItem implements LangConstants {
 				senderWidth = font.stringWidth(sender);
 			}
 			if (!focus) g.setColor(ChatCanvas.colors[COLOR_CHATS_ITEM_MEDIA]);
-			g.drawString(sender, x + tx, y + fontHeight + 4, 0);
+			g.drawString(sender, x + tx, y + fontHeight + 8, 0);
 			tx += senderWidth;
 		}
 
@@ -136,12 +136,12 @@ public class UIDialog extends UIItem implements LangConstants {
 				textRender = text = UILabel.ellipsis(this.text, font, w - tx - 4);
 			}
 			if (!focus) g.setColor(ChatCanvas.colors[media ? COLOR_CHATS_ITEM_MEDIA : COLOR_CHATS_ITEM_TEXT]);
-			g.drawString(text, x + tx, y + fontHeight + 4, 0);
+			g.drawString(text, x + tx, y + fontHeight + 8, 0);
 		}
 
 		if (next != null && !focus) {
 			g.setColor(ChatCanvas.colors[COLOR_CHATS_ITEM_SEPARATOR]);
-			g.drawLine(x, y + contentHeight, w, y + contentHeight);
+			g.drawLine(x, y + h, w, y + h);
 		}
 	}
 
@@ -162,7 +162,7 @@ public class UIDialog extends UIItem implements LangConstants {
 		if (enableImage) {
 			MP.avatarSize = imageWidth = fontHeight * 2;
 		}
-		return contentHeight = (fontHeight + 4) * 2;
+		return contentHeight = (fontHeight + 8) * 2;
 	}
 
 	boolean tap(int x, int y, boolean longTap) {
