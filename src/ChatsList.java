@@ -161,7 +161,7 @@ public class ChatsList extends MPList {
 					}
 				}
 				
-				insert(thread, size(), sb.toString(), id);
+				insert(thread, size(), sb.toString(), id, null);
 			}
 			
 			if (l == limit && j.has("count")) {
@@ -202,21 +202,28 @@ public class ChatsList extends MPList {
 				MP.appendDialog(sb.append('\n'), peer, id, dialog.getObject("msg", null));
 			}
 			
-			insert(thread, size(), sb.toString(), id);
+			insert(thread, size(), sb.toString(), id, null);
 		}
 	}
 	
-	void insert(Thread thread, int idx, String s, String id) {
+	void insert(Thread thread, int idx, String s, String id, Image img) {
 		synchronized (lock) {
-			safeInsert(thread, idx, s, null);
+//#ifndef NO_AVATARS
+			boolean loadAva;
+			if ((loadAva = (img == null))) {
+				img = id.charAt(0) == '-' ? MP.chatDefaultImg : MP.userDefaultImg;
+			}
+//#endif
+			safeInsert(thread, idx, s, img);
 			if (MP.chatsListFontSize != 0) {
 				try {
 					setFont(idx, MP.chatsListFontSize == 1 ? MP.smallPlainFont : MP.medPlainFont);
 				} catch (Exception ignored) {}
 			}
-			
-			if (noAvas || !MP.loadAvatars) return;
+//#ifndef NO_AVATARS
+			if (noAvas || !MP.loadAvatars || !loadAva) return;
 			MP.queueAvatar(id, new Object[] { this, id });
+//#endif
 		}
 	}
 	

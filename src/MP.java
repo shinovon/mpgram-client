@@ -437,7 +437,7 @@ public class MP extends MIDlet
 	private static final JSONObject chatsCache = new JSONObject();
 	private static final Hashtable imagesCache = new Hashtable();
 
-	private static Image userDefaultImg, chatDefaultImg;
+	static Image userDefaultImg, chatDefaultImg;
 //#ifndef NO_FILE
 	private static Image fileImg, folderImg;
 //#endif
@@ -1943,7 +1943,7 @@ public class MP extends MIDlet
 								}
 							}
 
-							if (notifications) handleNotifications(updates, sb, true);
+							handleNotifications(updates, sb, true);
 						} else {
 							sb.setLength(0);
 							sb.append("notifications")
@@ -2596,10 +2596,11 @@ public class MP extends MIDlet
 							int newIdx;
 							if (idx != -1) {
 								ids.removeElementAt(idx);
+								Image img = chatsList.getImage(idx);
 								chatsList.delete(idx);
 								newIdx = Math.min(chatsList.size(), idx < chatsList.pinnedCount ? 0 : chatsList.pinnedCount);
 
-								chatsList.insert(null, newIdx, sb.append('\n').append(text).toString(), peerId);
+								chatsList.insert(null, newIdx, sb.append('\n').append(text).toString(), peerId, img);
 								ids.insertElementAt(peerId, newIdx);
 //							} else {
 //								newIdx = Math.min(chatsList.size(), chatsList.pinnedCount);
