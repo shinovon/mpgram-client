@@ -118,7 +118,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		setFullScreenMode(true);
 
 		if (touch) {
-			top = MP.smallBoldFontHeight + MP.smallPlainFontHeight + 8;
+			top = Math.max(48, MP.smallBoldFontHeight + MP.smallPlainFontHeight + 8);
 		} else {
 			top = MP.smallBoldFontHeight + 4 + (MP.chatStatus && mediaFilter == null ? MP.smallPlainFontHeight + 4 : 0);
 		}
