@@ -497,7 +497,12 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 			g.fillRect(0, 0, w, h);
 			if (bgImg != null && chat) {
 //				g.drawImage(bgImg, (w - bgWidth) >> 1, (h - bgHeight) >> 1, 0);
-				g.drawRegion(bgImg, (bgWidth - w) >> 1, (bgHeight - h) >> 1, w, h, 0, (w - bgWidth) >> 1, (h - bgHeight) >> 1, 0);
+				int bgWidth = MPCanvas.bgWidth;
+				int bgHeight = MPCanvas.bgHeight;
+				g.drawRegion(bgImg,
+						Math.max(0, (bgWidth - w) >> 1), Math.max(0, (bgHeight - h) >> 1),
+						Math.min(bgWidth, w), Math.min(bgHeight, h), 0,
+						Math.max(0, (w - bgWidth) >> 1), Math.max(0, (h - bgHeight) >> 1), 0);
 			}
 			g.setColor(colors[COLOR_CHAT_FG]);
 
