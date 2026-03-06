@@ -567,12 +567,20 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 				tw = w - 100;
 				int bty = (th - 2) >> 1;
 				if (selected != 0) g.setColor(colors[COLOR_CHAT_PANEL_FG]);
-				// back button
+				// back icon
+//				if (backIcon != null) {
+//					int ax = (tx - 32) >> 1;
+//					int ay = (th - 32) >> 1;
+//					g.drawImage(backIcon, ax, ay, 0);
+//				} else
 				{
 					int bx = (tx - 16) >> 1;
 					g.drawLine(bx, bty, bx + 16, bty);
+					g.drawLine(bx, bty + 1, bx + 16, bty + 1);
 					g.drawLine(bx, bty, bx + 8, bty-8);
+					g.drawLine(bx, bty + 1, bx + 9, bty-8);
 					g.drawLine(bx, bty, bx + 8, bty+8);
+					g.drawLine(bx, bty + 1, bx + 7, bty+8);
 				}
 				if (showPhoto) {
 					if (photo != null) g.drawImage(photo, tx, (th - photoHeight) >> 1, 0);
@@ -595,11 +603,17 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					g.drawLine(bx + 10, bty + 6, bx + 16, bty);
 
 				} else if (/*query == null && */ mediaFilter == null) {
-					// menu button
+					// menu icon
+//					if (moreIcon != null) {
+//						int ax = w - tx + ((tx - 5) >> 1);
+//						int ay = (th - 21) >> 1;
+//						g.drawImage(moreIcon, ax, ay, 0);
+//					} else {
 					int bx = w - tx + ((tx - 3) >> 1);
 					g.fillRect(bx, bty - 6, 3, 3);
 					g.fillRect(bx, bty, 3, 3);
 					g.fillRect(bx, bty + 6, 3, 3);
+//					}
 				}
 			} else if (showPhoto) {
 				if (photo != null) g.drawImage(photo, tx, (th - photoHeight) >> 1, 0);

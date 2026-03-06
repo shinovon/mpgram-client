@@ -124,7 +124,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 	static void loadTheme() {
 		if (colorsCopy == null) {
 			try {
-				DataInputStream d = new DataInputStream(MP.midlet.getClass().getResourceAsStream("/c/".concat(MP.theme)));
+				DataInputStream d = new DataInputStream("".getClass().getResourceAsStream("/c/".concat(MP.theme)));
 				d.readUTF();
 				for (int i = 0; i < 50; ++i) {
 					colors[i] = d.readInt();
@@ -551,9 +551,15 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 			}
 		}
 
-//		g.setColor(-1);
-//		g.setFont(MP.smallPlainFont);
-//		g.drawString("f" + (System.currentTimeMillis() - now) + " r" + (deltaTime) + " i" + renderedItems, 20, 20, 0);
+		g.setFont(MP.smallPlainFont);
+		String s = "r:" + (System.currentTimeMillis() - now) + " t:" + (deltaTime) + " f:" + (1000 / deltaTime);
+		g.setColor(0);
+		g.drawString(s, 19, h - 60, 0);
+		g.drawString(s, 21, h - 60, 0);
+		g.drawString(s, 20, h - 59, 0);
+		g.drawString(s, 20, h - 61, 0);
+		g.setColor(0x00AA00);
+		g.drawString(s, 20, h - 60, 0);
 
 		// limit fps
 		if (deltaTime < 32) {
