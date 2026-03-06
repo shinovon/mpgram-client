@@ -242,7 +242,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 				topMsgId = j.getInt("id");
 				if (messageId == 0) {
 					messageId = j.getInt("read");
-				} else if (messageId != 0 && j.getInt("unread", 0) > limit) {
+				} else if (j.getInt("unread", 0) > limit) {
 					offsetId = messageId = j.getInt("read");
 					addOffset = -limit;
 					dir = 1;
@@ -716,7 +716,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					keyGuide = false;
 				}
 			} else if (touch || inputFocused) {
-				if (!touch && inputFocused) {
+				if (!touch) {
 					int bh = 4 + MP.smallBoldFontHeight;
 					g.setColor(colors[COLOR_CHAT_INPUT_BORDER]);
 					g.drawLine(0, h - bh, w, h - bh);
@@ -1908,7 +1908,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 						//noinspection BusyWait
 						Thread.sleep(1000);
 					}
-				} catch (Exception e) {}
+				} catch (Exception ignored) {}
 				if (typing[0] == 0) {
 					setStatus(null);
 				}

@@ -1107,7 +1107,7 @@ public class MP extends MIDlet
 					}
 					//noinspection BusyWait
 					Thread.sleep(200);
-					while (imagesToLoad.size() > 0) {
+					while (imagesToLoad.size() != 0) {
 						Object[] o;
 
 						try {
@@ -2685,7 +2685,7 @@ public class MP extends MIDlet
 				new Thread(this).start();
 				wait();
 			}
-		} catch (Exception e) {}
+		} catch (Exception ignored) {}
 	}
 
 	void cancel(Thread thread, boolean updates) {
@@ -2719,7 +2719,7 @@ public class MP extends MIDlet
 		) { // chats list commands
 			if (c == archiveCmd) {
 //#ifndef NO_CHAT_CANVAS
-				if (d instanceof ChatCanvas) {
+				if (d instanceof ChatsCanvas) {
 					((ChatsCanvas) d).changeFolder(1, L[LArchive]);
 				} else
 //#endif
@@ -6407,7 +6407,7 @@ public class MP extends MIDlet
 			RecordStore r = RecordStore.openRecordStore(AUTH_RECORD_NAME, true);
 			r.addRecord(b, 0, b.length);
 			r.closeRecordStore();
-		} catch (Exception e) {}
+		} catch (Exception ignored) {}
 	}
 
 	private static void writeConfig() throws Exception {
