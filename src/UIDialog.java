@@ -52,7 +52,7 @@ public class UIDialog extends UIItem implements LangConstants {
 
 	Font font;
 
-	UIDialog(JSONObject dialog) {
+	UIDialog(JSONObject dialog, boolean showMessage) {
 		focusable = true;
 
 		id = dialog.getString("id");
@@ -60,31 +60,32 @@ public class UIDialog extends UIItem implements LangConstants {
 		JSONObject peer = MP.getPeer(id, false);
 		title = MP.getName(peer, false);
 
-		JSONObject msg = dialog.getObject("msg", null);
-
-		time = MP.localizeDate(msg.getLong("date"), 2);
-
-		if (!peer.getBoolean("c", false)) {
-			if (msg.getBoolean("out", false) && !id.equals(MP.selfId)) {
-				sender = MP.L[LYou];
-			} else if (id.charAt(0) == '-' && msg.has("from_id")) {
-				sender = MP.getName(msg.getString("from_id"), true);
-			}
-		}
-		
 		enableImage = MP.loadAvatars;
 
-		if (msg.has("media")) {
-			media = true;
-			text = MP.L[LMedia];
-		} else if (msg.has("fwd")) {
-			media = true;
-			text = MP.L[LForwardedMessage];
-		} else if (msg.has("act")) {
-			media = true;
-			text = MP.L[LAction];
-		} else {
-			text = msg.getString("text");
+		if (showMessage) {
+			JSONObject msg = dialog.getObject("msg", null);
+			time = MP.localizeDate(msg.getLong("date"), 2);
+
+			if (!peer.getBoolean("c", false)) {
+				if (msg.getBoolean("out", false) && !id.equals(MP.selfId)) {
+					sender = MP.L[LYou];
+				} else if (id.charAt(0) == '-' && msg.has("from_id")) {
+					sender = MP.getName(msg.getString("from_id"), true);
+				}
+			}
+
+			if (msg.has("media")) {
+				media = true;
+				text = MP.L[LMedia];
+			} else if (msg.has("fwd")) {
+				media = true;
+				text = MP.L[LForwardedMessage];
+			} else if (msg.has("act")) {
+				media = true;
+				text = MP.L[LAction];
+			} else {
+				text = msg.getString("text");
+			}
 		}
 	}
 
@@ -170,7 +171,7 @@ public class UIDialog extends UIItem implements LangConstants {
 	}
 
 	boolean action() {
-		MP.openChat(id, -1);
+		((ChatsCanvas) container).select(this);
 		return true;
 	}
 

@@ -1249,7 +1249,8 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		UIMessage[] msgs = getSelected();
 		unselectAll();
 
-		MP.openLoad(new ChatsList(id, msgs));
+//		MP.openLoad(new ChatsList(id, msgs));
+		MP.openLoad(new ChatsCanvas(id, msgs))
 	}
 
 	public void startEdit(UIMessage item) {

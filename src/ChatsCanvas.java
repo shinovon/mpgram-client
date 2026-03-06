@@ -32,16 +32,41 @@ public class ChatsCanvas extends MPCanvas {
 	Hashtable table;
 	int pinnedCount;
 	String peerId, msgId;
+	UIMessage[] msgs;
 
-	ChatsCanvas(int folder) {
+	// main mode
+	ChatsCanvas(String title, int folder) {
 		super();
 		this.folder = folder;
 
-		setTitle(MP.L[Lmpgram]);
+		setTitle(title);
 		setCommandListener(MP.midlet);
 		addCommand(MP.backCmd);
 		addCommand(MP.foldersCmd);
 		addCommand(MP.refreshCmd);
+	}
+
+	// forward message mode
+	public ChatsCanvas(String peerId, String msgId) {
+		super();
+		setTitle(MP.L[LForward]);
+		this.folder = 0;
+		this.peerId = peerId;
+		this.msgId = msgId;
+		addCommand(MP.archiveCmd);
+		addCommand(MP.cancelCmd);
+	}
+
+	// forward messages
+	public ChatsCanvas(String peerId, UIMessage[] msgs) {
+		super();
+		setTitle(MP.L[LForward]);
+		this.folder = 0;
+		this.peerId = peerId;
+		this.msgId = "";
+		this.msgs = msgs;
+		addCommand(MP.archiveCmd);
+		addCommand(MP.cancelCmd);
 	}
 
 	void loadInternal(Thread thread) throws Exception {
@@ -68,7 +93,7 @@ public class ChatsCanvas extends MPCanvas {
 			JSONObject dialog = dialogs.getObject(i);
 			String id = dialog.getString("id");
 
-			UIDialog item = new UIDialog(dialog);
+			UIDialog item = new UIDialog(dialog, msgId == null);
 			table.put(id, item);
 
 			if (dialog.getBoolean("pin", false))
@@ -85,6 +110,27 @@ public class ChatsCanvas extends MPCanvas {
 //		offsetDate = 0;
 		folder = folderId;
 		MP.midlet.start(MP.RUN_LOAD_FORM, this);
+	}
+
+	void select(UIDialog dialog) {
+		String id = dialog.id;
+
+		if (msgId != null) {
+			// forward
+			MP.deleteFromHistory(this);
+			if (MP.current instanceof ChatCanvas && id.equals(((ChatCanvas) MP.current).id)) {
+				((ChatCanvas) MP.current).startForward(peerId, msgId, msgs);
+				return;
+			}
+			if (msgs != null) {
+				MP.openLoad(new ChatCanvas(id, 0, msgs));
+				return;
+			}
+			MP.openLoad(new ChatCanvas(id, 0, peerId, msgId));
+			return;
+		}
+
+		MP.openChat(id, -1);
 	}
 }
 //#endif

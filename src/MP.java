@@ -4787,7 +4787,7 @@ public class MP extends MIDlet
 		Displayable l;
 //#ifndef NO_CHAT_CANVAS
 		if (!legacyChatUI) {
-			l = chatsList = new ChatsCanvas(0);
+			l = chatsList = new ChatsCanvas(L[Lmpgram], 0);
 		} else
 //#endif
 		{
