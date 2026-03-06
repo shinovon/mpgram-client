@@ -25,6 +25,7 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.TextField;
 import java.io.DataInputStream;
+import java.io.InputStream;
 
 abstract class MPCanvas extends Canvas implements LangConstants {
 
@@ -182,6 +183,11 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 
 			colorsCopy = new int[colors.length];
 			System.arraycopy(colors, 0, colorsCopy, 0, colors.length);
+
+			// load icons
+			ChatCanvas.attachIcon = loadRLE("attach", colors[ChatCanvas.COLOR_CHAT_INPUT_ICON]);
+//			ChatCanvas.backIcon = loadRLE("back", colors[ChatCanvas.COLOR_CHAT_PANEL_FG]);
+//			ChatCanvas.moreIcon = loadRLE("more", colors[ChatCanvas.COLOR_CHAT_PANEL_FG]);
 		}
 
 		if (bgImg == null) {
@@ -204,6 +210,56 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 			} catch (Throwable e) {
 				bg = false;
 			}
+		}
+	}
+
+	private static Image loadRLE(String path, int color) {
+		try {
+			int w, h;
+
+			DataInputStream dis = new DataInputStream("".getClass().getResourceAsStream("/i/".concat(path)));
+
+			byte[] rle = new byte[dis.available()];
+			dis.read(rle);
+			dis.close();
+
+			w = (rle[0] << 24) | (rle[1] << 16) | (rle[2] << 8) | (rle[3] & 0xff);
+			h = (rle[4] << 24) | (rle[5] << 16) | (rle[6] << 8) | (rle[7] & 0xff);
+
+			byte[] alpha = new byte[w * h];
+			{
+				int inp = 8;
+				int alphap = 0;
+
+				while (alphap < alpha.length && rle.length - inp >= 3) {
+					int count = ((rle[inp] & 0xff) << 8) | (rle[inp + 1] & 0xff);
+					inp += 2;
+
+					boolean repeat = count > 0x7fff;
+					count = (count & 0x7fff) + 1;
+
+					if (repeat) {
+						byte b = rle[inp];
+						inp++;
+						int fillEnd = alphap + count;
+
+						for (; alphap < fillEnd; alphap++) {
+							alpha[alphap] = b;
+						}
+					} else {
+						System.arraycopy(rle, inp, alpha, alphap, count);
+						alphap += count;
+						inp += count;
+					}
+				}
+			}
+			int[] rgb = new int[w * h];
+			for (int i = 0; i < alpha.length; ++i) {
+				rgb[i] = (alpha[i] << 24) | color;
+			}
+			return Image.createRGBImage(rgb, w, h, true);
+		} catch (Exception e) {
+			return null;
 		}
 	}
 

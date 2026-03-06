@@ -37,7 +37,9 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 	static final int COLOR_CHAT_SEND_ICON = 14;
 	static final int COLOR_CHAT_INPUT_BORDER = 15;
 
-//	static Image attachIcon;
+	static Image attachIcon;
+	static Image backIcon;
+	static Image moreIcon;
 
 	String id;
 	String username;
@@ -838,17 +840,17 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 						// attach icon
 
 						int aw = topButtonWidth;
-//							if (attachIcon != null) {
-//								int ax = w - aw + ((aw - 24) >> 1);
-//								int ay = iy + ((ih - 24) >> 1);
-//								g.drawImage(attachIcon, ax, ay, 0);
-//							} else {
-						g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
-						int ax = w - aw + ((aw - 17) >> 1);
-						int ay = iy + ((ih - 24) >> 1);
-						g.fillRect(ax, ay + 12, 17, 1);
-						g.fillRect(ax + 8, ay + 4, 1, 17);
-//							}
+						if (attachIcon != null) {
+							int ax = w - aw + ((aw - 24) >> 1);
+							int ay = iy + ((ih - 24) >> 1);
+							g.drawImage(attachIcon, ax, ay, 0);
+						} else {
+							g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
+							int ax = w - aw + ((aw - 17) >> 1);
+							int ay = iy + ((ih - 24) >> 1);
+							g.fillRect(ax, ay + 12, 17, 1);
+							g.fillRect(ax + 8, ay + 4, 1, 17);
+						}
 					}
 				} else if (left) {
 					g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
