@@ -4605,6 +4605,7 @@ public class MP extends MIDlet
 		}
 		if (target instanceof UIDialog) {
 			((UIDialog) target).image = img;
+			((UIDialog) target).imageWidth = img.getWidth();
 			((UIDialog) target).requestPaint();
 			return;
 		}
