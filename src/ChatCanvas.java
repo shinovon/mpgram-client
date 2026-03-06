@@ -324,7 +324,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 
 		if (selfChat) {
 			title = MP.L[LSavedMessages];
-		} else if (postId != null || topMsgId != 0) {
+		} else if (postId != null /*|| topMsgId != 0*/) {
 			title = MP.L[LComments];
 		}
 
