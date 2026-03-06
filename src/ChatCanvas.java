@@ -212,12 +212,15 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 
 		if (mediaFilter == null && query == null && postPeer == null) {
 			JSONObject dialog = ((JSONObject) MP.api("getDialog&id=".concat(id))).getObject("res");
-			if (messageId == -1 && dialog.has("read_inbox_max_id")) {
+			if (dialog.has("read_out")) {
+				readOutboxId = dialog.getInt("read_out");
+			}
+			if (messageId == -1 && dialog.has("read_in")) {
 				messageId = 0;
-				int maxId = dialog.getInt("read_inbox_max_id");
+				int maxId = Math.max(readOutboxId, dialog.getInt("read_in"));
 				if (maxId != 0) {
 					messageId = maxId;
-					if (dialog.getInt("unread_count", 0) > limit) {
+					if (dialog.getInt("unread", 0) > limit) {
 						offsetId = maxId;
 						addOffset = -limit;
 						dir = 1;
@@ -225,9 +228,6 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 						offsetId = -1;
 					}
 				}
-			}
-			if (dialog.has("read_outbox_max_id")) {
-				readOutboxId = dialog.getInt("read_outbox_max_id");
 			}
 			if (MP.chatAvatar && photo == null && !photoQueued) {
 				MP.queueImage(id, this);
@@ -269,13 +269,10 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			if (mediaFilter == null) {
 				canWrite = !broadcast;
 
-				JSONObject info = (JSONObject) MP.api((!user && !forum ? "getFullInfo&id=" : "getInfo&id=").concat(id));
-				JSONObject full = info.getObject("full", null);
-
+				JSONObject info = (JSONObject) MP.api("getPeerInfo&id=".concat(id));
 				if (id.charAt(0) == '-') {
-					JSONObject chat = info.getObject("Chat");
-					if (chat.has("admin_rights")) {
-						JSONObject adminRights = chat.getObject("admin_rights");
+					if (info.has("admin_rights")) {
+						JSONObject adminRights = info.getObject("admin_rights");
 						canWrite = !broadcast || adminRights.getBoolean("post_messages", false);
 						canDelete = adminRights.getBoolean("delete_messages", false);
 						canBan = !broadcast && adminRights.getBoolean("ban_users", false);
@@ -302,8 +299,8 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 						return;
 					}
 
-					if (full != null && full.has("participants_count")) {
-						int members = full.getInt("participants_count");
+					if (info.has("count")) {
+						int members = info.getInt("count");
 						canSeeRead = !broadcast && members < 100;
 						defaultStatus = MP.localizePlural(members,
 								broadcast ? L_subscriber : L_member);
@@ -314,11 +311,11 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					canPin = true;
 					canDelete = true;
 					//noinspection AssignmentUsedAsCondition
-					if (bot = info.getObject("User").getBoolean("bot", false)) {
+					if (bot = info.getBoolean("bot", false)) {
 						defaultStatus = MP.L[LBot];
 					}
-					if (MP.chatStatus && info.getObject("User").has("status")) {
-						setStatus(info.getObject("User").getObject("status"));
+					if (MP.chatStatus && info.has("status")) {
+						setStatus(info.getObject("status"));
 					}
 				}
 			}

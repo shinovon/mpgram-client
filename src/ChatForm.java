@@ -147,10 +147,10 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 		
 		if (mediaFilter == null && query == null && postPeer == null && messageId == -1) {
 			JSONObject dialog = ((JSONObject) MP.api("getDialog&id=".concat(id))).getObject("res");
-			if (dialog.has("read_inbox_max_id")) {
+			if (dialog.has("read_in")) {
 				messageId = 0;
-				int maxId = dialog.getInt("read_inbox_max_id");
-				if (maxId != 0 && dialog.getInt("unread_count", 0) > limit) {
+				int maxId = dialog.getInt("read_in");
+				if (maxId != 0 && dialog.getInt("unread", 0) > limit) {
 					offsetId = messageId = maxId;
 					addOffset = -limit;
 					dir = 1;
@@ -191,11 +191,10 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 
 			if (mediaFilter == null) {
 				canWrite = !broadcast;
-				JSONObject info = (JSONObject) MP.api("getInfo&id=".concat(id));
+				JSONObject info = (JSONObject) MP.api("getPeerInfo&id=".concat(id));
 				if (id.charAt(0) == '-') {
-					JSONObject chat = info.getObject("Chat");
-					if (chat.has("admin_rights")) {
-						JSONObject adminRights = chat.getObject("admin_rights");
+					if (info.has("admin_rights")) {
+						JSONObject adminRights = info.getObject("admin_rights");
 						canWrite = !broadcast || adminRights.getBoolean("post_messages", false);
 						canDelete = adminRights.getBoolean("delete_messages", false);
 						canBan = !broadcast && adminRights.getBoolean("ban_users", false);
@@ -224,8 +223,8 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 				} else {
 					canPin = true;
 					canDelete = true;
-					if (MP.chatStatus && info.getObject("User").has("status")) {
-						setStatus(info.getObject("User").getObject("status"));
+					if (MP.chatStatus && info.has("status")) {
+						setStatus(info.getObject("status"));
 					}
 				}
 			}

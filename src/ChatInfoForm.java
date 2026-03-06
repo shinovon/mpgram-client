@@ -52,7 +52,7 @@ public class ChatInfoForm extends MPForm {
 
 	void loadInternal(Thread thread) throws Exception {
 		StringBuffer sb = new StringBuffer();
-		JSONObject rawPeer = null;
+		JSONObject info = null;
 		String name/* = null*/;
 		boolean broadcast = false;
 		if (mode == 0) {
@@ -65,9 +65,9 @@ public class ChatInfoForm extends MPForm {
 			JSONObject r = ((JSONObject) MP.api(sb.toString())).getObject("res");
 			MP.fillPeersCache(r);
 			
-			rawPeer = r.getArray("users").getObject(0);
-			id = rawPeer.getString("id");
-			name = MP.getNameRaw(rawPeer);
+			info = r.getArray("users").getObject(0);
+			id = info.getString("id");
+			name = MP.getNameRaw(info);
 		} else {
 			name = getTitle();
 		}
@@ -98,20 +98,17 @@ public class ChatInfoForm extends MPForm {
 				append(s);
 			}
 		}
-		
-		JSONObject full = null;
+
 		if (mode != 3) {
-			JSONObject fullInfo = (JSONObject) MP.api("getFullInfo&id=".concat(id));
-			full = fullInfo.getObject("full");
-			rawPeer = fullInfo.getObject(isUser ? "User" : "Chat");
+			info = (JSONObject) MP.api("getPeerInfo&id=".concat(id));
 			
 			setTitle(MP.L[isUser ? LUserInfo : broadcast ? LChannelInfo : topic ? LTopicInfo : LGroupInfo]);
 		}
 		
 		if (isUser) {
-			if (rawPeer.has("status")) {
+			if (info.has("status")) {
 				sb.setLength(0);
-				JSONObject status = rawPeer.getObject("status");
+				JSONObject status = info.getObject("status");
 				if ("userStatusOnline".equals(status.getString("_"))) {
 					sb.append(MP.L[LOnline]);
 				} else if (status.has("was_online")) {
@@ -128,8 +125,8 @@ public class ChatInfoForm extends MPForm {
 				append(s);
 			}
 			
-			if (rawPeer.has("phone")) {
-				phone = "+".concat(rawPeer.getString("phone"));
+			if (info.has("phone")) {
+				phone = "+".concat(info.getString("phone"));
 				addCommand(MP.callCmd);
 				
 				s = new StringItem(MP.L[LMobile], phone);
@@ -140,16 +137,16 @@ public class ChatInfoForm extends MPForm {
 				append(s);
 			}
 			
-			if (full.has("about")) {
-				s = new StringItem(MP.L[LAbout_User], full.getString("about"));
+			if (info.has("about")) {
+				s = new StringItem(MP.L[LAbout_User], info.getString("about"));
 				s.setFont(MP.medPlainFont);
 				s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 				s.setItemCommandListener(MP.midlet);
 				append(s);
 			}
 			
-			if (rawPeer.has("username")) {
-				s = new StringItem(MP.L[LUsername], "@".concat(rawPeer.getString("username")));
+			if (info.has("username")) {
+				s = new StringItem(MP.L[LUsername], "@".concat(info.getString("username")));
 				s.setFont(MP.medPlainFont);
 				s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 				s.setItemCommandListener(MP.midlet);
@@ -157,17 +154,17 @@ public class ChatInfoForm extends MPForm {
 			}
 		} else {
 			if (mode != 3) {
-				if (full.getBoolean("can_view_participants", false)) {
+				if (info.getBoolean("can_view_participants", false)) {
 					addCommand(MP.chatMembersCmd);
 				}
 				
-				if (rawPeer.has("admin_rights")) {
-					canBan = rawPeer.getObject("admin_rights").getBoolean("ban_users", false);
+				if (info.has("admin_rights")) {
+					canBan = info.getObject("admin_rights").getBoolean("ban_users", false);
 				}
 				
-				if (full.has("participants_count")) {
-					s = new StringItem(null, MP.localizePlural(full.getInt("participants_count"),
-							rawPeer.getBoolean("broadcast", false) ? L_subscriber : L_member));
+				if (info.has("participants_count")) {
+					s = new StringItem(null, MP.localizePlural(info.getInt("participants_count"),
+							info.getBoolean("broadcast", false) ? L_subscriber : L_member));
 					s.setFont(MP.medPlainFont);
 					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					s.setItemCommandListener(MP.midlet);
@@ -177,8 +174,8 @@ public class ChatInfoForm extends MPForm {
 				if (topic) {
 					// TODO
 				} else {
-					if (full.has("about")) {
-						s = new StringItem(MP.L[LAbout_Chat], full.getString("about"));
+					if (info.has("about")) {
+						s = new StringItem(MP.L[LAbout_Chat], info.getString("about"));
 						s.setFont(MP.medPlainFont);
 						s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 						s.setItemCommandListener(MP.midlet);
@@ -186,8 +183,8 @@ public class ChatInfoForm extends MPForm {
 					}
 				}
 				
-				if (rawPeer.has("username")) {
-					String t = "t.me/".concat(rawPeer.getString("username"));
+				if (info.has("username")) {
+					String t = "t.me/".concat(info.getString("username"));
 					s = new StringItem(MP.L[LLink], topic ? t.concat("/").concat(Integer.toString(chatForm.topMsgId())) : t);
 					s.setFont(MP.medPlainFont);
 					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -206,8 +203,8 @@ public class ChatInfoForm extends MPForm {
 			}
 		}
 		
-		if (!topic && full.has("pinned_msg_id")) {
-			this.pinnedMessageId = full.getInt("pinned_msg_id");
+		if (!topic && info.has("pinned")) {
+			this.pinnedMessageId = info.getInt("pinned");
 			
 			s = new StringItem(null, MP.L[LGoToPinnedMessage]);
 			s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -257,9 +254,9 @@ public class ChatInfoForm extends MPForm {
 		}
 		
 		if (!isUser && !topic) {
-			boolean left = rawPeer.getBoolean("left", false);
+			boolean left = info.getBoolean("left", false);
 			// there is no method for leaving a group in telegram api
-			if (left || rawPeer.has("username")) {
+			if (left || info.has("username")) {
 				s = new StringItem(null, MP.L[left ? LJoinGroup : LLeaveGroup], Item.BUTTON);
 				s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 				s.setDefaultCommand(left ? MP.joinChatCmd : MP.leaveChatCmd);
