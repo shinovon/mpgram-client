@@ -493,7 +493,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 
 		if (!skipRender || !menuFocused) {
 			// background
-			g.setColor(colors[ChatCanvas.COLOR_CHAT_BG]);
+			g.setColor(colors[chat ? ChatCanvas.COLOR_CHAT_BG : ChatsCanvas.COLOR_CHATS_BG]);
 			g.fillRect(0, 0, w, h);
 			if (bgImg != null && chat) {
 //				g.drawImage(bgImg, (w - bgWidth) >> 1, (h - bgHeight) >> 1, 0);

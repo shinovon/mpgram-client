@@ -579,8 +579,8 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					int bx = (tx - 16) >> 1;
 					g.drawLine(bx, bty, bx + 16, bty);
 					g.drawLine(bx, bty + 1, bx + 16, bty + 1);
-					g.drawLine(bx, bty, bx + 8, bty-8);
-					g.drawLine(bx, bty + 1, bx + 9, bty-8);
+					g.drawLine(bx, bty, bx + 7, bty-7);
+					g.drawLine(bx, bty + 1, bx + 8, bty-7);
 					g.drawLine(bx, bty, bx + 8, bty+8);
 					g.drawLine(bx, bty + 1, bx + 7, bty+8);
 				}
