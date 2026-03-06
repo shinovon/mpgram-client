@@ -608,7 +608,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 		}
 
 		g.setFont(MP.smallPlainFont);
-		String s = "r:" + (System.currentTimeMillis() - now) + " t:" + (deltaTime) + " f:" + (1000 / deltaTime);
+		String s = "r:" + (System.currentTimeMillis() - now) + " t:" + (deltaTime) + " f:" + (1000 / Math.max(1, deltaTime));
 		g.setColor(0);
 		g.drawString(s, 19, h - 60, 0);
 		g.drawString(s, 21, h - 60, 0);
