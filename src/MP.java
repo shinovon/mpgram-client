@@ -3446,7 +3446,8 @@ public class MP extends MIDlet
 					String prevTheme = theme;
 					theme = THEMES[0][Math.max(0, themeChoice.getSelectedIndex())];
 					if (!theme.equals(prevTheme)) {
-						ChatCanvas.colorsCopy = null;
+						MPCanvas.colorsCopy = null;
+						MPCanvas.loadTheme();
 					}
 					wallpaperPath = wallpaperPathField.getString().trim();
 //#endif

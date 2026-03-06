@@ -119,10 +119,12 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 
 	final boolean touch = !MP.forceKeyUI && hasPointerEvents();
 
-	MPCanvas() {
+	final boolean chat = this instanceof ChatCanvas;
+
+	static void loadTheme() {
 		if (colorsCopy == null) {
 			try {
-				DataInputStream d = new DataInputStream(getClass().getResourceAsStream("/c/".concat(MP.theme)));
+				DataInputStream d = new DataInputStream(MP.midlet.getClass().getResourceAsStream("/c/".concat(MP.theme)));
 				d.readUTF();
 				for (int i = 0; i < 50; ++i) {
 					colors[i] = d.readInt();
@@ -193,18 +195,22 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 					}
 
 					/*int i = */Math.max(bgWidth = bgImg.getWidth(), bgHeight = bgImg.getHeight());
-					//				int s = Math.max(getWidth(), getHeight());
-					//				if (i > s) {
-					//					bgImg = MP.resize(bgImg, s, s);
-					//				}
+	//				int s = Math.max(getWidth(), getHeight());
+	//				if (i > s) {
+	//					bgImg = MP.resize(bgImg, s, s);
+	//				}
 					bg = true;
 				}
 			} catch (Throwable e) {
 				bg = false;
 			}
 		}
+	}
 
-		if (this instanceof ChatCanvas) {
+	MPCanvas() {
+		loadTheme();
+
+		if (chat) {
 			// initialize keyboard
 			switch (MP.textMethod) {
 			case 0: // auto
@@ -433,8 +439,9 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 			// background
 			g.setColor(colors[ChatCanvas.COLOR_CHAT_BG]);
 			g.fillRect(0, 0, w, h);
-			if (bgImg != null) {
-				g.drawImage(bgImg, (w - bgWidth) >> 1, (h - bgHeight) >> 1, 0);
+			if (bgImg != null && chat) {
+//				g.drawImage(bgImg, (w - bgWidth) >> 1, (h - bgHeight) >> 1, 0);
+				g.drawRegion(bgImg, (bgWidth - w) >> 1, (bgHeight - h) >> 1, w, h, 0, (w - bgWidth) >> 1, (h - bgHeight) >> 1, 0);
 			}
 			g.setColor(colors[COLOR_CHAT_FG]);
 
@@ -739,7 +746,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 
 	protected void keyReleased(int key) {
 		super.keyReleased(key);
-		if (this instanceof ChatCanvas && keyboard != null && keyboard.isVisible() && keyboard.keyReleased(key)) {
+		if (chat && keyboard != null && keyboard.isVisible() && keyboard.keyReleased(key)) {
 			// return;
 		}
 	}
@@ -758,7 +765,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 			}
 		} catch (Exception ignored) {}
 		boolean repaint = false;
-		if (this instanceof ChatCanvas && keyboard != null && keyboard.isVisible() && game >= 0 && (repeat ? keyboard.keyRepeated(key) : keyboard.keyPressed(key))) {
+		if (chat && keyboard != null && keyboard.isVisible() && game >= 0 && (repeat ? keyboard.keyRepeated(key) : keyboard.keyPressed(key))) {
 			// keyboard grabbed event
 		} else if (key == -7 || (MP.blackberry && (key == 'p' || key == 'P'))) {
 			if (repeat) return;
@@ -898,7 +905,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 	}
 
 	protected void pointerPressed(int x, int y) {
-		if (this instanceof ChatCanvas && keyboard != null && keyboard.pointerPressed(x, y)) return;
+		if (chat && keyboard != null && keyboard.pointerPressed(x, y)) return;
 		focusItem(null, 0);
 		pressed = true;
 		dragging = false;
@@ -924,7 +931,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 
 
 	protected void pointerDragged(int x, int y) {
-		if (this instanceof ChatCanvas && keyboard != null && keyboard.pointerDragged(x, y)) return;
+		if (chat && keyboard != null && keyboard.pointerDragged(x, y)) return;
 		long now = System.currentTimeMillis();
 		if (contentPressed || (menuFocused && !menuFitsOnScreen)) {
 			if (longTap && !menuFocused) {
@@ -968,7 +975,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 						menuScroll += dy2;
 						if (kineticScroll * dy2 < 0) kineticScroll = 0;
 						lastDragDir = dy2 < 0 ? -1 : 1;
-					} else if (this instanceof ChatCanvas
+					} else if (chat
 							&& (draggingHorizontally || (!dragging && Math.abs(/*dy2*/dX) > Math.abs(dy2)))) {
 						if (!draggingHorizontally) {
 							focusItem(pointedItem, 0);
@@ -1129,7 +1136,8 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 
 		if (len != 0 && menu != null) {
 			for (int i = 0; i < colors.length; ++i) {
-				if (i == COLOR_CHAT_MENU_BG || i == COLOR_CHAT_MENU_HIGHLIGHT_BG || i == COLOR_CHAT_MENU_FG)
+				if (i == COLOR_CHAT_MENU_BG || i == COLOR_CHAT_MENU_HIGHLIGHT_BG
+						|| i == COLOR_CHAT_MENU_FG || i == COLOR_CHAT_MENU_SEPARATOR)
 					continue;
 				int c = colorsCopy[i];
 				colors[i] = ((((c >> 16) & 0xFF) * 15) >> 5) << 16 | ((((c >> 8) & 0xFF) * 15) >> 5) << 8 | ((((c) & 0xFF) * 15) >> 5);
