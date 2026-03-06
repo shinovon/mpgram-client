@@ -1265,15 +1265,13 @@ public class MP extends MIDlet
 				((MPList) param).load();
 				break;
 			}
+//#ifndef NO_CHAT_CANVAS
 			if (param instanceof MPCanvas) {
 				((MPCanvas) param).load();
 				break;
 			}
+//#endif
 			((MPForm) param).load();
-			break;
-		}
-		case RUN_LOAD_LIST: {
-			((MPList) param).load();
 			break;
 		}
 		case RUN_AUTH: {
@@ -3982,21 +3980,16 @@ public class MP extends MIDlet
 		if (c == refreshCmd) {
 			if (d instanceof MPForm) {
 				((MPForm) d).cancel();
-				start(RUN_LOAD_FORM, d);
-				return;
 			}
 			if (d instanceof MPList) {
 				((MPList) d).cancel();
-				start(RUN_LOAD_LIST, d);
-				return;
 			}
 //#ifndef NO_CHAT_CANVAS
 			if (d instanceof MPCanvas) {
 				((MPCanvas) d).cancel();
-				start(RUN_LOAD_FORM, d);
-				return;
 			}
 //#endif
+			start(RUN_LOAD_FORM, d);
 			return;
 		}
 		if (c == updateCmd) {
@@ -5208,7 +5201,7 @@ public class MP extends MIDlet
 
 	static void openLoad(Displayable d) {
 		display(d);
-		midlet.start(d instanceof MPList ? RUN_LOAD_LIST : RUN_LOAD_FORM, d);
+		midlet.start(RUN_LOAD_FORM, d);
 	}
 
 	// jump back at history, discarding everything after

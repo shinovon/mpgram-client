@@ -68,7 +68,7 @@ public class UILabel extends UIItem {
 		g.setColor(color);
 
 		UIItem root = (UIItem) container;
-		ChatCanvas chat = (ChatCanvas) root.container;
+		MPCanvas chat = (MPCanvas) root.container;
 		int t = (chat.reverse ? chat.height - chat.bottom + chat.scroll - (root.y + root.contentHeight)
 				: chat.top - chat.scroll + root.y) + this.y;
 
@@ -305,7 +305,7 @@ public class UILabel extends UIItem {
 
 	private int getVisibility(int[] pos) {
 		UIItem root = (UIItem) container;
-		ChatCanvas chat = (ChatCanvas) root.container;
+		MPCanvas chat = (MPCanvas) root.container;
 		int t = (chat.reverse ? chat.height - chat.bottom + chat.scroll - (root.y + root.contentHeight)
 				: chat.top - chat.scroll + root.y) + this.y + pos[1];
 

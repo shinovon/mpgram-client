@@ -25,7 +25,6 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.TextField;
 import java.io.DataInputStream;
-import java.io.InputStream;
 
 abstract class MPCanvas extends Canvas implements LangConstants {
 

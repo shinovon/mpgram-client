@@ -1318,8 +1318,9 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 				editorShown = true;
 				updateEditor = true;
 				bottomAnimProgress = bottom = h;
-			} else {
+			} else
 //#endif
+			{
 				bottomAnimTarget = h;
 			}
 		}

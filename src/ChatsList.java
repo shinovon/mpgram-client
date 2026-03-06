@@ -288,7 +288,7 @@ public class ChatsList extends MPList {
 		setTitle(title.concat(" - mpgram"));
 //		offsetDate = 0;
 		folder = folderId;
-		MP.midlet.start(MP.RUN_LOAD_LIST, this);
+		MP.midlet.start(MP.RUN_LOAD_FORM, this);
 	}
 	
 	void paginate(int dir) {

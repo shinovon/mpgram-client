@@ -26,7 +26,6 @@ public interface Constants {
 	int RUN_VALIDATE_AUTH = 2;
 	int RUN_IMAGES = 3;
 	int RUN_LOAD_FORM = 4;
-	int RUN_LOAD_LIST = 5;
 	int RUN_AUTH = 6;
 	int RUN_DELETE_MESSAGE = 7;
 	int RUN_RESOLVE_INVITE = 8;
