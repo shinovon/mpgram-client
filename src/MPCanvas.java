@@ -189,28 +189,6 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 //			ChatCanvas.backIcon = loadRLE("back", colors[ChatCanvas.COLOR_CHAT_PANEL_FG]);
 //			ChatCanvas.moreIcon = loadRLE("more", colors[ChatCanvas.COLOR_CHAT_PANEL_FG]);
 		}
-
-		if (bgImg == null) {
-			try {
-				String s = MP.wallpaperPath;
-				if (s != null && s.length() != 0) {
-					if (s.indexOf(':') != -1) {
-						bgImg = MP.getImage(s);
-					} else {
-						bgImg = Image.createImage(s);
-					}
-
-					/*int i = */Math.max(bgWidth = bgImg.getWidth(), bgHeight = bgImg.getHeight());
-	//				int s = Math.max(getWidth(), getHeight());
-	//				if (i > s) {
-	//					bgImg = MP.resize(bgImg, s, s);
-	//				}
-					bg = true;
-				}
-			} catch (Throwable e) {
-				bg = false;
-			}
-		}
 	}
 
 	private static Image loadRLE(String path, int color) {
@@ -267,6 +245,28 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 		loadTheme();
 
 		if (chat) {
+			if (bgImg == null) {
+				try {
+					String p = MP.wallpaperPath;
+					if (p != null && p.length() != 0) {
+						if (p.indexOf(':') != -1) {
+							bgImg = MP.getImage(p);
+						} else {
+							bgImg = Image.createImage(p);
+						}
+
+						/*int i = */Math.max(bgWidth = bgImg.getWidth(), bgHeight = bgImg.getHeight());
+//						int s = Math.max(getWidth(), getHeight());
+//						if (i > s) {
+//							bgImg = MP.resize(bgImg, s, s);
+//						}
+						bg = true;
+					}
+				} catch (Throwable e) {
+					bg = false;
+				}
+			}
+
 			// initialize keyboard
 			switch (MP.textMethod) {
 			case 0: // auto
