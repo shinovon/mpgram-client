@@ -34,6 +34,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 	static final int COLOR_CHAT_MENU_BG = 6;
 	static final int COLOR_CHAT_MENU_HIGHLIGHT_BG = 7;
 	static final int COLOR_CHAT_MENU_FG = 8;
+	static final int COLOR_CHAT_MENU_SEPARATOR = 9;
 
 	static int[] colors = new int[50];
 	static int[] colorsCopy;
@@ -508,8 +509,8 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 					g.setColor(colors[COLOR_CHAT_MENU_FG]);
 					g.drawString(MP.L[menu[i]], 4, my + ((menuItemHeight - MP.medPlainFontHeight) >> 1), 0);
 					my += menuItemHeight;
-//					g.setColor(0x232F39);
-//					g.drawLine(0, my, w, my);
+					g.setColor(colors[COLOR_CHAT_MENU_SEPARATOR]);
+					g.drawLine(0, my, w, my);
 				}
 			}
 		} else {

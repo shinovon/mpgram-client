@@ -30,12 +30,12 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 	static final int COLOR_CHAT_PANEL_BG = 3;
 	static final int COLOR_CHAT_PANEL_FG = 4;
 	static final int COLOR_CHAT_PANEL_BORDER = 5;
-	static final int COLOR_CHAT_STATUS_FG = 9;
-	static final int COLOR_CHAT_STATUS_HIGHLIGHT_FG = 10;
-	static final int COLOR_CHAT_POINTER_HOLD = 11;
-	static final int COLOR_CHAT_INPUT_ICON = 12;
-	static final int COLOR_CHAT_SEND_ICON = 13;
-	static final int COLOR_CHAT_INPUT_BORDER = 14;
+	static final int COLOR_CHAT_STATUS_FG = 10;
+	static final int COLOR_CHAT_STATUS_HIGHLIGHT_FG = 11;
+	static final int COLOR_CHAT_POINTER_HOLD = 12;
+	static final int COLOR_CHAT_INPUT_ICON = 13;
+	static final int COLOR_CHAT_SEND_ICON = 14;
+	static final int COLOR_CHAT_INPUT_BORDER = 15;
 
 //	static Image attachIcon;
 
@@ -1250,7 +1250,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		unselectAll();
 
 //		MP.openLoad(new ChatsList(id, msgs));
-		MP.openLoad(new ChatsCanvas(id, msgs))
+		MP.openLoad(new ChatsCanvas(id, msgs));
 	}
 
 	public void startEdit(UIMessage item) {
