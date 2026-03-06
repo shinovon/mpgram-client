@@ -574,7 +574,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 						g.fillRect(0, my, w, menuItemHeight);
 					}
 					g.setColor(colors[COLOR_CHAT_MENU_FG]);
-					g.drawString(MP.L[menu[i]], 4, my + ((menuItemHeight - MP.medPlainFontHeight) >> 1), 0);
+					g.drawString(MP.L[menu[i]], 8, my + ((menuItemHeight - MP.medPlainFontHeight) >> 1), 0);
 					my += menuItemHeight;
 					g.setColor(colors[COLOR_CHAT_MENU_SEPARATOR]);
 					g.drawLine(20, my, w - 20, my);

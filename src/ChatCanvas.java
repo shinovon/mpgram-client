@@ -38,8 +38,8 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 	static final int COLOR_CHAT_INPUT_BORDER = 15;
 
 	static Image attachIcon;
-	static Image backIcon;
-	static Image moreIcon;
+//	static Image backIcon;
+//	static Image moreIcon;
 
 	String id;
 	String username;
@@ -115,12 +115,16 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 
 	int selected;
 
+	boolean largeButtons;
+
 	ChatCanvas() {
 		super();
 		setFullScreenMode(true);
 
 		if (touch) {
-			top = Math.max(48, MP.smallBoldFontHeight + MP.smallPlainFontHeight + 8);
+			top = MP.smallBoldFontHeight + MP.smallPlainFontHeight + 8;
+			largeButtons = Math.max(getWidth(), getHeight()) >= 640;
+			if (largeButtons) top = Math.max(60, top);
 		} else {
 			top = MP.smallBoldFontHeight + 4 + (MP.chatStatus && mediaFilter == null ? MP.smallPlainFontHeight + 4 : 0);
 		}
@@ -436,8 +440,11 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		// postLoad
 		loading = false;
 		if (hasInput && (canWrite || left) && mediaFilter == null && query == null) {
-			inputFieldHeight = touch ? Math.max(MP.medPlainFontHeight + 20, 48)
-					: Math.max(MP.medPlainFontHeight + 16, 40);
+			if (touch) {
+				inputFieldHeight = Math.max(MP.medPlainFontHeight + 20, largeButtons ? 60 : 48);
+			} else {
+				inputFieldHeight = Math.max(MP.medPlainFontHeight + 16, 40);
+			}
 			if (forwardMsgs != null || forwardMsg != null) {
 				bottomAnimProgress = bottom = inputFieldHeight + MP.smallBoldFontHeight + 8;
 				if (!touch) inputFocused = true;
@@ -556,7 +563,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			g.fillRect(0, 0, w, th);
 			g.setColor(colors[COLOR_CHAT_PANEL_BORDER]);
 			g.drawLine(0, th, w, th);
-			if (h > 240) g.drawLine(0, th - 1, w, th - 1);
+//			if (h > 240) g.drawLine(0, th - 1, w, th - 1);
 
 			int tx = 4;
 			int tw = w - 8;
@@ -564,7 +571,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 				g.setColor(colors[COLOR_CHAT_PANEL_FG]);
 				tx = topButtonWidth;
 				if (tx == 0) {
-					tx = topButtonWidth = w < 320 ? 40 : 50;
+					tx = topButtonWidth = w < 320 ? 40 : largeButtons ? 60 : 50;
 				}
 				tw = w - 100;
 				int bty = (th - 2) >> 1;
@@ -577,8 +584,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 //				} else
 				{
 					int bx = (tx - 16) >> 1;
-					g.drawLine(bx, bty, bx + 16, bty);
-					g.drawLine(bx, bty + 1, bx + 16, bty + 1);
+					g.fillRect(bx, bty, 16, 2);
 					g.drawLine(bx, bty, bx + 7, bty-7);
 					g.drawLine(bx, bty + 1, bx + 8, bty-7);
 					g.drawLine(bx, bty, bx + 8, bty+8);
@@ -611,10 +617,11 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 //						int ay = (th - 21) >> 1;
 //						g.drawImage(moreIcon, ax, ay, 0);
 //					} else {
+					int bw = largeButtons ? 4 : 3;
 					int bx = w - tx + ((tx - 3) >> 1);
-					g.fillRect(bx, bty - 6, 3, 3);
-					g.fillRect(bx, bty, 3, 3);
-					g.fillRect(bx, bty + 6, 3, 3);
+					g.fillRect(bx, bty - (bw * 2), bw, bw);
+					g.fillRect(bx, bty, bw, bw);
+					g.fillRect(bx, bty + (bw * 2), bw, bw);
 //					}
 				}
 			} else if (showPhoto) {
@@ -792,7 +799,8 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 								} else {
 									NokiaAPI.TextEditor_setParent(nokiaEditor, this);
 									NokiaAPI.TextEditor_setMultiline(nokiaEditor, true);
-									NokiaAPI.TextEditor_setSize(nokiaEditor, 10, iy + 8, w - topButtonWidth - 8, ih - 8);
+									int yo = ih / 6;
+									NokiaAPI.TextEditor_setSize(nokiaEditor, 10, iy + yo, w - topButtonWidth - 8, ih - yo);
 									NokiaAPI.TextEditor_setIndicatorVisibility(nokiaEditor, false);
 									NokiaAPI.TextEditor_setBackgroundColor(nokiaEditor, colors[COLOR_CHAT_PANEL_BG] | 0xFF000000);
 									NokiaAPI.TextEditor_setForegroundColor(nokiaEditor, colors[COLOR_CHAT_PANEL_FG] | 0xFF000000);
@@ -821,6 +829,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 						g.drawString(text, 10, iy + ((ih - MP.smallPlainFontHeight) >> 1), 0);
 					}
 
+					int aw = topButtonWidth;
 					if ((text != null && text.trim().length() != 0) || file != null || forwardMsgs != null || forwardMsg != null) {
 						// send icon
 						int ty = iy + ((ih - 20) >> 1);
@@ -832,25 +841,33 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 							g.setColor(colors[COLOR_CHAT_SEND_ICON]);
 						}
 
-						g.fillTriangle(w - 8 - 20, ty, w - 8, ty + 10, w - 8 - 20, ty + 20);
+						int ax = w - aw + ((aw - 20) >> 1);
+
+						g.fillTriangle(ax, ty, ax + 20, ty + 10, ax, ty + 20);
 						g.setColor(colors[COLOR_CHAT_PANEL_BG]);
-						g.fillTriangle(w - 8 - 20, ty, w - 8 - 18, ty + 10, w - 8 - 20, ty + 20);
-						g.drawLine(w - 8 - 20, ty + 10, w - 8 - 10, ty + 10);
+						g.fillTriangle(ax, ty, ax + 2, ty + 10, ax, ty + 20);
+						g.drawLine(ax, ty + 10, ax + 10, ty + 10);
 					} else if (touch) {
 						// attach icon
 
-						int aw = topButtonWidth;
 						if (attachIcon != null) {
 							int ax = w - aw + ((aw - 24) >> 1);
 							int ay = iy + ((ih - 24) >> 1);
 							g.drawImage(attachIcon, ax, ay, 0);
 						} else {
-							g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
+						g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
+//						if (largeButtons) {
+//							int ax = w - aw + ((aw - 24) >> 1);
+//							int ay = iy + ((ih - 26) >> 1);
+//							g.fillRect(ax, ay + 12, 24, 2);
+//							g.fillRect(ax + 11, ay + 1, 2, 24);
+//						} else {
 							int ax = w - aw + ((aw - 17) >> 1);
 							int ay = iy + ((ih - 24) >> 1);
 							g.fillRect(ax, ay + 12, 17, 1);
 							g.fillRect(ax + 8, ay + 4, 1, 17);
 						}
+//						}
 					}
 				} else if (left) {
 					g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
