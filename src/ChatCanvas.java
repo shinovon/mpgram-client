@@ -460,7 +460,9 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			if (!MP.globalUpdates) {
 				MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
 			}
-			(typingThread = new Thread(this)).start();
+			if (MP.chatStatus) {
+				(typingThread = new Thread(this)).start();
+			}
 		}
 		if (botAnswer != null) {
 			JSONObject b = botAnswer;
@@ -1614,14 +1616,16 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		if (!this.update) return;
 		switch (type) {
 		case UPDATE_USER_STATUS: {
-			if (MP.chatStatus) {
-				setStatus(update.getObject("status"));
-				typing[0] = 0;
-				typingThread.interrupt();
-			}
+			if (!MP.chatStatus) break;
+
+			setStatus(update.getObject("status"));
+			typing[0] = 0;
+			typingThread.interrupt();
 			break;
 		}
 		case UPDATE_USER_TYPING: {
+			if (!MP.chatStatus) break;
+
 			if ("sendMessageCancelAction".equals(update.getObject("action").getString("_"))) {
 				setStatus(null);
 				if (user) {
@@ -1857,6 +1861,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		String s;
 		if (status == null) {
 			this.status = null;
+			statusRender = null;
 			if (MP.chatStatus) {
 				if (wasOnline == 1) {
 					s = MP.L[LOnline];
@@ -1869,7 +1874,6 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 				}
 				if (s != this.status) {
 					this.status = s;
-					statusRender = null;
 					queueRepaint();
 				}
 			}
