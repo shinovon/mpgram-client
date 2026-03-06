@@ -86,8 +86,8 @@ public class MP extends MIDlet
 			"az",
 			"ca",
 			"de",
-			"en",
 			"en_gb",
+			"en",
 			"es",
 			"fi",
 			"pt",
@@ -100,8 +100,8 @@ public class MP extends MIDlet
 			"Azərbaycan",
 			"Català",
 			"Deutsch",
-			"English (US)",
 			"English (UK)",
+			"English (US)",
 			"Español",
 			"Suomi",
 			"Português",
@@ -237,6 +237,7 @@ public class MP extends MIDlet
 	static int playMethod; // 0: stream, 1: write to file
 //#endif
 	private static boolean playlistDirection = true;
+	static boolean time12;
 
 	private static boolean needWriteConfig;
 
@@ -753,6 +754,7 @@ public class MP extends MIDlet
 			playlistDirection = j.getBoolean("playlistDirection", playlistDirection);
 			playerVolume = j.getInt("playerVolume", playerVolume);
 			playerCreateMethod = j.getInt("playerCreateMethod", playerCreateMethod);
+			time12 = j.getBoolean("time12", time12);
 		} catch (Exception ignored) {}
 
 		// load auth
@@ -6131,7 +6133,14 @@ public class MP extends MIDlet
 
 	static StringBuffer appendTime(StringBuffer sb, long date) {
 		date = (date + tzOffset) / 60;
-		return sb.append(n(((int) date / 60) % 24))
+		int hour = ((int) date / 60) % 24;
+		if (time12) {
+			return sb.append(hour == 0 ? 12 : hour == 12 ? 12 : (hour % 12))
+					.append(':')
+					.append(n((int) date % 60))
+					.append(hour < 12 ? " AM" : " PM");
+		}
+		return sb.append(n(hour))
 				.append(':')
 				.append(n((int) date % 60));
 	}
@@ -6232,9 +6241,17 @@ public class MP extends MIDlet
 
 		if (mode == 2) {
 			if (d < 24 * 60 * 60) {
-				sb.append(n(c.get(Calendar.HOUR_OF_DAY)))
-				.append(':')
-				.append(n(c.get(Calendar.MINUTE)));
+				if (time12) {
+					int hour = c.get(Calendar.HOUR_OF_DAY);
+					sb.append(hour == 0 ? 12 : hour == 12 ? 12 : (hour % 12))
+					.append(':')
+					.append(n(c.get(Calendar.MINUTE)))
+					.append(hour < 12 ? " AM" : " PM");
+				} else {
+					sb.append(n(c.get(Calendar.HOUR_OF_DAY)))
+					.append(':')
+					.append(n(c.get(Calendar.MINUTE)));
+				}
 			} else if (d < 6 * 24 * 60 * 60) {
 				sb.append(L[LSun + c.get(Calendar.DAY_OF_WEEK) - 1]);
 			} else {
@@ -6262,10 +6279,19 @@ public class MP extends MIDlet
 					.append(n(c.get(Calendar.YEAR)));
 				}
 				if (b || mode == 3) {
-					sb.append(L[Lat_Time])
-					.append(n(c.get(Calendar.HOUR_OF_DAY)))
-					.append(':')
-					.append(n(c.get(Calendar.MINUTE)));
+					sb.append(L[Lat_Time]);
+
+					if (time12) {
+						int hour = c.get(Calendar.HOUR_OF_DAY);
+						sb.append(hour == 0 ? 12 : hour == 12 ? 12 : (hour % 12))
+						.append(':')
+						.append(n(c.get(Calendar.MINUTE)))
+						.append(hour < 12 ? " AM" : " PM");
+					} else {
+						sb.append(n(c.get(Calendar.HOUR_OF_DAY)))
+						.append(':')
+						.append(n(c.get(Calendar.MINUTE)));
+					}
 				}
 			} else {
 				if (!ru) sb.append(L[LJan + c.get(Calendar.MONTH)]).append(' ');
@@ -6278,10 +6304,18 @@ public class MP extends MIDlet
 				}
 
 				if (mode == 1) {
-					sb.append(' ')
-					.append(n(c.get(Calendar.HOUR_OF_DAY)))
-					.append(':')
-					.append(n(c.get(Calendar.MINUTE)));
+					sb.append(' ');
+					if (time12) {
+						int hour = c.get(Calendar.HOUR_OF_DAY);
+						sb.append(hour == 0 ? 12 : hour == 12 ? 12 : (hour % 12))
+						.append(':')
+						.append(n(c.get(Calendar.MINUTE)))
+						.append(hour < 12 ? " AM" : " PM");
+					} else {
+						sb.append(n(c.get(Calendar.HOUR_OF_DAY)))
+						.append(':')
+						.append(n(c.get(Calendar.MINUTE)));
+					}
 				}
 			}
 		}
@@ -6493,6 +6527,7 @@ public class MP extends MIDlet
 		j.put("playlistDirection", playlistDirection);
 		j.put("playerVolume", playerVolume);
 		j.put("playerCreateMethod", playerCreateMethod);
+		j.put("time12", time12);
 
 		byte[] b = j.toString().getBytes("UTF-8");
 		RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
