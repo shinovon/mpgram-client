@@ -931,7 +931,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					if (file != null && y - height + inputFieldHeight + MP.medPlainFontHeight + 8 > 0) {
 						if (cancel) {
 							file = null;
-							focusInput();
+							focusInput(false);
 						} else {
 							// TODO file options
 						}
@@ -941,7 +941,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 						} else {
 							replyMsgId = 0;
 							keyGuide = false;
-							focusInput();
+							focusInput(false);
 						}
 					}
 				} else if (x > width - 48) {
@@ -1065,7 +1065,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 				queueRepaint();
 			} else if (key == -5 || game == Canvas.FIRE) {
 				if (canWrite && hasInput) {
-					focusInput();
+					focusInput(true);
 				}
 			}
 			return true;
@@ -1273,19 +1273,19 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		resetInput();
 		text = item.origText;
 		editMsgId = item.id;
-		focusInput();
+		focusInput(true);
 	}
 
 	public void startReply(UIMessage item) {
 		if (editMsgId != 0 || forwardMsgs != null || forwardMsg != null) resetInput();
 		replyMsgId = item.id;
-		focusInput();
+		focusInput(true);
 	}
 
 	public void setFile(String s) {
 		file = s;
 		fileRender = null;
-		focusInput();
+		focusInput(false);
 	}
 
 	public void startForward(String peer, String msg, UIMessage[] msgs) {
@@ -1294,10 +1294,10 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		this.forwardPeer = peer;
 		this.forwardMsg = msg;
 		this.forwardMsgs = msgs;
-		focusInput();
+		focusInput(true);
 	}
 
-	private void focusInput() {
+	private void focusInput(boolean showKeyboard) {
 		int h = inputFieldHeight;
 		if (replyMsgId != 0 || editMsgId != 0 || forwardMsgs != null || forwardMsg != null) {
 			h += MP.smallBoldFontHeight + 8;
@@ -1326,7 +1326,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 
 		if (keyboard != null) {
 			keyboard.setText(text);
-			keyboard.show();
+			if (showKeyboard) keyboard.show();
 		}
 		queueRepaint();
 	}
@@ -1334,7 +1334,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 	private void send() {
 		if (!canWrite || !hasInput) return;
 		if (!touch && !inputFocused) {
-			focusInput();
+			focusInput(true);
 		} else if ((text != null && text.trim().length() != 0) || file != null || forwardMsgs != null || forwardMsg != null) {
 			synchronized (this) {
 				if (!MP.sending) {
