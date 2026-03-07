@@ -4458,7 +4458,8 @@ public class MP extends MIDlet
 
 		if (playerProgress != null) {
 			try {
-				final long duration = currentMusic.getObject("media").getObject("audio").getInt("time", 0) * 1000000L;
+				JSONObject media = currentMusic.getObject("media");
+				final long duration = media.has("audio") ? player.getDuration() : (media.getObject("audio").getInt("time", 0) * 1000000L);
 				int progress = (int) ((player.getMediaTime() * 100) / duration);
 
 				if (progress < 0) {
