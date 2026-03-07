@@ -594,7 +594,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 					if (now - pressTime > 200) {
 						kineticScroll = 0;
 						int size = Math.min(360, (int) (now - pressTime - 200) / 2);
-//						g.setColor(colors[COLOR_CHAT_POINTER_HOLD]);
+//						g.setColor(colors[ChatCanvas.COLOR_CHAT_POINTER_HOLD]);
 //						g.fillArc(pointerX - 25, pointerY - 25, 50, 50, 90, (size * 360) / 200);
 						if (size >= 200) {
 							// handle long tap
@@ -992,7 +992,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 		} else {
 			pointedItem = null;
 		}
-//		queueRepaint();
+		queueRepaint();
 	}
 
 
@@ -1383,6 +1383,10 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 	public void showNotify() {
 		skipRender = false;
 		repaint();
+	}
+
+	void closed(boolean destroy) {
+		if (destroy) cancel();
 	}
 
 	protected void scrolled() {

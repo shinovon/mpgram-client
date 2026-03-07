@@ -488,7 +488,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 	}
 
 	public void closed(boolean destroy) {
-		if (destroy) cancel();
+		super.closed(destroy);
 //#ifndef NO_NOKIAUI
 		if (nokiaEditor != null) {
 			try {

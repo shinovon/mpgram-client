@@ -5306,10 +5306,10 @@ public class MP extends MIDlet
 			((MPForm) p).closed(back);
 		} else if (p instanceof MPList) {
 			((MPList) p).closed(back);
-		} else if (p instanceof MPChat) {
-			((MPChat) p).closed(back);
+		} else if (p instanceof MPCanvas) {
+			((MPCanvas) p).closed(back);
 		}
-		if (back && (p instanceof MPForm || p instanceof MPList || p instanceof MPChat)) {
+		if (back && (p instanceof MPForm || p instanceof MPList || p instanceof MPCanvas)) {
 			imagesToLoad.removeAllElements();
 		}
 
