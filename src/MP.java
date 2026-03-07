@@ -2150,6 +2150,7 @@ public class MP extends MIDlet
 					sb.append("&offset_id=").append(((String[]) param)[2])
 					.append("&add_offset=-1");
 				} else if (mode == 6) {
+					// single file
 					sb.append("&id=").append(((String[]) param)[2]);
 				}
 
@@ -4459,7 +4460,7 @@ public class MP extends MIDlet
 		if (playerProgress != null) {
 			try {
 				JSONObject media = currentMusic.getObject("media");
-				final long duration = media.has("audio") ? player.getDuration() : (media.getObject("audio").getInt("time", 0) * 1000000L);
+				final long duration = media.has("audio") ? (media.getObject("audio").getInt("time", 0) * 1000000L) : player.getDuration();
 				int progress = (int) ((player.getMediaTime() * 100) / duration);
 
 				if (progress < 0) {
