@@ -2139,7 +2139,7 @@ public class MP extends MIDlet
 				playlistPeer = peer;
 			}
 			try {
-				StringBuffer sb = new StringBuffer("searchMessages&filter=Music&media=1");
+				StringBuffer sb = new StringBuffer(mode == 6 ? "getMessages&media=1" : "searchMessages&filter=Audio&media=1");
 				sb.append("&peer=").append(peer);
 				sb.append("&limit=").append(messagesLimit);
 				if (mode == 1 || mode == 4) {
@@ -2149,6 +2149,8 @@ public class MP extends MIDlet
 				} else if (mode == 3) {
 					sb.append("&offset_id=").append(((String[]) param)[2])
 					.append("&add_offset=-1");
+				} else if (mode == 6) {
+					sb.append("&id=").append(((String[]) param)[2]);
 				}
 
 				List list = playlistList;
@@ -2174,12 +2176,12 @@ public class MP extends MIDlet
 				int l = messages.size();
 				playlistSize = j.getInt("count", -1);
 
-				if (mode == 0 || mode == 3) {
+				if (mode == 0 || mode == 3 || mode == 6) {
 					playlist = messages;
 					playlistOffset = j.getInt("off", 0);
 					playlistIndex = 0;
 					currentMusic = playlist.getObject(0);
-					if (mode == 3) {
+					if (mode == 3 || mode == 6) {
 						display(initPlayerForm());
 						startPlayer(currentMusic);
 					} else {
@@ -2206,10 +2208,10 @@ public class MP extends MIDlet
 				for (int i = 0; i < l; ++i) {
 					JSONObject media = playlist.getObject(i).getObject("media");
 					sb.setLength(0);
-					if ((t = media.getObject("audio").getString("artist", null)) != null) {
+					if (media.has("audio") && (t = media.getObject("audio").getString("artist", null)) != null) {
 						sb.append(t).append(" - ");
 					}
-					if ((t = media.getObject("audio").getString("title", null)) != null) {
+					if (media.has("audio") && (t = media.getObject("audio").getString("title", null)) != null) {
 						sb.append(t);
 					} else {
 						sb.append(media.getString("name", ""));
@@ -2217,6 +2219,8 @@ public class MP extends MIDlet
 					list.append(sb.toString(), null);
 				}
 				list.setSelectedIndex(playlistIndex, true);
+
+				if (mode == 6) playlist = null;
 
 				if (cur) display(list);
 			} catch (Exception e) {
@@ -2435,7 +2439,7 @@ public class MP extends MIDlet
 
 				String t;
 				if (playerTitleLabel != null) {
-					if ((t = media.getObject("audio").getString("title", null)) == null) {
+					if (!media.has("audio") || (t = media.getObject("audio").getString("title", null)) == null) {
 						if ((t = name) == null) {
 							t = L[LUnknownTrack];
 						}
@@ -2443,7 +2447,7 @@ public class MP extends MIDlet
 					playerTitleLabel.setText(t);
 				}
 				if (playerArtistLabel != null) {
-					if ((t = media.getObject("audio").getString("artist", null)) == null) {
+					if (!media.has("audio") || (t = media.getObject("audio").getString("artist", null)) == null) {
 						t = "";
 					}
 					playerArtistLabel.setText(t);

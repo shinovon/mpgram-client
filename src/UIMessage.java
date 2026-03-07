@@ -110,6 +110,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	int photoRawWidth, photoRawHeight;
 	long fileSize;
 	boolean voice;
+	boolean audio;
 	byte[] waveform, waveformRender;
 
 	String time, nameRender, dateRender;
@@ -354,9 +355,11 @@ public class UIMessage extends UIItem implements LangConstants {
 						}
 					} else {
 						mediaDownload = true;
-						mediaPlayable = media.has("audio")
-								&& ("audio/mpeg".equals(t)
+						audio = media.has("audio");
+						mediaPlayable = "audio/midi".equals(t) ||
+								audio && ("audio/mpeg".equals(t)
 										|| "audio/aac".equals(t)
+
 										/*|| "audio/m4a".equals(t)*/);
 						mediaFileName = media.getString("name", null);
 						StringBuffer sb = new StringBuffer();
@@ -1506,7 +1509,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				break;
 			}
 			MP.display(MP.loadingAlert(MP.L[LLoading]), MP.current);
-			MP.midlet.start(MP.RUN_LOAD_PLAYLIST, new String[] {peerId, "3", idStr});
+			MP.midlet.start(MP.RUN_LOAD_PLAYLIST, new String[] {peerId, audio ? "6" : "3", idStr});
 			break;
 		case LGoTo:
 			MPChat parent = ((ChatCanvas) container).parent;
