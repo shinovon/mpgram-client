@@ -323,7 +323,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 			kineticScroll = scroll = 0;
 			
 			loadInternal(thread);
-			MP.display(this);
+//			MP.display(this);
 			queueRepaint();
 		} catch (Exception e) {
 			if (e == MP.cancelException || canceled || this.thread != thread) {

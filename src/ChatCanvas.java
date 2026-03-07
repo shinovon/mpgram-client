@@ -483,6 +483,8 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		MP.notificationMessages.remove(id);
 //#endif
 //#endif
+
+		MP.display(this);
 	}
 
 	public void closed(boolean destroy) {

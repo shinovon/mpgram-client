@@ -102,6 +102,8 @@ public class ChatsCanvas extends MPCanvas {
 			safeAdd(thread, item, false);
 			if (MP.loadAvatars) MP.queueAvatar(id, item);
 		}
+
+		MP.display(this);
 	}
 
 	void changeFolder(int folderId, String title) {
