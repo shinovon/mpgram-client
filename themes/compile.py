@@ -20,6 +20,7 @@ enum_colors = {
     "CHAT_INPUT_ICON": 13,
     "CHAT_SEND_ICON": 14,
     "CHAT_INPUT_BORDER": 15,
+    "CHAT_SCROLLBAR": 16,
 
     "MESSAGE_BG": 20,
     "MESSAGE_OUT_BG": 21,
@@ -46,7 +47,9 @@ enum_colors = {
     "CHATS_ITEM_TITLE": 43,
     "CHATS_ITEM_TEXT": 44,
     "CHATS_ITEM_MEDIA": 45,
-    "CHATS_ITEM_SEPARATOR": 46
+    "CHATS_ITEM_SEPARATOR": 46,
+    "CHATS_ITEM_UNREAD_BG": 47,
+    "CHATS_ITEM_UNREAD_FG": 48
 }
 
 enum_style = {
