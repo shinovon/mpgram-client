@@ -35,6 +35,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 	static final int COLOR_CHAT_MENU_HIGHLIGHT_BG = 7;
 	static final int COLOR_CHAT_MENU_FG = 8;
 	static final int COLOR_CHAT_MENU_SEPARATOR = 9;
+	static final int COLOR_CHAT_SCROLLBAR = 16;
 
 	static int[] colors = new int[50];
 	static int[] colorsCopy;

@@ -3132,6 +3132,7 @@ public class MP extends MIDlet
 							L[LForceKeyInput],
 							L[LChatAvatar],
 //#endif
+							"12-hour time format"
 					}, null);
 					uiChoice.setSelectedIndex(i = 0, reverseChat);
 					uiChoice.setSelectedIndex(++i, showMedia);
@@ -3146,6 +3147,7 @@ public class MP extends MIDlet
 					uiChoice.setSelectedIndex(++i, forceKeyUI);
 					uiChoice.setSelectedIndex(++i, chatAvatar);
 //#endif
+					uiChoice.setSelectedIndex(++i, time12);
 					uiChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(uiChoice);
 
@@ -3442,7 +3444,10 @@ public class MP extends MIDlet
 					fastScrolling = uiChoice.isSelected(++i);
 					forceKeyUI = uiChoice.isSelected(++i);
 					chatAvatar = uiChoice.isSelected(++i);
+//#endif
+					time12 = uiChoice.isSelected(++i);
 
+//#ifndef NO_CHAT_CANVAS
 					String prevTheme = theme;
 					theme = THEMES[0][Math.max(0, themeChoice.getSelectedIndex())];
 					if (!theme.equals(prevTheme)) {
