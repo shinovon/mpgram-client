@@ -832,6 +832,10 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					}
 
 					int aw = topButtonWidth;
+					if (aw == 0) {
+						aw = topButtonWidth = inputFieldHeight;
+					}
+
 					if ((text != null && text.trim().length() != 0) || file != null || forwardMsgs != null || forwardMsg != null) {
 						// send icon
 						int ty = iy + ((ih - 20) >> 1);
