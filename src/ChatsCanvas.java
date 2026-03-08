@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 //#ifndef NO_CHAT_CANVAS
+import javax.microedition.lcdui.Canvas;
 import java.util.Hashtable;
 
 public class ChatsCanvas extends MPCanvas {
@@ -132,6 +133,42 @@ public class ChatsCanvas extends MPCanvas {
 		}
 
 		MP.openChat(id, -1);
+	}
+
+	protected boolean handleKey(int key, int game) {
+		if (key == Canvas.KEY_NUM2 || key == Canvas.KEY_NUM8) {
+			int dir = key == Canvas.KEY_NUM2 ? -1 : 1;
+//			if (reverse) dir = -dir;
+			focusItem(null, 0);
+			focusedItem = scrollCurrentItem = scrollTargetItem = null;
+			scrollTo(scroll + ((clipHeight * 7 / 8) * dir));
+			queueRepaint();
+			return true;
+		}
+		if (this != MP.chatsList) {
+			return false;
+		}
+		if (key == Canvas.KEY_NUM1) {
+			MP.midlet.commandAction(MP.searchChatsCmd, this);
+			return true;
+		}
+		if (key == Canvas.KEY_NUM3) {
+			MP.midlet.commandAction(MP.foldersCmd, this);
+			return true;
+		}
+		if (key == Canvas.KEY_NUM4) {
+			MP.midlet.commandAction(MP.contactsCmd, this);
+			return true;
+		}
+		if (key == Canvas.KEY_NUM6) {
+			MP.midlet.commandAction(MP.refreshCmd, this);
+			return true;
+		}
+		if (key == Canvas.KEY_NUM9) {
+			MP.midlet.commandAction(MP.openLinkCmd, this);
+			return true;
+		}
+		return false;
 	}
 }
 //#endif
