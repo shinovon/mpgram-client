@@ -22,3 +22,4 @@ MicroEdition-Profile: MIDP-2.0
 MIDlet-Jar-URL: mpgram.jar
 MIDlet-Permissions: javax.microedition.io.Connector.http
 Nokia-Scalable-Icon-MIDlet-1: /m.svg
+Nokia-MIDlet-S60-Selection-Key-Compatibility: true
