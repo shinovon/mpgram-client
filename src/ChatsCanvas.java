@@ -99,7 +99,7 @@ public class ChatsCanvas extends MPCanvas {
 			if (dialog.getBoolean("pin", false))
 				++pinnedCount;
 
-			safeAdd(thread, item, false);
+			safeAdd(thread, item, i == 0);
 			if (MP.loadAvatars) MP.queueAvatar(id, item);
 		}
 		return true;
