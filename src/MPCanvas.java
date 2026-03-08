@@ -323,8 +323,9 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 			scrollCurrentItem = scrollTargetItem = focusedItem = null;
 			kineticScroll = scroll = 0;
 			
-			loadInternal(thread);
-//			MP.display(this);
+			if (loadInternal(thread)) {
+				MP.display(this);
+			}
 			queueRepaint();
 		} catch (Exception e) {
 			if (e == MP.cancelException || canceled || this.thread != thread) {
@@ -554,7 +555,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 			}
 
 			g.setClip(0, 0, w, h);
-			paintInternal(g, w, h, now);
+			if (paintInternal(g, w, h, now)) animate = true;
 		} else {
 			g.setClip(0, 0, w, h);
 		}
@@ -1430,11 +1431,11 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 		return false;
 	}
 
-	protected void paintInternal(Graphics g, int w, int h, long now) {
-
+	protected boolean paintInternal(Graphics g, int w, int h, long now) {
+		return false;
 	}
 
-	abstract void loadInternal(Thread thread) throws Exception;
+	abstract boolean loadInternal(Thread thread) throws Exception;
 
 }
 //#endif

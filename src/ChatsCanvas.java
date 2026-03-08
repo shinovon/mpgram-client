@@ -69,7 +69,7 @@ public class ChatsCanvas extends MPCanvas {
 		addCommand(MP.cancelCmd);
 	}
 
-	void loadInternal(Thread thread) throws Exception {
+	boolean loadInternal(Thread thread) throws Exception {
 		table = new Hashtable();
 		pinnedCount = 0;
 
@@ -102,8 +102,7 @@ public class ChatsCanvas extends MPCanvas {
 			safeAdd(thread, item, false);
 			if (MP.loadAvatars) MP.queueAvatar(id, item);
 		}
-
-		MP.display(this);
+		return true;
 	}
 
 	void changeFolder(int folderId, String title) {

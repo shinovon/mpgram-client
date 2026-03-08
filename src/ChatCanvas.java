@@ -186,7 +186,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		hasInput = input;
 	}
 
-	public void loadInternal(Thread thread) throws Exception {
+	public boolean loadInternal(Thread thread) throws Exception {
 		selected = 0;
 		titleRender = null;
 		statusRender = null;
@@ -296,7 +296,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 						this.topics = topics;
 						this.topicsList = list;
 						infoLoaded = true;
-						return;
+						return false;
 					}
 
 					if (info.has("count")) {
@@ -421,7 +421,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					MP.gc();
 					if (a++ == 0) continue;
 					MP.display(MP.errorAlert(MP.L[LNotEnoughMemory_Alert]), this);
-					return;
+					return false;
 				}
 			} while (true);
 		}
@@ -432,7 +432,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 
 		finished = true;
 
-		if (thread != this.thread) return;
+		if (thread != this.thread) return false;
 
 		// postLoad
 		loading = false;
@@ -484,7 +484,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 //#endif
 //#endif
 
-		MP.display(this);
+		return true;
 	}
 
 	public void closed(boolean destroy) {
@@ -547,7 +547,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 
 	// Canvas
 
-	protected void paintInternal(Graphics g, int w, int h, long now) {
+	protected boolean paintInternal(Graphics g, int w, int h, long now) {
 		if (touch && !loading && lastDragDir == (reverse ? -1 : 1) && (scroll >= clipHeight || (!endReached && hasOffset))) {
 			g.setColor(colors[COLOR_CHAT_PANEL_FG]);
 			int tx = width - 40, ty = reverse ? height - bottom - 40 : top + 40;
@@ -556,6 +556,8 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		} else {
 			arrowShown = false;
 		}
+
+		boolean animate = false;
 
 		// top panel
 		if (top != 0) {
@@ -714,7 +716,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					g.drawString(MP.L[LCancel], w - 2, by + 1, Graphics.TOP | Graphics.RIGHT);
 				}
 			} else if (keyGuide) {
-//				animate = true; // TODO
+				animate = true;
 				g.drawString(MP.L[LMenu], 2, by + 1, Graphics.TOP | Graphics.LEFT);
 				g.drawString(MP.L[LChat], w - 2, by + 1, Graphics.TOP | Graphics.RIGHT);
 				if (keyGuideTime == 0) {
@@ -882,6 +884,8 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					g.drawString(MP.L[LWrite], w >> 1, by + 1, Graphics.TOP | Graphics.HCENTER);
 			}
 		}
+
+		return animate;
 	}
 
 	private void back() {

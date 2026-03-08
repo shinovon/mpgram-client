@@ -3499,7 +3499,14 @@ public class MP extends MIDlet
 					useView = uiChoice.isSelected(++i);
 					fullPlayerCover = uiChoice.isSelected(++i);
 //#ifndef NO_CHAT_CANVAS
-					legacyChatUI = uiChoice.isSelected(++i);
+					boolean newLegacyUI = uiChoice.isSelected(++i);
+					if (newLegacyUI != legacyChatUI) {
+						if (chatsList != null) {
+							mainDisplayable = mainChatsList();
+						}
+						legacyChatUI = newLegacyUI;
+					}
+
 					fastScrolling = uiChoice.isSelected(++i);
 					forceKeyUI = uiChoice.isSelected(++i);
 					chatAvatar = uiChoice.isSelected(++i);
