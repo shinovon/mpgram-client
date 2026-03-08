@@ -52,6 +52,8 @@ public interface Constants {
 	int RUN_OPEN_URL = 29;
 	int RUN_UNINSTALL_STICKER_SET = 30;
 	int RUN_RESET_SETTINGS = 31;
+	int RUN_INVITE_MEMBER = 32;
+	int RUN_VIEW_INVITE_LINK = 33;
 
 	long ZERO_CHANNEL_ID = -1000000000000L;
 

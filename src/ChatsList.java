@@ -38,10 +38,8 @@ public class ChatsList extends MPList {
 	boolean canBan;
 	String peerId, msgId;
 	int pinnedCount;
-//#ifndef NO_CHAT_CANVAS
-	UIMessage[] msgs;
-//#endif
 	final Object lock = new Object();
+	boolean invite;
 
 	// main mode
 	public ChatsList(String title, int folder) {
@@ -79,19 +77,17 @@ public class ChatsList extends MPList {
 		addCommand(MP.cancelCmd);
 //		setFitPolicy(List.TEXT_WRAP_ON);
 	}
-	
-//#ifndef NO_CHAT_CANVAS
-	// forward messages
-	public ChatsList(String peerId, UIMessage[] msgs) {
-		super(MP.L[LForward]);
-		this.folder = 0;
-		this.peerId = peerId;
-		this.msgId = "";
-		this.msgs = msgs;
-		addCommand(MP.archiveCmd);
-		addCommand(MP.cancelCmd);
+
+	// invite contacts to chat mode
+	public ChatsList() {
+		super("Add Member"); // TODO unlocalized
+		this.url = "getContacts&fields=status";
+		this.users = true;
+		this.noAvas = true;
+		this.invite = true;
+		addCommand(MP.backCmd);
+		setFitPolicy(List.TEXT_WRAP_ON);
 	}
-//#endif
 
 	void loadInternal(Thread thread) throws Exception {
 		deleteAll();
@@ -242,24 +238,22 @@ public class ChatsList extends MPList {
 		if (i == -1) return;
 		String id = (String) ids.elementAt(i);
 		if (id == null) return;
+
+		if (invite) {
+			MP.deleteFromHistory(this);
+
+			if (!(MP.current instanceof ChatInfoForm)) {
+				// something terrible happened
+				return;
+			}
+
+			((ChatInfoForm) MP.current).chatForm.invite(id);
+			return;
+		}
 		
 		if (msgId != null) {
 			// forward
 			MP.deleteFromHistory(this);
-//#ifndef NO_CHAT_CANVAS
-			if (!MP.legacyChatUI) {
-				if (MP.current instanceof ChatCanvas && id.equals(((ChatCanvas) MP.current).id)) {
-					((ChatCanvas) MP.current).startForward(peerId, msgId, msgs);
-					return;
-				}
-				if (msgs != null) {
-					MP.openLoad(new ChatCanvas(id, 0, msgs));
-					return;
-				}
-				MP.openLoad(new ChatCanvas(id, 0, peerId, msgId));
-				return;
-			}
-//#endif
 
 			// TODO topics
 			MP.openChat(id, 0);

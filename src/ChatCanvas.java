@@ -1791,6 +1791,14 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		setTitle(this.title = title);
 	}
 
+	public void invite(String id) {
+		MP.midlet.start(Constants.RUN_INVITE_MEMBER, new String[] {
+				channel ? "inviteToChannel" : "addChatUser",
+				this.id,
+				id
+		});
+	}
+
 	// KeyboardListener
 
 	public boolean onKeyboardType(char c) {

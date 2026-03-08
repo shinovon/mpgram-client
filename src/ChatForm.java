@@ -1285,6 +1285,14 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 		this.canWrite = canWrite;
 		setTitle(this.title = title);
 	}
+
+	public void invite(String id) {
+		MP.midlet.start(Constants.RUN_INVITE_MEMBER, new String[] {
+				channel ? "inviteToChannel" : "addChatUser",
+				this.id,
+				id
+		});
+	}
 	
 	public void gc() {
 		// TODO

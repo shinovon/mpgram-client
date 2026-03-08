@@ -339,6 +339,8 @@ public class MP extends MIDlet
 	static Command chatVoiceCmd;
 	static Command gotoPinnedMsgCmd;
 	static Command chatMembersCmd;
+	static Command inviteMemberCmd;
+	static Command viewInviteLinkCmd;
 
 	static Command stickerItemCmd;
 	static Command addStickerPackCmd;
@@ -871,6 +873,8 @@ public class MP extends MIDlet
 		chatVoiceCmd = new Command(L[LVoiceMessages], Command.ITEM, 5);
 		gotoPinnedMsgCmd = new Command(L[LGoTo], Command.ITEM, 1);
 		chatMembersCmd = new Command(L[LMembers], Command.SCREEN, 6);
+		inviteMemberCmd = new Command("Add member", Command.SCREEN, 7); // TODO unlocalized
+		viewInviteLinkCmd = new Command("View invite link", Command.SCREEN, 8); // TODO unlocalized
 
 		stickerItemCmd = new Command(L[LSticker], Command.ITEM, 1);
 		addStickerPackCmd = new Command(L[LAddStickers], Command.OK, 2);
@@ -2501,6 +2505,55 @@ public class MP extends MIDlet
 			notifyDestroyed();
 			break;
 		}
+		case RUN_INVITE_MEMBER: {
+			try {
+				String[] params = (String[]) param;
+				StringBuffer sb = new StringBuffer(params[0]);
+				sb.append("&peer=").append(params[1])
+				.append("&id=").append(params[2]);
+				MP.api(sb.toString());
+
+				display(infoAlert("Member invited"), current);
+			} catch (Exception e) {
+				display(errorAlert(e), current);
+			}
+			break;
+		}
+		case RUN_VIEW_INVITE_LINK: {
+			try {
+				ChatInfoForm form = (ChatInfoForm) param;
+				StringBuffer sb = new StringBuffer("getExportedChatInvites&peer=").append(form.id);
+
+				JSONArray invites = ((JSONObject) MP.api(sb.toString())).getArray("res");
+
+				String link = null;
+				long l = invites.size();
+				for (int i = 0; i < l; ++i) {
+					JSONObject j = invites.getObject(i);
+					if (j.getBoolean("revoked", false)
+							|| !selfId.equals(j.getString("admin_id"))) {
+						continue;
+					}
+
+					link = j.getString("link");
+
+					if (j.getBoolean("permanent", false)) {
+						break;
+					}
+				}
+
+				if (link == null) {
+					sb.setLength(0);
+					sb.append("exportChatInvite&peer=").append(form.id);
+					link = ((JSONObject) MP.api(sb.toString())).getObject("res").getString("link");
+				}
+
+				copy("", link);
+			} catch (Exception e) {
+				display(errorAlert(e), current);
+			}
+			break;
+		}
 		}
 //		running--;
 	}
@@ -2929,6 +2982,14 @@ public class MP extends MIDlet
 				openLoad(new ChatsList(L[LMembers],
 						"getParticipants&peer=" + ((ChatInfoForm) current).id + "&fields=status",
 						((ChatInfoForm) d).id, ((ChatInfoForm) d).canBan));
+				return;
+			}
+			if (c == inviteMemberCmd) {
+				openLoad(new ChatsList());
+				return;
+			}
+			if (c == viewInviteLinkCmd) {
+				start(RUN_VIEW_INVITE_LINK, d);
 				return;
 			}
 		}

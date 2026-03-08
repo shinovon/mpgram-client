@@ -67,6 +67,7 @@ public interface MPChat {
 	void handleBotAnswer(JSONObject j);
 	void paginate(int dir);
 	void openTopic(int topMsgId, boolean canWrite, String title);
+	void invite(String id);
 	
 	void load();
 	void closed(boolean destroy);

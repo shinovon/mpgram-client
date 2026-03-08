@@ -157,6 +157,10 @@ public class ChatInfoForm extends MPForm {
 				if (info.getBoolean("can_view_participants", false)) {
 					addCommand(MP.chatMembersCmd);
 				}
+				if (chatForm != null) {
+					addCommand(MP.inviteMemberCmd);
+					addCommand(MP.viewInviteLinkCmd);
+				}
 				
 				if (info.has("admin_rights")) {
 					canBan = info.getObject("admin_rights").getBoolean("ban_users", false);
