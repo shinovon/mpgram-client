@@ -1067,6 +1067,13 @@ public class MP extends MIDlet
 				selfId = ((JSONObject) api("me&status=1")).getString("id");
 				userState = 4;
 
+				try {
+					JSONObject j = ((JSONObject) api("getNotifySettings"));
+					muteUsers = j.getInt("users") != 0;
+					muteChats = j.getInt("chats") != 0;
+					muteBroadcasts = j.getInt("broadcasts") != 0;
+				} catch (Exception ignored) {}
+
 				openLoad(mainDisplayable = mainChatsList());
 				if (param != null) {
 					writeAuth();
@@ -1773,20 +1780,6 @@ public class MP extends MIDlet
 				boolean wasShown = false;
 				StringBuffer sb = new StringBuffer();
 				JSONObject j;
-
-//#ifndef NO_NOTIFY
-				while (notifications && user != null) {
-					try {
-						j = ((JSONObject) api("getNotifySettings"));
-						muteUsers = j.getInt("users") != 0;
-						muteChats = j.getInt("chats") != 0;
-						muteBroadcasts = j.getInt("broadcasts") != 0;
-						break;
-					} catch (Exception ignored) {
-//						continue;
-					}
-				}
-//#endif
 
 				int offset = 0;
 				boolean check = true;

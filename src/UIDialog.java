@@ -69,7 +69,8 @@ public class UIDialog extends UIItem implements LangConstants {
 		enableImage = MP.loadAvatars;
 
 		if (showMessage) {
-			silent = dialog.getBoolean("silent", false);
+			silent = dialog.getBoolean("silent", peer.getBoolean("c", false) ?
+					MP.muteBroadcasts : id.charAt(0) == '-' ? MP.muteChats : MP.muteUsers);
 
 			int unreadCount = dialog.getInt("unread", 0);
 			if (unreadCount != 0) unread = Integer.toString(unreadCount);

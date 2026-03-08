@@ -574,6 +574,7 @@ public class UIMessage extends UIItem implements LangConstants {
 
 		g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_BG : COLOR_MESSAGE_BG]);
 		boolean bg;
+		//noinspection AssignmentUsedAsCondition
 		if ((bg = (ChatCanvas.style[STYLE_MESSAGE_FILL] != 0 && (!sticker || commentsText != null)))) {
 			g.fillRect(x, y, cw, h);
 		}
@@ -1479,7 +1480,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			MP.copyMessageLink(peerId, idStr);
 			break;
 		case LForward:
-			MP.openLoad(new ChatsList(peerId, idStr));
+			MP.openLoad(new ChatsCanvas(peerId, idStr));
 			break;
 		case LDelete: {
 			MP.confirm(MP.RUN_DELETE_MESSAGE | 0x100 | 0x200,
@@ -1603,11 +1604,8 @@ public class UIMessage extends UIItem implements LangConstants {
 			return false;
 		}
 		if (((ChatCanvas) container).selected != 0) {
-			if (!selected) {
-				selected = true;
-				((ChatCanvas) container).selected(this);
-				return false;
-			}
+			selected = true;
+			((ChatCanvas) container).selected(this);
 			return false;
 		}
 		int w = ((ChatCanvas) container).width;

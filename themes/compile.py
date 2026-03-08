@@ -49,7 +49,8 @@ enum_colors = {
     "CHATS_ITEM_MEDIA": 45,
     "CHATS_ITEM_SEPARATOR": 46,
     "CHATS_ITEM_UNREAD_BG": 47,
-    "CHATS_ITEM_UNREAD_FG": 48
+    "CHATS_ITEM_UNREAD_FG": 48,
+    "CHATS_ITEM_UNREAD_MUTED_BG": 49
 }
 
 enum_style = {
