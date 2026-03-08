@@ -326,7 +326,6 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 			if (loadInternal(thread)) {
 				MP.display(this);
 			}
-			queueRepaint();
 		} catch (Exception e) {
 			if (e == MP.cancelException || canceled || this.thread != thread) {
 				// ignore exception if cancel detected
@@ -338,6 +337,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 			if (this.thread == thread) {
 				loading = false;
 				this.thread = null;
+				queueRepaint();
 			}
 		}
 	}

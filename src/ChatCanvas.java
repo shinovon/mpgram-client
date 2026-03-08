@@ -508,7 +508,6 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 	public void showNotify() {
 		if (!touch && keyGuideTime == 0) {
 			keyGuide = true;
-			bottomAnimTarget = MP.smallBoldFontHeight + 2;
 		}
 		if (shouldUpdate && !update && !loading) {
 			update = true;
@@ -883,6 +882,9 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 				if (hasInput && canWrite)
 					g.drawString(MP.L[LWrite], w >> 1, by + 1, Graphics.TOP | Graphics.HCENTER);
 			}
+		} else if (!loading && keyGuide && bottomAnimTarget == -1) {
+			bottomAnimTarget = MP.smallBoldFontHeight + 2;
+			animate = true;
 		}
 
 		return animate;

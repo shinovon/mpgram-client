@@ -765,7 +765,7 @@ public class MP extends MIDlet
 			if (version < 1) {
 //#ifndef NO_CHAT_CANVAS
 				if (!legacyChatUI) {
-					chatStatus = f.getHeight() >= 360;
+					chatStatus = chatStatus || f.getHeight() >= 360;
 					reverseChat = true;
 				}
 //#endif
@@ -3514,10 +3514,10 @@ public class MP extends MIDlet
 //#ifndef NO_CHAT_CANVAS
 					boolean newLegacyUI = uiChoice.isSelected(++i);
 					if (newLegacyUI != legacyChatUI) {
-						if (chatsList != null) {
-							mainDisplayable = mainChatsList();
-						}
 						legacyChatUI = newLegacyUI;
+						if (chatsList != null && selfId != null) {
+							midlet.start(RUN_LOAD_FORM, mainDisplayable = mainChatsList());
+						}
 					}
 
 					fastScrolling = uiChoice.isSelected(++i);
