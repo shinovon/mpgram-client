@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mtjMetadata jad="mpgram.jad" version="2.0.1.201509042315">
-   <device group="Nokia Symbian3 SDK v1.0 " name="SymbianDevice"/>
+   <device group="KEmulator nnx64" name="KEmulator"/>
    <signing projectSpecific="false" signProject="false">
       <alias/>
    </signing>
    <configurations>
       <configuration active="true" name="Regular">
-         <device group="KEmulator nnmod" name="KEmulator"/>
+         <device group="KEmulator nnx64" name="KEmulator"/>
          <symbolSet name="KEmulator"/>
       </configuration>
       <configuration active="false" name="Lite">
-         <device group="KEmulator nnmod" name="KEmulator"/>
+         <device group="KEmulator nnx64" name="KEmulator"/>
          <symbolSet name="KEmulator">
             <symbol name="NO_CHAT_CANVAS" value="true"/>
-            <symbol name="NO_ZIP" value="true"/>
-            <symbol name="NO_NOKIAUI" value="true"/>
             <symbol name="NO_AVATARS" value="true"/>
-            <symbol name="NO_NOTIFY" value="true"/>
-            <symbol name="NO_FILE" value="true"/>
             <symbol name="MINI" value="true"/>
             <symbol name="NO_LANGS" value="true"/>
+            <symbol name="NO_NOTIFY" value="true"/>
+            <symbol name="NO_FILE" value="true"/>
+            <symbol name="NO_ZIP" value="true"/>
+            <symbol name="NO_NOKIAUI" value="true"/>
          </symbolSet>
       </configuration>
       <configuration active="false" name="BlackBerry">
-         <device group="KEmulator nnmod" name="KEmulator"/>
+         <device group="KEmulator nnx64" name="KEmulator"/>
          <symbolSet name="KEmulator">
-            <symbol name="NO_NOKIAUI" value="true"/>
             <symbol name="BLACKBERRY_BUILD" value="true"/>
+            <symbol name="NO_NOKIAUI" value="true"/>
          </symbolSet>
       </configuration>
    </configurations>

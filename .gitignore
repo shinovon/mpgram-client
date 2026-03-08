@@ -1,5 +1,6 @@
 *.class
 *.jar
+*.zip
 
 # eclipse
 /.settings/
@@ -23,8 +24,10 @@
 /res/c/
 
 # intellij
-/.idea/
-/out/
+/.idea/**
+!/.idea/arifacts
+!/.idea/artifacts/**
+!/.idea/modules.xml
+!/.idea/misc.xml
 /META-INF/
-*.iml
 proguard*.cfg

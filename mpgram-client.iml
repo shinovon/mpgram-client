@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="Python" name="Python">
+      <configuration sdkName="Python 3.10" />
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_3" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/res" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/j2mekeyboard/res" type="java-resource" />
+      <excludeFolder url="file://$MODULE_DIR$/deployed" />
+      <excludeFolder url="file://$MODULE_DIR$/.processed" />
+      <excludeFolder url="file://$MODULE_DIR$/.mtj.tmp" />
+      <excludeFolder url="file://$MODULE_DIR$/.settings" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Python 3.10 interpreter library" level="application" />
+  </component>
+</module>
