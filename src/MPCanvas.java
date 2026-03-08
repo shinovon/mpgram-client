@@ -363,6 +363,14 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 		}
 		width = w; height = h;
 
+		if (loading && !chat) {
+			g.setColor(colors[ChatsCanvas.COLOR_CHATS_BG]);
+			g.fillRect(0, 0, w, h);
+			g.setColor(colors[ChatsCanvas.COLOR_CHAT_FG]);
+			g.drawString(MP.L[LLoading], w >> 1, h >> 3, Graphics.TOP | Graphics.HCENTER);
+			return;
+		}
+
 		boolean animate = false;
 
 		// animations
