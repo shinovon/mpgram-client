@@ -2513,7 +2513,7 @@ public class MP extends MIDlet
 				.append("&id=").append(params[2]);
 				MP.api(sb.toString());
 
-				display(infoAlert("Member invited"), current);
+				display(infoAlert("Member invited"), current); // TODO unlocalized
 			} catch (Exception e) {
 				display(errorAlert(e), current);
 			}
@@ -3521,6 +3521,17 @@ public class MP extends MIDlet
 					if ((chatsLimit = chatsGauge.getValue()) < 5) {
 						chatsGauge.setValue(chatsLimit = 5);
 					}
+					if (chatsList != null) {
+//#ifndef NO_CHAT_CANVAS
+						if (chatsList instanceof ChatsCanvas) {
+							((ChatsCanvas) chatsList).limit = chatsLimit;
+						} else
+//#endif
+						{
+							((ChatsList) chatsList).limit = chatsLimit;
+						}
+					}
+
 					if ((messagesLimit = msgsGauge.getValue()) < 5) {
 						msgsGauge.setValue(messagesLimit = 5);
 					}

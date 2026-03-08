@@ -146,7 +146,7 @@ public class UIDialog extends UIItem implements LangConstants {
 		if (unread != null) {
 			g.setColor(MPCanvas.colors[silent ? COLOR_CHATS_ITEM_UNREAD_MUTED_BG : COLOR_CHATS_ITEM_UNREAD_BG]);
 			int uw = unreadWidth;
-			g.fillRect(w - 8 - uw, y + fontHeight + 6, uw + 4, fontHeight + 4);
+			g.fillRect(w - 8 - uw, y + fontHeight + 8, uw + 4, fontHeight + 4);
 
 			g.setColor(MPCanvas.colors[COLOR_CHATS_ITEM_UNREAD_FG]);
 			g.drawString(unread, w - 6 - uw, y + fontHeight + 10, 0);
