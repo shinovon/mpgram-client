@@ -841,7 +841,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 			}
 		} catch (Exception ignored) {}
 		boolean repaint = false;
-		if (chat && keyboard != null && keyboard.isVisible() && game >= 0 && (repeat ? keyboard.keyRepeated(key) : keyboard.keyPressed(key))) {
+		if (chat && !menuFocused && keyboard != null && keyboard.isVisible() && game >= 0 && (repeat ? keyboard.keyRepeated(key) : keyboard.keyPressed(key))) {
 			// keyboard grabbed event
 		} else if (key == -7 || (MP.blackberry && (key == 'p' || key == 'P'))) {
 			if (repeat) return;
@@ -891,7 +891,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 				}
 				repaint = true;
 			} else if (key == -5 || game == Canvas.FIRE) {
-				menuAction(menuCurrent);
+				menuAction(menu[menuCurrent]);
 				repaint = true;
 			}
 		} else if (loading) {

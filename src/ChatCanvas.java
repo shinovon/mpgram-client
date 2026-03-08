@@ -484,6 +484,9 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 //#endif
 //#endif
 
+		if (!touch && keyGuideTime == 0) {
+			keyGuide = true;
+		}
 		return true;
 	}
 
@@ -506,9 +509,6 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 	}
 
 	public void showNotify() {
-		if (!touch && keyGuideTime == 0) {
-			keyGuide = true;
-		}
 		if (shouldUpdate && !update && !loading) {
 			update = true;
 			if (!MP.globalUpdates) {
