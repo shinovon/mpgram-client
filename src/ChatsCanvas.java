@@ -34,6 +34,7 @@ public class ChatsCanvas extends MPCanvas {
 	int pinnedCount;
 	String peerId, msgId;
 	UIMessage[] msgs;
+	boolean noAvas;
 
 	// main mode
 	ChatsCanvas(String title, int folder) {
@@ -51,6 +52,7 @@ public class ChatsCanvas extends MPCanvas {
 	public ChatsCanvas(String peerId, String msgId) {
 		super();
 		setTitle(MP.L[LForward]);
+		setCommandListener(MP.midlet);
 		this.folder = 0;
 		this.peerId = peerId;
 		this.msgId = msgId;
@@ -62,6 +64,7 @@ public class ChatsCanvas extends MPCanvas {
 	public ChatsCanvas(String peerId, UIMessage[] msgs) {
 		super();
 		setTitle(MP.L[LForward]);
+		setCommandListener(MP.midlet);
 		this.folder = 0;
 		this.peerId = peerId;
 		this.msgId = "";
@@ -101,7 +104,7 @@ public class ChatsCanvas extends MPCanvas {
 				++pinnedCount;
 
 			safeAdd(thread, item, i == 0);
-			if (MP.loadAvatars) MP.queueAvatar(id, item);
+			if (MP.loadAvatars && !noAvas) MP.queueAvatar(id, item);
 		}
 		return true;
 	}
@@ -169,6 +172,16 @@ public class ChatsCanvas extends MPCanvas {
 			return true;
 		}
 		return false;
+	}
+
+	void shown() {
+		if (!finished || firstItem == null || noAvas)
+			return;
+		UIItem item = firstItem;
+		do {
+			if (!((UIDialog) item).enableImage || ((UIDialog) item).image != null) continue;
+			MP.queueAvatar(((UIDialog) item).id, item);
+		} while ((item = item.next) != null);
 	}
 }
 //#endif

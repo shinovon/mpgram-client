@@ -370,6 +370,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 			g.setColor(colors[ChatsCanvas.COLOR_CHATS_BG]);
 			g.fillRect(0, 0, w, h);
 			g.setColor(colors[ChatsCanvas.COLOR_CHAT_FG]);
+			g.setFont(MP.smallPlainFont);
 			g.drawString(MP.L[LLoading], w >> 1, h >> 3, Graphics.TOP | Graphics.HCENTER);
 			return;
 		}
@@ -584,12 +585,13 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 					if (i == menuCurrent && (!touch || menuCurrent != -1)) {
 						g.setColor(colors[COLOR_CHAT_MENU_HIGHLIGHT_BG]);
 						g.fillRect(0, my, w, menuItemHeight);
+					} else if (i != menu.length - 1) {
+						g.setColor(colors[COLOR_CHAT_MENU_SEPARATOR]);
+						g.drawLine(20, my + menuItemHeight, w - 20, my + menuItemHeight);
 					}
 					g.setColor(colors[COLOR_CHAT_MENU_FG]);
 					g.drawString(MP.L[menu[i]], 8, my + ((menuItemHeight - MP.medPlainFontHeight) >> 1), 0);
 					my += menuItemHeight;
-					g.setColor(colors[COLOR_CHAT_MENU_SEPARATOR]);
-					g.drawLine(20, my, w - 20, my);
 				}
 			}
 		} else {
@@ -893,7 +895,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 				}
 				repaint = true;
 			} else if (key == -5 || game == Canvas.FIRE) {
-				menuAction(menu[menuCurrent]);
+				doMenuAction(menuCurrent);
 				repaint = true;
 			}
 		} else if (loading) {
@@ -1253,14 +1255,14 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 	}
 
 	private void doMenuAction(int i) {
-		if (i >= menu.length) return;
-
-		if (menu[i] == LBack) {
-			// just close
-		} else if (menuItem == null) {
-			menuAction(menu[i]);
-		} else {
-			menuItem.menuAction(menu[i]);
+		if (i >= 0 && i < menu.length) {
+			if (menu[i] == LBack) {
+				// just close
+			} else if (menuItem == null) {
+				menuAction(menu[i]);
+			} else {
+				menuItem.menuAction(menu[i]);
+			}
 		}
 		closeMenu();
 		queueRepaint();
@@ -1439,5 +1441,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 
 	abstract boolean loadInternal(Thread thread) throws Exception;
 
+	void shown() {
+	}
 }
 //#endif

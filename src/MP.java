@@ -5416,6 +5416,8 @@ public class MP extends MIDlet
 			((MPForm) d).shown();
 		} else if (d instanceof MPList) {
 			((MPList) d).shown();
+		} else if (d instanceof MPCanvas) {
+			((MPCanvas) d).shown();
 		}
 		if (back) return;
 		// push to history

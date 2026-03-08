@@ -302,7 +302,7 @@ public class ChatsList extends MPList {
 	}
 	
 	void shown() {
-		if (!finished || ids == null || (noAvas && MP.chatsListFontSize == 0))
+		if (!finished || ids == null || ((noAvas || !MP.loadAvatars) && MP.chatsListFontSize == 0))
 			return;
 		for (int i = ids.size() - 1; i >= 0; i--) {
 			if (MP.chatsListFontSize != 0) {

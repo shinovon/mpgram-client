@@ -1050,9 +1050,6 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					LChatInfo,
 					LSearchMessages,
 					LSendSticker,
-//#ifndef NO_FILE
-					LAttachFile,
-//#endif
 					LWriteMessage
 			} : new int[] { LRefresh, LChatInfo, LSearchMessages });
 			return true;
@@ -1180,7 +1177,8 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		}
 
 		// input menu
-		case LEdit: {
+		case LEdit:
+		case LFullscreenTextBox: {
 			showTextBox();
 			break;
 		}
@@ -1396,11 +1394,8 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		if (touch) {
 			bottomAnimTarget = inputFieldHeight;
 		} else {
-			int h = funcFocused ? MP.smallBoldFontHeight + 4 : 0;
-			if (inputFocused) {
-				h += inputFieldHeight;
-			}
-			bottomAnimTarget = h;
+			bottomAnimTarget = inputFocused ? (inputFieldHeight + MP.smallBoldFontHeight + 4) :
+					funcFocused ? MP.smallBoldFontHeight + 4 : 0;
 		}
 		keyGuide = false;
 		forwardPeer = null;

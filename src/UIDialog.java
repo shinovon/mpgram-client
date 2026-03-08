@@ -162,9 +162,9 @@ public class UIDialog extends UIItem implements LangConstants {
 			g.drawString(text, x + tx, y + fontHeight + 10, 0);
 		}
 
-		if (next != null && !focus) {
+		if (next != null) {
 			g.setColor(MPCanvas.colors[COLOR_CHATS_ITEM_SEPARATOR]);
-			g.drawLine(x, y + h, w, y + h);
+			g.drawLine(x, y + h - 1, w, y + h - 1);
 		}
 	}
 
@@ -180,7 +180,9 @@ public class UIDialog extends UIItem implements LangConstants {
 		font = MP.chatsListFontSize < 2 ? MP.smallPlainFont : MP.medPlainFont;
 		int fontHeight = font.getHeight();
 
-		timeWidth = font.stringWidth(time);
+		if (time != null) {
+			timeWidth = font.stringWidth(time);
+		}
 
 		if (unread != null) {
 			unreadWidth = font.stringWidth(unread);
