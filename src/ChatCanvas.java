@@ -1626,7 +1626,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 
 			setStatus(update.getObject("status"));
 			typing[0] = 0;
-			typingThread.interrupt();
+			if (typingThread != null) typingThread.interrupt();
 			break;
 		}
 		case UPDATE_USER_TYPING: {
@@ -1639,7 +1639,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 				} else {
 					removeTyper(update.getString("from_id"));
 				}
-				typingThread.interrupt();
+				if (typingThread != null) typingThread.interrupt();
 				break;
 			}
 			if (id.charAt(0) == '-' && update.has("top_msg_id") && topMsgId != update.getInt("top_msg_id"))
@@ -1674,7 +1674,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 				}
 				updateTypingStatus();
 			}
-			typingThread.interrupt();
+			if (typingThread != null) typingThread.interrupt();
 			synchronized (typingLock) {
 				typingLock.notify();
 			}
@@ -1692,7 +1692,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			} else if (typing[0] != 0) {
 				removeTyper(msg.getString("from_id", null));
 			}
-			typingThread.interrupt();
+			if (typingThread != null) typingThread.interrupt();
 
 			// delete old messages
 			while (count >= limit) {
@@ -1723,7 +1723,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			} else if (typing[0] != 0) {
 				removeTyper(msg.getString("from_id", null));
 			}
-			typingThread.interrupt();
+			if (typingThread != null) typingThread.interrupt();
 
 			UIMessage item = (UIMessage) table.get(msg.getString("id"));
 			if (item != null) {

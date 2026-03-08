@@ -644,7 +644,7 @@ public class MP extends MIDlet
 			tzOffset = TimeZone.getDefault().getRawOffset() / 1000;
 		} catch (Throwable ignored) {} // just to be sure
 
-		fullPlayerCover = reverseChat = f.getHeight() >= 360;
+		fullPlayerCover = f.getHeight() >= 360;
 
 //#ifndef NO_NOTIFY
 //#ifndef NO_NOKIAUI
@@ -669,6 +669,9 @@ public class MP extends MIDlet
 				|| d.indexOf("S7350") != -1)) {
 			forceKeyUI = true;
 		}
+
+		chatStatus = f.getHeight() >= 360;
+		reverseChat = true;
 //#endif
 
 		// load settings
@@ -757,6 +760,16 @@ public class MP extends MIDlet
 			playerVolume = j.getInt("playerVolume", playerVolume);
 			playerCreateMethod = j.getInt("playerCreateMethod", playerCreateMethod);
 			time12 = j.getBoolean("time12", time12);
+
+			int version = j.getInt("v", 0);
+			if (version < 1) {
+//#ifndef NO_CHAT_CANVAS
+				if (!legacyChatUI) {
+					chatStatus = f.getHeight() >= 360;
+					reverseChat = true;
+				}
+//#endif
+			}
 		} catch (Exception ignored) {}
 
 		// load auth
@@ -6614,6 +6627,8 @@ public class MP extends MIDlet
 		j.put("playerVolume", playerVolume);
 		j.put("playerCreateMethod", playerCreateMethod);
 		j.put("time12", time12);
+
+		j.put("v", 1);
 
 		byte[] b = j.toString().getBytes("UTF-8");
 		RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
