@@ -125,11 +125,11 @@ public class UIDialog extends UIItem implements LangConstants {
 				titleRender = title = UILabel.ellipsis(this.title, font, w - 8 - tx - timeWidth);
 			}
 			if (!focus) g.setColor(MPCanvas.colors[COLOR_CHATS_ITEM_TITLE]);
-			g.drawString(title, x + tx, y + 4, 0);
+			g.drawString(title, x + tx, y + 6, 0);
 		}
 		if (time != null) {
 			if (!focus) g.setColor(MPCanvas.colors[COLOR_CHATS_ITEM_TEXT]);
-			g.drawString(time, w - timeWidth - 6, y + 4, 0);
+			g.drawString(time, w - timeWidth - 6, y + 6, 0);
 		}
 
 		if (sender != null) {
@@ -139,7 +139,7 @@ public class UIDialog extends UIItem implements LangConstants {
 				senderWidth = font.stringWidth(sender);
 			}
 			if (!focus) g.setColor(MPCanvas.colors[COLOR_CHATS_ITEM_MEDIA]);
-			g.drawString(sender, x + tx, y + fontHeight + 8, 0);
+			g.drawString(sender, x + tx, y + fontHeight + 10, 0);
 			tx += senderWidth;
 		}
 
@@ -149,7 +149,7 @@ public class UIDialog extends UIItem implements LangConstants {
 			g.fillRect(w - 8 - uw, y + fontHeight + 6, uw + 4, fontHeight + 4);
 
 			g.setColor(MPCanvas.colors[COLOR_CHATS_ITEM_UNREAD_FG]);
-			g.drawString(unread, w - 6 - uw, y + fontHeight + 8, 0);
+			g.drawString(unread, w - 6 - uw, y + fontHeight + 10, 0);
 		}
 
 		if (text != null) {
@@ -159,7 +159,7 @@ public class UIDialog extends UIItem implements LangConstants {
 				textRender = text = UILabel.ellipsis(this.text, font, w - tx - 4 - uw);
 			}
 			if (!focus) g.setColor(MPCanvas.colors[media ? COLOR_CHATS_ITEM_MEDIA : COLOR_CHATS_ITEM_TEXT]);
-			g.drawString(text, x + tx, y + fontHeight + 8, 0);
+			g.drawString(text, x + tx, y + fontHeight + 10, 0);
 		}
 
 		if (next != null && !focus) {
