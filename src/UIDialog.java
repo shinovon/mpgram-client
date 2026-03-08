@@ -197,6 +197,12 @@ public class UIDialog extends UIItem implements LangConstants {
 	}
 
 	boolean action() {
+		if (unread != null && Integer.parseInt(unread) < MP.messagesLimit) {
+			unread = null;
+			textRender = null;
+			unreadWidth = 0;
+		}
+
 		((ChatsCanvas) container).select(this);
 		return true;
 	}
