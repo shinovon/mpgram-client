@@ -31,3 +31,5 @@
 !/.idea/misc.xml
 /META-INF/
 proguard*.cfg
+
+gwSettings.dat

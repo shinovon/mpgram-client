@@ -29,6 +29,10 @@
             <symbol name="NO_NOKIAUI" value="true"/>
          </symbolSet>
       </configuration>
+      <configuration active="false" name="OnDeviceDebug">
+         <device group="Nokia Symbian3 SDK v1.0 " name="SymbianDevice"/>
+         <symbolSet name="SymbianDevice"/>
+      </configuration>
    </configurations>
    <liblets/>
 </mtjMetadata>
