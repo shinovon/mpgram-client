@@ -63,7 +63,7 @@ public interface Constants {
 	String AVATAR_RECORD_PREFIX = "mcA";
 
 	// URLs
-	String DEFAULT_INSTANCE_URL = "http://mp2.nnchan.ru/"; // TODO
+	String DEFAULT_INSTANCE_URL = "http://mp.nnchan.ru/";
 	String API_URL = "api.php";
 	String AVA_URL = "ava.php";
 	String FILE_URL = "file.php";

@@ -5435,6 +5435,20 @@ public class MP extends MIDlet
 			if (url.indexOf(':') == -1) {
 				url = "http://".concat(url);
 			}
+			if (symbianJrt && System.getProperty("forcedomain") != null) {
+				if (url.startsWith("http")) {
+					if (System.getProperty("asd") != null) {
+						url = "nativeapp://application-uid=0x10008D39;content=4 " + url;
+					}
+				}
+				// xplore tries to open it as image
+//				else if (url.startsWith("file:")) {
+//					if (url.endsWith(".zip")) {
+//						url = "nativeapp://application-exe=Xplore.exe;content="
+//								+ url.substring(7).replace('/', '\\');
+//					}
+//				}
+			}
 			if (platformRequest(url)) destroyApp(true);
 		} catch (Exception e) {
 			e.printStackTrace();
