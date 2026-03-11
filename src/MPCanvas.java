@@ -325,6 +325,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 			queueRepaint();
 			
 			if (loadInternal(thread)) {
+				finished = true;
 				loading = false;
 				MP.display(this);
 			}

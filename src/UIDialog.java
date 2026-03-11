@@ -54,6 +54,7 @@ public class UIDialog extends UIItem implements LangConstants {
 	
 	Image image;
 	boolean enableImage;
+	boolean imageLoaded;
 	int imageWidth;
 
 	Font font;
@@ -66,7 +67,10 @@ public class UIDialog extends UIItem implements LangConstants {
 		JSONObject peer = MP.getPeer(id, false);
 		title = MP.getName(peer, false);
 
-		enableImage = MP.loadAvatars;
+		//noinspection AssignmentUsedAsCondition
+		if ((enableImage = MP.loadAvatars)) {
+			image = id.charAt(0) == '-' ? MP.chatDefaultImg : MP.userDefaultImg;
+		}
 
 		if (showMessage) {
 			silent = dialog.getBoolean("silent", peer.getBoolean("c", false) ?

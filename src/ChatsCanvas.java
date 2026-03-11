@@ -103,7 +103,7 @@ public class ChatsCanvas extends MPCanvas {
 			if (dialog.getBoolean("pin", false))
 				++pinnedCount;
 
-			safeAdd(thread, item, i == 0);
+			safeAdd(thread, item, !touch && i == 0);
 			if (MP.loadAvatars && !noAvas) MP.queueAvatar(id, item);
 		}
 		return true;
@@ -175,11 +175,17 @@ public class ChatsCanvas extends MPCanvas {
 	}
 
 	void shown() {
-		if (!finished || firstItem == null || noAvas)
+		if (firstItem == null)
+			return;
+		if (touch && focusedItem != null) {
+			focusItem(null, 0);
+			queueRepaint();
+		}
+		if (!finished || noAvas || !MP.loadAvatars)
 			return;
 		UIItem item = firstItem;
 		do {
-			if (!((UIDialog) item).enableImage || ((UIDialog) item).image != null) continue;
+			if (!((UIDialog) item).enableImage || ((UIDialog) item).imageLoaded) continue;
 			MP.queueAvatar(((UIDialog) item).id, item);
 		} while ((item = item.next) != null);
 	}
