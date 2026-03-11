@@ -1529,7 +1529,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			((ChatCanvas) container).selected(this);
 			break;
 		case LSeenList:
-			MP.openLoad(new ChatsList("Read",
+			MP.openLoad(new ChatsList(MP.L[LSeenList_Title],
 					"getMessageReadParticipants&peer=" + ((ChatCanvas) container).id + "&id=" + idStr,
 					null, false));
 			break;
