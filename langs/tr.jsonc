@@ -150,6 +150,8 @@
 	"Files": "Dosyalar",
 	"AudioFiles": "Müzik",
 	"VoiceMessages": "Sesli mesajlar",
+	"AddMember": "Add member", // Untranslated
+	"ViewInviteLink": "View invite link", // Untranslated
 
 	// Dialog commands
 	"Ok": "Tamam",
@@ -338,6 +340,7 @@
 	"Remove_Alert": "Remove \"%\"?", // Untranslated
 	"ResetSettings_Alert": "Reset settings?", // Untranslated
 	"ApplicationWillClose_Alert": "Application will close...", // Untranslated
+	"UserInvited_Alert": "User invited", // Untranslated
 
 	// Chat form
 	"ChatMedia_Title": "Medya",
@@ -434,6 +437,7 @@
 	"GroupInfo": "Grup Bilgisi",
 	"ChannelInfo": "Kanal Bilgisi",
 	"TopicInfo": "Konu Bilgisi",
+	"AddMember_Title": "Add Member", // Untranslated
 
 	"_member": " üye",
 	"_members": " üye",

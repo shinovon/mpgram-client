@@ -886,8 +886,8 @@ public class MP extends MIDlet
 		chatVoiceCmd = new Command(L[LVoiceMessages], Command.ITEM, 5);
 		gotoPinnedMsgCmd = new Command(L[LGoTo], Command.ITEM, 1);
 		chatMembersCmd = new Command(L[LMembers], Command.SCREEN, 6);
-		inviteMemberCmd = new Command("Add member", Command.SCREEN, 7); // TODO unlocalized
-		viewInviteLinkCmd = new Command("View invite link", Command.SCREEN, 8); // TODO unlocalized
+		inviteMemberCmd = new Command(L[LAddMember], Command.SCREEN, 7);
+		viewInviteLinkCmd = new Command(L[LViewInviteLink], Command.SCREEN, 8);
 
 		stickerItemCmd = new Command(L[LSticker], Command.ITEM, 1);
 		addStickerPackCmd = new Command(L[LAddStickers], Command.OK, 2);
@@ -2526,7 +2526,7 @@ public class MP extends MIDlet
 				.append("&id=").append(params[2]);
 				MP.api(sb.toString());
 
-				display(infoAlert("Member invited"), current); // TODO unlocalized
+				display(infoAlert(L[LUserInvited_Alert]), current);
 			} catch (Exception e) {
 				display(errorAlert(e), current);
 			}

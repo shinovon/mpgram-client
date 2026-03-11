@@ -150,6 +150,8 @@
 	"Files": "Arquivos",
 	"AudioFiles": "Áudios",
 	"VoiceMessages": "Voice messages", // Untranslated
+	"AddMember": "Add member", // Untranslated
+	"ViewInviteLink": "View invite link", // Untranslated
 	
 	// Dialog commands
 	"Ok": "OK",
@@ -338,6 +340,7 @@
 	"Remove_Alert": "Remove \"%\"?", // Untranslated
 	"ResetSettings_Alert": "Reset settings?", // Untranslated
 	"ApplicationWillClose_Alert": "Application will close...", // Untranslated
+	"UserInvited_Alert": "User invited", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Mídia",
@@ -434,6 +437,7 @@
 	"GroupInfo": "Informações do grupo", 
 	"ChannelInfo": "Informações do canal", 
 	"TopicInfo": "Informações do tópico", 
+	"AddMember_Title": "Add Member", // Untranslated
 	
 	"_member": " membro",
 	"_members": " membros",

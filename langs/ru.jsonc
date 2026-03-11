@@ -150,6 +150,8 @@
 	"Files": "Файлы",
 	"AudioFiles": "Музыка",
 	"VoiceMessages": "Голосовые сообщ.",
+	"AddMember": "Добавить участника",
+	"ViewInviteLink": "Показ. ссылку приглашения",
 	
 	// Dialog commands
 	"Ok": "ОК",
@@ -338,6 +340,7 @@
 	"Remove_Alert": "Удалить \"%\"?",
 	"ResetSettings_Alert": "Сбросить настройки?",
 	"ApplicationWillClose_Alert": "Приложение будет закрыто...",
+	"UserInvited_Alert": "Пользователь приглашен",
 	
 	// Chat form
 	"ChatMedia_Title": "Медиафайлы",
@@ -413,7 +416,7 @@
 	"UnknownTrack": "Без названия",
 	"Playlist_Title": "Плейлист",
 	"Volume": "Громкость",
-	"TogglePlaylistOrder": "Поменять порядок восп.",
+	"TogglePlaylistOrder": "Поменять порядок воспр.",
 	
 	// Profile/chat info
 	"Online": "в сети",
@@ -434,6 +437,7 @@
 	"GroupInfo": "Группа",
 	"ChannelInfo": "Канал",
 	"TopicInfo": "Тема",
+	"AddMember_Title": "Добавление участника",
 	
 	"_member": " участник",
 	"_members": " участника",

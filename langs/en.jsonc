@@ -150,6 +150,8 @@
 	"Files": "Files",
 	"AudioFiles": "Music",
 	"VoiceMessages": "Voice messages",
+	"AddMember": "Add member",
+	"ViewInviteLink": "View invite link",
 	
 	// Dialog commands
 	"Ok": "Ok",
@@ -338,6 +340,7 @@
 	"Remove_Alert": "Remove \"%\"?",
 	"ResetSettings_Alert": "Reset settings?",
 	"ApplicationWillClose_Alert": "Application will close...",
+	"UserInvited_Alert": "User invited",
 	
 	// Chat form
 	"ChatMedia_Title": "Media",
@@ -434,6 +437,7 @@
 	"GroupInfo": "Group Info",
 	"ChannelInfo": "Channel Info",
 	"TopicInfo": "Topic Info",
+	"AddMember_Title": "Add Member",
 	
 	"_member": " member",
 	"_members": " members",

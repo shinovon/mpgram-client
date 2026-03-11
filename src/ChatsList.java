@@ -80,7 +80,7 @@ public class ChatsList extends MPList {
 
 	// invite contacts to chat mode
 	public ChatsList() {
-		super("Add Member"); // TODO unlocalized
+		super(MP.L[LAddMember_Title]);
 		this.url = "getContacts&fields=status";
 		this.users = true;
 		this.noAvas = true;
