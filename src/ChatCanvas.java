@@ -211,24 +211,26 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		}
 
 		if (mediaFilter == null && query == null && postPeer == null) {
-			JSONObject dialog = ((JSONObject) MP.api("getDialog&id=".concat(id))).getObject("res");
-			if (dialog.has("read_out")) {
-				readOutboxId = dialog.getInt("read_out");
-			}
-			if (messageId == -1 && dialog.has("read_in")) {
-				messageId = 0;
-				int maxId = Math.max(readOutboxId, dialog.getInt("read_in"));
-				if (maxId != 0) {
-					messageId = maxId;
-					if (dialog.getInt("unread", 0) > limit) {
-						offsetId = maxId;
-						addOffset = -limit;
-						dir = 1;
-					} else {
-						offsetId = -1;
+			try {
+				JSONObject dialog = ((JSONObject) MP.api("getDialog&id=".concat(id))).getObject("res");
+				if (dialog.has("read_out")) {
+					readOutboxId = dialog.getInt("read_out");
+				}
+				if (messageId == -1 && dialog.has("read_in")) {
+					messageId = 0;
+					int maxId = Math.max(readOutboxId, dialog.getInt("read_in"));
+					if (maxId != 0) {
+						messageId = maxId;
+						if (dialog.getInt("unread", 0) > limit) {
+							offsetId = maxId;
+							addOffset = -limit;
+							dir = 1;
+						} else {
+							offsetId = -1;
+						}
 					}
 				}
-			}
+			} catch (Exception ignored) {}
 			if (MP.chatAvatar && photo == null && !photoQueued) {
 				MP.queueImage(id, this);
 				photoHeight = MP.avatarSize;

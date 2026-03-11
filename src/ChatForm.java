@@ -146,16 +146,18 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 		}
 		
 		if (mediaFilter == null && query == null && postPeer == null && messageId == -1) {
-			JSONObject dialog = ((JSONObject) MP.api("getDialog&id=".concat(id))).getObject("res");
-			if (dialog.has("read_in")) {
-				messageId = 0;
-				int maxId = dialog.getInt("read_in");
-				if (maxId != 0 && dialog.getInt("unread", 0) > limit) {
-					offsetId = messageId = maxId;
-					addOffset = -limit;
-					dir = 1;
+			try {
+				JSONObject dialog = ((JSONObject) MP.api("getDialog&id=".concat(id))).getObject("res");
+				if (dialog.has("read_in")) {
+					messageId = 0;
+					int maxId = dialog.getInt("read_in");
+					if (maxId != 0 && dialog.getInt("unread", 0) > limit) {
+						offsetId = messageId = maxId;
+						addOffset = -limit;
+						dir = 1;
+					}
 				}
-			}
+			} catch (Exception ignored) {}
 		}
 		
 		StringBuffer sb = new StringBuffer();
