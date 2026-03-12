@@ -2153,7 +2153,7 @@ public class MP extends MIDlet
 				playlistPeer = peer;
 			}
 			try {
-				StringBuffer sb = new StringBuffer(mode == 6 ? "getMessages&media=1" : "searchMessages&filter=Audio&media=1");
+				StringBuffer sb = new StringBuffer(mode == 6 ? "getMessages&media=1" : "searchMessages&filter=Music&media=1");
 				sb.append("&peer=").append(peer);
 				sb.append("&limit=").append(messagesLimit);
 				if (mode == 1 || mode == 4) {
