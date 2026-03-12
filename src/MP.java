@@ -2189,52 +2189,57 @@ public class MP extends MIDlet
 				JSONObject j = (JSONObject) MP.api(sb.toString());
 				JSONArray messages = j.getArray("messages");
 				int l = messages.size();
-				playlistSize = j.getInt("count", -1);
+				if (l != 0) {
+					playlistSize = j.getInt("count", -1);
 
-				if (mode == 0 || mode == 3 || mode == 6) {
-					playlist = messages;
-					playlistOffset = j.getInt("off", 0);
-					playlistIndex = 0;
-					currentMusic = playlist.getObject(0);
-					if (mode == 3 || mode == 6) {
-						display(initPlayerForm());
-						startPlayer(currentMusic);
-					} else {
-						display(list);
+					if (mode == 0 || mode == 3 || mode == 6) {
+						playlist = messages;
+						playlistOffset = j.getInt("off", 0);
+						playlistIndex = 0;
+						currentMusic = playlist.getObject(0);
+						if (mode == 3 || mode == 6) {
+							display(initPlayerForm());
+							startPlayer(currentMusic);
+						} else {
+							display(list);
+						}
+					} else if (mode == 1 || mode == 4) {
+						for (int i = 0; i < l; ++i) {
+							playlist.add(messages.getObject(i));
+						}
+						if (mode == 1) startNextMusic(playlistDirection, playlistIndex);
+					} else if (mode == 2 || mode == 5) {
+						playlistIndex += l;
+						playlistOffset -= l;
+						if (playlistOffset < 0) playlistOffset = 0;
+						for (int i = l - 1; i >= 0; --i) {
+							playlist.put(0, messages.getObject(i));
+						}
+						if (mode == 2) startNextMusic(!playlistDirection, playlistIndex);
 					}
-				} else if (mode == 1 || mode == 4) {
+
+					list.deleteAll();
+					l = playlist.size();
+					String t;
 					for (int i = 0; i < l; ++i) {
-						playlist.add(messages.getObject(i));
+						JSONObject media = playlist.getObject(i).getObject("media");
+						sb.setLength(0);
+						if (media.has("audio") && (t = media.getObject("audio").getString("artist", null)) != null) {
+							sb.append(t).append(" - ");
+						}
+						if (media.has("audio") && (t = media.getObject("audio").getString("title", null)) != null) {
+							sb.append(t);
+						} else {
+							sb.append(media.getString("name", ""));
+						}
+						list.append(sb.toString(), null);
 					}
-					if (mode == 1) startNextMusic(playlistDirection, playlistIndex);
-				} else if (mode == 2 || mode == 5) {
-					playlistIndex += l;
-					playlistOffset -= l;
-					if (playlistOffset < 0) playlistOffset = 0;
-					for (int i = l - 1; i >= 0; --i) {
-						playlist.put(0, messages.getObject(i));
-					}
-					if (mode == 2) startNextMusic(!playlistDirection, playlistIndex);
+					list.setSelectedIndex(playlistIndex, true);
+				} else if (mode == 3 || mode == 6) {
+					display(errorAlert("Unknown error!"), current);
+				} else if (mode == 0) {
+					display(list);
 				}
-
-				list.deleteAll();
-				l = playlist.size();
-				String t;
-				for (int i = 0; i < l; ++i) {
-					JSONObject media = playlist.getObject(i).getObject("media");
-					sb.setLength(0);
-					if (media.has("audio") && (t = media.getObject("audio").getString("artist", null)) != null) {
-						sb.append(t).append(" - ");
-					}
-					if (media.has("audio") && (t = media.getObject("audio").getString("title", null)) != null) {
-						sb.append(t);
-					} else {
-						sb.append(media.getString("name", ""));
-					}
-					list.append(sb.toString(), null);
-				}
-				list.setSelectedIndex(playlistIndex, true);
-
 				if (mode == 6) playlist = null;
 
 				if (cur) display(list);
