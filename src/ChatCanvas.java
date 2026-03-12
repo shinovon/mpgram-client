@@ -104,6 +104,9 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 	boolean editorShown;
 	boolean funcWasFocused;
 
+	UIMessage[] forwardMsgsOnLoad;
+	String forwardPeerOnLoad, forwardMsgOnLoad;
+
 	int topButtonWidth;
 
 	Image photo;
@@ -147,7 +150,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		this();
 		this.id = id;
 		this.topMsgId = topMsg;
-		this.forwardMsgs = forward;
+		this.forwardMsgsOnLoad = forward;
 		init(query == null);
 	}
 
@@ -156,8 +159,8 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		this();
 		this.id = id;
 		this.topMsgId = topMsg;
-		this.forwardPeer = forwardPeerId;
-		this.forwardMsg = forwardMsgId;
+		this.forwardPeerOnLoad = forwardPeerId;
+		this.forwardMsgOnLoad = forwardMsgId;
 		init(query == null);
 	}
 
@@ -486,9 +489,20 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 //#endif
 //#endif
 
-		if (!touch && keyGuideTime == 0) {
+		if (forwardMsgOnLoad != null || forwardMsgsOnLoad != null) {
+			if (hasInput && canWrite) {
+				forwardPeer = forwardPeerOnLoad;
+				forwardMsg = forwardMsgOnLoad;
+				forwardMsgs = forwardMsgsOnLoad;
+				focusInput(false);
+			}
+			forwardPeerOnLoad = null;
+			forwardMsgOnLoad = null;
+			forwardMsgsOnLoad = null;
+		} else if (!touch && keyGuideTime == 0) {
 			keyGuide = true;
 		}
+
 		return true;
 	}
 
@@ -1605,15 +1619,19 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 
 		String name1 = id1 == 0 ? null : MP.getName(Long.toString(id1), true);
 		if (count == 1) {
-			this.status = MP.localizeFormatted(L_isTyping, name1);
+			this.status = name1 == null ? MP.L[LTyping] : MP.localizeFormatted(L_isTyping, name1);
 		} else if (count == 2) {
 			String l = MP.L[L_areTyping];
 			String name2 = MP.getName(Long.toString(id2), true);
-			int idx1 = l.indexOf('%');
-			int idx2 = l.indexOf('%', idx1 + 1);
-			this.status = l.substring(0, idx1).concat(name1)
-					.concat(l.substring(idx1 + 1, idx2).concat(name2).concat(l.substring(idx2 + 1))
-			);
+			if (name1 == null || name2 == null) {
+				this.status = MP.L[LTyping];
+			} else {
+				int idx1 = l.indexOf('%');
+				int idx2 = l.indexOf('%', idx1 + 1);
+				this.status = l.substring(0, idx1).concat(name1)
+						.concat(l.substring(idx1 + 1, idx2).concat(name2).concat(l.substring(idx2 + 1))
+						);
+			}
 		} else if (count > 4) {
 			this.status = MP.L[LManyPeopleAreTyping];
 		} else {
