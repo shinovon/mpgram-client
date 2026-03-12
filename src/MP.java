@@ -205,8 +205,8 @@ public class MP extends MIDlet
 	static boolean reopenChat;
 	static boolean fullPlayerCover;
 	static boolean notifications;
-//#ifndef NO_NOTIFY
 	static boolean muteUsers, muteChats, muteBroadcasts;
+//#ifndef NO_NOTIFY
 	static boolean notifySound = true;
 	static int notifyMethod = 1; // 0: off, 1: alert, 2: nokiaui, 3: pigler api
 	static boolean notifyAvas = true;
@@ -5434,10 +5434,17 @@ public class MP extends MIDlet
 			((MPForm) p).closed(back);
 		} else if (p instanceof MPList) {
 			((MPList) p).closed(back);
-		} else if (p instanceof MPCanvas) {
+		}
+//#ifndef NO_CHAT_CANVAS
+		else if (p instanceof MPCanvas) {
 			((MPCanvas) p).closed(back);
 		}
-		if (back && (p instanceof MPForm || p instanceof MPList || p instanceof MPCanvas)) {
+//#endif
+		if (back && (p instanceof MPForm || p instanceof MPList
+//#ifndef NO_CHAT_CANVAS
+				|| p instanceof MPCanvas
+//#endif
+				)) {
 			imagesToLoad.removeAllElements();
 		}
 
@@ -5445,9 +5452,12 @@ public class MP extends MIDlet
 			((MPForm) d).shown();
 		} else if (d instanceof MPList) {
 			((MPList) d).shown();
-		} else if (d instanceof MPCanvas) {
+		}
+//#ifndef NO_CHAT_CANVAS
+		else if (d instanceof MPCanvas) {
 			((MPCanvas) d).shown();
 		}
+//#endif
 		if (back) return;
 		// push to history
 		if (d != mainDisplayable && (formHistory.isEmpty() || formHistory.lastElement() != d)) {
