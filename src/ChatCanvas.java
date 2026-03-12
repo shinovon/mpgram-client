@@ -1388,7 +1388,8 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 							r == 0 ? null : Integer.toString(r),
 							editMsgId == 0 ? null : Integer.toString(editMsgId),
 							file,
-							null, forwardPeer, forwardMsg, forwardMsgs
+							null, forwardPeer, forwardMsg, forwardMsgs,
+							forum ? Integer.toString(topMsgId) : null
 					});
 				}
 			}

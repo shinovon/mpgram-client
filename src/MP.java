@@ -1466,6 +1466,7 @@ public class MP extends MIDlet
 //#ifndef NO_CHAT_CANVAS
 				UIMessage[] fwdMsgs = ((Object[]) param).length < 9 ? null : (UIMessage[]) ((Object[]) param)[8];
 //#endif
+				String top = ((Object[]) param).length < 10 ? null : (String) ((Object[]) param)[9];
 
 				Alert alert = null;
 				if (sendChoice != null || file != null) {
@@ -1494,6 +1495,9 @@ public class MP extends MIDlet
 					sb.append("&peer=").append(writeTo);
 					if (replyTo != null) {
 						sb.append("&reply=").append(replyTo);
+					}
+					if (top != null) {
+						sb.append("&top=").append(top);
 					}
 					if (sendChoice != null) {
 						if (sendChoice[0]) {
@@ -4414,7 +4418,9 @@ public class MP extends MIDlet
 			if ((reopenChat || !longpoll) && MP.updatesThread != null) {
 				cancel(MP.updatesThread, true);
 			}
-			start(RUN_SEND_MESSAGE, new Object[] { t, ((ChatForm) current).id, null, null, null, null, null, null });
+			start(RUN_SEND_MESSAGE, new Object[] { t, ((ChatForm) current).id, null, null, null, null, null, null, null,
+					((ChatForm) current).forum ? Integer.toString(((ChatForm) current).topMsgId) : null
+			});
 			return;
 		}
 		if (c == stickerItemCmd) {
