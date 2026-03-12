@@ -2189,6 +2189,21 @@ public class MP extends MIDlet
 				JSONObject j = (JSONObject) MP.api(sb.toString());
 				JSONArray messages = j.getArray("messages");
 				int l = messages.size();
+
+				// filter
+				if (l != 0) {
+					try {
+						for (int i = l - 1; i >= 0; --i) {
+							JSONObject media = messages.getObject(i).getObject("media");
+							String t;
+							if (!"audio/mpeg".equals(t = media.getString("mime")) && !"audio/aac".equals(t)) {
+								messages.remove(i);
+							}
+						}
+					} catch (Exception ignored) {}
+					l = messages.size();
+				}
+
 				if (l != 0) {
 					playlistSize = j.getInt("count", -1);
 
