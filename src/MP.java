@@ -2237,6 +2237,8 @@ public class MP extends MIDlet
 					list.setSelectedIndex(playlistIndex, true);
 				} else if (mode == 3 || mode == 6) {
 					display(errorAlert("Unknown error!"), current);
+				} else if (mode == 1 || mode == 2) {
+					playerState = 0;
 				} else if (mode == 0) {
 					display(list);
 				}
