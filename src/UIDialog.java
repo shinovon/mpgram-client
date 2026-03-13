@@ -59,6 +59,8 @@ public class UIDialog extends UIItem implements LangConstants {
 
 	Font font;
 
+	boolean compact;
+
 	UIDialog(JSONObject dialog, boolean showMessage) {
 		focusable = true;
 
@@ -71,6 +73,8 @@ public class UIDialog extends UIItem implements LangConstants {
 		if ((enableImage = MP.loadAvatars)) {
 			image = id.charAt(0) == '-' ? MP.chatDefaultImg : MP.userDefaultImg;
 		}
+
+		compact = MP.compactChats;
 
 		if (showMessage) {
 			silent = dialog.getBoolean("silent", peer.getBoolean("c", false) ?
@@ -129,41 +133,43 @@ public class UIDialog extends UIItem implements LangConstants {
 				titleRender = title = UILabel.ellipsis(this.title, font, w - 8 - tx - timeWidth);
 			}
 			if (!focus) g.setColor(MPCanvas.colors[COLOR_CHATS_ITEM_TITLE]);
-			g.drawString(title, x + tx, y + 6, 0);
+			g.drawString(title, x + tx, y + (compact ? 4 : 6), 0);
 		}
 		if (time != null) {
 			if (!focus) g.setColor(MPCanvas.colors[COLOR_CHATS_ITEM_TEXT]);
-			g.drawString(time, w - timeWidth - 6, y + 6, 0);
+			g.drawString(time, w - timeWidth - 4, y + (compact ? 4 : 6), 0);
 		}
 
-		if (sender != null) {
-			String sender = senderRender;
-			if (sender == null) {
-				senderRender = sender = UILabel.ellipsis(this.sender, font, (w - tx) >> 1).concat(": ");
-				senderWidth = font.stringWidth(sender);
+		if (!compact) {
+			if (sender != null) {
+				String sender = senderRender;
+				if (sender == null) {
+					senderRender = sender = UILabel.ellipsis(this.sender, font, (w - tx) >> 1).concat(": ");
+					senderWidth = font.stringWidth(sender);
+				}
+				if (!focus) g.setColor(MPCanvas.colors[COLOR_CHATS_ITEM_MEDIA]);
+				g.drawString(sender, x + tx, y + fontHeight + 10, 0);
+				tx += senderWidth;
 			}
-			if (!focus) g.setColor(MPCanvas.colors[COLOR_CHATS_ITEM_MEDIA]);
-			g.drawString(sender, x + tx, y + fontHeight + 10, 0);
-			tx += senderWidth;
-		}
 
-		if (unread != null) {
-			g.setColor(MPCanvas.colors[silent ? COLOR_CHATS_ITEM_UNREAD_MUTED_BG : COLOR_CHATS_ITEM_UNREAD_BG]);
-			int uw = unreadWidth;
-			g.fillRect(w - 8 - uw, y + fontHeight + 8, uw + 4, fontHeight + 4);
+			if (unread != null) {
+				g.setColor(MPCanvas.colors[silent ? COLOR_CHATS_ITEM_UNREAD_MUTED_BG : COLOR_CHATS_ITEM_UNREAD_BG]);
+				int uw = unreadWidth;
+				g.fillRect(w - 8 - uw, y + fontHeight + 8, uw + 4, fontHeight + 4);
 
-			g.setColor(MPCanvas.colors[COLOR_CHATS_ITEM_UNREAD_FG]);
-			g.drawString(unread, w - 6 - uw, y + fontHeight + 10, 0);
-		}
-
-		if (text != null) {
-			String text = textRender;
-			if (text == null) {
-				int uw = unreadWidth == 0 ? 0 : (unreadWidth + 8);
-				textRender = text = UILabel.ellipsis(this.text, font, w - tx - 4 - uw);
+				g.setColor(MPCanvas.colors[COLOR_CHATS_ITEM_UNREAD_FG]);
+				g.drawString(unread, w - 6 - uw, y + fontHeight + 10, 0);
 			}
-			if (!focus) g.setColor(MPCanvas.colors[media ? COLOR_CHATS_ITEM_MEDIA : COLOR_CHATS_ITEM_TEXT]);
-			g.drawString(text, x + tx, y + fontHeight + 10, 0);
+
+			if (text != null) {
+				String text = textRender;
+				if (text == null) {
+					int uw = unreadWidth == 0 ? 0 : (unreadWidth + 8);
+					textRender = text = UILabel.ellipsis(this.text, font, w - tx - 4 - uw);
+				}
+				if (!focus) g.setColor(MPCanvas.colors[media ? COLOR_CHATS_ITEM_MEDIA : COLOR_CHATS_ITEM_TEXT]);
+				g.drawString(text, x + tx, y + fontHeight + 10, 0);
+			}
 		}
 
 		if (next != null) {
@@ -193,9 +199,9 @@ public class UIDialog extends UIItem implements LangConstants {
 		}
 
 		if (enableImage) {
-			MP.avatarSize = imageWidth = fontHeight * 2;
+			MP.avatarSize = imageWidth = compact ? fontHeight : (fontHeight * 2);
 		}
-		return contentHeight = (fontHeight + 8) * 2;
+		return contentHeight = (fontHeight + 8) * (compact ? 1 : 2);
 	}
 
 	boolean tap(int x, int y, boolean longTap) {

@@ -228,6 +228,7 @@ public class MP extends MIDlet
 	static boolean chatAvatar;
 	static String wallpaperPath = "";
 	static boolean addSelectCommand;
+	static boolean compactChats;
 //#endif
 //#ifndef NO_FILE
 	static int downloadMethod; // 0 - always ask, 1 - in app, 2 - browser
@@ -934,8 +935,8 @@ public class MP extends MIDlet
 //#ifndef NO_AVATARS
 //#ifndef NO_CHAT_CANVAS
 		if (!legacyChatUI) {
-			Font font = MP.chatsListFontSize < 2 ? MP.smallPlainFont : MP.medPlainFont;
-			avatarSize = font.getHeight() * 2;
+			avatarSize = getFontHeight(MP.chatsListFontSize < 2 ? MP.smallPlainFont : MP.medPlainFont)
+					* (compactChats ? 1 : 2);
 		}
 //#endif
 		if (loadAvatars) {
