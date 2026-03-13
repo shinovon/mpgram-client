@@ -3239,7 +3239,7 @@ public class MP extends MIDlet
 							L[LForceKeyInput],
 							L[LChatAvatar],
 //#endif
-							"12-hour time format"
+							L[L12HourTimeFormat],
 					}, null);
 					uiChoice.setSelectedIndex(i = 0, reverseChat);
 					uiChoice.setSelectedIndex(++i, showMedia);

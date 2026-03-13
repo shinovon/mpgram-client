@@ -236,6 +236,7 @@
 	"ForceKeyInput": "Force keypad input", // Untranslated
 	"ChatAvatar": "Show avatar in chat", // Untranslated
 	"ChatWallpaper": "Chat wallpaper", // Untranslated
+	"12HourTimeFormat": "12-hour time format", // Untranslated
 
 	// Behaviour settings
 	"WaitForPageToLoad": "Sayfa yüklenmesini bekle",

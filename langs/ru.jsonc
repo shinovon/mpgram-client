@@ -236,6 +236,7 @@
 	"ForceKeyInput": "Исп. кнопочный ввод",
 	"ChatAvatar": "Показ. аватарку в чате",
 	"ChatWallpaper": "Обои чата",
+	"12HourTimeFormat": "12-час. формат времени",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Ждать полной загрузки",

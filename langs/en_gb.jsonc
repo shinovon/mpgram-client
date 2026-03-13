@@ -236,6 +236,7 @@
 	"ForceKeyInput": "Force keypad input",
 	"ChatAvatar": "Show avatar in chat",
 	"ChatWallpaper": "Chat wallpaper",
+	"12HourTimeFormat": "12-hour time format",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Wait for page to load",
