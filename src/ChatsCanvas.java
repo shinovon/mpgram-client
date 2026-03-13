@@ -46,6 +46,10 @@ public class ChatsCanvas extends MPCanvas {
 		addCommand(MP.backCmd);
 		addCommand(MP.foldersCmd);
 		addCommand(MP.refreshCmd);
+
+		if (!touch && MP.addSelectCommand) {
+			addCommand(MP.canvasOkCmd);
+		}
 	}
 
 	// forward message mode
@@ -58,6 +62,10 @@ public class ChatsCanvas extends MPCanvas {
 		this.msgId = msgId;
 		addCommand(MP.archiveCmd);
 		addCommand(MP.cancelCmd);
+
+		if (!touch && MP.addSelectCommand) {
+			addCommand(MP.canvasOkCmd);
+		}
 	}
 
 	// forward messages
@@ -71,6 +79,10 @@ public class ChatsCanvas extends MPCanvas {
 		this.msgs = msgs;
 		addCommand(MP.archiveCmd);
 		addCommand(MP.cancelCmd);
+
+		if (!touch && MP.addSelectCommand) {
+			addCommand(MP.canvasOkCmd);
+		}
 	}
 
 	boolean loadInternal(Thread thread) throws Exception {

@@ -113,7 +113,7 @@ public class UIDialog extends UIItem implements LangConstants {
 			g.setColor(MPCanvas.colors[COLOR_CHATS_ITEM_HIGHLIGHT_FG]);
 		}
 
-		int fontHeight = font.getHeight();
+		int fontHeight = MP.getFontHeight(font);
 		g.setFont(font);
 
 		int tx = 4;
@@ -182,7 +182,7 @@ public class UIDialog extends UIItem implements LangConstants {
 		textRender = null;
 
 		font = MP.chatsListFontSize < 2 ? MP.smallPlainFont : MP.medPlainFont;
-		int fontHeight = font.getHeight();
+		int fontHeight = MP.getFontHeight(font);
 
 		if (time != null) {
 			timeWidth = font.stringWidth(time);

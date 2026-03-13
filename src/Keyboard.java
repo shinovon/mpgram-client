@@ -121,11 +121,11 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 	private int textHintColor = DEFAULT_TEXT_HINT_COLOR;
 
 	private Font font = Font.getFont(0, 0, 0);
-	private int fontHeight = font.getHeight();
+	private int fontHeight = MP.getFontHeight(font);
 	private String layoutPackRes;
 	private boolean hasQwertyLayouts;
 	private Font textFont = Font.getFont(0, 0, 8);
-	private int textFontHeight = textFont.getHeight();
+	private int textFontHeight = MP.getFontHeight(textFont);
 
 	boolean hasRepeatEvents;
 	boolean hasPointerEvents = true;
@@ -577,10 +577,10 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 			g.setColor(textHintColor);
 			s = textHint;
 		}
-		int th = textFont.getHeight() + 2;
+		int th = MP.getFontHeight(textFont) + 2;
 		if (multiLine && !hint) {
 			String[] arr = getTextArray();
-			int yo = -(height - textFont.getHeight()) >> 1;
+			int yo = -(height - MP.getFontHeight(textFont)) >> 1;
 			while (th * arr.length > height + yo) {
 				yo += th;
 			}
@@ -635,7 +635,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 			}
 			drawCaret(g, cx, cy);
 		} else {
-			textY += (height - textFont.getHeight()) >> 1;
+			textY += (height - MP.getFontHeight(textFont)) >> 1;
 			if (!hint) {
 				int ww = 0;
 				while (textFont.stringWidth(s) >= width - 4) {
@@ -972,7 +972,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 	 */
 	public void setKeyFont(Font font) {
 		this.font = font;
-		this.fontHeight = font.getHeight();
+		this.fontHeight = MP.getFontHeight(font);
 		this.keyTextY = ((keyHeight - fontHeight) >> 1) + 1;
 	}
 
@@ -983,7 +983,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 	 */
 	public void setTextFont(Font font) {
 		this.textFont = font;
-		this.textFontHeight = font.getHeight();
+		this.textFontHeight = MP.getFontHeight(font);
 	}
 
 	/**
@@ -1568,7 +1568,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 		x -= 2;
 		if (multiLine) {
 			String[] arr = getTextArray();
-			int textHeight = textFont.getHeight() + 2;
+			int textHeight = MP.getFontHeight(textFont) + 2;
 			int line = y / textHeight;
 			if (arr != null && line >= 0 && line < arr.length) {
 				int lineLength = arr[line].length();

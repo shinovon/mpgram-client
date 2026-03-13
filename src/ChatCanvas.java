@@ -1224,11 +1224,11 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 	protected void sizeChanged(int width, int height) {
 		skipRender = false;
 		updateEditor = true;
-		MP.smallPlainFontHeight = MP.smallPlainFont.getHeight();
+		MP.smallPlainFontHeight = MP.getFontHeight(MP.smallPlainFont);
 		MP.smallPlainFontSpaceWidth = MP.smallPlainFont.charWidth(' ');
-		MP.smallBoldFontHeight = MP.smallBoldFont.getHeight();
-		MP.medPlainFontHeight = MP.medPlainFont.getHeight();
-		MP.medBoldFontHeight = MP.medBoldFont.getHeight();
+		MP.smallBoldFontHeight = MP.getFontHeight(MP.smallBoldFont);
+		MP.medPlainFontHeight = MP.getFontHeight(MP.medPlainFont);
+		MP.medBoldFontHeight = MP.getFontHeight(MP.medBoldFont);
 		queueRepaint();
 	}
 

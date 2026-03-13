@@ -835,7 +835,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 								s.setFont(MP.medPlainFont);
 								safeInsert(thread, insert++, s);
 								
-								Spacer sp = new Spacer(MP.medPlainFont.charWidth(' '), MP.medPlainFont.getHeight());
+								Spacer sp = new Spacer(MP.medPlainFont.charWidth(' '), MP.getFontHeight(MP.medPlainFont));
 								s.setLayout(Item.LAYOUT_CENTER);
 								safeInsert(thread, insert++, sp);
 

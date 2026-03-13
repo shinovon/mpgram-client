@@ -1116,7 +1116,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			Font f = MP.smallBoldFont;
 
 			int by = -BUTTON_GRID_VGAP;
-			int bh = replyMarkupButtonHeight = f.getHeight() + BUTTON_GRID_VGAP * 2 + BUTTON_PADDING_HEIGHT * 2;
+			int bh = replyMarkupButtonHeight = MP.getFontHeight(f) + BUTTON_GRID_VGAP * 2 + BUTTON_PADDING_HEIGHT * 2;
 			int count = 0;
 			Vector v = new Vector();
 			for (int i = 0; i < replyMarkup.length; ++i) {

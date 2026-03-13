@@ -320,6 +320,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 		try {
 			count = 0;
 			firstItem = lastItem = null;
+			scrollTarget = -1;
 			scrollCurrentItem = scrollTargetItem = focusedItem = null;
 			kineticScroll = scroll = 0;
 			queueRepaint();

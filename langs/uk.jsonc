@@ -94,6 +94,7 @@
 	"Contacts": "Контакти",
 	"Search": "Пошук",
 	"OpenByLink": "Відкрити за посиланням",
+	"Select_OK": "Select", // Untranslated
 	
 	// Message commands
 	"OpenChat": "Відкрити чат",

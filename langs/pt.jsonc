@@ -94,6 +94,7 @@
 	"Contacts": "Contatos",
 	"Search": "Buscar",
 	"OpenByLink": "Abrir pelo link",
+	"Select_OK": "Select", // Untranslated
 
 	// Message commands
 	"OpenChat": "Abrir conversa",

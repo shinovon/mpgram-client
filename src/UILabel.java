@@ -139,7 +139,7 @@ public class UILabel extends UIItem {
 			String url = (String) e[2];
 			int style = e[3] == null ? 0 : ((int[]) e[3])[0];
 
-			fh = font.getHeight();
+			fh = MP.getFontHeight(font);
 			if (text == null || "\n".equals(text)) {
 				if (ellipsis) {
 					if (x != 0) x += font.charWidth(' ');

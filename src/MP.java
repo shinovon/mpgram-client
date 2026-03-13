@@ -144,11 +144,11 @@ public class MP extends MIDlet
 	static final Font smallBoldFont = Font.getFont(0, Font.STYLE_BOLD, Font.SIZE_SMALL);
 	static final Font smallItalicFont = Font.getFont(0, Font.STYLE_ITALIC, Font.SIZE_SMALL);
 
-	static int smallPlainFontHeight = smallPlainFont.getHeight();
+	static int smallPlainFontHeight = MP.getFontHeight(smallPlainFont);
 	static int smallPlainFontSpaceWidth = smallPlainFont.charWidth(' ');
-	static int smallBoldFontHeight = smallBoldFont.getHeight();
-	static int medPlainFontHeight = medPlainFont.getHeight();
-	static int medBoldFontHeight = medBoldFont.getHeight();
+	static int smallBoldFontHeight = MP.getFontHeight(smallBoldFont);
+	static int medPlainFontHeight = MP.getFontHeight(medPlainFont);
+	static int medBoldFontHeight = MP.getFontHeight(medBoldFont);
 
 	static final IllegalStateException cancelException = new IllegalStateException("cancel");
 
@@ -227,6 +227,7 @@ public class MP extends MIDlet
 	static boolean lazyLoading = true;
 	static boolean chatAvatar;
 	static String wallpaperPath = "";
+	static boolean addSelectCommand;
 //#endif
 //#ifndef NO_FILE
 	static int downloadMethod; // 0 - always ask, 1 - in app, 2 - browser
@@ -291,6 +292,9 @@ public class MP extends MIDlet
 	static Command contactsCmd;
 	static Command searchChatsCmd;
 	static Command openLinkCmd;
+//#ifndef NO_CHAT_CANVAS
+	static Command canvasOkCmd;
+//#endif
 
 	static Command itemChatCmd;
 	static Command itemChatInfoCmd;
@@ -672,6 +676,7 @@ public class MP extends MIDlet
 
 		chatStatus = f.getHeight() >= 360;
 		reverseChat = true;
+		addSelectCommand = !symbian && f.getHeight() > 220;
 //#endif
 
 		// load settings
@@ -838,6 +843,9 @@ public class MP extends MIDlet
 		contactsCmd = new Command(L[LContacts], Command.SCREEN, 9);
 		searchChatsCmd = new Command(L[LSearch], Command.SCREEN, 10);
 		openLinkCmd = new Command(L[LOpenByLink], Command.SCREEN, 11);
+//#ifndef NO_CHAT_CANVAS
+		canvasOkCmd = new Command(L[LSelect_OK], Command.OK, 0);
+//#endif
 
 		itemChatCmd = new Command(L[LOpenChat], Command.ITEM, 1);
 		itemChatInfoCmd = new Command(L[LProfile], Command.ITEM, 2);
@@ -6712,6 +6720,11 @@ public class MP extends MIDlet
 		}
 		formHistory.removeAllElements();
 		System.gc();
+	}
+
+	static int getFontHeight(Font font) {
+		// TODO samsung
+		return font.getHeight();
 	}
 
 	// endregion

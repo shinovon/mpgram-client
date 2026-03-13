@@ -126,7 +126,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 
 			int w = getWidth(), h = getHeight();
 			g.setFont(f);
-			int fh = f.getHeight();
+			int fh = MP.getFontHeight(f);
 			if (toDraw == null) {
 				if (firstDraw) {
 					firstDraw = false;

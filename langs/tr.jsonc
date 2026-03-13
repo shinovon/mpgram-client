@@ -94,6 +94,7 @@
 	"Contacts": "Kişiler",
 	"Search": "Ara",
 	"OpenByLink": "Bağlantıyla aç",
+	"Select_OK": "Select", // Untranslated
 
 	// Message commands
 	"OpenChat": "Sohbeti aç",

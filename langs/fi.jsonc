@@ -94,6 +94,7 @@
 	"Contacts": "Yhteystiedot",
 	"Search": "Haku",
 	"OpenByLink": "Avaa linkillä",
+	"Select_OK": "Select", // Untranslated
 	
 	// Message commands
 	"OpenChat": "Avaa keskustelu",
