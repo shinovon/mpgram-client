@@ -49,6 +49,6 @@ Does not work on most Samsung phones.
 
 ## License notice
 
-This project's license is messed up, as it contains modified parts of TUBE42 imagelib (LGPL) and jazzlib (GPLv2 or later).
+This project contains modified parts of TUBE42 imagelib (LGPL) and jazzlib (GPLv2 or later).
 
 If you want to fork this project under the MIT license, you have to exclude jazzlib (src/zip) from it.
