@@ -227,7 +227,7 @@ public class MP extends MIDlet
 	static boolean lazyLoading = true;
 	static boolean chatAvatar;
 	static String wallpaperPath = "";
-	static boolean addSelectCommand;
+	static boolean noSelectCommand;
 	static boolean compactChats;
 //#endif
 //#ifndef NO_FILE
@@ -677,7 +677,7 @@ public class MP extends MIDlet
 
 		chatStatus = f.getHeight() >= 360;
 		reverseChat = true;
-		addSelectCommand = !symbian && f.getHeight() > 220;
+		noSelectCommand = symbian;
 //#endif
 
 		// load settings

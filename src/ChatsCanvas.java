@@ -47,7 +47,7 @@ public class ChatsCanvas extends MPCanvas {
 		addCommand(MP.foldersCmd);
 		addCommand(MP.refreshCmd);
 
-		if (!touch && MP.addSelectCommand) {
+		if (!touch && !MP.noSelectCommand && getWidth() > 176) {
 			addCommand(MP.canvasOkCmd);
 		}
 	}
@@ -63,7 +63,7 @@ public class ChatsCanvas extends MPCanvas {
 		addCommand(MP.archiveCmd);
 		addCommand(MP.cancelCmd);
 
-		if (!touch && MP.addSelectCommand) {
+		if (!touch && !MP.noSelectCommand && getWidth() > 176) {
 			addCommand(MP.canvasOkCmd);
 		}
 	}
@@ -80,7 +80,7 @@ public class ChatsCanvas extends MPCanvas {
 		addCommand(MP.archiveCmd);
 		addCommand(MP.cancelCmd);
 
-		if (!touch && MP.addSelectCommand) {
+		if (!touch && !MP.noSelectCommand && getWidth() > 176) {
 			addCommand(MP.canvasOkCmd);
 		}
 	}
