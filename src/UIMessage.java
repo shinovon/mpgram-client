@@ -851,7 +851,7 @@ public class UIMessage extends UIItem implements LangConstants {
 						showDate = false;
 						break date;
 					}
-				} else {
+//				} else {
 //					showDate = false;
 //					break date;
 				}
@@ -1071,7 +1071,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			if (l != 0 && reactsText == null) {
 				int[] pos = (int[]) ((Object[]) text.render.elementAt(l - 1))[3];
 				tw = pos[0] + pos[2];
-				if (!(timeBreak = tw + timeWidth >= (photo ? maxW : cw))) {
+				if (!(timeBreak = tw + timeWidth >= cw)) {
 					tw += timeWidth;
 				}
 				maxW = Math.max(maxW, minW + tw);

@@ -29,13 +29,6 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 	private final String id;
 
 
-	/**
-	 * Creates the view.
-	 * 
-	 * @param emo  Object with data.
-	 * @param prev Previous screen.
-	 * @param page Number of page to start.
-	 */
 	public ViewCanvas(String peer, String id) {
 		this.peer = peer;
 		this.id = id;
@@ -76,11 +69,6 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 		}
 	}
 
-	/**
-	 * Called when image must change its zoom.
-	 * 
-	 * @param size New zoom to apply.
-	 */
 	protected void resize() {
 		if (resizing) return;
 		resizing = true;
