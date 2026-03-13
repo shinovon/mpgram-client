@@ -6278,15 +6278,34 @@ public class MP extends MIDlet
 		StringBuffer s = new StringBuffer();
 		int c;
 		int i = 1;
+		boolean patch = false;
+		boolean index = true;
 		while ((c = r.read()) > 0) {
 			if (c == '\r') continue;
 			if (c == '\\') {
 				s.append((c = r.read()) == 'n' ? '\n' : (char) c);
 				continue;
 			}
-			if (c == '\n') {
-				L[i++] = s.toString();
+			if (patch && index && c == ':') {
+				i = Integer.parseInt(s.toString());
+				index = false;
 				s.setLength(0);
+				continue;
+			}
+			if (c == '\n') {
+				String t = s.toString();
+				s.setLength(0);
+				if (i == 1 && t.startsWith("/l/")) {
+					patch = true;
+					loadLocale(t.substring(3));
+					continue;
+				}
+				if (patch) {
+					L[i] = t;
+					index = true;
+					continue;
+				}
+				L[i++] = t;
 				continue;
 			}
 			s.append((char) c);

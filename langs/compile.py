@@ -59,24 +59,42 @@ if not err:
         with open(n, encoding="utf-8") as f:
             j = load_jsonc(f, lines)
 
+        patch = "LocaleBase" in j
+
         with open("../res/l/" + n[:-6], mode='w', encoding="utf-8") as f:
-            for s in en_json.keys():
-                if s in j:
-                    if j[s] == None:
-                        f.write(escape(en_json[s]))
-                        #print("Missing key:", s)
-                    else:
+            if patch:
+                f.write("/l/")
+                f.write(j["LocaleBase"])
+                f.write("\n")
+
+                i = 1
+                for s in en_json.keys():
+                    if s in j:
                         o = en_json[s]
                         t = j[s]
-                        if n != "ar.jsonc" and len(o.strip()) != 0 and len(t.strip()) != 0 and (o.strip().lower()[0] == o.strip()[0]) != (t.strip().lower()[0] == t.strip()[0]):
-                            print('Warning: "{}": "{}"->"{}" does not match original case'.format(s, o, t))
+                        f.write(str(i))
+                        f.write(":")
                         f.write(escape(t))
-                else:
-                    f.write(escape(en_json[s]))
-                    print("Missing key:", s)
-                f.write("\n")
+                        f.write("\n")
+                    i = i + 1
+            else:
+                for s in en_json.keys():
+                    if s in j:
+                        if j[s] == None:
+                            f.write(escape(en_json[s]))
+                            #print("Missing key:", s)
+                        else:
+                            o = en_json[s]
+                            t = j[s]
+                            if n != "ar.jsonc" and len(o.strip()) != 0 and len(t.strip()) != 0 and (o.strip().lower()[0] == o.strip()[0]) != (t.strip().lower()[0] == t.strip()[0]):
+                                print('Warning: "{}": "{}"->"{}" does not match original case'.format(s, o, t))
+                            f.write(escape(t))
+                    else:
+                        f.write(escape(en_json[s]))
+                        print("Missing key:", s)
+                    f.write("\n")
         
-        if len(lines) != len(en_lines):
+        if not patch and len(lines) != len(en_lines):
             print("Filling")
             for k in en_json.keys():
                 if k in j.keys():
