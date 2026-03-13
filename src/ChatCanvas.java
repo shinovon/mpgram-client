@@ -191,6 +191,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 
 	public boolean loadInternal(Thread thread) throws Exception {
 		selected = 0;
+		bottom = 0;
 		titleRender = null;
 		statusRender = null;
 		fileRender = null;
@@ -465,9 +466,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			if (!MP.globalUpdates) {
 				MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
 			}
-			if (MP.chatStatus) {
-				(typingThread = new Thread(this)).start();
-			}
+			(typingThread = new Thread(this)).start();
 		}
 		if (botAnswer != null) {
 			JSONObject b = botAnswer;
@@ -689,9 +688,18 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					if (title == null) {
 						titleRender = title = UILabel.ellipsis(query != null ? MP.L[LSearch] : this.title, font, tw - 4);
 					}
-					g.setColor(colors[COLOR_CHAT_PANEL_FG]);
 					g.setFont(font);
-					g.drawString(title, tx, ty, 0);
+					if (!medfont && status != null && typing[0] != 0) {
+						String status = statusRender;
+						if (status == null) {
+							statusRender = status = UILabel.ellipsis(this.status, MP.smallPlainFont, tw - 4);
+						}
+						g.setColor(colors[COLOR_CHAT_STATUS_HIGHLIGHT_FG]);
+						g.drawString(status, tx, ty, 0);
+					} else {
+						g.setColor(colors[COLOR_CHAT_PANEL_FG]);
+						g.drawString(title, tx, ty, 0);
+					}
 				}
 				if (medfont && !hideStatus) {
 					g.setColor(colors[typing[0] != 0 ? COLOR_CHAT_STATUS_HIGHLIGHT_FG : COLOR_CHAT_STATUS_FG]);
@@ -1652,7 +1660,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			break;
 		}
 		case UPDATE_USER_TYPING: {
-			if (!MP.chatStatus) break;
+//			if (!MP.chatStatus) break;
 
 			if ("sendMessageCancelAction".equals(update.getObject("action").getString("_"))) {
 				setStatus(null);
@@ -1896,7 +1904,6 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 	private void setStatus(JSONObject status) {
 		String s;
 		if (status == null) {
-			this.status = null;
 			statusRender = null;
 			if (MP.chatStatus) {
 				if (wasOnline == 1) {
@@ -1912,6 +1919,9 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					this.status = s;
 					queueRepaint();
 				}
+			} else if (this.status != null) {
+				this.status = null;
+				queueRepaint();
 			}
 			return;
 		}
