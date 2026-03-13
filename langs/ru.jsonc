@@ -94,7 +94,7 @@
 	"Contacts": "Контакты",
 	"Search": "Поиск",
 	"OpenByLink": "Открыть по ссылке",
-	"Select_OK": "Select", // Untranslated
+	"Select_OK": "Выбрать",
 	
 	// Message commands
 	"OpenChat": "Открыть чат",
