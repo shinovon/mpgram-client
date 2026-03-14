@@ -2882,6 +2882,12 @@ public class MP extends MIDlet
 				start(RUN_BAN_MEMBER, new String[] {((ChatsList) d).peerId, null, id});
 				return;
 			}
+//#ifndef NO_CHAT_CANVAS
+			if (c == canvasOkCmd) {
+				((MPCanvas) d).key(-5, false);
+				return;
+			}
+//#endif
 		}
 		if (d instanceof MPChat) { // chat form commands
 			if (c == latestCmd) {
