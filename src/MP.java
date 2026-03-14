@@ -2207,7 +2207,7 @@ public class MP extends MIDlet
 						for (int i = l - 1; i >= 0; --i) {
 							JSONObject media = messages.getObject(i).getObject("media");
 							String t;
-							if (!"audio/mpeg".equals(t = media.getString("mime")) && !"audio/aac".equals(t)) {
+							if (!"audio/mpeg".equals(t = media.getString("mime")) && !"audio/aac".equals(t) && !"audio/midi".equals(t)) {
 								messages.remove(i);
 							}
 						}
@@ -4634,7 +4634,7 @@ public class MP extends MIDlet
 				String t;
 				// filter playable media
 				if (!"audio/mpeg".equals(t = msg.getObject("media").getString("mime"))
-						&& !"audio/aac".equals(t)
+						&& !"audio/aac".equals(t) && !"audio/midi".equals(t)
 						/*&& !"audio/m4a".equals(t)*/)
 					continue;
 				playlistIndex = idx;
