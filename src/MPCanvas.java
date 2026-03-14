@@ -255,7 +255,9 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 							bgImg = Image.createImage(p);
 						}
 
-						/*int i = */Math.max(bgWidth = bgImg.getWidth(), bgHeight = bgImg.getHeight());
+						bgWidth = bgImg.getWidth();
+						bgHeight = bgImg.getHeight();
+//						int i = Math.max(bgWidth = bgImg.getWidth(), bgHeight = bgImg.getHeight());
 //						int s = Math.max(getWidth(), getHeight());
 //						if (i > s) {
 //							bgImg = MP.resize(bgImg, s, s);
@@ -530,7 +532,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 					if (d > 0) {
 						x = d;
 					} else if (pointedItem instanceof UIMessage) {
-						x = Math.max(-100, Math.min(0, d));
+						x = Math.max(-100, d);
 					}
 				}
 

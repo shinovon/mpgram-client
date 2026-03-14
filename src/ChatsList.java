@@ -206,6 +206,7 @@ public class ChatsList extends MPList {
 		synchronized (lock) {
 //#ifndef NO_AVATARS
 			boolean loadAva;
+			//noinspection AssignmentUsedAsCondition
 			if ((loadAva = (img == null))) {
 				img = id.charAt(0) == '-' ? MP.chatDefaultImg : MP.userDefaultImg;
 			}

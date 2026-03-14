@@ -582,13 +582,11 @@ public class MP extends MIDlet
 		}
 
 		boolean s40 = false;
-		try {
-			// s40 check
-			if (Class.forName("com.nokia.mid.impl.isa.jam.Jam") != null) {
-				series40 = s40 = true;
-				systemName = "Series 40";
-			}
-		} catch (Exception ignored) {}
+		// s40 check
+		if (checkClass("com.nokia.mid.impl.isa.jam.Jam")) {
+			series40 = s40 = true;
+			systemName = "Series 40";
+		}
 
 		if (systemName == null && (p = System.getProperty("os.name")) != null) {
 			if ((v = System.getProperty("os.version")) != null) {
@@ -600,20 +598,24 @@ public class MP extends MIDlet
 		// Test UTF-8 support
 		byte[] b = new byte[] { (byte) 0xF0, (byte) 0x9F, (byte) 0x98, (byte) 0x83 };
 		try {
+			//noinspection ResultOfMethodCallIgnored
 			new InputStreamReader(new ByteArrayInputStream(b), encoding = "UTF-8").read();
 			if (new String(b, encoding).length() != 2) throw new Exception();
 		} catch (Exception e) {
 			try {
+				//noinspection ResultOfMethodCallIgnored
 				new InputStreamReader(new ByteArrayInputStream(b), encoding = "UTF8").read();
 				if (new String(b, encoding).length() != 2) throw new Exception();
 			} catch (Exception e2) {
 				utf = false;
 				b = new byte[] { (byte) 0xD0, (byte) 0xB2, (byte) 0xD1, (byte) 0x8B, (byte) 0xD1, (byte) 0x84 };
 				try {
+					//noinspection ResultOfMethodCallIgnored
 					new InputStreamReader(new ByteArrayInputStream(b), encoding = "UTF-8").read();
 					if (new String(b, encoding).length() != 3) throw new Exception();
 				} catch (Exception e3) {
 					try {
+						//noinspection ResultOfMethodCallIgnored
 						new InputStreamReader(new ByteArrayInputStream(b), encoding = "UTF8").read();
 						if (new String(b, encoding).length() != 3) throw new Exception();
 					} catch (Exception e4) {
@@ -1203,7 +1205,7 @@ public class MP extends MIDlet
 								url = sb.toString();
 							} else if (src instanceof JSONObject) { // sticker or document
 								url = instanceUrl + FILE_URL + "?a&sticker=" + ((JSONObject) src).getString("id")
-										+ "&access_hash=" + ((JSONObject) src).getString("access_hash") + "&s=32&p=r" + 
+										+ "&access_hash=" + ((JSONObject) src).getString("access_hash") + "&s=32&p=r" +
 										("application/x-tgsticker".equals(((JSONObject) src).getString("mime", ""))
 												? "tgss" : "sprevs");
 //#ifndef NO_CHAT_CANVAS
@@ -1287,7 +1289,7 @@ public class MP extends MIDlet
 							gc();
 						} catch (Exception e) {
 							e.printStackTrace();
-						} 
+						}
 					}
 				}
 			} catch (Exception e) {
@@ -1616,7 +1618,7 @@ public class MP extends MIDlet
 			}
 			break;
 		}
-		case RUN_JOIN_CHANNEL: 
+		case RUN_JOIN_CHANNEL:
 		case RUN_LEAVE_CHANNEL: {
 			try {
 				MP.api((run == RUN_JOIN_CHANNEL ? "join" : "leave").concat("Channel&id=").concat((String) param));
@@ -2641,7 +2643,7 @@ public class MP extends MIDlet
 			if (msg.getBoolean("out", false)
 					|| update.getBoolean("muted", false)
 					|| msg.getBoolean("silent", false)
-				    || (global && (update.has("left")
+					|| (global && (update.has("left")
 					|| (!msg.getBoolean("mentioned", false)
 					&& (update.has("mute_until") || update.has("broadcast") ?
 					muteBroadcasts : update.has("chat") ? muteChats : muteUsers))))) {
@@ -3103,7 +3105,7 @@ public class MP extends MIDlet
 					return;
 				}
 
-				TextBox t = new TextBox(L[LPhoneNumber], phone == null ? "" : phone, 30, TextField.PHONENUMBER);
+				TextBox t = new TextBox(L[LPhoneNumber], /*phone != null ? phone : */"", 30, TextField.PHONENUMBER);
 				t.addCommand(cancelCmd);
 				t.addCommand(authNextCmd);
 				t.setCommandListener(this);
@@ -4434,7 +4436,7 @@ public class MP extends MIDlet
 			browse("tel:".concat(((StringItem) item).getText()));
 			return;
 		}
-		if (c == sendCmd && current instanceof ChatForm) { 
+		if (c == sendCmd && current instanceof ChatForm) {
 			// textfield send
 			String t;
 			if ((t = ((TextField) item).getString().trim()).length() == 0)
@@ -4516,7 +4518,7 @@ public class MP extends MIDlet
 			return;
 		}
 		if (item == playerVolumeGauge) {
-			try { 
+			try {
 				((VolumeControl) currentPlayer.getControl("VolumeControl"))
 				.setLevel(playerVolume = playerVolumeGauge.getValue());
 			} catch (Throwable ignored) {}
@@ -4773,7 +4775,7 @@ public class MP extends MIDlet
 
 	static void fillPeersCache(JSONObject r) {
 		JSONObject users = r.getObject("users", null);
-		if (users != null && usersCache != null) {
+		if (users != null) {
 			if (usersCache.size() > peersCacheThreshold) {
 				usersCache.clear();
 			}
@@ -4786,7 +4788,7 @@ public class MP extends MIDlet
 			}
 		}
 		JSONObject chats = r.getObject("chats", null);
-		if (chats != null && chatsCache != null) {
+		if (chats != null) {
 			if (chatsCache.size() > peersCacheThreshold) {
 				chatsCache.clear();
 			}
@@ -5167,7 +5169,7 @@ public class MP extends MIDlet
 	}
 
 	static void copyMessageLink(String peerId, String msgId) {
-		StringBuffer sb = new StringBuffer("https://t.me/"); 
+		StringBuffer sb = new StringBuffer("https://t.me/");
 		String username = ((MPChat) current).username();
 		if (peerId.charAt(0) == '-' && username == null) {
 			sb.append("c/");
@@ -5829,10 +5831,10 @@ public class MP extends MIDlet
 			}
 			if (in != null) try {
 				in.close();
-			} catch (IOException e) {}
+			} catch (IOException ignored) {}
 			if (hc != null) try {
 				hc.close();
-			} catch (IOException e) {}
+			} catch (IOException ignored) {}
 		}
 //		System.out.println(res instanceof JSONObject ?
 //				((JSONObject) res).format(0) : res instanceof JSONArray ?
@@ -5956,13 +5958,13 @@ public class MP extends MIDlet
 		} finally {
 			if (file != null) try {
 				file.close();
-			} catch (IOException e) {}
+			} catch (IOException ignored) {}
 			if (httpIn != null) try {
 				httpIn.close();
-			} catch (IOException e) {}
+			} catch (IOException ignored) {}
 			if (http != null) try {
 				http.close();
-			} catch (IOException e) {}
+			} catch (IOException ignored) {}
 		}
 	}
 //#endif
@@ -6034,10 +6036,9 @@ public class MP extends MIDlet
 	}
 
 	static byte[] get(String url) throws IOException {
-		HttpConnection hc = null;
+		HttpConnection hc = openHttpConnection(url);
 		InputStream in = null;
 		try {
-			hc = openHttpConnection(url);
 			hc.setRequestMethod("GET");
 			int r;
 			if ((r = hc.getResponseCode()) >= 400) {
@@ -6047,10 +6048,10 @@ public class MP extends MIDlet
 		} finally {
 			try {
 				if (in != null) in.close();
-			} catch (IOException e) {}
+			} catch (IOException ignored) {}
 			try {
-				if (hc != null) hc.close();
-			} catch (IOException e) {}
+				hc.close();
+			} catch (IOException ignored) {}
 		}
 	}
 
@@ -6060,12 +6061,11 @@ public class MP extends MIDlet
 			return get(url);
 		}
 
-		InputConnection c = null;
+		// file and other
+		InputConnection c = (InputConnection) Connector.open(url, Connector.READ);
 		InputStream in = null;
 		int len;
 		try {
-			// file and other
-			c = (InputConnection) Connector.open(url, Connector.READ);
 			in = c.openInputStream();
 //#ifndef NO_FILE
 			if (c instanceof FileConnection) {
@@ -6079,10 +6079,10 @@ public class MP extends MIDlet
 		} finally {
 			try {
 				if (in != null) in.close();
-			} catch (IOException e) {}
+			} catch (IOException ignored) {}
 			try {
-				if (c != null) c.close();
-			} catch (IOException e) {}
+				c.close();
+			} catch (IOException ignored) {}
 		}
 	}
 
@@ -6723,6 +6723,7 @@ public class MP extends MIDlet
 
 	private static boolean checkClass(String s) {
 		try {
+			//noinspection ConstantValue
 			return Class.forName(s) != null;
 		} catch (Exception e) {
 			return false;
@@ -6928,12 +6929,14 @@ public class MP extends MIDlet
 							if (i != 0) {
 								s = new StringItem(null, text.substring(0, j));
 								s.setFont(f);
+								//noinspection DataFlowIssue
 								((MPForm) form).safeInsert(thread, insert++, s);
 							}
 							s = new StringItem(null, text.substring(j, k));
 							s.setFont(f);
 							s.setDefaultCommand(richTextLinkCmd);
 							s.setItemCommandListener(midlet);
+							//noinspection DataFlowIssue
 							((MPForm) form).safeInsert(thread, insert++, s);
 						}
 
@@ -6968,12 +6971,14 @@ public class MP extends MIDlet
 							if (i != 0) {
 								s = new StringItem(null, text.substring(0, i));
 								s.setFont(f);
+								//noinspection DataFlowIssue
 								((MPForm) form).safeInsert(thread, insert++, s);
 							}
 							s = new StringItem(null, text.substring(i, k));
 							s.setFont(f);
 							s.setDefaultCommand(richTextLinkCmd);
 							s.setItemCommandListener(midlet);
+							//noinspection DataFlowIssue
 							((MPForm) form).safeInsert(thread, insert++, s);
 						}
 
@@ -7006,6 +7011,7 @@ public class MP extends MIDlet
 		}
 
 		if (space != 0 /* && instanceof MPForm */ ) {
+			//noinspection DataFlowIssue // checked above
 			((MPForm) form).safeInsert(thread, insert++, new Spacer(f.charWidth(' ') * space, f.getBaselinePosition()));
 		}
 
@@ -7018,7 +7024,7 @@ public class MP extends MIDlet
 		if (state[RT_PRE] != 0) {
 			face = Font.FACE_MONOSPACE;
 			style = Font.STYLE_BOLD;
-			size = Font.SIZE_SMALL;
+//			size = Font.SIZE_SMALL;
 		} else {
 			if (state[RT_BOLD] != 0) {
 				style |= Font.STYLE_BOLD;
@@ -7103,6 +7109,7 @@ public class MP extends MIDlet
 		resize_rgb_filtered(src_i, dst, w, h, size_w, size_h);
 
 		// not needed anymore
+		//noinspection UnusedAssignment
 		src_i = null;
 
 		return Image.createRGBImage(dst, size_w, size_h, true);
@@ -7116,14 +7123,14 @@ public class MP extends MIDlet
 		//
 		// The pixel position is defined by y_a and y_b,
 		// which are 24.8 fixed point numbers
-		// 
+		//
 		// for bilinear interpolation, we use y_a1 <= y_a <= y_b1
 		// and x_a1 <= x_a <= x_b1, with y_d and x_d defining how long
 		// from x/y_b1 we are.
 		//
-		// since we are resizing one line at a time, we will at most 
+		// since we are resizing one line at a time, we will at most
 		// need two lines from the source image (y_a1 and y_b1).
-		// this will save us some memory but will make the algorithm 
+		// this will save us some memory but will make the algorithm
 		// noticeably slower
 
 		for (int index1 = 0, y = 0; y < h1; y++) {
@@ -7250,6 +7257,7 @@ public class MP extends MIDlet
 				throw new RuntimeException("JSON: Unexpected end of text");
 			if (str.indexOf('\\') != -1) {
 				char[] chars = str.toCharArray();
+				//noinspection UnusedAssignment
 				str = null;
 				int l = chars.length - 1;
 				StringBuffer sb = new StringBuffer();
@@ -7325,7 +7333,6 @@ public class MP extends MIDlet
 					}
 				}
 				str = sb.toString();
-				sb = null;
 				return str;
 			}
 			return str.substring(1, length);
@@ -7344,6 +7351,7 @@ public class MP extends MIDlet
 
 			for (int splIndex; i < length; i = splIndex + 1) {
 				// skip all spaces
+				//noinspection StatementWithEmptyBody
 				for (; i < length - 1 && str.charAt(i) <= ' '; i++);
 
 				splIndex = i;
@@ -7416,7 +7424,7 @@ public class MP extends MIDlet
 					if (length > 8) // (str.length() - (str.charAt(0) == '-' ? 1 : 0)) >= 10
 						return new Long(Long.parseLong(str));
 					return new Integer(Integer.parseInt(str));
-				} catch (Exception e) {}
+				} catch (Exception ignored) {}
 			}
 			throw new RuntimeException("JSON: Couldn't be parsed: ".concat(str));
 		}
@@ -7474,7 +7482,7 @@ public class MP extends MIDlet
 				return ((Integer) o).intValue();
 			if (o instanceof Long)
 				return (int) ((Long) o).longValue();
-		} catch (Throwable e) {}
+		} catch (Throwable ignored) {}
 		throw new RuntimeException("JSON: Cast to int failed: " + o);
 	}
 
@@ -7486,7 +7494,7 @@ public class MP extends MIDlet
 				return ((Integer) o).longValue();
 			if (o instanceof Long)
 				return ((Long) o).longValue();
-		} catch (Throwable e) {}
+		} catch (Throwable ignored) {}
 		throw new RuntimeException("JSON: Cast to long failed: " + o);
 	}
 

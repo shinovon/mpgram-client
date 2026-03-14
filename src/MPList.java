@@ -56,8 +56,8 @@ public abstract class MPList extends List implements LangConstants {
 			if (MP.useLoadingForm && MP.current == this) {
 				MP.display(this);
 			}
-		} catch (InterruptedException e) {
-		} catch (InterruptedIOException e) {
+		} catch (InterruptedException ignored) {
+		} catch (InterruptedIOException ignored) {
 		} catch (Exception e) {
 			if (e == MP.cancelException || canceled || this.thread != thread) {
 				// ignore exception if cancel detected

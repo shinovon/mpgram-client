@@ -1184,7 +1184,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 					//noinspection BusyWait
 					Thread.sleep(5000);
 					typing = 0;
-				} catch (Exception e) {}
+				} catch (Exception ignored) {}
 				if (typing == 0) {
 					setStatus(null);
 				}
@@ -1192,7 +1192,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 
 			setTicker(null);
 			typing = 0;
-		} catch (Exception e) {}
+		} catch (Exception ignored) {}
 	}
 	
 	// interface getters

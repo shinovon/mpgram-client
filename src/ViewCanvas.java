@@ -84,6 +84,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 						+ (Math.min(getWidth(), getHeight()) * zoom) + "&tw=" + (getWidth() * zoom) + "&th=" + (getHeight() * zoom));
 				l = b.length;
 				origImg = Image.createImage(b, 0, b.length);
+				//noinspection UnusedAssignment
 				b = null;
 				System.gc();
 			} catch (RuntimeException e) {
