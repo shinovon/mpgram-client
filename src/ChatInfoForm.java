@@ -106,6 +106,10 @@ public class ChatInfoForm extends MPForm {
 		}
 		
 		if (isUser) {
+//#if "" != ""
+			// assert that user profile can not be opened in invite mode
+			if (mode == 3) throw new RuntimeException();
+//#endif
 			if (info.has("status")) {
 				sb.setLength(0);
 				JSONObject status = info.getObject("status");

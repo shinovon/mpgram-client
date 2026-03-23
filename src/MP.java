@@ -191,7 +191,6 @@ public class MP extends MIDlet
 	static boolean notifyAvas = true;
 	static int notificationVolume = 100;
 //#endif
-	static final boolean globalUpdates = false; // unused
 	static boolean longpoll = true;
 	static int playerVolume = 50;
 	static boolean voiceConversion;
@@ -1088,7 +1087,7 @@ public class MP extends MIDlet
 					start(RUN_CHECK_OTA, null);
 				}
 
-				if (keepAlive || notifications || globalUpdates)
+				if (keepAlive || notifications)
 					start(RUN_KEEP_ALIVE, null);
 				break;
 			} catch (APIException e) {
@@ -1547,7 +1546,7 @@ public class MP extends MIDlet
 					((MPChat) current).sent();
 				}
 
-				if ((reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) && !globalUpdates) {
+				if (reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) {
 					// load latest messages
 					commandAction(latestCmd, current);
 					// for some reason these commented lines cause weird crash on nokia e52
@@ -1637,7 +1636,7 @@ public class MP extends MIDlet
 			break;
 		}
 		case RUN_CHAT_UPDATES: { // chat updates loop
-			if (!globalUpdates && MP.updatesThread != null) {
+			if (MP.updatesThread != null) {
 				try {
 					cancel(MP.updatesThread, true);
 					while (MP.updatesThread != null || MP.updatesRunning) {
@@ -1798,14 +1797,13 @@ public class MP extends MIDlet
 						&& (keepAlive
 //#ifndef NO_NOTIFY
 						|| notifications
-						|| globalUpdates
 //#endif
 						)) {
 					//noinspection BusyWait
-					Thread.sleep(globalUpdates ? 1 : wasShown ? pushInterval : pushBgInterval);
+					Thread.sleep(wasShown ? pushInterval : pushBgInterval);
 					if (
 //#ifndef NO_NOTIFY
-							(!notifications || !globalUpdates) &&
+							!notifications &&
 //#endif
 							(threadConnections.size() != 0
 							|| (playerState == 1 && (reopenChat || series40))))
@@ -1818,7 +1816,7 @@ public class MP extends MIDlet
 					} catch (Exception ignored) {}
 
 					// update status
-					if (keepAlive && !globalUpdates) {
+					if (keepAlive) {
 						try {
 							if ((shown && !notifications) || wasShown != shown) {
 								api(wasShown != shown ?
@@ -1830,13 +1828,11 @@ public class MP extends MIDlet
 
 //#ifndef NO_NOTIFY
 					// get notifications
-					if (!globalUpdates) {
-						if (!notifications && (!chatsList.isShown()))
-							continue;
-						if (updatesThread != null && !paused) {
-							check = true;
-							continue;
-						}
+					if (!notifications && (!chatsList.isShown()))
+						continue;
+					if (updatesThread != null && !paused) {
+						check = true;
+						continue;
 					}
 					try {
 						while (check && user != null) {
@@ -1855,123 +1851,21 @@ public class MP extends MIDlet
 						}
 
 						sb.setLength(0);
-						if (globalUpdates) {
-							sb.append("updates&media=1")
-									.append("&offset=").append(offset)
-									.append("&timeout=").append(longpoll ? updatesTimeout : 1)
-									.append("&limit=200")
-									.append("&p=1&m=1")
-							;
-							if (!longpoll) {
-								sb.append("&longpoll=0");
-							} else {
-								sb.append("&delay=").append(shown ? 1 : 5);
-							}
+						sb.append("notifications")
+						.append("&offset=").append(offset)
+						.append("&mu=").append(muteUsers ? '1' : '0')
+						.append("&mc=").append(muteChats ? '1' : '0')
+						.append("&mb=").append(muteBroadcasts ? '1' : '0')
+						;
+						if (shown) sb.append("&online=1");
 
-							j = (JSONObject) api(sb.toString());
+						j = (JSONObject) api(sb.toString());
 
-							if (j.has("cancel")) {
-								throw cancelException;
-							}
+						JSONArray updates = j.getArray("res");
 
-							JSONArray updates = j.getArray("res");
-							int l = updates.size();
+						offset = j.getInt("offset");
 
-							offset = updates.getObject(l - 1).getInt("update_id");
-
-							MPChat form = current instanceof MPChat ? (MPChat) current : null;
-
-							if (form != null && form.updating()) {
-								String peer = form.id();
-								boolean channel = form.channel();
-								boolean user = peer.charAt(0) != '-';
-								int topMsgId = form.topMsgId();
-
-								for (int i = 0; i < l; ++i) {
-									JSONObject update = updates.getObject(i);
-									update = update.getObject("update");
-									String type = update.getString("_");
-
-									JSONObject msg = update.getObject("message", null);
-
-									if (user && "updateUserStatus".equals(type)) {
-										if (!update.getString("user_id").equals(peer)) continue;
-										form.handleUpdate(MPChat.UPDATE_USER_STATUS, update);
-									} else if (user ? "updateUserTyping".equals(type)
-											: channel ? "updateChannelUserTyping".equals(type)
-											: "updateChatUserTyping".equals(type)) {
-										if (user && !update.getString("user_id").equals(peer)) continue;
-										if (channel) {
-											if (!peer.equals(update.getString("channel_id"))
-													|| (update.has("top_msg_id") && update.getInt("top_msg_id") != topMsgId)) {
-												continue;
-											}
-										} else if (!update.getString("chat_id").equals(peer)) continue;
-										form.handleUpdate(MPChat.UPDATE_USER_TYPING, update);
-									} else if (channel ? "updateNewChannelMessage".equals(type)
-											: "updateNewMessage".equals(type)) {
-										if (msg.getInt("id") <= form.firstMsgId()) continue;
-										if (user) {
-											if ((peer.equals(selfId) && !peer.equals(msg.getString("peer_id", peer)))
-													|| !msg.getString("peer_id").equals(peer) &&
-													(msg.getBoolean("out", false) || !selfId.equals(msg.getString("peer_id")) || !peer.equals(msg.getString("from_id")))) {
-												continue;
-											}
-										} else if (!peer.equals(msg.getString("peer_id"))
-												|| (msg.has("reply") && msg.getObject("reply").getInt("top") != topMsgId)) {
-											continue;
-										}
-										form.handleUpdate(MPChat.UPDATE_NEW_MESSAGE, update);
-									} else if (channel && "updateDeleteChannelMessages".equals(type)) {
-										if (!peer.equals(update.getString("channel_id"))
-												|| (update.has("top_msg_id") && update.getInt("top_msg_id") != topMsgId)) {
-											continue;
-										}
-										form.handleUpdate(MPChat.UPDATE_DELETE_MESSAGES, update);
-									} else if (channel ? "updateEditChannelMessage".equals(type)
-											: "updateEditMessage".equals(type)) {
-										if (user) {
-											if ((peer.equals(selfId) && !peer.equals(msg.getString("peer_id", peer)))
-													|| !msg.getString("peer_id").equals(peer) &&
-													(msg.getBoolean("out", false) || !selfId.equals(msg.getString("peer_id")) || !peer.equals(msg.getString("from_id")))) {
-												continue;
-											}
-										} else if (!peer.equals(msg.getString("peer_id"))
-												|| (msg.has("reply") && msg.getObject("reply").getInt("top") != topMsgId)) {
-											continue;
-										}
-										form.handleUpdate(MPChat.UPDATE_EDIT_MESSAGE, update);
-									} else if (channel ? "updateReadChannelOutbox".equals(type)
-											: "updateReadHistoryOutbox".equals(type)) {
-										if ((update.has("peer") && !update.getString("peer").equals(peer))
-												|| (update.has("channel_id") && !update.getString("channel_id").equals(peer)))
-											continue;
-										form.handleUpdate(MPChat.UPDATE_READ_OUTBOX, update);
-									} else if (!channel && "updateDeleteMessages".equals(type)) {
-										form.handleUpdate(MPChat.UPDATE_DELETE_MESSAGES, update);
-									}
-								}
-							}
-
-							handleNotifications(updates, sb, true);
-						} else {
-							sb.setLength(0);
-							sb.append("notifications")
-							.append("&offset=").append(offset)
-							.append("&mu=").append(muteUsers ? '1' : '0')
-							.append("&mc=").append(muteChats ? '1' : '0')
-							.append("&mb=").append(muteBroadcasts ? '1' : '0')
-							;
-							if (shown) sb.append("&online=1");
-
-							j = (JSONObject) api(sb.toString());
-
-							JSONArray updates = j.getArray("res");
-
-							offset = j.getInt("offset");
-
-							handleNotifications(updates, sb, false);
-						}
+						handleNotifications(updates, sb);
 					} catch (Exception e) {
 						e.printStackTrace();
 						if (e.toString().indexOf("Interrupted") != -1 || e == cancelException) {
@@ -2037,7 +1931,7 @@ public class MP extends MIDlet
 					} else throw e;
 				}
 
-				if ((reopenChat || !longpoll || !form.updating() || !form.endReached()) && !globalUpdates) {
+				if (reopenChat || !longpoll || !form.updating() || !form.endReached()) {
 					// see ChatForm#postLoad() for answer handling
 					form.setBotAnswer(j);
 					commandAction(latestCmd, current);
@@ -2080,7 +1974,7 @@ public class MP extends MIDlet
 				String[] s = (String[]) param;
 				MP.api("pinMessage&peer=".concat(s[0].concat("&id=").concat(s[1])));
 
-				if ((reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) && !globalUpdates) {
+				if (reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) {
 					// load latest messages
 					commandAction(latestCmd, current);
 				} else if (display.getCurrent() != current) {
@@ -2104,7 +1998,7 @@ public class MP extends MIDlet
 				MP.api(sb.toString());
 
 				goBackTo((Displayable) form.chatForm);
-				if ((reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) && !globalUpdates) {
+				if (reopenChat || !longpoll || !((MPChat) current).updating() || !((MPChat) current).endReached()) {
 					// load latest messages
 					commandAction(latestCmd, (Displayable) form.chatForm);
 				}
@@ -2537,10 +2431,7 @@ public class MP extends MIDlet
 		case RUN_INVITE_MEMBER: {
 			try {
 				String[] params = (String[]) param;
-				StringBuffer sb = new StringBuffer(params[0]);
-				sb.append("&peer=").append(params[1])
-				.append("&id=").append(params[2]);
-				MP.api(sb.toString());
+				MP.api(params[0] + "&peer=" + params[1] + "&id=" + params[2]);
 
 				display(infoAlert(L[LUserInvited_Alert]), current);
 			} catch (Exception e) {
@@ -2588,7 +2479,7 @@ public class MP extends MIDlet
 	}
 
 //#ifndef NO_NOTIFY
-	void handleNotifications(JSONArray updates, StringBuffer sb, boolean global) {
+	void handleNotifications(JSONArray updates, StringBuffer sb) {
 		int l = updates.size();
 		JSONArray newMsgs = null;
 
@@ -2621,13 +2512,8 @@ public class MP extends MIDlet
 
 			if (msg.getBoolean("out", false)
 					|| update.getBoolean("muted", false)
-					|| msg.getBoolean("silent", false)
-					|| (global && (update.has("left")
-					|| (!msg.getBoolean("mentioned", false)
-					&& (update.has("mute_until") || update.has("broadcast") ?
-					muteBroadcasts : update.has("chat") ? muteChats : muteUsers))))) {
-				if (!global || update.has("left")) continue;
-				msg.put("muted", true);
+					|| msg.getBoolean("silent", false)) {
+				continue;
 			}
 
 			if (newMsgs == null) {
@@ -2673,35 +2559,6 @@ public class MP extends MIDlet
 					sb.append(" +").append(count);
 				}
 				String title = sb.toString();
-
-				if (globalUpdates && chatsList != null) {
-					if (chatsList instanceof ChatsList) {
-						ChatsList chatsList = (ChatsList) MP.chatsList;
-						try {
-							synchronized (chatsList.lock) {
-								Vector ids = chatsList.ids;
-								int idx = ids.indexOf(peerId);
-								int newIdx;
-								if (idx != -1) {
-									ids.removeElementAt(idx);
-									Image img = chatsList.getImage(idx);
-									chatsList.delete(idx);
-									newIdx = Math.min(chatsList.size(), idx < chatsList.pinnedCount ? 0 : chatsList.pinnedCount);
-
-									chatsList.insert(null, newIdx, sb.append('\n').append(text).toString(), peerId, img);
-									ids.insertElementAt(peerId, newIdx);
-//							} else {
-//								newIdx = Math.min(chatsList.size(), chatsList.pinnedCount);
-								}
-							}
-						} catch (Exception ignored) {}
-					}
-//#ifndef NO_CHAT_CANVAS
-					else {
-						// TODO
-					}
-//#endif
-				}
 
 				if (!paused && current instanceof MPChat && current.isShown() && peerId.equals(((MPChat) current).id())) {
 //#ifndef NO_NOKIAUI
@@ -2794,6 +2651,12 @@ public class MP extends MIDlet
 	// region UI Listeners
 
 	public void commandAction(Command c, Displayable d) {
+//#if ""!=""
+		// assertion so idea won't complain about possible NPEs
+		// if it can be null on some device/platform, then we don't want to support that one.
+		if (d == null) throw new RuntimeException();
+//#endif
+
 		if (d instanceof ChatsList
 //#ifndef NO_CHAT_CANVAS
 				|| d instanceof ChatsCanvas
@@ -2824,14 +2687,6 @@ public class MP extends MIDlet
 				openLoad(new ChatsList(L[LContacts], "getContacts&fields=status", null, false));
 				return;
 			}
-			if (c == nextPageCmd) {
-				((ChatsList) d).paginate(1);
-				return;
-			}
-			if (c == prevPageCmd) {
-				((ChatsList) d).paginate(-1);
-				return;
-			}
 			if (c == openLinkCmd) {
 				TextBox t = new TextBox("", "https://t.me/", 200, TextField.URL);
 				t.addCommand(cancelCmd);
@@ -2850,19 +2705,35 @@ public class MP extends MIDlet
 				display(t);
 				return;
 			}
-			if (c == banMemberCmd) {
-				int i = ((List) d).getSelectedIndex();
-				if (i == -1) return;
+			{ // only lcdui commands
+				if (c == nextPageCmd) {
+					//noinspection DataFlowIssue
+					((ChatsList) d).paginate(1);
+					return;
+				}
+				if (c == prevPageCmd) {
+					//noinspection DataFlowIssue
+					((ChatsList) d).paginate(-1);
+					return;
+				}
+				if (c == banMemberCmd) {
+					//noinspection DataFlowIssue
+					int i = ((List) d).getSelectedIndex();
+					if (i == -1) return;
 
-				String id = (String) ((ChatsList) d).ids.elementAt(i);
-				if (id == null) return;
+					//noinspection DataFlowIssue
+					String id = (String) ((ChatsList) d).ids.elementAt(i);
+					if (id == null) return;
 
-				display(loadingAlert(L[LLoading]), current);
-				start(RUN_BAN_MEMBER, new String[] {((ChatsList) d).peerId, null, id});
-				return;
+					display(loadingAlert(L[LLoading]), current);
+					//noinspection DataFlowIssue
+					start(RUN_BAN_MEMBER, new String[]{((ChatsList) d).peerId, null, id});
+					return;
+				}
 			}
 //#ifndef NO_CHAT_CANVAS
 			if (c == canvasOkCmd) {
+				//noinspection DataFlowIssue
 				((MPCanvas) d).key(-5, false);
 				return;
 			}
@@ -3133,6 +3004,7 @@ public class MP extends MIDlet
 			}
 			if (c == authCodeCmd) {
 				// code entered
+				//noinspection DataFlowIssue
 				String code = ((TextBox) d).getString();
 				if (code.length() < 5) {
 					display(errorAlert(L[LInvalidCode_Alert]), null);
@@ -3145,6 +3017,7 @@ public class MP extends MIDlet
 			}
 			if (c == authPasswordCmd) {
 				// password entered
+				//noinspection DataFlowIssue
 				String pass = ((TextBox) d).getString();
 				if (pass.length() == 0) {
 					display(errorAlert(L[LCloudPasswordEmpty_Alert]), null);
@@ -3727,6 +3600,7 @@ public class MP extends MIDlet
 				return;
 			}
 			if (c == saveLanguagesCmd) {
+				//noinspection DataFlowIssue
 				List l = (List) d;
 				boolean[] selected = new boolean[l.size()];
 
@@ -3808,6 +3682,7 @@ public class MP extends MIDlet
 //#ifndef NO_CHAT_CANVAS
 				if (!legacyChatUI) {
 					commandAction(backCmd, d);
+					//noinspection DataFlowIssue
 					String s = ((ChatCanvas) current).text = ((TextBox) d).getString();
 					if (ChatCanvas.keyboard != null) {
 						ChatCanvas.keyboard.setText(s);
@@ -3817,6 +3692,7 @@ public class MP extends MIDlet
 				}
 //#endif
 
+				//noinspection DataFlowIssue
 				messageField.setString(((TextBox) d).getString());
 				c = backCmd;
 			}
@@ -3828,17 +3704,21 @@ public class MP extends MIDlet
 			return;
 		}
 		if (c == removeStickerPackCmd) {
+			//noinspection DataFlowIssue
 			int i = ((List) d).getSelectedIndex();
 			if (i == -1) return;
 
+			//noinspection DataFlowIssue
 			JSONObject set = ((StickerPacksList) d).sets.getObject(i);
 			confirm(RUN_UNINSTALL_STICKER_SET | 0x100, set, null, MP.localizeFormatted(LRemove_Alert, set.getString("title")));
 			return;
 		}
 		if (c == shareStickerPackCmd) {
+			//noinspection DataFlowIssue
 			int i = ((List) d).getSelectedIndex();
 			if (i == -1) return;
 
+			//noinspection DataFlowIssue
 			JSONObject set = ((StickerPacksList) d).sets.getObject(i);
 			if (set.has("short_name")) {
 				copy(set.getString("title"), "https://t.me/addstickers/" + set.getString("short_name"));
@@ -3979,18 +3859,20 @@ public class MP extends MIDlet
 			return;
 		}
 		if (c == List.SELECT_COMMAND) {
+			//noinspection DataFlowIssue
+			List l = (List) d;
 			if (d instanceof MPList) {
-				((MPList) d).select(((List) d).getSelectedIndex());
+				((MPList) d).select(l.getSelectedIndex());
 				return;
 			}
 			if (d == playlistList) {
 				if (playerState == 3) return;
-				startPlayer(currentMusic = playlist.getObject(playlistIndex = ((List) d).getSelectedIndex()));
+				startPlayer(currentMusic = playlist.getObject(playlistIndex = l.getSelectedIndex()));
 				return;
 			}
 			if (d instanceof ChatTopicsList) {
 				MPChat form = ((ChatTopicsList) d).chatForm;
-				int i = ((List) d).getSelectedIndex();
+				int i = l.getSelectedIndex();
 				if (form == null || i == -1) return;
 				JSONObject topic = form.topics().getObject(i);
 				form.resetChat();
@@ -4004,10 +3886,10 @@ public class MP extends MIDlet
 			}
 //#ifndef NO_FILE
 			// file picker
-			int i = ((List) d).getSelectedIndex();
+			int i = l.getSelectedIndex();
 			if (i == -1) return;
-			boolean dir = ((List) d).getImage(i) == folderImg;
-			String name = ((List) d).getString(i);
+			boolean dir = l.getImage(i) == folderImg;
+			String name = l.getString(i);
 			String path = d.getTitle();
 
 			if ("/".equals(path)) {
@@ -4093,6 +3975,7 @@ public class MP extends MIDlet
 		if (c == goCmd) { // url dialog submit
 			commandAction(backCmd, d);
 
+			//noinspection DataFlowIssue
 			openUrl(((TextBox) d).getString(), false);
 			return;
 		}
@@ -4171,6 +4054,7 @@ public class MP extends MIDlet
 		if (c == copyCmd) {
 			try {
 				if (checkClass("com.nokia.mid.ui.Clipboard")) {
+					//noinspection DataFlowIssue
 					NokiaAPI.copy(((TextBox) d).getString());
 					display(infoAlert(L[LTextCopied_Alert]), current);
 					return;
@@ -4377,7 +4261,7 @@ public class MP extends MIDlet
 					sending = true;
 				}
 
-				if ((reopenChat || !longpoll) && !globalUpdates) {
+				if (reopenChat || !longpoll) {
 					display(loadingAlert(L[LSending]), current);
 					if (MP.updatesThread != null) {
 						cancel(MP.updatesThread, true);
@@ -4993,7 +4877,6 @@ public class MP extends MIDlet
 			list.setSelectCommand(List.SELECT_COMMAND);
 			list.setCommandListener(midlet);
 
-			int fails = 0;
 			for (;;) {
 				if ("/".equals(path)) {
 					list.setTitle("/");
@@ -5043,7 +4926,7 @@ public class MP extends MIDlet
 						}
 						break;
 					} catch (IOException e) {
-						if (fails++ != 0) throw e;
+						// directory is inaccessible, open roots instead
 						list.deleteAll();
 						path = "/";
 //						continue;
@@ -5473,6 +5356,7 @@ public class MP extends MIDlet
 			if (symbianJrt && System.getProperty("forcedomain") != null) {
 				if (url.startsWith("http")) {
 					if (System.getProperty("asd") != null) {
+						// workaround specifically for my e7 because "services" app doesn't work there
 						url = "nativeapp://application-uid=0x10008D39;content=4 " + url;
 					}
 				}
@@ -5505,6 +5389,7 @@ public class MP extends MIDlet
 		midlet.browse(url);
 	}
 
+	/** @noinspection StatementWithEmptyBody*/
 	static boolean handleDeepLink(String url, boolean ask) {
 		if (url.startsWith("@")) {
 			openChat(url.substring(1), -1);
@@ -5766,34 +5651,32 @@ public class MP extends MIDlet
 			}
 
 			int c;
-			try {
-				threadConnections.put(thread, hc = openHttpConnection(t));
-				hc.setRequestMethod("GET");
-				c = hc.getResponseCode();
-			} catch (IOException e) {
-				if (e.toString().indexOf("-36") != -1) {
-					c = 504;
-				} else {
-					throw e;
-				}
-			}
-
-			// repeat request on server timeout
-			if ((c == 502 || c == 504)
-					&& !url.startsWith("updates") && !url.startsWith("send")) {
-				try {
+			boolean b = url.indexOf("method=send") != -1 || url.indexOf("method=updates") != -1;
+			for (;;) {
+				if (hc != null) try {
 					hc.close();
 				} catch (Exception ignored) {}
 				try {
+					threadConnections.put(thread, hc = openHttpConnection(t));
+					hc.setRequestMethod("GET");
+					c = hc.getResponseCode();
+					if (b || (c != 502 && c != 504)) {
+						break;
+					}
+				} catch (IOException e) {
+					if (b || e.toString().indexOf("-36") == -1) {
+						throw e;
+					}
+				}
+				// if http code is timeout, or network disconnected, retry 1 time.
+				try {
+					//noinspection BusyWait
 					Thread.sleep(5000);
-				} catch (InterruptedException e) {
+				} catch (Exception e) {
 					throw new RuntimeException(e.toString());
 				}
-
-				threadConnections.put(thread, hc = openHttpConnection(t));
-				hc.setRequestMethod("GET");
-
-				c = hc.getResponseCode();
+				b = true;
+				// continue;
 			}
 
 			try {
@@ -6222,12 +6105,14 @@ public class MP extends MIDlet
 						if (chat) {
 							downloadedPath = dest;
 							goBackToChat();
-							alert.setIndicator(null);
-							alert.addCommand(okDownloadCmd);
-							if (!series40) alert.addCommand(openDownloadedCmd);
-							alert.removeCommand(cancelDownloadCmd);
-							alert.setString(L[LDownloadedTo] + downloadPath);
-							display(alert, current);
+							if (alert != null) {
+								alert.setIndicator(null);
+								alert.addCommand(okDownloadCmd);
+								if (!series40) alert.addCommand(openDownloadedCmd);
+								alert.removeCommand(cancelDownloadCmd);
+								alert.setString(L[LDownloadedTo] + downloadPath);
+								display(alert, current);
+							}
 						}
 					} finally {
 						try {

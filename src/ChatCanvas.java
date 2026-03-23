@@ -198,7 +198,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		resetInput();
 		bottomAnimTarget = -1;
 
-		if (!MP.globalUpdates && (MP.reopenChat || (query == null && mediaFilter == null))
+		if (MP.reopenChat || (query == null && mediaFilter == null)
 				&& MP.chatUpdates
 				&& (MP.updatesThread != null || MP.updatesRunning)) {
 			MP.display(MP.loadingAlert(MP.L[LWaitingForPrevChat]), this);
@@ -463,9 +463,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 				&& MP.chatUpdates && !update) {
 			// start updater thread
 			update = shouldUpdate = true;
-			if (!MP.globalUpdates) {
-				MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
-			}
+			MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
 			(typingThread = new Thread(this)).start();
 		}
 		if (botAnswer != null) {
@@ -526,9 +524,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 	public void showNotify() {
 		if (shouldUpdate && !update && !loading) {
 			update = true;
-			if (!MP.globalUpdates) {
-				MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
-			}
+			MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
 			if (typingThread == null) {
 				(typingThread = new Thread(this)).start();
 			}
@@ -549,7 +545,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		// close updater thread
 		if (update) {
 			update = false;
-			if (!MP.globalUpdates && (MP.updatesThread != null || MP.updatesRunning)) {
+			if (MP.updatesThread != null || MP.updatesRunning) {
 				MP.midlet.cancel(MP.updatesThread, true);
 			}
 			if (typingThread != null) typingThread.interrupt();

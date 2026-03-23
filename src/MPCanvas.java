@@ -1010,6 +1010,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 		} else {
 			pointedItem = null;
 		}
+		// needed here to handle long taps
 		queueRepaint();
 	}
 
