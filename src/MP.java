@@ -1569,7 +1569,12 @@ public class MP extends MIDlet
 		case RUN_RESOLVE_INVITE: {
 			try {
 				JSONObject r = ((JSONObject) MP.api("checkChatInvite&id=".concat((String) param))).getObject("res");
-				JSONObject rawPeer = r.getObject("chat");
+				JSONObject rawPeer = r.getObject("chat", null);
+				if (rawPeer == null) {
+					// private chat, id is not known
+					openLoad(new ChatInfoForm(r, (String) param, 3));
+					break;
+				}
 				String id = rawPeer.getString("id");
 				String type = r.getString("_");
 				if ("chatInviteAlready".equals(type)) {
@@ -1577,8 +1582,7 @@ public class MP extends MIDlet
 					openChat(id, 0);
 					break;
 				}
-
-				openLoad(new ChatInfoForm(id, getNameRaw(rawPeer), "chatInvitePeek".equals(type) ? 2 : 3));
+				openLoad(new ChatInfoForm(rawPeer, (String) param, 2));
 			} catch (Exception e) {
 				display(errorAlert(e), current);
 			}
@@ -1590,6 +1594,10 @@ public class MP extends MIDlet
 				MP.api("importChatInvite&id=".concat(d.invite));
 
 				commandAction(backCmd, current);
+				if (d.id == null) {
+					display(infoAlert("Invite accepted"), current); // TODO unlocalized
+					break;
+				}
 				openChat(d.id, 0);
 			} catch (Exception e) {
 				display(errorAlert(e), current);
@@ -1881,7 +1889,10 @@ public class MP extends MIDlet
 		case RUN_CANCEL_UPDATES: {
 			if (longpoll) {
 				try {
-					api("cancelUpdates");
+					if (((JSONObject) api("cancelUpdates")).getInt("res") == 0) {
+						Thread.sleep(500);
+						api("cancelUpdates");
+					}
 				} catch (Exception ignored) {}
 				try {
 					Thread.sleep(100);
@@ -2636,14 +2647,12 @@ public class MP extends MIDlet
 			}
 		}
 		Connection c = (Connection) threadConnections.get(thread);
-		if (c == null) {
-			if (updates && updatesSleeping) {
-				thread.interrupt();
-			}
-			return;
+		if (c != null && !closingConnections.contains(c)) {
+			midlet.start(updates ? RUN_CANCEL_UPDATES : RUN_CLOSE_CONNECTION, c);
 		}
-		if (closingConnections.contains(c)) return;
-		midlet.start(updates ? RUN_CANCEL_UPDATES : RUN_CLOSE_CONNECTION, c);
+		if (updates && (updatesSleeping || !series40)) {
+			thread.interrupt();
+		}
 	}
 
 	// endregion
@@ -5304,33 +5313,31 @@ public class MP extends MIDlet
 			}
 		}
 
+		
 		Displayable p = display.getCurrent();
 		if (p == loadingForm) p = current;
+		
+		if (p != null && p != d) {
+			if (p instanceof MPForm) {
+				((MPForm) p).closed(back);
+			} else if (p instanceof MPList) {
+				((MPList) p).closed(back);
+			}
+//#ifndef NO_CHAT_CANVAS
+			else if (p instanceof MPCanvas) {
+				((MPCanvas) p).closed(back);
+			}
+//#endif
+		}
 		display.setCurrent(current = d);
-		if (p == null || p == d) return;
 
-		if (p instanceof MPForm) {
-			((MPForm) p).closed(back);
-		} else if (p instanceof MPList) {
-			((MPList) p).closed(back);
-		}
-//#ifndef NO_CHAT_CANVAS
-		else if (p instanceof MPCanvas) {
-			((MPCanvas) p).closed(back);
-		}
-//#endif
-		if (back && (p instanceof MPForm || p instanceof MPList
-//#ifndef NO_CHAT_CANVAS
-				|| p instanceof MPCanvas
-//#endif
-				)) {
-			imagesToLoad.removeAllElements();
-		}
-
+		if (p == d) return;
 		if (d instanceof MPForm) {
 			((MPForm) d).shown();
 		} else if (d instanceof MPList) {
 			((MPList) d).shown();
+		} else if (d instanceof MPCanvas) {
+			((MPCanvas) d).shown();
 		}
 //#ifndef NO_CHAT_CANVAS
 		else if (d instanceof MPCanvas) {

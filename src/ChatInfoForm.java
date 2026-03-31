@@ -33,6 +33,7 @@ public class ChatInfoForm extends MPForm {
 	final int mode; // 0 - chat info or profile by id, 1 - phone, 2 - invite peek, 3 - invite
 	int pinnedMessageId;
 	boolean canBan;
+	private JSONObject inviteInfo;
 	
 	public ChatInfoForm(String id, MPChat chatForm, int mode) {
 		super(id);
@@ -48,6 +49,13 @@ public class ChatInfoForm extends MPForm {
 		super(title);
 		this.id = id;
 		this.mode = mode;
+	}
+	
+	public ChatInfoForm(JSONObject info, String invite, int mode) {
+		super(info.getString("title"));
+		this.invite = invite;
+		this.mode = mode;
+		this.inviteInfo = info;
 	}
 
 	void loadInternal(Thread thread) throws Exception {
@@ -68,11 +76,14 @@ public class ChatInfoForm extends MPForm {
 			info = r.getArray("users").getObject(0);
 			id = info.getString("id");
 			name = MP.getNameRaw(info);
+		} else if (inviteInfo != null) {
+			info = inviteInfo;
+			name = inviteInfo.getString("title");
 		} else {
 			name = getTitle();
 		}
 		
-		boolean isUser = id.charAt(0) != '-';
+		boolean isUser = mode != 3 && id.charAt(0) != '-';
 		boolean topic = mode == 0 && chatForm != null && chatForm.forum();
 		StringItem s;
 		
@@ -99,17 +110,13 @@ public class ChatInfoForm extends MPForm {
 			}
 		}
 
-		if (mode != 3) {
+		if (mode != 3 && mode != 2) {
 			info = (JSONObject) MP.api("getPeerInfo&id=".concat(id));
 			
 			setTitle(MP.L[isUser ? LUserInfo : broadcast ? LChannelInfo : topic ? LTopicInfo : LGroupInfo]);
 		}
 		
 		if (isUser) {
-//#if "" != ""
-			// assert that user profile can not be opened in invite mode
-			if (mode == 3) throw new RuntimeException();
-//#endif
 			if (info.has("status")) {
 				sb.setLength(0);
 				JSONObject status = info.getObject("status");
@@ -157,7 +164,15 @@ public class ChatInfoForm extends MPForm {
 				append(s);
 			}
 		} else {
-			if (mode != 3) {
+			if (mode == 3) {
+				if (info.has("about")) {
+					s = new StringItem(MP.L[LAbout_Chat], info.getString("about"));
+					s.setFont(MP.medPlainFont);
+					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					s.setItemCommandListener(MP.midlet);
+					append(s);
+				}
+			} else {
 				if (info.getBoolean("can_view_participants", false)) {
 					addCommand(MP.chatMembersCmd);
 				}
