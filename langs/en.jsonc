@@ -343,6 +343,7 @@
 	"ResetSettings_Alert": "Reset settings?",
 	"ApplicationWillClose_Alert": "Application will close...",
 	"UserInvited_Alert": "User invited",
+	"InviteAccepted_Alert": "Invite accepted",
 	
 	// Chat form
 	"ChatMedia_Title": "Media",

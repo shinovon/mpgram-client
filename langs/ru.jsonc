@@ -343,6 +343,7 @@
 	"ResetSettings_Alert": "Сбросить настройки?",
 	"ApplicationWillClose_Alert": "Приложение будет закрыто...",
 	"UserInvited_Alert": "Пользователь приглашен",
+	"InviteAccepted_Alert": "Приглашение принято",
 	
 	// Chat form
 	"ChatMedia_Title": "Медиафайлы",

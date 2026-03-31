@@ -1595,7 +1595,7 @@ public class MP extends MIDlet
 
 				commandAction(backCmd, current);
 				if (d.id == null) {
-					display(infoAlert("Invite accepted"), current); // TODO unlocalized
+					display(infoAlert(L[LInviteAccepted_Alert]), current);
 					break;
 				}
 				openChat(d.id, 0);
