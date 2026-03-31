@@ -5336,8 +5336,6 @@ public class MP extends MIDlet
 			((MPForm) d).shown();
 		} else if (d instanceof MPList) {
 			((MPList) d).shown();
-		} else if (d instanceof MPCanvas) {
-			((MPCanvas) d).shown();
 		}
 //#ifndef NO_CHAT_CANVAS
 		else if (d instanceof MPCanvas) {
