@@ -573,7 +573,7 @@ public class JSONStream extends Reader {
 						return new Integer(Integer.parseInt(str.substring(2), 16));
 					}
 					// decimal
-					if (str.indexOf('.') != -1 || str.indexOf('E') != -1 || "-0".equals(str))
+					if (str.indexOf('.') != -1 || str.indexOf('E') != -1 || str.indexOf('e') != -1 || "-0".equals(str))
 //						return new Double(Double.parseDouble(str));
 						return str;
 					if (first == '-') length--;
