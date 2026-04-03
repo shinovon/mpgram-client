@@ -13,7 +13,7 @@ Nokia-Scalable-Icon-MIDlet-1: /m.svg
 UseNativeTextButtons: false
 Nokia-MIDlet-Background-Event: pause
 LGE-MIDlet-Width: 240
-MIDlet-Version: 1.4.2
+MIDlet-Version: 1.4.3
 Manifest-Version: 1.0
 Navi-Key-Hidden: true
 Nokia-MIDlet-Splash-Screen-Image: suppress
