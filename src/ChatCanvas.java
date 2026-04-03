@@ -222,12 +222,12 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 				}
 				if (messageId == -1 && dialog.has("read_in")) {
 					messageId = 0;
-					int maxId = Math.max(readOutboxId, dialog.getInt("read_in"));
+					int maxId = dialog.getInt("read_in");
 					if (maxId != 0) {
 						messageId = maxId;
 						if (dialog.getInt("unread", 0) > limit) {
 							offsetId = maxId;
-							addOffset = -limit;
+							addOffset = -limit / 2;
 							dir = 1;
 						} else {
 							offsetId = -1;
@@ -254,7 +254,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					messageId = j.getInt("read");
 				} else if (j.getInt("unread", 0) > limit) {
 					offsetId = messageId = j.getInt("read");
-					addOffset = -limit;
+					addOffset = -limit / 2;
 					dir = 1;
 				} else {
 					messageId = 0;
@@ -353,7 +353,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		if (messageId != 0 && offsetId == 0) {
 			// message to focus
 			offsetId = messageId;
-			addOffset = -1;
+			addOffset = -limit / 2;
 		}
 
 		if (query != null || topMsgId != 0 || mediaFilter != null) {
