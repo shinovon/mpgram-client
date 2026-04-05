@@ -85,7 +85,7 @@
 	"ClearCache": "Önbelleği temizle",
 	"Locate": "Konum bul",
 	"ShowSessionCode": "Oturum kodunu göster",
-	"ResetSettings": "Reset settings", // Untranslated
+	"ResetSettings": "Ayarları sıfırla",
 
 	// Chats list commands
 	"Folders": "Klasörler",
@@ -94,7 +94,7 @@
 	"Contacts": "Kişiler",
 	"Search": "Ara",
 	"OpenByLink": "Bağlantıyla aç",
-	"Select_OK": "Select", // Untranslated
+	"Select_OK": "Seç",
 
 	// Message commands
 	"OpenChat": "Sohbeti aç",
@@ -112,7 +112,7 @@
 	"Copy": "Kopyala",
 	"CopyLink": "Bağlantıyı kopyala",
 	"Select": "Seç",
-	"SeenList": "Seen list", // Untranslated
+	"SeenList": "Görüntüleyenler",
 
 	// Item commands
 	"Link_Cmd": "Bağlantı",
@@ -132,7 +132,7 @@
 	"SendSticker": "Çıkartma gönder",
 	"Menu": "Menü",
 	"Write": "Yaz",
-	"AttachFile": "Attach file", // Untranslated
+	"AttachFile": "Dosya ekle",
 
 	// Message writing form commands
 	"Send": "Gönder",
@@ -151,8 +151,8 @@
 	"Files": "Dosyalar",
 	"AudioFiles": "Müzik",
 	"VoiceMessages": "Sesli mesajlar",
-	"AddMember": "Add member", // Untranslated
-	"ViewInviteLink": "View invite link", // Untranslated
+	"AddMember": "Üye ekle",
+	"ViewInviteLink": "Davet linkine bak",
 
 	// Dialog commands
 	"Ok": "Tamam",
@@ -233,10 +233,10 @@
 	"FullscreenTextBox": "Tam ekran metin kutusu",
 	"Theme": "Tema",
 	"InputLanguages": "Giriş dilleri",
-	"ForceKeyInput": "Force keypad input", // Untranslated
-	"ChatAvatar": "Show avatar in chat", // Untranslated
-	"ChatWallpaper": "Chat wallpaper", // Untranslated
-	"12HourTimeFormat": "12-hour time format", // Untranslated
+	"ForceKeyInput": "Tuş takımı girişini zorla",
+	"ChatAvatar": "Sohbette avatar göster",
+	"ChatWallpaper": "Sohbet duvarkağıdı",
+	"12HourTimeFormat": "12-saat formatı",
 
 	// Behaviour settings
 	"WaitForPageToLoad": "Sayfa yüklenmesini bekle",
@@ -339,11 +339,11 @@
 	"Logout_Alert": "Çıkış yapmak istediğine emin misin?",
 	"RewriteFile_Alert": "Dosya zaten mevcut, üzerine yazılsın mı?",
 	"OpenThisLink_Alert": "Bu bağlantı açılsın mı?",
-	"Remove_Alert": "Remove \"%\"?", // Untranslated
-	"ResetSettings_Alert": "Reset settings?", // Untranslated
-	"ApplicationWillClose_Alert": "Application will close...", // Untranslated
-	"UserInvited_Alert": "User invited", // Untranslated
-	"InviteAccepted_Alert": "Invite accepted", // Untranslated
+	"Remove_Alert": "Kaldır \"%\"?",
+	"ResetSettings_Alert": "Ayarlar sıfırlansın mı?",
+	"ApplicationWillClose_Alert": "Uygulama kapanacak...",
+	"UserInvited_Alert": "Kullanıcı davet edildi",
+	"InviteAccepted_Alert": "Davet kabul edildi",
 
 	// Chat form
 	"ChatMedia_Title": "Medya",
@@ -353,12 +353,12 @@
 	"SavedMessages": "Kaydedilmiş mesajlar",
 	"SomeoneIsTyping": "Biri yazıyor...",
 	"Typing": "yazıyor...",
-	"_isTyping": "% is typing..", // Untranslated
-	"_areTyping": "% and % are typing...", // Untranslated
-	"_peopleAreTyping": "", // Untranslated
-	"_peopleAreTyping_1": " people are typing...", // Untranslated
+	"_isTyping": "% yazıyor..",
+	"_areTyping": "% ve % yazıyor...",
+	"_peopleAreTyping": "",
+	"_peopleAreTyping_1": " birileri yazıyor...",
 	"_peopleAreTyping_2": "",
-	"ManyPeopleAreTyping": "Many people are typing...", // Untranslated
+	"ManyPeopleAreTyping": "Birileri yazıyor...",
 
 	// Message
 	"ForwardedFrom": "İletilen: ",
@@ -374,7 +374,7 @@
 	"_react": " tepki",
 	"_reacts": " tepki",
 	"_reacts2": "",
-	"SeenList_Title": "Seen List", // Untranslated
+	"SeenList_Title": "Görüntüleyenler",
 
 	// Message media
 	"Media": "Medya",
@@ -406,8 +406,8 @@
 	"Stickers_Title": "Çıkartmalar",
 	"Sticker": "Çıkartma",
 	"AddStickers": "Çıkartma ekle",
-	"Remove": "Remove", // Untranslated
-	"Share": "Share", // Untranslated
+	"Remove": "Kaldır",
+	"Share": "Paylaş",
 
 	// Music player
 	"Player_Title": "Müzik oynatıcı",
@@ -441,7 +441,7 @@
 	"GroupInfo": "Grup Bilgisi",
 	"ChannelInfo": "Kanal Bilgisi",
 	"TopicInfo": "Konu Bilgisi",
-	"AddMember_Title": "Add Member", // Untranslated
+	"AddMember_Title": "Üye ekle",
 
 	"_member": " üye",
 	"_members": " üye",
