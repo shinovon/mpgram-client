@@ -25,6 +25,7 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.TextField;
 import java.io.DataInputStream;
+import java.util.Random;
 
 abstract class MPCanvas extends Canvas implements LangConstants {
 
@@ -125,15 +126,25 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 	static void loadTheme() {
 		if (colorsCopy == null) {
 			try {
-				DataInputStream d = new DataInputStream("".getClass().getResourceAsStream("/c/".concat(MP.theme)));
-				d.readUTF();
-				for (int i = 0; i < 50; ++i) {
-					colors[i] = d.readInt();
+				if ("random".equals(MP.theme)) {
+					Random rng = new Random();
+					for (int i = 0; i < 50; ++i) {
+						colors[i] = (rng.nextInt(255) << 8) | (rng.nextInt(255) << 16) | (rng.nextInt(255));
+					}
+					for (int i = 0; i < 20; ++i) {
+						style[i] = rng.nextInt(2);
+					}
+				} else {
+					DataInputStream d = new DataInputStream("".getClass().getResourceAsStream("/c/".concat(MP.theme)));
+					d.readUTF();
+					for (int i = 0; i < 50; ++i) {
+						colors[i] = d.readInt();
+					}
+					for (int i = 0; i < 20; ++i) {
+						style[i] = d.readByte() & 0xFF;
+					}
+					d.close();
 				}
-				for (int i = 0; i < 20; ++i) {
-					style[i] = d.readByte() & 0xFF;
-				}
-				d.close();
 			} catch (Exception e) {
 				colors[ChatCanvas.COLOR_CHAT_BG] = 0x0E1621;
 				colors[ChatCanvas.COLOR_CHAT_FG] = 0xFFFFFF;
