@@ -5036,7 +5036,7 @@ public class MP extends MIDlet
 	}
 
 	static void copy(String title, String text) {
-		TextBox t = new TextBox(title, text, Math.max(2000, text.length() + 1), TextField.UNEDITABLE);
+		TextBox t = new TextBox(title, text, Math.max(2000, text.length() + 1), TextField.ANY);
 		t.addCommand(backCmd);
 //#ifndef NO_NOKIAUI
 		if (checkClass("com.nokia.mid.ui.Clipboard")) t.addCommand(copyCmd);
