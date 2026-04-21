@@ -777,6 +777,21 @@ public class MP extends MIDlet
 			} catch (Exception ignored) {}
 		}
 
+		migrate: {
+			if ("http://mp.nnchan.ru/".equals(instanceUrl)) {
+				instanceUrl = "http://mp.nnproject.cc/";
+			} else if ("https://mp.nnchan.ru/".equals(instanceUrl)) {
+				instanceUrl = "https://mp.nnproject.cc/";
+			} else if ("http://mp2.nnchan.ru/".equals(instanceUrl)) {
+				instanceUrl = "http://mp2.nnproject.cc/";
+			} else if ("https://mp2.nnchan.ru/".equals(instanceUrl)) {
+				instanceUrl = "https://mp2.nnproject.cc/";
+			} else {
+				break migrate;
+			}
+			writeAuth();
+		}
+
 		// load locale
 		(L = new String[LLocaleStrings + 2])[Lmpgram] = "MPGram";
 		try {
