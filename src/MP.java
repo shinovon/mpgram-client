@@ -218,6 +218,7 @@ public class MP extends MIDlet
 //#endif
 	private static boolean playlistDirection = true;
 	static boolean time12;
+	static boolean migrateAsked;
 
 	private static boolean needWriteConfig;
 
@@ -255,6 +256,8 @@ public class MP extends MIDlet
 	private static Command authRetryCmd;
 	private static Command authQrCmd;
 	private static Command authCheckQrCmd;
+	private static Command migrateYesCmd;
+	private static Command migrateNoCmd;
 
 	private static Command logoutCmd;
 	private static Command clearCacheCmd;
@@ -746,6 +749,7 @@ public class MP extends MIDlet
 			playerVolume = j.getInt("playerVolume", playerVolume);
 			playerCreateMethod = j.getInt("playerCreateMethod", playerCreateMethod);
 			time12 = j.getBoolean("time12", time12);
+			migrateAsked = j.getBoolean("migrated", migrateAsked);
 
 			int version = j.getInt("v", 0);
 			if (version < 1) {
@@ -775,21 +779,6 @@ public class MP extends MIDlet
 			try {
 				user = getAppProperty("MPGram-User");
 			} catch (Exception ignored) {}
-		}
-
-		migrate: {
-			if ("http://mp.nnchan.ru/".equals(instanceUrl)) {
-				instanceUrl = "http://mp.nnproject.cc/";
-			} else if ("https://mp.nnchan.ru/".equals(instanceUrl)) {
-				instanceUrl = "https://mp.nnproject.cc/";
-			} else if ("http://mp2.nnchan.ru/".equals(instanceUrl)) {
-				instanceUrl = "http://mp2.nnproject.cc/";
-			} else if ("https://mp2.nnchan.ru/".equals(instanceUrl)) {
-				instanceUrl = "https://mp2.nnproject.cc/";
-			} else {
-				break migrate;
-			}
-			writeAuth();
 		}
 
 		// load locale
@@ -823,6 +812,8 @@ public class MP extends MIDlet
 		authRetryCmd = new Command(L[LRetry], Command.OK, 1);
 		authQrCmd = new Command(L[LNewSession], Command.ITEM, 1);
 		authCheckQrCmd = new Command(L[LCheck], Command.OK, 1);
+		migrateYesCmd = new Command(L[LOk], Command.OK, 1);
+		migrateNoCmd = new Command(L[LCancel], Command.OK, 2);
 
 		logoutCmd = new Command(L[LLogout], Command.ITEM, 1);
 		clearCacheCmd = new Command(L[LClearCache], Command.ITEM, 1);
@@ -1077,6 +1068,21 @@ public class MP extends MIDlet
 //		running++;
 		switch (run) {
 		case RUN_VALIDATE_AUTH: {
+			if (param == null && !migrateAsked && instanceUrl.endsWith(".nnchan.ru/")) {
+				String text;
+				if ("ru".equals(lang)) {
+					text = "Вы хотите перейти с mp.nnchan.ru на mp.nnproject.cc? \nСервер тот же, поменяется только домен. \nЭтот вопрос больше не будет задаваться в будущем.";
+				} else {
+					text = "Do you want to migrate from mp.nnchan.ru to mp.nnproject.cc? \nServer is the same, only domain will change. \nThis question will not be asked again.";
+				}
+				Alert alert = alert("Instance migration", text, AlertType.WARNING);
+				alert.setCommandListener(this);
+				alert.setTimeout(Alert.FOREVER);
+				alert.addCommand(migrateYesCmd);
+				alert.addCommand(migrateNoCmd);
+				display(alert, null);
+				break;
+			}
 			Displayable returnTo = param == null ? authForm : current;
 			Alert alert = loadingAlert(L[LAuthorizing]);
 			if (param == null) {
@@ -3054,6 +3060,25 @@ public class MP extends MIDlet
 			}
 			if (c == authRetryCmd) {
 				start(RUN_VALIDATE_AUTH, mainDisplayable);
+				return;
+			}
+			if (c == migrateYesCmd) {
+				migrateAsked = true;
+				try {
+					int i = instanceUrl.indexOf(".nnchan.ru");
+					instanceUrl = instanceUrl.substring(0, i) + ".nnproject.cc" + instanceUrl.substring(i + 10);
+					writeAuth();
+					writeConfig();
+				} catch (Exception ignored) {}
+				start(RUN_VALIDATE_AUTH, null);
+				return;
+			}
+			if (c == migrateNoCmd) {
+				migrateAsked = true;
+				try {
+					writeConfig();
+				} catch (Exception ignored) {}
+				start(RUN_VALIDATE_AUTH, null);
 				return;
 			}
 		}
@@ -6600,6 +6625,7 @@ public class MP extends MIDlet
 		j.put("playerVolume", playerVolume);
 		j.put("playerCreateMethod", playerCreateMethod);
 		j.put("time12", time12);
+		j.put("migrated", migrateAsked);
 
 		j.put("v", 1);
 
