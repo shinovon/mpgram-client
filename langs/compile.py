@@ -86,7 +86,7 @@ if not err:
                         else:
                             o = en_json[s]
                             t = j[s]
-                            if n != "ar.jsonc" and len(o.strip()) != 0 and len(t.strip()) != 0 and (o.strip().lower()[0] == o.strip()[0]) != (t.strip().lower()[0] == t.strip()[0]):
+                            if n != "ar.jsonc" and n != "zh-CN.jsonc" and len(o.strip()) != 0 and len(t.strip()) != 0 and (o.strip().lower()[0] == o.strip()[0]) != (t.strip().lower()[0] == t.strip()[0]):
                                 print('Warning: "{}": "{}"->"{}" does not match original case'.format(s, o, t))
                             f.write(escape(t))
                     else:

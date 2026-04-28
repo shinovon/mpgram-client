@@ -74,6 +74,7 @@ public class MP extends MIDlet
 			"ru",
 			"uk",
 			"ar",
+			"zh-CN",
 		},
 		{
 			"Azərbaycan",
@@ -88,6 +89,7 @@ public class MP extends MIDlet
 			"Русский",
 			"Українська",
 			"العربية",
+			"简体中文",
 		}
 	};
 //#endif
