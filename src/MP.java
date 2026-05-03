@@ -62,6 +62,7 @@ public class MP extends MIDlet
 //#ifndef NO_LANGS
 	static final String[][] LANGS = {
 		{
+			"ar",
 			"az",
 			"ca",
 			"de",
@@ -73,10 +74,10 @@ public class MP extends MIDlet
 			"tr",
 			"ru",
 			"uk",
-			"ar",
 			"zh-CN",
 		},
 		{
+			"العربية",
 			"Azərbaycan",
 			"Català",
 			"Deutsch",
@@ -88,7 +89,6 @@ public class MP extends MIDlet
 			"Türkçe",
 			"Русский",
 			"Українська",
-			"العربية",
 			"简体中文",
 		}
 	};
