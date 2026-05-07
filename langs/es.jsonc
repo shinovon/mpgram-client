@@ -73,19 +73,19 @@
 	"Saturday": "Sabado",
 	
 	// Auth commands
-	"Auth": "Autorizacion",
+	"Auth": "Autorización",
 	"Next": "Siguiente",
-	"NewSession": "Nueva sesion",
-	"ImportSession": "Importar sesion",
-	"Show": "Show", // Untranslated
-	"Check": "Check", // Untranslated
+	"NewSession": "Nueva sesión",
+	"ImportSession": "Importar sesión",
+	"Show": "Mostrar",
+	"Check": "Comprobar",
 	
 	// Settings commands
-	"Logout": "Cerrar sesion",
+	"Logout": "Cerrar sesión",
 	"ClearCache": "Liberar datos",
-	"Locate": "Locate", // Untranslated
-	"ShowSessionCode": "Show session code", // Untranslated
-	"ResetSettings": "Reset settings", // Untranslated
+	"Locate": "Localizar",
+	"ShowSessionCode": "Mostrar código de sesión", 
+	"ResetSettings": "Restablecer la configuración",
 	
 	// Chats list commands
 	"Folders": "Carpetas",
@@ -94,7 +94,7 @@
 	"Contacts": "Contactos",
 	"Search": "Busqueda",
 	"OpenByLink": "Abrir por enlace",
-	"Select_OK": "Select", // Untranslated
+	"Select_OK": "Seleccionar",
 	
 	// Message commands
 	"OpenChat": "Abrir chat",
@@ -109,10 +109,10 @@
 	"Pin": "Fijado",
 	"BanMember": "Prohibir miembro",
 	"Comments": "Discusión",
-	"Copy": "Copy", // Untranslated
-	"CopyLink": "Copy link", // Untranslated
-	"Select": "Select", // Untranslated
-	"SeenList": "Seen list", // Untranslated
+	"Copy": "Copiar",
+	"CopyLink": "Copiar enlace",
+	"Select": "Seleccionar",
+	"SeenList": "Lista vista",
 	
 	// Item commands
 	"Link_Cmd": "Enlace",
@@ -120,8 +120,8 @@
 	"Call": "Llamar",
 	"Download": "Descargar",
 	"Play_Item": "Reproducir",
-	"RunBotAction": "Run", // Untranslated
-	"SaveHere": "Save here", // Untranslated
+	"RunBotAction": "Iniciar bot",
+	"SaveHere": "Guardar aquí",
 	
 	// Chat form commands
 	"WriteMessage": "Escribir mensaje",
@@ -130,9 +130,9 @@
 	"Older": "Mensajes antiguos",
 	"Newer": "Mensajes mas recientes",
 	"SendSticker": "Enviar pegatina",
-	"Menu": "Menu", // Untranslated
-	"Write": "Write", // Untranslated
-	"AttachFile": "Attach file", // Untranslated
+	"Menu": "Menú",
+	"Write": "Escribir",
+	"AttachFile": "Adjuntar archivo",
 	
 	// Message writing form commands
 	"Send": "Enviar",
@@ -149,41 +149,41 @@
 	"Photos": "Fotos",
 	"Videos": "Videos",
 	"Files": "Archivos",
-	"AudioFiles": "Musica",
-	"VoiceMessages": "Voice messages", // Untranslated
-	"AddMember": "Add member", // Untranslated
-	"ViewInviteLink": "View invite link", // Untranslated
+	"AudioFiles": "Música",
+	"VoiceMessages": "Mensajes de voz",
+	"AddMember": "Agregar miembro",
+	"ViewInviteLink": "Ver enlace de invitación",
 	
 	// Dialog commands
 	"Ok": "Aceptar",
 	"Cancel": "Cancelar",
-	"Open": "Open", // Untranslated
+	"Open": "Abrir",
 	
 	// Pagination commands
-	"NextPage": "Pagina siguiente",
-	"PrevPage": "Pagina anterior",
+	"NextPage": "Página siguiente",
+	"PrevPage": "Página anterior",
 	
 	// Loading states
 	"Loading": "Cargando",
 	"Authorizing": "Autorizando",
 	"WaitingForServerResponse": "Esperando respuesta del servidor...",
 	"Sending": "Enviando",
-	"WaitingForPrevChat": "Esperando a que se desconecte el chat anterior...",
-	"Downloading": "Downloading", // Untranslated
+	"WaitingForPrevChat": "Esperando a qué se desconecte el chat anterior...",
+	"Downloading": "Descargando",
 	
 	// Authorization process
-	"Auth_Title": "Autorizacion",
+	"Auth_Title": "Autorización",
 	"InstanceURL": "URL de la Instancia",
 	"InstancePassword": "Contraseña de Instancia",
 	"ChooseAuthMethod": "Elija el método de autorización",
-	"PhoneNumber": "Numero de telefono",
-	"SessionCode": "Codigo de sesión",
-	"Code": "Codigo",
-	"CloudPassword": "Contraseña 2fa",
+	"PhoneNumber": "Número de teléfono",
+	"SessionCode": "Código de sesión",
+	"Code": "Código",
+	"CloudPassword": "Contraseña 2FA",
 	"Captcha": "Codigo de la imagen",
 	"Auth_Btn": "Autorizar",
-	"InvalidCode_Alert": "Codigo invalido",
-	"CodeExpired_Alert": "Codigo caducado!",
+	"InvalidCode_Alert": "Código inválido",
+	"CodeExpired_Alert": "Código caducado!",
 	"Auth_Hint1": "(deje vacío si usa mp.nnchan.ru o su instancia no tiene contraseña)",
 	"InvalidInstance_Alert": "URL de instancia no válida!",
 	"InvalidPhoneNumber_Alert": "¡Número de teléfono inválido!",
@@ -196,19 +196,19 @@
 	"APIDisabled_Alert": "¡Esta instancia no admite API!",
 	"ClientOutdated_Alert": "¡Cliente desactualizado!",
 	"InvalidInstancePassword_Alert": "Contraseña de instancia no válida!",
-	"InvalidSessionCode_Alert": "Invalid session code!", // Untranslated
+	"InvalidSessionCode_Alert": "Código de sesión no válido!",
 	"Retry": "Reintentar",
-	"Login_Btn": "Log in using phone number", // Untranslated
-	"LoginWithQR_Btn": "Log in using QR code", // Untranslated
-	"Advanced": "Advanced", // Untranslated
-	"QrCode_Alert": "QR code is ready", // Untranslated
+	"Login_Btn": "Iniciar sesión con número de teléfono",
+	"LoginWithQR_Btn": "Iniciar sesión con el código QR",
+	"Advanced": "Avanzado",
+	"QrCode_Alert": "El código QR está listo",
 	
 	// Settings sections
 	"UI": "Interfaz de usuario",
-	"Behaviour": "Caracteristicas",
-	"Images": "Imagenes",
-	"Authorization": "Autorizacion",
-	"Notifications": "Notificationes",
+	"Behaviour": "Características",
+	"Images": "Imágenes",
+	"Authorization": "Autorización",
+	"Notifications": "Notificaciones",
 	
 	// UI Settings
 	"Language": "Lenguaje",
@@ -226,17 +226,17 @@
 	"ChatTextField": "Campo de texto en el chat",
 	"BuiltinImageViewer": "Visor de imágenes incorporado",
 	"LargeMusicCover": "Cubierta de reproductor grande",
-	"LegacyUI": "Legacy UI", // Untranslated
-	"FastScrolling": "Disable animations", // Untranslated
-	"Keyboard": "Keyboard", // Untranslated
-	"Auto": "Auto", // Untranslated
-	"FullscreenTextBox": "Fullscreen edit", // Untranslated
-	"Theme": "Theme", // Untranslated
-	"InputLanguages": "Input languages", // Untranslated
-	"ForceKeyInput": "Force keypad input", // Untranslated
-	"ChatAvatar": "Show avatar in chat", // Untranslated
-	"ChatWallpaper": "Chat wallpaper", // Untranslated
-	"12HourTimeFormat": "12-hour time format", // Untranslated
+	"LegacyUI": "Interfaz simple",
+	"FastScrolling": "Deshabilitar animaciones",
+	"Keyboard": "Teclado",
+	"Auto": "Automático",
+	"FullscreenTextBox": "Edición a pantalla completa",
+	"Theme": "Tema",
+	"InputLanguages": "Idiomas de entrada",
+	"ForceKeyInput": "Forzar la entrada del teclado",
+	"ChatAvatar": "Mostrar avatar en el chat",
+	"ChatWallpaper": "Fondo de pantalla de chat",
+	"12HourTimeFormat": "formato de hora de 12 horas",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Espere a que se cargue la pagina",
@@ -251,27 +251,27 @@
 	"NetworkAccess": "Acceso a la red",
 	"MobileData": "Datos",
 	"WiFi": "Wi-Fi",
-	"Longpoll": "Longpoll", // Untranslated
-	"UpdatesInterval": "Updates interval", // Untranslated
-	"DownloadPath": "Download path", // Untranslated
-	"DownloadMethod": "Download method", // Untranslated
-	"AlwaysAsk": "Always ask", // Untranslated
-	"InApp": "In app", // Untranslated
-	"WithBrowser": "With browser", // Untranslated
-	"PartialUpload": "Partial upload", // Untranslated
-	"PlaybackMethod": "Playback method", // Untranslated
-	"Stream": "Stream", // Untranslated
-	"CacheToFile": "Cache to file", // Untranslated
-	"PlayerCreationMethod": "Player creation method", // Untranslated
-	"PassURL": "Pass URL", // Untranslated
-	"PassConnectionStream": "Pass connection stream", // Untranslated
+	"Longpoll": "Encuesta larga",
+	"UpdatesInterval": "Intervalo de actualizaciones",
+	"DownloadPath": "Ruta de descarga",
+	"DownloadMethod": "Método de descarga",
+	"AlwaysAsk": "Preguntar siempre",
+	"InApp": "En aplicación",
+	"WithBrowser": "Con navegador",
+	"PartialUpload": "Carga parcial",
+	"PlaybackMethod": "Método de reproducción",
+	"Stream": "Escuchando",
+	"CacheToFile": "Caché para archivar",
+	"PlayerCreationMethod": "Crear metodo de reproducción",
+	"PassURL": "Pasar por URL",
+	"PassConnectionStream": "Pasar flujo de conexión",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Cargar miniaturas de medios",
 	"LoadAvatars": "Cargar avatares",
 	"MultiThreadedLoading": "Carga multihilo",
 	"RoundAvatars": "Avatares redondeados",
-	"LazyLoading": "Lazy loading", // Untranslated
+	"LazyLoading": "Carga diferida",
 	
 	// Cache settings
 	"AvatarsCaching": "Almacenar cache de avatares",
@@ -293,7 +293,7 @@
 	"PushBackgroundInterval": "Intervalo de Notificaciones de fondo",
 	
 	// About
-	"AboutText": "Cliente de Telegram asistido por servidor para J2ME, basado en la API web de MPGram.",
+	"AboutText": "Cliente de Telegram creado especialmente para servidor J2ME, basado en la API web de MPGram.",
 	"Developer": "Desarrollador",
 	"Author": "Autor",
 	"Donate": "Donar",
@@ -312,53 +312,53 @@
 	"SendAsVoice": "Enviar como mensaje de voz",
 	"HideWithSpoiler": "Ocultar con spoiler",
 	"EnableHTMLFormatting": "HTML formato",
-	"TextField_Hint": "Write a message...", // Untranslated
-	"Clear": "Clear", // Untranslated
+	"TextField_Hint": "Escribe un mensaje...",
+	"Clear": "Eliminar",
 	
 	// Alert messages
 	"MessageSent_Alert": "Mensaje enviado",
 	"MessageDeleted_Alert": "Mensaje eliminado",
-	"UpdateAvailable_Alert": "Nueva actualizacion disponible",
+	"UpdateAvailable_Alert": "Nueva actualización disponible",
 	"MemberBanned_Alert": "Miembro prohibido",
 	"StickersAdded_Alert": "Pegatinas agregadas",
 	"ChooseNetwork_Alert": "Elija el punto de acceso a la red",
 	"FailedToLoadImage": "Error al cargar la imagen",
-	"TextCopied_Alert": "Text copied", // Untranslated
-	"NotEnoughMemory_Alert": "Not enough memory", // Untranslated
-	"DownloadCanceled_Alert": "Download canceled", // Untranslated
-	"DownloadedTo": "Downloaded to ", // Untranslated
-	"ChooseDownloadMethod_Alert": "Choose download method", // Untranslated
-	"FailedToSaveSettings_Alert": "Failed to save settings", // Untranslated
-	"PiglerNotAvailable_Alert": "Pigler API is selected but not available, \ndownload it from https://nnproject.cc/pna", // Untranslated
-	"DeleteNMessage_Alert": "Delete % message?", // Untranslated
-	"DeleteNMessages_Alert": "Delete % messages?", // Untranslated
-	"DeleteNMessages_Alert_2": "", // Untranslated
-	"DeleteMessage_Alert": "Delete message?", // Untranslated
-	"PinMessage_Alert": "Pin message?", // Untranslated
-	"BanMember_Alert": "Ban member?", // Untranslated
-	"Logout_Alert": "Are you sure you want to log out?", // Untranslated
-	"RewriteFile_Alert": "File already exists, rewrite?", // Untranslated
-	"OpenThisLink_Alert": "Open this link?", // Untranslated
-	"Remove_Alert": "Remove \"%\"?", // Untranslated
-	"ResetSettings_Alert": "Reset settings?", // Untranslated
-	"ApplicationWillClose_Alert": "Application will close...", // Untranslated
-	"UserInvited_Alert": "User invited", // Untranslated
-	"InviteAccepted_Alert": "Invite accepted", // Untranslated
+	"TextCopied_Alert": "Texto copiado",
+	"NotEnoughMemory_Alert": "Memoria insuficiente",
+	"DownloadCanceled_Alert": "Descarga cancelada",
+	"DownloadedTo": "Descargado en",
+	"ChooseDownloadMethod_Alert": "Elija el método de descarga",
+	"FailedToSaveSettings_Alert": "Error al guardar la configuración",
+	"PiglerNotAvailable_Alert": "Pigler API está seleccionada pero no disponible, descárguela de https://nnproject.cc/pna",
+	"DeleteNMessage_Alert": "¿Eliminar % mensaje?",
+	"DeleteNMessages_Alert": "¿Eliminar % mensajes?",
+	"DeleteNMessages_Alert_2": "¿Eliminar mensaje?",
+	"DeleteMessage_Alert": "¿Eliminar mensajes?",
+	"PinMessage_Alert": "¿Mensaje fijado?",
+	"BanMember_Alert": "¿Miembro bloqueado?",
+	"Logout_Alert": "¿Estás seguro de que quieres cerrar sesión?",
+	"RewriteFile_Alert": "El archivo ya existe, ¿reescribirlo?",
+	"OpenThisLink_Alert": "¿Abrir este enlace?",
+	"Remove_Alert": "¿Eliminar \"%\"?",
+	"ResetSettings_Alert": "Restablecer la configuración?",
+	"ApplicationWillClose_Alert": "La aplicación se cerrará...",
+	"UserInvited_Alert": "Usuario invitado",
+	"InviteAccepted_Alert": "Invitación aceptada",
 	
 	// Chat form
 	"ChatMedia_Title": "Archivos",
 	"Search_TitlePrefix": "Buscar - ",
 	"OlderMessages": "Mensajes antiguos",
 	"NewerMessages": "Mensajes mas recientes",
-	"SavedMessages": "Saved messages", // Untranslated
-	"SomeoneIsTyping": "Someone is typing...", // Untranslated
-	"Typing": "typing...", // Untranslated
-	"_isTyping": "% is typing..", // Untranslated
-	"_areTyping": "% and % are typing...", // Untranslated
-	"_peopleAreTyping": "", // Untranslated
-	"_peopleAreTyping_1": " people are typing...", // Untranslated
+	"SavedMessages": "Mensajes guardados",
+	"SomeoneIsTyping": "Alguien está escribiendo...",
+	"Typing": "Escribiendo...",
+	"_isTyping": "% está escribiendo..",
+	"_areTyping": "% y % está escribiendo...",
+	"_peopleAreTyping": "",
+	"_peopleAreTyping_1": " la gente está escribiendo...",
 	"_peopleAreTyping_2": "",
-	"ManyPeopleAreTyping": "Many people are typing...", // Untranslated
+	"ManyPeopleAreTyping": "Mucha gente está escribiendo...",
 	
 	// Message
 	"ForwardedFrom": "Reenviado desde ",
@@ -370,19 +370,19 @@
 	"_comment": " comentario",
 	"_comments": " comentarios",
 	"_comments2": "",
-	"ReplyTo": "Reply to ", // Untranslated
-	"_react": " react", // Untranslated
-	"_reacts": " reacts", // Untranslated
+	"ReplyTo": "Responder a",
+	"_react": " reaccionar",
+	"_reacts": " reacciona",
 	"_reacts2": "",
-	"SeenList_Title": "Seen List", // Untranslated
+	"SeenList_Title": "Lista Vista",
 	
 	// Message media
 	"Media": "archivo",
 	"Poll": "Encuesta",
 	"Geo": "Localizacion: ",
-	"Photo": "Photo", // Untranslated
-	"Video": "Video", // Untranslated
-	"VoiceMessage": "Voice message", // Untranslated
+	"Photo": "Foto",
+	"Video": "Video",
+	"VoiceMessage": "Mensaje de voz",
 	
 	// Chat actions
 	"PinnedMessage_Action": " mensaje anclado",
@@ -406,8 +406,8 @@
 	"Stickers_Title": "Pegatinas",
 	"Sticker": "Pegatina",
 	"AddStickers": "Añadir pegatinas",
-	"Remove": "Remove", // Untranslated
-	"Share": "Share", // Untranslated
+	"Remove": "Eliminar",
+	"Share": "Compartir",
 	
 	// Music player
 	"Player_Title": "Reproductor de música",
@@ -419,8 +419,8 @@
 	"Next_Player": "Siguiente",
 	"UnknownTrack": "Pista Desconocida",
 	"Playlist_Title": "Lista de reproducción",
-	"Volume": "Volume", // Untranslated
-	"TogglePlaylistOrder": "Toggle order", // Untranslated
+	"Volume": "Volumen",
+	"TogglePlaylistOrder": "Alternar orden",
 	
 	// Profile/chat info
 	"Online": "en linea",
@@ -441,7 +441,7 @@
 	"GroupInfo": "Info del grupo",
 	"ChannelInfo": "Info del canal",
 	"TopicInfo": "Información del tema",
-	"AddMember_Title": "Add Member", // Untranslated
+	"AddMember_Title": "Agregar Miembro",
 	
 	"_member": " miembro",
 	"_members": " miembros",
