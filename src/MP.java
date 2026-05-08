@@ -552,6 +552,14 @@ public class MP extends MIDlet
 					d = p.substring(0, i);
 				}
 			}
+//#ifndef NO_CHAT_CANVAS
+			if (p.toLowerCase().indexOf("maui") != -1 || p.toLowerCase().indexOf("fastbcc") != -1
+					|| p.toLowerCase().indexOf("itel") != -1 || p.indexOf("S7350") != -1) {
+				// low end chinese phones and/or returns incorrect value hasPointerEvents
+				forceKeyUI = true;
+				fastScrolling = true;
+			}
+//#endif
 			deviceName = d;
 		}
 
@@ -655,11 +663,6 @@ public class MP extends MIDlet
 //#endif
 
 //#ifndef NO_CHAT_CANVAS
-		if (d != null && (d.toLowerCase().indexOf("fastbcc") != -1 || d.toLowerCase().indexOf("itel") != -1
-				|| d.indexOf("S7350") != -1)) {
-			forceKeyUI = true;
-		}
-
 		chatStatus = f.getHeight() >= 360;
 		reverseChat = true;
 		noSelectCommand = symbian;
