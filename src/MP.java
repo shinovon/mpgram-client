@@ -149,9 +149,11 @@ public class MP extends MIDlet
 	private static String instancePassword;
 	private static int tzOffset;
 	static boolean useLoadingForm;
+//#ifndef NO_AVATARS
 	static int avatarSize;
-	static int photoSize = 120;
 	static boolean loadAvatars = true;
+//#endif
+	static int photoSize = 120;
 	static boolean loadThumbs = true;
 	static boolean reverseChat;
 	static boolean showMedia = true;
@@ -555,7 +557,7 @@ public class MP extends MIDlet
 //#ifndef NO_CHAT_CANVAS
 			if (p.toLowerCase().indexOf("maui") != -1 || p.toLowerCase().indexOf("fastbcc") != -1
 					|| p.toLowerCase().indexOf("itel") != -1 || p.indexOf("S7350") != -1) {
-				// low end chinese phones and/or returns incorrect value hasPointerEvents
+				// low end chinese phones and/or impl returns incorrect value in hasPointerEvents
 				forceKeyUI = true;
 				fastScrolling = true;
 			}
@@ -632,9 +634,11 @@ public class MP extends MIDlet
 		jsonStream = symbianJrt || !symbian;
 		threadedImages = symbianJrt;
 
+//#ifndef NO_AVATARS
 		avatarSize = Math.min(display.getBestImageHeight(Display.LIST_ELEMENT), display.getBestImageWidth(Display.LIST_ELEMENT));
 		if (avatarSize < 8) avatarSize = 16;
 		else if (avatarSize > 120) avatarSize = 120;
+//#endif
 
 		photoSize = Math.min(f.getWidth(), f.getHeight()) / 3;
 
