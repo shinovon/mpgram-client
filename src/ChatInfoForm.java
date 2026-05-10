@@ -93,6 +93,7 @@ public class ChatInfoForm extends MPForm {
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 			append(s);
 		} else {
+//#ifndef NO_AVATARS
 			if (MP.loadAvatars) {
 				ImageItem img = new ImageItem("", null, 0, "");
 				try {
@@ -101,6 +102,7 @@ public class ChatInfoForm extends MPForm {
 				MP.queueAvatar(id, img);
 				append(img);
 			}
+//#endif
 			
 			if (name != null) {
 				s = new StringItem(null, name);
