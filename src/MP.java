@@ -3079,6 +3079,7 @@ public class MP extends MIDlet
 					writeAuth();
 					writeConfig();
 				} catch (Exception ignored) {}
+				display.setCurrent(mainDisplayable);
 				start(RUN_VALIDATE_AUTH, null);
 				return;
 			}
@@ -3087,6 +3088,7 @@ public class MP extends MIDlet
 				try {
 					writeConfig();
 				} catch (Exception ignored) {}
+				display.setCurrent(mainDisplayable);
 				start(RUN_VALIDATE_AUTH, null);
 				return;
 			}
