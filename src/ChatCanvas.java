@@ -1591,10 +1591,11 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 				if (typing[idx] != l) continue;
 				typing[idx] = 0;
 				typing[idx + 1] = 0;
-				typing[0]--;
+				if (typing[0] > 0) typing[0]--;
 				if (i != 4) {
 					System.arraycopy(typing, idx + 2, typing, idx, typing.length - idx - 2);
 				}
+				break;
 			}
 		}
 	}
@@ -1682,17 +1683,16 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					add: {
 						for (int i = 0; i < 5; ++i) {
 							int idx = (i << 1) + 1;
-							boolean replace = false;
-							if (typing[idx] != 0) {
-								if (now - typing[idx + 1] < 4000 && typing[idx] != fromid) {
-									continue;
-								} else replace = true;
+							if (typing[idx] == fromid || (typing[idx + 1] != 0 && now - typing[idx + 1] > 4000)) {
+								typing[idx + 1] = now;
+								break add;
 							}
-
-							typing[idx] = fromid;
-							typing[idx + 1] = now;
-							if (!replace) typing[0]++;
-							break add;
+							if (typing[idx] == 0) {
+								typing[idx] = fromid;
+								typing[idx + 1] = now;
+								typing[0]++;
+								break add;
+							}
 						}
 						typing[1] = fromid;
 						typing[2] = now;
@@ -1940,8 +1940,8 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		try {
 			while (update) {
 				try {
-					if (typing[0] == 0) {
-						synchronized (typingLock) {
+					synchronized (typingLock) {
+						if (typing[0] == 0) {
 							typingLock.wait(60000);
 						}
 					}
@@ -1958,7 +1958,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 								if (now - typing[idx + 1] < 5000) continue;
 								typing[idx] = 0;
 								typing[idx + 1] = 0;
-								typing[0]--;
+								if (typing[0] > 0) typing[0]--;
 								if (i != 4) {
 									System.arraycopy(typing, idx + 2, typing, idx, typing.length - idx - 2);
 								}
