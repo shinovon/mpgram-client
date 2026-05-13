@@ -1684,6 +1684,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 						for (int i = 0; i < 5; ++i) {
 							int idx = (i << 1) + 1;
 							if (typing[idx] == fromid || (typing[idx + 1] != 0 && now - typing[idx + 1] > 4000)) {
+								typing[idx] = fromid;
 								typing[idx + 1] = now;
 								break add;
 							}
