@@ -30,7 +30,7 @@
 !/.idea/modules.xml
 !/.idea/misc.xml
 /META-INF/
-proguard*.cfg
+proguard-local.cfg
 /out/
 
 gwSettings.dat
