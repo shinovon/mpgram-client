@@ -8,5 +8,8 @@
 	"Behaviour": "Behaviour",
 	"Authorization": "Authorisation",
 	"FullscreenTextBox": "Full-screen edit",
+	"License": "Released under the MIT licenсe.\nCopyright (C) %",
+	"ImagelibLicense": "Contains parts of the TUBE42 imagelib, licenсed under the LGPL.\nCopyright (C) %",
+	"GNUClasspathLicense": "Contains parts of GNU Classpath, licenсed under the GPL v2\nCopyright (C) %",
 	"DownloadCanceled_Alert": "Download cancelled"
 }

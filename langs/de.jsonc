@@ -298,6 +298,11 @@
 	"Author": "Autor",
 	"Donate": "Spenden",
 	"Chat": "Chat",
+	"Web": "Web", // Untranslated
+	"CommunityTranslations": "Community translations:", // Untranslated
+	"License": "Released under the MIT license.\nCopyright (C) %", // Untranslated
+	"ImagelibLicense": "Contains parts of the TUBE42 imagelib, licensed under the LGPL.\nCopyright (C) %", // Untranslated
+	"GNUClasspathLicense": "Contains parts of GNU Classpath, licensed under the GPL v2\nCopyright (C) %", // Untranslated
 	
 	// Write form
 	"Reply_Title": "Antworten",

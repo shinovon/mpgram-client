@@ -3847,7 +3847,7 @@ public class MP extends MIDlet
 
 			f.append(new Spacer(2, 2));
 
-			s = new StringItem(null, "Web\n");
+			s = new StringItem(null, L[LWeb].concat("\n"));
 			s.setFont(smallPlainFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
@@ -3887,28 +3887,27 @@ public class MP extends MIDlet
 			s.setItemCommandListener(this);
 			f.append(s);
 
-			s = new StringItem(null, "Community translations:\n\n"
+			s = new StringItem(null, L[LCommunityTranslations].concat("\n\n"
 					+ "Arabic: ZAIOOD999, nourhan5908\n"
 					+ "Azerbaijani: Red Fixrai\n"
 					+ "Catalan: Dragan232\n"
+					+ "German: Ricardo Breitkopf\n"
 					+ "Spanish: Jazmin Rocio\n"
 					+ "Finnish: gtrxAC\n"
 					+ "Portuguese: kefelili\n"
+					+ "Turkish: symbuzzer\n"
 					+ "Ukrainian: karusel33, PhantomHorror\n"
-					+ "Turkish: symbuzzer\n");
+					+ "Chinese Simplified: ginkgocore\n"));
 			s.setFont(smallPlainFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 
-			s = new StringItem(null, "\n\nReleased under the MIT license.\n"
-					+ "Copyright (C) 2022-2026 Arman Jussupgaliyev\n\n"
+			s = new StringItem(null, "\n\n" + localizeFormatted(LLicense, "2022-2026 Arman Jussupgaliyev")
 //#ifndef NO_AVATARS
-					+ "Contains parts of the TUBE42 imagelib, licensed under the LGPL.\n"
-					+ "Copyright (C) 2007 Free Software Foundation, Inc.\n\n"
+					+ "\n\n" + localizeFormatted(LImagelibLicense, "2007 Free Software Foundation, Inc.")
 //#endif
 //#ifndef NO_ZIP
-					+ "Contains parts of GNU Classpath, licensed under the GPL v2\n"
-					+ "Copyright (C) 1999-2004 Free Software Foundation, Inc."
+					+ "\n\n" + localizeFormatted(LGNUClasspathLicense, "1999-2004 Free Software Foundation, Inc.")
 //#endif
 					);
 			s.setFont(smallPlainFont);

@@ -298,6 +298,11 @@
 	"Author": "Автор",
 	"Donate": "Поддержать",
 	"Chat": "Чат",
+	"Web": "Web-сайт",
+	"CommunityTranslations": "Переводы от сообщества:",
+	"License": "Выпущено под лицензией MIT.\nCopyright (C) %",
+	"ImagelibLicense": "Содержит части TUBE42 imagelib, лицензированно под LGPL.\nCopyright (C) %",
+	"GNUClasspathLicense": "Содержит части GNU Classpath, лицензированно под GPL v2\nCopyright (C) %",
 	
 	// Write form
 	"Reply_Title": "Ответ",

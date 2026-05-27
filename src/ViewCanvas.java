@@ -37,6 +37,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 		loader = new Thread(this);
 		loader.start();
 		setFullScreenMode(true);
+		// TODO qr mode
 	}
 
 	public final void run() {
