@@ -2616,10 +2616,10 @@ public class MP extends MIDlet
 //#ifndef NO_NOKIAUI
 					if (notifyMethod != 1) {
 						Image img = null;
-						if (!Notifier.has(peerId) && imagesCache.containsKey(peerId)) {
-							img = (Image) imagesCache.get(peerId);
-						}
 						try {
+							if (!Notifier.has(peerId) && imagesCache.containsKey(peerId)) {
+								img = (Image) imagesCache.get(peerId);
+							}
 							if (Notifier.post(peerId, title, text, notifyMethod, img) && img == null && notifyAvas) {
 								MP.queueAvatar(peerId, peerId);
 							}
