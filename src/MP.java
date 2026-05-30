@@ -6059,9 +6059,9 @@ public class MP extends MIDlet
 	}
 
 	public static StringBuffer appendUrl(StringBuffer sb, String url) {
-		char[] chars = url.toCharArray();
-		for (int i = 0; i < chars.length; i++) {
-			int c = chars[i];
+		int l = url.length();
+		for (int i = 0; i < l; i++) {
+			int c = url.charAt(i);
 			if (65 <= c && c <= 90) {
 				sb.append((char) c);
 			} else if (97 <= c && c <= 122) {
