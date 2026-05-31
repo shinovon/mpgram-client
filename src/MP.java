@@ -1488,15 +1488,17 @@ public class MP extends MIDlet
 				String top = ((Object[]) param).length < 10 ? null : (String) ((Object[]) param)[9];
 
 				Alert alert = null;
-				if (sendChoice != null || file != null) {
-					alert = new Alert(symbian ? L[Lmpgram] : "");
-					alert.setString(L[LSending]);
-					alert.setIndicator(new Gauge(null, false, Gauge.INDEFINITE, Gauge.CONTINUOUS_RUNNING));
-					alert.addCommand(cancelUploadCmd);
-					alert.setCommandListener(this);
-					alert.setTimeout(Alert.FOREVER);
-					display(alert, current);
-				}
+				try {
+					if (sendChoice != null || file != null) {
+						alert = new Alert(symbian ? L[Lmpgram] : "");
+						alert.setString(L[LSending]);
+						alert.setIndicator(new Gauge(null, false, Gauge.INDEFINITE, Gauge.CONTINUOUS_RUNNING));
+						alert.addCommand(cancelUploadCmd);
+						alert.setCommandListener(this);
+						alert.setTimeout(Alert.FOREVER);
+						display(alert, current);
+					}
+				} catch (Exception ignored) {}
 
 				if (file != null && file.length() <= 8) {
 					file = null;
@@ -1551,7 +1553,7 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 				try {
 					if (!checkClass("javax.microedition.io.file.FileConnection")) throw new Error();
-					postMessage(sb.toString(), file, text, alert);
+					postMessage(sb.toString(), file, text, blackberry ? null : alert);
 				} catch (Error e)
 //#endif
 				{
@@ -2229,7 +2231,7 @@ public class MP extends MIDlet
 
 				downloadDocument(instanceUrl + FILE_URL + "?c=" + msg[0] + "&m=" + msg[1],
 						"file:///".concat(downloadPath.concat(name)),
-						alert,
+						blackberry ? null : alert,
 						null,
 						size,
 						true
@@ -5773,11 +5775,13 @@ public class MP extends MIDlet
 		FileConnection file = null;
 
 		Gauge gauge = null;
-		if (alert != null) {
-			alert.setTitle(L[LSending]);
-			gauge = new Gauge(null, false, 100, 0);
-			alert.setIndicator(gauge);
-		}
+		try {
+			if (alert != null) {
+				alert.setTitle(L[LSending]);
+				gauge = new Gauge(null, false, 100, 0);
+				alert.setIndicator(gauge);
+			}
+		} catch (Exception ignored) {}
 		int fileTotal = 0, fileSent = 0;
 
 		StringBuffer sb = new StringBuffer();
