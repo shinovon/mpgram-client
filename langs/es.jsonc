@@ -237,6 +237,7 @@
 	"ChatAvatar": "Mostrar avatar en el chat",
 	"ChatWallpaper": "Fondo de pantalla de chat",
 	"12HourTimeFormat": "formato de hora de 12 horas",
+	"StickerPreviewSize": "Sticker preview size", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Espere a que se cargue la pagina",

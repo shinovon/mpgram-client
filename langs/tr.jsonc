@@ -237,6 +237,7 @@
 	"ChatAvatar": "Sohbette avatar göster",
 	"ChatWallpaper": "Sohbet duvarkağıdı",
 	"12HourTimeFormat": "12-saat formatı",
+	"StickerPreviewSize": "Sticker preview size", // Untranslated
 
 	// Behaviour settings
 	"WaitForPageToLoad": "Sayfa yüklenmesini bekle",

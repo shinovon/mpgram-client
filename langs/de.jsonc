@@ -237,6 +237,7 @@
 	"ChatAvatar": "Show avatar in chat", // Untranslated
 	"ChatWallpaper": "Chat wallpaper", // Untranslated
 	"12HourTimeFormat": "12-hour time format", // Untranslated
+	"StickerPreviewSize": "Sticker preview size", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Warte bis Seite geladen",

@@ -223,6 +223,7 @@ public class MP extends MIDlet
 	private static boolean playlistDirection = true;
 	static boolean time12;
 	static boolean migrateAsked;
+	static int stickerPreviewSize = 32;
 
 	private static boolean needWriteConfig;
 
@@ -393,6 +394,7 @@ public class MP extends MIDlet
 	private static Gauge chatsGauge;
 	private static Gauge msgsGauge;
 	private static Gauge updateTimeoutGauge;
+	private static Gauge stickerPreviewSizeGauge;
 //#ifndef NO_NOTIFY
 	private static ChoiceGroup notifyChoice;
 	private static ChoiceGroup notifyMethodChoice;
@@ -759,6 +761,7 @@ public class MP extends MIDlet
 			playerCreateMethod = j.getInt("playerCreateMethod", playerCreateMethod);
 			time12 = j.getBoolean("time12", time12);
 			migrateAsked = j.getBoolean("migrated", migrateAsked);
+			stickerPreviewSize = j.getInt("stickerPreviewSize", stickerPreviewSize);
 
 			int version = j.getInt("v", 0);
 			if (version < 1) {
@@ -1213,7 +1216,7 @@ public class MP extends MIDlet
 								url = sb.toString();
 							} else if (src instanceof JSONObject) { // sticker or document
 								url = instanceUrl + FILE_URL + "?a&sticker=" + ((JSONObject) src).getString("id")
-										+ "&access_hash=" + ((JSONObject) src).getString("access_hash") + "&s=32&p=r" +
+										+ "&access_hash=" + ((JSONObject) src).getString("access_hash") + "&s=" + stickerPreviewSize + "&p=r" +
 										("application/x-tgsticker".equals(((JSONObject) src).getString("mime", ""))
 												? "tgss" : "sprevs");
 //#ifndef NO_CHAT_CANVAS
@@ -3184,6 +3187,10 @@ public class MP extends MIDlet
 					photoSizeGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(photoSizeGauge);
 
+					stickerPreviewSizeGauge = new Gauge(L[LStickerPreviewSize], true, 32, Math.min(32, stickerPreviewSize / 8));
+					stickerPreviewSizeGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(stickerPreviewSizeGauge);
+
 					chatsGauge = new Gauge(L[LChatsCount], true, 50, chatsLimit);
 					chatsGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(chatsGauge);
@@ -3494,6 +3501,9 @@ public class MP extends MIDlet
 //#endif
 					if ((photoSize = (photoSizeGauge.getValue() * 8)) < 16) {
 						photoSizeGauge.setValue((photoSize = 16) / 8);
+					}
+					if ((stickerPreviewSize = (stickerPreviewSizeGauge.getValue() * 8)) < 16) {
+						stickerPreviewSizeGauge.setValue((stickerPreviewSize = 16) / 8);
 					}
 					if ((chatsLimit = chatsGauge.getValue()) < 5) {
 						chatsGauge.setValue(chatsLimit = 5);
@@ -6640,6 +6650,7 @@ public class MP extends MIDlet
 		j.put("playerCreateMethod", playerCreateMethod);
 		j.put("time12", time12);
 		j.put("migrated", migrateAsked);
+		j.put("stickerPreviewSize", stickerPreviewSize);
 
 		j.put("v", 1);
 

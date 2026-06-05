@@ -237,6 +237,7 @@
 	"ChatAvatar": "Показ. аватарку в чате",
 	"ChatWallpaper": "Обои чата",
 	"12HourTimeFormat": "12-час. формат времени",
+	"StickerPreviewSize": "Размер стикеров в предпросмотре",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Ждать полной загрузки",

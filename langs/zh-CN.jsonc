@@ -237,6 +237,7 @@
 	"ChatAvatar": "聊天内显示头像",
 	"ChatWallpaper": "聊天壁纸",
 	"12HourTimeFormat": "12小时制",
+	"StickerPreviewSize": "Sticker preview size", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "等待页面加载完成",
