@@ -57,6 +57,8 @@ public interface Constants {
 	int RUN_SET_GAUGE_VALUE = 34;
 	int RUN_SET_ALERT_STRING = 35;
 	int RUN_SET_ALERT_INDICATOR = 36;
+	int RUN_START_VOICE_PLAYER = 37;
+	int RUN_VOICE_LOOP = 38;
 
 	long ZERO_CHANNEL_ID = -1000000000000L;
 

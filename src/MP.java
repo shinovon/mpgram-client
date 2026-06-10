@@ -360,6 +360,10 @@ public class MP extends MIDlet
 	static Command playerCmd;
 	static Command togglePlaylistOrderCmd;
 
+	static Command voicePlayCmd;
+	static Command voicePauseCmd;
+	static Command voiceCloseCmd;
+
 	private static Command updateCmd;
 	// endregion
 
@@ -428,6 +432,10 @@ public class MP extends MIDlet
 	private static StringItem playerPlaypauseBtn;
 	private static ImageItem playerCover;
 
+	// voice ui
+	private static Alert voiceAlert;
+	private static Gauge voiceProgress;
+
 	// cache
 	private static final JSONObject usersCache = new JSONObject();
 	private static final JSONObject chatsCache = new JSONObject();
@@ -475,6 +483,13 @@ public class MP extends MIDlet
 //#endif
 	static Player notificationPlayer;
 //#endif
+
+	// voice playback
+	private static String voicePeer;
+	private static int voiceMessageId;
+	private static int voiceState;
+	private static int voiceDuration;
+	private static Player voicePlayer;
 
 	// region MIDlet
 
@@ -928,6 +943,10 @@ public class MP extends MIDlet
 		playlistCmd = new Command(L[LOpenPlaylist], Command.SCREEN, 2);
 		playerCmd = new Command(L[LOpenPlayer], Command.SCREEN, 20);
 		togglePlaylistOrderCmd = new Command(L[LTogglePlaylistOrder], Command.SCREEN, 3);
+
+		voicePlayCmd = new Command(L[LPlay_Player], Command.OK, 1);
+		voicePauseCmd = new Command(L[LPause_Player], Command.OK, 2);
+		voiceCloseCmd = new Command(L[LCancel], Command.CANCEL, 3); // TODO localize
 
 		loadingForm = new Form(L[Lmpgram]);
 		loadingForm.append(L[LLoading]);
@@ -2282,6 +2301,7 @@ public class MP extends MIDlet
 			break;
 		}
 		case RUN_START_PLAYER: {
+			// TODO: check for threadUnsafeUI
 			try {
 				JSONObject msg = (JSONObject) param;
 
@@ -2535,6 +2555,90 @@ public class MP extends MIDlet
 		}
 		case RUN_SET_ALERT_INDICATOR: {
 			((Alert) param).setIndicator((Gauge) temp);
+			break;
+		}
+		case RUN_START_VOICE_PLAYER: {
+			try {
+				try {
+					voiceProgress.setValue(Gauge.CONTINUOUS_RUNNING);
+					voiceProgress.setMaxValue(Gauge.INDEFINITE);
+				} catch (Exception ignored) {}
+
+				StringBuffer url = new StringBuffer(instanceUrl);
+				url.append(VOICE_URL);
+				url.append("?c=").append(voicePeer)
+						.append("&m=").append(voiceMessageId)
+						.append("&user=").append(user);
+
+				Player p;
+				{ // stream
+					int method = playerCreateMethod;
+					if (method == 0) { // auto
+						if (series40) {
+							try {
+								Class.forName("com.sun.mmedia.protocol.CommonDS");
+								// s40v1 uses sun impl for media and i/o, so it should work fine
+								method = 1;
+							} catch (Exception e) {
+								// s40v2+ breaks http locator parsing
+								method = 2;
+							}
+						} else {
+							method = 1;
+							if (symbian) {
+								String platform = System.getProperty("microedition.platform");
+								if (symbianJrt &&
+										(platform.indexOf("java_build_version=2.") != -1
+												|| platform.indexOf("java_build_version=1.4") != -1)) {
+									// emc (s60v5+), supports mp3 streaming
+								} else if (checkClass("com.symbian.mmapi.PlayerImpl")) {
+									// uiq
+								} else {
+									// mmf (s60v3.2-)
+									method = 2;
+								}
+							}
+						}
+					}
+					if (method == 2) { // pass connector stream
+						p = Manager.createPlayer(openHttpConnection(url.toString()).openInputStream(), "audio/mpeg");
+					} else { // pass url
+						p = Manager.createPlayer(url.toString());
+					}
+
+					try {
+						voiceProgress.setValue(0);
+						voiceProgress.setMaxValue(100);
+					} catch (Exception ignored) {}
+
+					p.addPlayerListener(midlet);
+					voicePlayer = p;
+
+					p.realize();
+					try {
+						((VolumeControl) p.getControl("VolumeControl")).setLevel(50);
+					} catch (Throwable ignored) {}
+					p.prefetch();
+					p.start();
+					voiceState = 1;
+
+					voiceAlert.setString("Playing"); // TODO localize
+				}
+			} catch (Exception e) {
+				display(errorAlert(e), current);
+				closeVoicePlayer();
+				voiceState = 0;
+			}
+			break;
+		}
+		case RUN_VOICE_LOOP: {
+			try {
+				while (voicePlayer != null && voiceState == 1) {
+					playerUpdate(voicePlayer, null, null);
+					//noinspection BusyWait
+					Thread.sleep(500L);
+				}
+			} catch (Exception ignored) {}
 			break;
 		}
 		}
@@ -4149,6 +4253,34 @@ public class MP extends MIDlet
 				return;
 			}
 		}
+		{ // voice player commands TODO
+			if (c == voicePlayCmd) {
+				if (voicePlayer != null) {
+					try {
+						voicePlayer.start();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				return;
+			}
+			if (c == voicePauseCmd) {
+				if (voicePlayer != null) {
+					try {
+						voicePlayer.stop();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				return;
+			}
+			if (c == voiceCloseCmd) {
+				if (voiceState != 3) {
+					closeVoicePlayer();
+				}
+				return;
+			}
+		}
 //#ifndef NO_NOKIAUI
 		if (c == copyCmd) {
 			try {
@@ -4457,7 +4589,7 @@ public class MP extends MIDlet
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 
-			browseUser(VOICE_URL + "?c=" + s[0] + "&m=" + s[1]);
+			startVoiceMessage(s[0], Integer.parseInt(s[1]), 0);
 			return;
 		}
 		if (c == postCommentsCmd) {
@@ -4516,6 +4648,45 @@ public class MP extends MIDlet
 	// region Music player
 
 	public void playerUpdate(Player player, String event, Object eventData) {
+		if (voicePlayer != null) {
+			if (PlayerListener.END_OF_MEDIA.equals(event)) {
+				voiceState = 2;
+				if (voiceProgress != null) {
+					voiceProgress.setValue(100);
+				}
+				voiceAlert.removeCommand(voicePauseCmd);
+				closeVoicePlayer();
+				return;
+			}
+			if (PlayerListener.STARTED.equals(event)) {
+				voiceAlert.setString("Playing"); // TODO localize
+				voiceState = 1;
+				voiceAlert.removeCommand(voicePlayCmd);
+				voiceAlert.addCommand(voicePauseCmd);
+				start(RUN_VOICE_LOOP, player);
+			} else if (PlayerListener.STOPPED.equals(event) || PlayerListener.STOPPED_AT_TIME.equals(event)) {
+				voiceAlert.setString("Paused"); // TODO localize
+				voiceState = 2;
+				voiceAlert.removeCommand(voicePauseCmd);
+				voiceAlert.addCommand(voicePlayCmd);
+			} else if (PlayerListener.ERROR.equals(event)) {
+				closeVoicePlayer();
+//				display(errorAlert("Player error"), null);
+				return;
+			}
+
+			if (voiceProgress != null) {
+				try {
+					long duration = voiceDuration * 1000000L;
+					if (duration == 0) {
+						duration = player.getDuration();
+					}
+					int progress = (int) ((player.getMediaTime() * 100) / duration);
+					voiceProgress.setValue(progress < 0 ? 0 : progress > 100 ? 100 : progress);
+				} catch (Exception ignored) {}
+			}
+			return;
+		}
 		if (PlayerListener.END_OF_MEDIA.equals(event)) {
 			playerState = 2;
 			if (playerProgress != null) {
@@ -4557,14 +4728,7 @@ public class MP extends MIDlet
 					duration = player.getDuration();
 				}
 				int progress = (int) ((player.getMediaTime() * 100) / duration);
-
-				if (progress < 0) {
-					progress = 0;
-				} else if (progress > 100) {
-					progress = 100;
-				}
-
-				playerProgress.setValue(progress);
+				playerProgress.setValue(progress < 0 ? 0 : progress > 100 ? 100 : progress);
 			} catch (Exception ignored) {}
 		}
 	}
@@ -4645,6 +4809,65 @@ public class MP extends MIDlet
 	}
 
 	// endregion
+
+	// region Voice player
+
+	static void startVoiceMessage(String peer, int id, int duration) { // TODO
+		if (!voiceConversion) {
+			display(errorAlert("Voice conversion not supported by server"), null);
+			return;
+		}
+//		browseUser(VOICE_URL + "?c=" + s[0] + "&m=" + s[1]);
+		if (voiceState == 3) return;
+		closeVoicePlayer();
+
+		if (playerState != 0) {
+			// stop music player
+			closePlayer();
+			playerState = 0;
+		}
+
+		voiceState = 3;
+
+		voicePeer = peer;
+		voiceMessageId = id;
+		voiceDuration = duration;
+
+		Gauge gauge = new Gauge(null, false, 100, 0);
+		Alert alert = new Alert("voice");
+		alert.setString(L[LLoading]);
+		alert.setCommandListener(midlet);
+		alert.setTimeout(Alert.FOREVER);
+		alert.addCommand(voiceCloseCmd);
+		alert.setIndicator(gauge);
+		display(alert);
+
+		voiceAlert = alert;
+		voiceProgress = gauge;
+
+		midlet.start(RUN_START_VOICE_PLAYER, null);
+	}
+
+	static void closeVoicePlayer() {
+		if (voicePlayer != null) {
+			try {
+				voicePlayer.stop();
+			} catch (Throwable ignored) {}
+			try {
+				voicePlayer.close();
+			} catch (Throwable ignored) {}
+			voicePlayer = null;
+			voiceState = 0;
+		}
+		if (display.getCurrent() == voiceAlert) {
+			display(current);
+		}
+		voiceProgress = null;
+		voiceAlert = null;
+		voicePeer = null;
+	}
+
+	// endregion Voice player
 
 	// region Image queue
 

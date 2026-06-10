@@ -112,6 +112,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	boolean voice;
 	boolean audio;
 	byte[] waveform, waveformRender;
+	int audioDuration;
 
 	String time, nameRender, dateRender;
 	String replyNameRender, replyTextRender, forwardRender;
@@ -369,6 +370,7 @@ public class UIMessage extends UIItem implements LangConstants {
 								if (audio.getBoolean("voice", false)) {
 									int time = audio.getInt("time");
 									sb.append(time / 60).append(':').append(MP.n(time % 60));
+									audioDuration = time;
 									mediaSubtitle = sb.toString();
 									sb.setLength(0);
 
@@ -1503,10 +1505,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			break;
 		case LPlay_Item:
 			if (voice) {
-				if (!MP.voiceConversion) break;
-
-				// TODO voice player
-				MP.midlet.browseUser(MP.VOICE_URL + "?c=" + peerId + "&m=" + idStr);
+				MP.startVoiceMessage(peerId, id, audioDuration);
 				break;
 			}
 			MP.display(MP.loadingAlert(MP.L[LLoading]), MP.current);
