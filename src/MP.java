@@ -224,6 +224,7 @@ public class MP extends MIDlet
 	static boolean time12;
 	static boolean migrateAsked;
 	static int stickerPreviewSize = 32;
+	static boolean threadUnsafeUI;
 
 	private static boolean needWriteConfig;
 
@@ -445,6 +446,8 @@ public class MP extends MIDlet
 	private static String[] downloadMessage;
 	private static String downloadCurrentPath;
 	private static String downloadedPath;
+	private static int tempInt;
+	private static Object temp;
 
 	static int confirmationTask;
 	static Object confirmationParam;
@@ -635,6 +638,7 @@ public class MP extends MIDlet
 		useLoadingForm = !symbianJrt;
 		jsonStream = symbianJrt || !symbian;
 		threadedImages = symbianJrt;
+		threadUnsafeUI = blackberry;
 
 //#ifndef NO_AVATARS
 		avatarSize = Math.min(display.getBestImageHeight(Display.LIST_ELEMENT), display.getBestImageWidth(Display.LIST_ELEMENT));
@@ -1556,7 +1560,7 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 				try {
 					if (!checkClass("javax.microedition.io.file.FileConnection")) throw new Error();
-					postMessage(sb.toString(), file, text, blackberry ? null : alert);
+					postMessage(sb.toString(), file, text, alert);
 				} catch (Error e)
 //#endif
 				{
@@ -2234,7 +2238,7 @@ public class MP extends MIDlet
 
 				downloadDocument(instanceUrl + FILE_URL + "?c=" + msg[0] + "&m=" + msg[1],
 						"file:///".concat(downloadPath.concat(name)),
-						blackberry ? null : alert,
+						alert,
 						null,
 						size,
 						true
@@ -2520,6 +2524,18 @@ public class MP extends MIDlet
 			}
 			break;
 		}
+		case RUN_SET_GAUGE_VALUE: {
+			((Gauge) param).setValue(tempInt);
+			break;
+		}
+		case RUN_SET_ALERT_STRING: {
+			((Alert) param).setString((String) temp);
+			break;
+		}
+		case RUN_SET_ALERT_INDICATOR: {
+			((Alert) param).setIndicator((Gauge) temp);
+			break;
+		}
 		}
 //		running--;
 	}
@@ -2668,6 +2684,17 @@ public class MP extends MIDlet
 				run = i;
 				runParam = param;
 				new Thread(this).start();
+				wait();
+			}
+		} catch (Exception ignored) {}
+	}
+
+	void startLCDUI(int i, Object param) {
+		try {
+			synchronized (this) {
+				run = i;
+				runParam = param;
+				display.callSerially(this);
 				wait();
 			}
 		} catch (Exception ignored) {}
@@ -5787,9 +5814,13 @@ public class MP extends MIDlet
 		Gauge gauge = null;
 		try {
 			if (alert != null) {
-				alert.setTitle(L[LSending]);
 				gauge = new Gauge(null, false, 100, 0);
-				alert.setIndicator(gauge);
+				if (threadUnsafeUI) {
+					temp = gauge;
+					midlet.startLCDUI(RUN_SET_ALERT_INDICATOR, alert);
+				} else {
+					alert.setIndicator(gauge);
+				}
 			}
 		} catch (Exception ignored) {}
 		int fileTotal = 0, fileSent = 0;
@@ -5872,7 +5903,13 @@ public class MP extends MIDlet
 							}
 							fileSent += i;
 							if (gauge != null) {
-								gauge.setValue(Math.min((fileSent * 100) / fileTotal, 100));
+								int v = Math.min((fileSent * 100) / fileTotal, 100);
+								if (threadUnsafeUI) {
+									tempInt = v;
+									midlet.startLCDUI(RUN_SET_GAUGE_VALUE, gauge);
+								} else {
+									gauge.setValue(v);
+								}
 							}
 							if (!sending) throw cancelException;
 						}
@@ -6134,9 +6171,16 @@ public class MP extends MIDlet
 				confirmationParam = downloadCurrentPath;
 				downloadCurrentPath = null;
 
-				alert.setIndicator(null);
+//				if (threadUnsafeUI) {
+				alert = new Alert(alert.getTitle());
+				alert.setCommandListener(midlet);
+				alert.setTimeout(Alert.FOREVER);
+//				} else {
+//					alert.setIndicator(null);
+//				}
 				alert.setString(L[LRewriteFile_Alert]);
 				alert.addCommand(confirmCmd);
+				alert.addCommand(cancelDownloadCmd);
 				display(alert, current);
 				return;
 			} else {
@@ -6151,10 +6195,28 @@ public class MP extends MIDlet
 					InputStream in = openInputStream(hc);
 					try {
 						if (alert != null) {
-							if (gauge != null && size != 0) {
-								alert.setIndicator(gauge = new Gauge(null, false, 100, 0));
+							if (size <= 0) {
+								size = (int) hc.getLength();
 							}
-							alert.setString(L[LDownloading]);
+							if (size > 0) {
+								if (gauge == null) {
+									gauge = new Gauge(null, false, 100, 0);
+									if (threadUnsafeUI) {
+										temp = gauge;
+										midlet.startLCDUI(RUN_SET_ALERT_INDICATOR, alert);
+									} else {
+										alert.setIndicator(gauge);
+									}
+								}
+							} else {
+								gauge = null;
+							}
+							if (threadUnsafeUI) {
+								temp = L[LDownloading];
+								midlet.startLCDUI(RUN_SET_ALERT_STRING, alert);
+							} else {
+								alert.setString(L[LDownloading]);
+							}
 						}
 
 						byte[] buf = new byte[4096];
@@ -6163,8 +6225,14 @@ public class MP extends MIDlet
 						int c = 0;
 						while ((read = in.read(buf)) != -1) {
 							out.write(buf, 0, read);
-							if (gauge != null && (c++ % 4) == 0) {
-								gauge.setValue(Math.min((int) ((readTotal * 100) / size), 100));
+							if (gauge != null && (c++ & 3) == 0) {
+								int v = Math.min((int) ((readTotal * 100) / size), 100);
+								if (threadUnsafeUI) {
+									tempInt = v;
+									midlet.startLCDUI(RUN_SET_GAUGE_VALUE, gauge);
+								} else {
+									gauge.setValue(v);
+								}
 							}
 							if (!downloading) throw cancelException;
 							readTotal += read;
@@ -6175,10 +6243,16 @@ public class MP extends MIDlet
 							downloadedPath = dest;
 							goBackToChat();
 							if (alert != null) {
-								alert.setIndicator(null);
+//								if (threadUnsafeUI) {
+								alert = new Alert(alert.getTitle());
+								alert.setCommandListener(midlet);
+								alert.setTimeout(Alert.FOREVER);
+//								} else {
+//									alert.setIndicator(null);
+//								}
 								alert.addCommand(okDownloadCmd);
 								if (!series40) alert.addCommand(openDownloadedCmd);
-								alert.removeCommand(cancelDownloadCmd);
+//								alert.removeCommand(cancelDownloadCmd);
 								alert.setString(L[LDownloadedTo] + downloadPath);
 								display(alert, current);
 							}
