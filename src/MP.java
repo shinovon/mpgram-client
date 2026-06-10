@@ -647,6 +647,7 @@ public class MP extends MIDlet
 //#endif
 
 		photoSize = Math.min(f.getWidth(), f.getHeight()) / 3;
+		stickerPreviewSize = Math.min(f.getWidth(), f.getHeight()) / 6;
 
 		try {
 			tzOffset = TimeZone.getDefault().getRawOffset() / 1000;
