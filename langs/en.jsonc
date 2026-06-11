@@ -133,6 +133,7 @@
 	"Menu": "Menu",
 	"Write": "Write",
 	"AttachFile": "Attach file",
+	"SendVoiceMessage": "Send voice message",
 	
 	// Message writing form commands
 	"Send": "Send",
@@ -159,6 +160,8 @@
 	"Cancel": "Cancel",
 	"Open": "Open",
 	"Close": "Close",
+	"Start": "Start",
+	"Stop": "Stop",
 	
 	// Pagination commands
 	"NextPage": "Next page",
@@ -352,6 +355,10 @@
 	"UserInvited_Alert": "User invited",
 	"InviteAccepted_Alert": "Invite accepted",
 	"VoiceConversionNotSupported_Alert": "Voice messages not supported by server",
+	"Ready_Alert": "Ready",
+	"RecorderInitFailed_Alert": "Failed to initialize voice recorder",
+	"Recording_Alert": "Recording...",
+	"VoiceMessageRecorded_Alert": "Voice message has been recorded",
 	
 	// Chat form
 	"ChatMedia_Title": "Media",

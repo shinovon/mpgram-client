@@ -1070,7 +1070,10 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					LChatInfo,
 					LSearchMessages,
 					LSendSticker,
-					LWriteMessage
+					LWriteMessage,
+//#ifndef NO_RECORD
+					MP.voiceConversion && MP.supportsAudioRecording ? LSendVoiceMessage : Integer.MIN_VALUE,
+//#endif
 			} : new int[] { LRefresh, LChatInfo, LSearchMessages });
 			return true;
 		}
@@ -1191,6 +1194,12 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			forwardSelected();
 			break;
 		}
+//#ifndef NO_RECORD
+		case LSendVoiceMessage: {
+			MP.openVoiceRecorder(id, null);
+			break;
+		}
+//#endif
 		case LOpenPlayer: {
 			MP.midlet.commandAction(MP.playerCmd, this);
 			break;
@@ -1403,6 +1412,9 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					LAttachFile,
 //#endif
 					LSendSticker,
+//#ifndef NO_RECORD
+					MP.voiceConversion && MP.supportsAudioRecording ? LSendVoiceMessage : Integer.MIN_VALUE,
+//#endif
 			});
 		}
 	}

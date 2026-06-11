@@ -133,6 +133,7 @@
 	"Menu": "Menú",
 	"Write": "Escribir",
 	"AttachFile": "Adjuntar archivo",
+	"SendVoiceMessage": "Send voice message", // Untranslated
 	
 	// Message writing form commands
 	"Send": "Enviar",
@@ -159,6 +160,8 @@
 	"Cancel": "Cancelar",
 	"Open": "Abrir",
 	"Close": "Close", // Untranslated
+	"Start": "Start", // Untranslated
+	"Stop": "Stop", // Untranslated
 	
 	// Pagination commands
 	"NextPage": "Página siguiente",
@@ -352,6 +355,10 @@
 	"UserInvited_Alert": "Usuario invitado",
 	"InviteAccepted_Alert": "Invitación aceptada",
 	"VoiceConversionNotSupported_Alert": "Voice messages not supported by server", // Untranslated
+	"Ready_Alert": "Ready", // Untranslated
+	"RecorderInitFailed_Alert": "Failed to initialize voice recorder", // Untranslated
+	"Recording_Alert": "Recording...", // Untranslated
+	"VoiceMessageRecorded_Alert": "Voice message has been recorded", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Archivos",

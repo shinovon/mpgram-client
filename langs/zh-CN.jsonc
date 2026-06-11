@@ -133,6 +133,7 @@
 	"Menu": "菜单",
 	"Write": "输入",
 	"AttachFile": "添加文件",
+	"SendVoiceMessage": "Send voice message", // Untranslated
 	
 	// Message writing form commands
 	"Send": "发送",
@@ -159,6 +160,8 @@
 	"Cancel": "取消",
 	"Open": "打开",
 	"Close": "Close", // Untranslated
+	"Start": "Start", // Untranslated
+	"Stop": "Stop", // Untranslated
 	
 	// Pagination commands
 	"NextPage": "下一页",
@@ -352,6 +355,10 @@
 	"UserInvited_Alert": "邀请发送成功",
 	"InviteAccepted_Alert": "已接受邀请",
 	"VoiceConversionNotSupported_Alert": "Voice messages not supported by server", // Untranslated
+	"Ready_Alert": "Ready", // Untranslated
+	"RecorderInitFailed_Alert": "Failed to initialize voice recorder", // Untranslated
+	"Recording_Alert": "Recording...", // Untranslated
+	"VoiceMessageRecorded_Alert": "Voice message has been recorded", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "媒体文件",

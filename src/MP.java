@@ -40,9 +40,13 @@ import javax.microedition.io.file.FileConnection;
 import javax.microedition.io.file.FileSystemRegistry;
 //#endif
 import javax.microedition.lcdui.*;
+import javax.microedition.media.Control;
 import javax.microedition.media.Manager;
 import javax.microedition.media.Player;
 import javax.microedition.media.PlayerListener;
+//#ifndef NO_RECORD
+import javax.microedition.media.control.RecordControl;
+//#endif
 import javax.microedition.media.control.VolumeControl;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.rms.RecordStore;
@@ -237,6 +241,9 @@ public class MP extends MIDlet
 	static boolean blackberry;
 	static boolean symbian;
 	static boolean series40;
+//#ifndef NO_RECORD
+	static boolean supportsAudioRecording;
+//#endif
 
 	// endregion Settings
 
@@ -364,6 +371,12 @@ public class MP extends MIDlet
 	static Command voicePlayCmd;
 	static Command voicePauseCmd;
 	static Command voiceCloseCmd;
+//#ifndef NO_RECORD
+	static Command recorderStartCmd;
+	static Command recorderStopCmd;
+	static Command recorderCloseCmd;
+	static Command recorderSendCmd;
+//#endif
 
 	private static Command updateCmd;
 	// endregion
@@ -436,6 +449,9 @@ public class MP extends MIDlet
 	// voice ui
 	private static Alert voiceAlert;
 	private static Gauge voiceProgress;
+//#ifndef NO_RECORD
+	private static Alert recordAlert;
+//#endif
 
 	// cache
 	private static final JSONObject usersCache = new JSONObject();
@@ -467,16 +483,6 @@ public class MP extends MIDlet
 	private static int fileMode; // 0 - select directory for saving, 1 - select file for upload, 2 - select file for wallpaper
 //#endif
 
-	// music
-	private static JSONArray playlist;
-	private static int playlistIndex;
-	private static int playlistSize;
-	private static int playlistOffset;
-	private static String playlistPeer;
-	private static JSONObject currentMusic;
-	static int playerState; // 1 - playing, 2 - paused, 3 - loading
-	private static Player currentPlayer;
-
 	// notifications
 //#ifndef NO_NOTIFY
 //#ifndef NO_NOKIAUI
@@ -484,14 +490,6 @@ public class MP extends MIDlet
 //#endif
 	static Player notificationPlayer;
 //#endif
-
-	// voice playback
-	private static String voicePeer;
-	private static String voiceFrom;
-	private static int voiceMessageId;
-	private static int voiceState;
-	private static int voiceDuration;
-	private static Player voicePlayer;
 
 	// region MIDlet
 
@@ -694,6 +692,11 @@ public class MP extends MIDlet
 		chatStatus = f.getHeight() >= 360;
 		reverseChat = true;
 		noSelectCommand = symbian;
+//#endif
+
+//#ifndef NO_RECORD
+		p = System.getProperty("audio.encodings");
+		supportsAudioRecording = p != null && p.length() != 0;
 //#endif
 
 		// load settings
@@ -949,6 +952,12 @@ public class MP extends MIDlet
 		voicePlayCmd = new Command(L[LPlay_Player], Command.OK, 1);
 		voicePauseCmd = new Command(L[LPause_Player], Command.OK, 2);
 		voiceCloseCmd = new Command(L[LClose], Command.CANCEL, 3);
+//#ifndef NO_RECORD
+		recorderStartCmd = new Command(L[LStart], Command.OK, 1);
+		recorderStopCmd = new Command(L[LStop], Command.OK, 2);
+		recorderCloseCmd = new Command(L[LClose], Command.CANCEL, 3);
+		recorderSendCmd = new Command(L[LSend], Command.OK, 1);
+//#endif
 
 		loadingForm = new Form(L[Lmpgram]);
 		loadingForm.append(L[LLoading]);
@@ -1553,8 +1562,11 @@ public class MP extends MIDlet
 						if (sendChoice[0]) {
 							sb.append("&uncompressed=1");
 						}
-						if (sendChoice[1]) {
+						if (sendChoice.length > 1 && sendChoice[1]) {
 							sb.append("&spoiler=1");
+						}
+						if (sendChoice.length > 2 && sendChoice[2]) {
+							sb.append("&voice=1");
 						}
 					}
 //#ifndef NO_CHAT_CANVAS
@@ -2671,6 +2683,80 @@ public class MP extends MIDlet
 			} catch (Exception ignored) {}
 			break;
 		}
+//#ifndef NO_RECORDER
+		case RUN_VOICE_RECORDER: {
+			Alert alert = recordAlert;
+			String s = System.getProperty("audio.encodings");
+			if (s == null) s = "";
+
+			Player p = null;
+			try {
+				if (s.indexOf("audio/amr") != -1 && s.indexOf("16000") != -1) {
+					p = tryCreatePlayer("capture://audio?encoding=audio/amr&rate=16000");
+				}
+				if (p == null && s.indexOf("audio/amr") != -1) {
+					p = tryCreatePlayer("capture://audio?encoding=audio/amr");
+				}
+				if (p == null && s.indexOf("amr") != -1) {
+					p = tryCreatePlayer("capture://audio?encoding=amr");
+				}
+				if (p == null && s.indexOf("audio/wav") != -1) {
+					p = tryCreatePlayer("capture://audio?encoding=audio/wav");
+				}
+				if (p == null && s.indexOf("wav") != -1) {
+					p = tryCreatePlayer("capture://audio?encoding=wav");
+				}
+				if (p == null) {
+					p = tryCreatePlayer("capture://audio");
+				}
+			} catch (Exception ignored) {}
+
+			if (p == null) {
+				display(errorAlert(L[LRecorderInitFailed_Alert]), null);
+				recordAlert = null;
+				return;
+			}
+
+			RecordControl r;
+			try {
+				r = (RecordControl) p.getControl("RecordControl");
+				s = "";
+				String mime = p.getContentType();
+				if (mime != null) {
+					if (mime.indexOf("amr") != -1) {
+						s = ".amr";
+					} else if (mime.indexOf("wav") != -1) {
+						s = ".wav";
+					}
+				}
+				s = getAudioCacheDir().concat("temp".concat(s));
+				FileConnection fc = (FileConnection) Connector.open(s);
+				try {
+					if (!fc.exists()) fc.create();
+				} finally {
+					fc.close();
+				}
+				r.setRecordLocation(recordPath = s);
+				p.addPlayerListener(midlet);
+			} catch (Exception e) {
+				display(errorAlert(L[LRecorderInitFailed_Alert] + " \n" + e), null);
+				recordAlert = null;
+				return;
+			}
+
+			recordPlayer = p;
+			recordControl = r;
+
+			if (threadUnsafeUI) {
+				temp = L[LReady_Alert];
+				midlet.startLCDUI(RUN_SET_ALERT_STRING, alert);
+			} else {
+				alert.setString(L[LReady_Alert]);
+			}
+			alert.addCommand(recorderStartCmd);
+			break;
+		}
+//#endif
 		}
 //		running--;
 	}
@@ -2782,7 +2868,7 @@ public class MP extends MIDlet
 						} catch (Throwable ignored) {}
 					} else
 //#endif
-					{
+					if (!(display.getCurrent() instanceof Alert)) {
 						Alert alert = new Alert(title);
 						alert.setString(text);
 						alert.setTimeout(1500);
@@ -4283,7 +4369,7 @@ public class MP extends MIDlet
 				return;
 			}
 		}
-		{ // voice player commands TODO
+		{ // voice player commands
 			if (c == voicePlayCmd) {
 				if (voicePlayer != null) {
 					try {
@@ -4311,6 +4397,41 @@ public class MP extends MIDlet
 				return;
 			}
 		}
+//#ifndef NO_RECORD
+		{ // voice recorder commands TODO
+			if (c == recorderStartCmd) {
+				try {
+					recordAlert.removeCommand(recorderStartCmd);
+					((RecordControl) recordControl).startRecord();
+					recordPlayer.start();
+				} catch (Exception e) {
+					closeVoiceRecorder();
+					display(errorAlert(e), null);
+				}
+				return;
+			}
+			if (c == recorderStopCmd) {
+				try {
+					recordAlert.removeCommand(recorderStopCmd);
+					recordPlayer.stop();
+				} catch (Exception e) {
+					closeVoiceRecorder();
+					display(errorAlert(e), null);
+				}
+				return;
+			}
+			if (c == recorderCloseCmd) {
+				closeVoiceRecorder();
+				return;
+			}
+			if (c == recorderSendCmd) {
+				closeVoiceRecorder();
+				MP.sending = true;
+				start(RUN_SEND_MESSAGE, new Object[] { "", writeTo, replyTo, null, recordPath, new boolean[] { false, false, true }, null, null });
+				return;
+			}
+		}
+//#endif
 //#ifndef NO_NOKIAUI
 		if (c == copyCmd) {
 			try {
@@ -4677,7 +4798,39 @@ public class MP extends MIDlet
 
 	// region Music player
 
+	private static JSONArray playlist;
+	private static int playlistIndex;
+	private static int playlistSize;
+	private static int playlistOffset;
+	private static String playlistPeer;
+	private static JSONObject currentMusic;
+	static int playerState; // 1 - playing, 2 - paused, 3 - loading
+	private static Player currentPlayer;
+
 	public void playerUpdate(Player player, String event, Object eventData) {
+//#ifndef NO_RECORD
+		if (recordPlayer != null) {
+			// TODO
+			if (PlayerListener.STARTED.equals(event)) {
+				recordAlert.setString(L[LRecording_Alert]);
+				recordAlert.addCommand(recorderStopCmd);
+			} else if (PlayerListener.STOPPED.equals(event) || PlayerListener.STOPPED_AT_TIME.equals(event)) {
+				try {
+					((RecordControl) recordControl).commit();
+					recordAlert.addCommand(recorderSendCmd);
+					recordAlert.setString(L[LVoiceMessageRecorded_Alert]);
+				} catch (Exception e) {
+					closeVoiceRecorder();
+					display(errorAlert(e), null);
+				}
+				return;
+			} else if (PlayerListener.ERROR.equals(event)) {
+				closeVoiceRecorder();
+				return;
+			}
+			return;
+		}
+//#endif
 		if (voicePlayer != null) {
 			if (PlayerListener.END_OF_MEDIA.equals(event)) {
 				voiceState = 2;
@@ -4889,6 +5042,13 @@ public class MP extends MIDlet
 
 	// region Voice player
 
+	private static String voicePeer;
+	private static String voiceFrom;
+	private static int voiceMessageId;
+	private static int voiceState;
+	private static int voiceDuration;
+	private static Player voicePlayer;
+
 	static void startVoiceMessage(String peer, int id, int duration, String from) { // TODO
 		if (!voiceConversion) {
 			display(errorAlert(L[LVoiceConversionNotSupported_Alert]), null);
@@ -4918,7 +5078,7 @@ public class MP extends MIDlet
 		alert.setTimeout(Alert.FOREVER);
 		alert.addCommand(voiceCloseCmd);
 		alert.setIndicator(gauge);
-		display(alert);
+		display(alert, null);
 
 		voiceAlert = alert;
 		voiceProgress = gauge;
@@ -4946,6 +5106,73 @@ public class MP extends MIDlet
 	}
 
 	// endregion Voice player
+
+//#ifndef NO_RECORD
+	// region Voice recording
+
+	private static Player recordPlayer;
+	private static Control recordControl;
+	private static String recordPath;
+
+	static void openVoiceRecorder(String peerId, String reply) { // TODO
+		if (!voiceConversion) {
+			display(errorAlert(L[LVoiceConversionNotSupported_Alert]), null);
+			return;
+		}
+
+		writeTo = peerId;
+		replyTo = reply;
+
+		if (playerState != 0) {
+			// stop music player
+			closePlayer();
+			playerState = 0;
+		}
+
+		Alert alert = new Alert(symbian ? L[Lmpgram] : "");
+		alert.setString(L[LLoading]);
+		alert.setCommandListener(midlet);
+		alert.setTimeout(Alert.FOREVER);
+		alert.addCommand(recorderCloseCmd);
+		display(alert, null);
+
+		recordAlert = alert;
+		midlet.start(RUN_VOICE_RECORDER, null);
+	}
+
+	private static Player tryCreatePlayer(String url) throws Exception {
+		Player p = null;
+		try {
+			p = Manager.createPlayer(url);
+			p.realize();
+			return p;
+		} catch (Exception e) {
+			if (e instanceof SecurityException) throw e;
+			if (p != null) p.close();
+			return null;
+		}
+	}
+
+	static void closeVoiceRecorder() {
+		if (recordPlayer != null) {
+			Player p = recordPlayer;
+			recordPlayer = null;
+			try {
+				p.stop();
+			} catch (Throwable ignored) {}
+			try {
+				p.close();
+			} catch (Throwable ignored) {}
+		}
+		recordControl = null;
+		if (display.getCurrent() == recordAlert) {
+			display(current);
+		}
+		recordAlert = null;
+	}
+
+	// endregion Voice recording
+//#endif
 
 	// region Image queue
 

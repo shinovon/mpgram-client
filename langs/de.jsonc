@@ -133,6 +133,7 @@
 	"Menu": "Menu", // Untranslated
 	"Write": "Write", // Untranslated
 	"AttachFile": "Attach file", // Untranslated
+	"SendVoiceMessage": "Send voice message", // Untranslated
 	
 	// Message writing form commands
 	"Send": "Sende",
@@ -159,6 +160,8 @@
 	"Cancel": "Abrechen",
 	"Open": "Open", // Untranslated
 	"Close": "Close", // Untranslated
+	"Start": "Start", // Untranslated
+	"Stop": "Stop", // Untranslated
 	
 	// Pagination commands
 	"NextPage": "Nächste Seite",
@@ -352,6 +355,10 @@
 	"UserInvited_Alert": "User invited", // Untranslated
 	"InviteAccepted_Alert": "Invite accepted", // Untranslated
 	"VoiceConversionNotSupported_Alert": "Voice messages not supported by server", // Untranslated
+	"Ready_Alert": "Ready", // Untranslated
+	"RecorderInitFailed_Alert": "Failed to initialize voice recorder", // Untranslated
+	"Recording_Alert": "Recording...", // Untranslated
+	"VoiceMessageRecorded_Alert": "Voice message has been recorded", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Mediem",

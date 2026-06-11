@@ -133,6 +133,7 @@
 	"Menu": "Опции",
 	"Write": "Написать",
 	"AttachFile": "Прикрепить файл",
+	"SendVoiceMessage": "Отпр. голосовое сообщ.",
 	
 	// Message writing form commands
 	"Send": "Отправить",
@@ -159,6 +160,8 @@
 	"Cancel": "Отмена",
 	"Open": "Открыть",
 	"Close": "Закрыть",
+	"Start": "Старт",
+	"Stop": "Стоп",
 	
 	// Pagination commands
 	"NextPage": "След. стр.",
@@ -352,6 +355,10 @@
 	"UserInvited_Alert": "Пользователь приглашен",
 	"InviteAccepted_Alert": "Приглашение принято",
 	"VoiceConversionNotSupported_Alert": "Голосовые сообщения не поддерживаются сервером",
+	"Ready_Alert": "Готов",
+	"RecorderInitFailed_Alert": "Не удалось инициализировать запись",
+	"Recording_Alert": "Запись...",
+	"VoiceMessageRecorded_Alert": "Голосовое сообщение записано",
 
 	// Chat form
 	"ChatMedia_Title": "Медиафайлы",

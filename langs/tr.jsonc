@@ -133,6 +133,7 @@
 	"Menu": "Menü",
 	"Write": "Yaz",
 	"AttachFile": "Dosya ekle",
+	"SendVoiceMessage": "Send voice message", // Untranslated
 
 	// Message writing form commands
 	"Send": "Gönder",
@@ -159,6 +160,8 @@
 	"Cancel": "İptal",
 	"Open": "Aç",
 	"Close": "Close", // Untranslated
+	"Start": "Start", // Untranslated
+	"Stop": "Stop", // Untranslated
 
 	// Pagination commands
 	"NextPage": "Sonraki sayfa",
@@ -352,6 +355,10 @@
 	"UserInvited_Alert": "Kullanıcı davet edildi",
 	"InviteAccepted_Alert": "Davet kabul edildi",
 	"VoiceConversionNotSupported_Alert": "Voice messages not supported by server", // Untranslated
+	"Ready_Alert": "Ready", // Untranslated
+	"RecorderInitFailed_Alert": "Failed to initialize voice recorder", // Untranslated
+	"Recording_Alert": "Recording...", // Untranslated
+	"VoiceMessageRecorded_Alert": "Voice message has been recorded", // Untranslated
 
 	// Chat form
 	"ChatMedia_Title": "Medya",
