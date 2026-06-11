@@ -4876,19 +4876,19 @@ public class MP extends MIDlet
 					int progress = (int) ((current * 100) / duration);
 					progress = progress < 0 ? 0 : progress > 100 ? 100 : progress;
 
-					StringBuffer sb = new StringBuffer(voiceFrom);
-					int time = (int) (current / 1000000L);
-					sb.append(" \n").append(time / 60).append(':').append(MP.n(time % 60))
-					.append(" / ");
-					time = (int) (duration / 1000000L);
-					sb.append(time / 60).append(':').append(MP.n(time % 60));
-
-					if (threadUnsafeUI) {
-						temp = sb.toString();
-						startLCDUI(RUN_SET_ALERT_STRING, voiceAlert);
-					} else {
-						voiceAlert.setString(sb.toString());
-					}
+//					StringBuffer sb = new StringBuffer(voiceFrom);
+//					int time = (int) (current / 1000000L);
+//					sb.append(" \n").append(time / 60).append(':').append(MP.n(time % 60))
+//					.append(" / ");
+//					time = (int) (duration / 1000000L);
+//					sb.append(time / 60).append(':').append(MP.n(time % 60));
+//
+//					if (threadUnsafeUI) {
+//						temp = sb.toString();
+//						startLCDUI(RUN_SET_ALERT_STRING, voiceAlert);
+//					} else {
+//						voiceAlert.setString(sb.toString());
+//					}
 
 					if (threadUnsafeUI) {
 						tempInt = progress;
