@@ -1,0 +1,101 @@
+~~First beta release goal~~
+- [x] login
+- [x] chats list
+- [x] chat
+- [x] images
+- [x] avatars
+- [x] download files in browser
+- [x] send messages
+- [x] reply to messages
+- [x] common media types: photo, webpage, document
+- [x] app icon
+- [x] settings
+- [x] profile
+
+~~Release goal~~
+- [x] format render
+- [x] chat pagination
+- [x] multi-threaded avatars loading
+- [x] avatars cache
+- [x] handle invite link
+- [x] send files
+- [x] don't show forbidden actions: write, reply, delete
+- [x] date labels in chat
+- [x] delete messages
+- [x] search messages
+- [x] search chats
+- [x] replies
+- [x] folders
+- [x] change chat title correspondingly to selected folder
+- [x] common chat actions
+- [x] grouped messages
+- [x] localization
+- [x] handle start bot link
+- [x] bot buttons
+- [x] chat auto update
+- [x] message link
+- [x] clear cache button
+- [x] default avatar placeholder
+- [x] edit messages
+- [x] mark messages as read
+- [x] get device name
+- [x] chat pinned message
+- [x] chat members list
+- [x] ban member
+- [x] built-in image viewer
+- [x] unread count
+- [x] contacts list
+- [x] history start from unread
+- [x] pm online status
+- [x] stickers
+- [x] send sticker
+- [x] add sticker pack
+- [x] handle phone number link
+- [x] manual open link dialog
+- [x] text field in chat
+- [x] keep session alive, send online status
+- [x] send typing status
+- [x] bot button alerts
+- [x] pin messages
+
+Post-release todo:
+- [x] chat media list
+- [x] forum chats
+- [ ] chats list pagination
+- [x] nokiaui stuff
+- [ ] other media: ~~geo~~, poll (#32)
+- [x] voice messages (#30)
+- [x] global notifications
+- [x] download files without browser
+- [ ] built-in camera
+- [ ] user friendly error messages
+- [ ] file picker preview
+- [x] music
+- [ ] count rms cache entries
+- [x] chat canvas
+- [ ] cache music
+- [x] invite user to chat (#31)
+- [x] post comments
+- [x] avatar in chat info form
+- [x] cover in music player
+- [x] music playback methods
+- [x] #6
+- [x] #10
+- [x] message edited mark
+- [ ] chats cache
+- [ ] folders cache
+- [x] player volume
+- [x] avatars in notifications
+- [x] ban confirmation dialog
+- [ ] peers cache
+- [x] refactor locale keys
+- [x] minimize instead of exit
+- [x] animated stickers
+- [x] toggle playlist order
+- [ ] voice transcription
+- [x] remember last selected directory
+- [x] open file after download
+- [x] qr code auth
+- [x] message read list
+- [x] delete stickerpack
+- [x] chats list canvas
