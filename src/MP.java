@@ -1874,7 +1874,7 @@ public class MP extends MIDlet
 							!notifications &&
 //#endif
 							(threadConnections.size() != 0
-							|| (playerState == 1 && (reopenChat || series40))))
+							|| ((playerState == 1 || voiceState == 1) && (reopenChat || series40))))
 						continue;
 
 					boolean shown = false;
@@ -2622,7 +2622,6 @@ public class MP extends MIDlet
 					p.prefetch();
 					p.start();
 					voiceState = 1;
-					voiceAlert.setString(localizeFormatted(LVoiceMessageFrom, voiceFrom));
 				}
 			} catch (Exception e) {
 				display(errorAlert(e), current);
@@ -4652,7 +4651,12 @@ public class MP extends MIDlet
 			if (PlayerListener.END_OF_MEDIA.equals(event)) {
 				voiceState = 2;
 				if (voiceProgress != null) {
-					voiceProgress.setValue(100);
+					if (threadUnsafeUI) {
+						tempInt = 100;
+						startLCDUI(RUN_SET_GAUGE_VALUE, voiceProgress);
+					} else {
+						voiceProgress.setValue(100);
+					}
 				}
 				voiceAlert.removeCommand(voicePauseCmd);
 				closeVoicePlayer();
@@ -4679,8 +4683,30 @@ public class MP extends MIDlet
 					if (duration == 0) {
 						duration = player.getDuration();
 					}
-					int progress = (int) ((player.getMediaTime() * 100) / duration);
-					voiceProgress.setValue(progress < 0 ? 0 : progress > 100 ? 100 : progress);
+					long current = player.getMediaTime();
+					int progress = (int) ((current * 100) / duration);
+					progress = progress < 0 ? 0 : progress > 100 ? 100 : progress;
+
+					StringBuffer sb = new StringBuffer(voiceFrom);
+					int time = (int) (current / 1000000L);
+					sb.append(" \n").append(time / 60).append(':').append(MP.n(time % 60))
+					.append(" / ");
+					time = (int) (duration / 1000000L);
+					sb.append(time / 60).append(':').append(MP.n(time % 60));
+
+					if (threadUnsafeUI) {
+						temp = sb.toString();
+						startLCDUI(RUN_SET_ALERT_STRING, voiceAlert);
+					} else {
+						voiceAlert.setString(sb.toString());
+					}
+
+					if (threadUnsafeUI) {
+						tempInt = progress;
+						startLCDUI(RUN_SET_GAUGE_VALUE, voiceProgress);
+					} else {
+						voiceProgress.setValue(progress);
+					}
 				} catch (Exception ignored) {}
 			}
 			return;
@@ -4688,7 +4714,12 @@ public class MP extends MIDlet
 		if (PlayerListener.END_OF_MEDIA.equals(event)) {
 			playerState = 2;
 			if (playerProgress != null) {
-				playerProgress.setValue(100);
+				if (threadUnsafeUI) {
+					tempInt = 100;
+					startLCDUI(RUN_SET_GAUGE_VALUE, playerProgress);
+				} else {
+					playerProgress.setValue(100);
+				}
 			}
 			if (playerPlaypauseBtn != null) {
 				playerPlaypauseBtn.setText(L[LPlay_Player]);
@@ -4726,7 +4757,13 @@ public class MP extends MIDlet
 					duration = player.getDuration();
 				}
 				int progress = (int) ((player.getMediaTime() * 100) / duration);
-				playerProgress.setValue(progress < 0 ? 0 : progress > 100 ? 100 : progress);
+				progress = progress < 0 ? 0 : progress > 100 ? 100 : progress;
+				if (threadUnsafeUI) {
+					tempInt = progress;
+					startLCDUI(RUN_SET_GAUGE_VALUE, playerProgress);
+				} else {
+					playerProgress.setValue(progress);
+				}
 			} catch (Exception ignored) {}
 		}
 	}
@@ -4828,12 +4865,12 @@ public class MP extends MIDlet
 		voiceState = 3;
 
 		voicePeer = peer;
-		voiceFrom = from;
+		voiceFrom = MP.localizeFormatted(LVoiceMessageFrom, from);
 		voiceMessageId = id;
 		voiceDuration = duration;
 
 		Gauge gauge = new Gauge(null, false, 100, 0);
-		Alert alert = new Alert(L[LVoiceMessage]);
+		Alert alert = new Alert(symbian ? L[Lmpgram] : "");
 		alert.setString(L[LLoading]);
 		alert.setCommandListener(midlet);
 		alert.setTimeout(Alert.FOREVER);

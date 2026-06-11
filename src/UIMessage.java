@@ -1505,7 +1505,7 @@ public class UIMessage extends UIItem implements LangConstants {
 			break;
 		case LPlay_Item:
 			if (voice) {
-				MP.startVoiceMessage(peerId, id, audioDuration, this.name);
+				MP.startVoiceMessage(peerId, id, audioDuration, MP.getName(fromId, true));
 				break;
 			}
 			MP.display(MP.loadingAlert(MP.L[LLoading]), MP.current);
