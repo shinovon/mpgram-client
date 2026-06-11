@@ -61,41 +61,39 @@
 Post-release todo:
 - [x] chat media list
 - [x] forum chats
-- [ ] chats list pagination
 - [x] nokiaui stuff
-- [ ] other media: ~~geo~~, poll (#32)
 - [x] voice messages (#30)
 - [x] global notifications
 - [x] download files without browser
-- [ ] built-in camera
-- [ ] user friendly error messages
-- [ ] file picker preview
 - [x] music
-- [ ] count rms cache entries
 - [x] chat canvas
-- [ ] cache music
 - [x] invite user to chat (#31)
 - [x] post comments
 - [x] avatar in chat info form
 - [x] cover in music player
 - [x] music playback methods
-- [x] #6
-- [x] #10
 - [x] message edited mark
-- [ ] chats cache
-- [ ] folders cache
 - [x] player volume
 - [x] avatars in notifications
 - [x] ban confirmation dialog
-- [ ] peers cache
 - [x] refactor locale keys
 - [x] minimize instead of exit
 - [x] animated stickers
 - [x] toggle playlist order
-- [ ] voice transcription
 - [x] remember last selected directory
 - [x] open file after download
 - [x] qr code auth
 - [x] message read list
 - [x] delete stickerpack
 - [x] chats list canvas
+- [ ] chats list pagination
+- [ ] other media: ~~geo~~, poll (#32)
+- [ ] built-in camera
+- [ ] user friendly error messages
+- [ ] file picker preview
+- [ ] count rms cache entries
+- [ ] cache music
+- [ ] chats cache
+- [ ] folders cache
+- [ ] peers cache
+- [ ] voice transcription
