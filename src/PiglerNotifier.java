@@ -33,7 +33,7 @@ public class PiglerNotifier implements IPiglerTapHandler {
 	private static Object listener;
 	private static Object api;
 
-	static void init() {
+	static void init() throws Exception {
 		if (api != null) return;
 		listener = new PiglerNotifier();
 		api = new PiglerAPI();
