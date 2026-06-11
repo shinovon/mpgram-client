@@ -499,7 +499,7 @@ public class MP extends MIDlet
 //#ifndef NO_NOTIFY
 //#ifndef NO_NOKIAUI
 		try {
-			Notifier.close();
+			closeNotifier();
 		} catch (Throwable ignored) {}
 //#endif
 //#endif
@@ -1047,7 +1047,7 @@ public class MP extends MIDlet
 //#ifndef NO_NOKIAUI
 		// init notifications api wrapper
 		try {
-			Notifier.init();
+			initNotifier();
 		} catch (Throwable ignored) {}
 //#endif
 //#endif
@@ -2690,7 +2690,7 @@ public class MP extends MIDlet
 
 //#ifndef NO_NOKIAUI
 				try {
-					Notifier.remove(peerId);
+					removeNotification(peerId);
 				} catch (Throwable ignored) {}
 				notificationMessages.remove(peerId);
 //#endif
@@ -2760,7 +2760,7 @@ public class MP extends MIDlet
 				if (!paused && current instanceof MPChat && current.isShown() && peerId.equals(((MPChat) current).id())) {
 //#ifndef NO_NOKIAUI
 					try {
-						Notifier.remove(peerId);
+						removeNotification(peerId);
 					} catch (Throwable ignored) {}
 					notificationMessages.remove(peerId);
 //#endif
@@ -2773,10 +2773,10 @@ public class MP extends MIDlet
 					if (notifyMethod != 1) {
 						Image img = null;
 						try {
-							if (!Notifier.has(peerId) && imagesCache.containsKey(peerId)) {
+							if (!hasNotification(peerId) && imagesCache.containsKey(peerId)) {
 								img = (Image) imagesCache.get(peerId);
 							}
-							if (Notifier.post(peerId, title, text, notifyMethod, img) && img == null && notifyAvas) {
+							if (postNotification(peerId, title, text, notifyMethod, img) && img == null && notifyAvas) {
 								MP.queueAvatar(peerId, peerId);
 							}
 						} catch (Throwable ignored) {}
@@ -5019,7 +5019,7 @@ public class MP extends MIDlet
 		if (target instanceof String) {
 			// notification
 			try {
-				Notifier.updateImage((String) target, img);
+				updateNotificationImage((String) target, img);
 			} catch (Throwable ignored) {}
 //			return;
 		}
@@ -6583,6 +6583,78 @@ public class MP extends MIDlet
 //#endif
 
 	// endregion
+
+	// region Notifier
+
+	static Hashtable nokiaIds = new Hashtable();
+	static Hashtable piglerIds = new Hashtable();
+	static Image icon;
+	private static boolean nokiaNotifier;
+	private static boolean piglerNotifier;
+
+	static void initNotifier() {
+		try {
+			icon = Image.createImage("/m.png");
+		} catch (Exception ignored) {}
+
+		try {
+			Class.forName("com.nokia.mid.ui.SoftNotification");
+			NokiaNotifier.init();
+			nokiaNotifier = true;
+		} catch (Throwable ignored) {}
+
+		try {
+			Class.forName("org.pigler.api.PiglerAPI");
+			PiglerNotifier.init();
+			piglerNotifier = true;
+		} catch (Throwable ignored) {}
+	}
+
+	public static boolean postNotification(String peerId, String peer, String text, int mode, Image image) {
+		int id = 0;
+		try {
+			if (piglerNotifier) {
+				try {
+					Class.forName("org.pigler.api.PiglerAPI");
+					PiglerNotifier.showGlobalPopup(peer, text);
+				} catch (Throwable ignored) {}
+			}
+
+			if (mode == 3) {
+				Class.forName("org.pigler.api.PiglerAPI");
+				if (!piglerNotifier) return false;
+
+				PiglerNotifier.post(peerId, peer, text, id, image);
+				return true;
+			} else if (mode == 2) {
+				Class.forName("com.nokia.mid.ui.SoftNotification");
+				if (!nokiaNotifier) return false;
+
+				return NokiaNotifier.post(peerId, peer, text, id);
+			}
+		} catch (Throwable ignored) {}
+		return false;
+	}
+
+	public static void removeNotification(String peerId) {
+		if (nokiaNotifier) NokiaNotifier.remove(peerId);
+		if (piglerNotifier) PiglerNotifier.remove(peerId);
+	}
+
+	public static void updateNotificationImage(String peerId, Image image) {
+		if (piglerNotifier) PiglerNotifier.updateImage(peerId, image);
+	}
+
+	public static boolean hasNotification(String peerId) {
+		return piglerIds.contains(peerId) || nokiaIds.contains(peerId);
+	}
+
+	public static void closeNotifier() {
+		if (nokiaNotifier) NokiaNotifier.close();
+		if (piglerNotifier) PiglerNotifier.close();
+	}
+
+	// endregion Notifier
 
 	// region Localizations
 

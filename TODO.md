@@ -97,3 +97,5 @@ Post-release todo:
 - [ ] folders cache
 - [ ] peers cache
 - [ ] voice transcription
+- [ ] send voice messages
+- [ ] custom themes

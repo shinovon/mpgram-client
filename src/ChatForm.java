@@ -170,7 +170,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 				topMsgId = j.getInt("id");
 				if (messageId == 0) {
 					messageId = j.getInt("read");
-				} else if (messageId != 0 && j.getInt("unread", 0) > limit) {
+				} else if (j.getInt("unread", 0) > limit) {
 					offsetId = messageId = j.getInt("read");
 					addOffset = -limit;
 					dir = 1;
@@ -388,7 +388,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 //#ifndef NO_NOTIFY
 //#ifndef NO_NOKIAUI
 		try {
-			Notifier.remove(id);
+			MP.removeNotification(id);
 		} catch (Throwable ignored) {}
 		MP.notificationMessages.remove(id);
 //#endif

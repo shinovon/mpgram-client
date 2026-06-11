@@ -21,6 +21,7 @@ Telegram client for J2ME platform based on [MPGram Web API](https://github.com/s
 - File uploads
 - Message search
 - Contact list
+- Voice messages
 
 ## Device support
 
