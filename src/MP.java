@@ -955,7 +955,7 @@ public class MP extends MIDlet
 //#ifndef NO_RECORD
 		recorderStartCmd = new Command(L[LStart], Command.OK, 1);
 		recorderStopCmd = new Command(L[LStop], Command.OK, 2);
-		recorderCloseCmd = new Command(L[LClose], Command.CANCEL, 3);
+		recorderCloseCmd = new Command(L[LCancel], Command.CANCEL, 3);
 		recorderSendCmd = new Command(L[LSend], Command.OK, 1);
 //#endif
 
@@ -2720,7 +2720,7 @@ public class MP extends MIDlet
 			RecordControl r;
 			try {
 				r = (RecordControl) p.getControl("RecordControl");
-				s = "";
+				s = null;
 				String mime = p.getContentType();
 				if (mime != null) {
 					if (mime.indexOf("amr") != -1) {
@@ -2728,6 +2728,11 @@ public class MP extends MIDlet
 					} else if (mime.indexOf("wav") != -1) {
 						s = ".wav";
 					}
+				}
+				if (s == null) {
+					display(errorAlert(L[LRecorderInitFailed_Alert] + " \nUnknown type: " + mime), null);
+					recordAlert = null;
+					return;
 				}
 				s = getAudioCacheDir().concat("temp".concat(s));
 				FileConnection fc = (FileConnection) Connector.open(s);
