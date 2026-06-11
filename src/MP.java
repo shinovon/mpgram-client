@@ -225,6 +225,7 @@ public class MP extends MIDlet
 	static boolean migrateAsked;
 	static int stickerPreviewSize = 32;
 	static boolean threadUnsafeUI;
+	static int voiceVolume = 50;
 
 	private static boolean needWriteConfig;
 
@@ -2352,13 +2353,7 @@ public class MP extends MIDlet
 						playerProgress.setMaxValue(100);
 					} catch (Exception ignored) {}
 
-					String fileUrl = System.getProperty("fileconn.dir.private");
-					if (fileUrl == null) {
-						fileUrl = System.getProperty("fileconn.dir.music");
-					}
-					if (fileUrl == null) {
-						fileUrl = "file:///C:/";
-					}
+					String fileUrl = getAudioCacheDir();
 					String ext = media.getString("name", "");
 					int i;
 					if ((i = ext.lastIndexOf('.')) != -1) {
@@ -2572,6 +2567,42 @@ public class MP extends MIDlet
 						.append("&user=").append(user);
 
 				Player p;
+//#ifndef NO_FILE
+				if (playMethod == 1) { // file
+					if (threadUnsafeUI) {
+						temp = L[LDownloading];
+						startLCDUI(RUN_SET_ALERT_STRING, voiceAlert);
+					} else {
+						voiceAlert.setString(L[LDownloading]);
+					}
+					try {
+						voiceProgress.setValue(0);
+						playerProgress.setMaxValue(100);
+					} catch (Exception ignored) {}
+
+					String fileUrl = getAudioCacheDir();
+					MP.downloadDocument(url.toString(), fileUrl = fileUrl.concat("temp.mp3"), null, playerProgress, 0, false);
+
+					try {
+						playerProgress.setValue(Gauge.CONTINUOUS_RUNNING);
+						playerProgress.setMaxValue(Gauge.INDEFINITE);
+					} catch (Exception ignored) {}
+
+					int method = playerCreateMethod;
+					if (method == 0) { // auto
+						if (series40) {
+							method = 2;
+						} else {
+							method = 1;
+						}
+					}
+					if (method == 2) { // pass connector stream
+						p = Manager.createPlayer(Connector.openInputStream(fileUrl), "audio/mpeg");
+					} else { // pass url
+						p = Manager.createPlayer(fileUrl);
+					}
+				} else
+//#endif
 				{ // stream
 					int method = playerCreateMethod;
 					if (method == 0) { // auto
@@ -2606,23 +2637,23 @@ public class MP extends MIDlet
 					} else { // pass url
 						p = Manager.createPlayer(url.toString());
 					}
-
-					try {
-						voiceProgress.setValue(0);
-						voiceProgress.setMaxValue(100);
-					} catch (Exception ignored) {}
-
-					p.addPlayerListener(midlet);
-					voicePlayer = p;
-
-					p.realize();
-					try {
-						((VolumeControl) p.getControl("VolumeControl")).setLevel(50);
-					} catch (Throwable ignored) {}
-					p.prefetch();
-					p.start();
-					voiceState = 1;
 				}
+
+				try {
+					voiceProgress.setValue(0);
+					voiceProgress.setMaxValue(100);
+				} catch (Exception ignored) {}
+
+				p.addPlayerListener(midlet);
+				voicePlayer = p;
+
+				p.realize();
+				try {
+					((VolumeControl) p.getControl("VolumeControl")).setLevel(voiceVolume);
+				} catch (Throwable ignored) {}
+				p.prefetch();
+				p.start();
+				voiceState = 1;
 			} catch (Exception e) {
 				display(errorAlert(e), current);
 				closeVoicePlayer();
@@ -4841,6 +4872,17 @@ public class MP extends MIDlet
 		while (playerForm != null && playerForm.get(0) == playerCover) {
 			playerForm.delete(0);
 		}
+	}
+
+	static String getAudioCacheDir() {
+		String s = System.getProperty("fileconn.dir.private");
+		if (s == null) {
+			s = System.getProperty("fileconn.dir.music");
+		}
+		if (s == null) {
+			s = "file:///C:/";
+		}
+		return s;
 	}
 
 	// endregion
