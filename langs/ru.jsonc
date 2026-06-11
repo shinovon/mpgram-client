@@ -158,6 +158,7 @@
 	"Ok": "ОК",
 	"Cancel": "Отмена",
 	"Open": "Открыть",
+	"Close": "Закрыть",
 	
 	// Pagination commands
 	"NextPage": "След. стр.",
@@ -350,7 +351,8 @@
 	"ApplicationWillClose_Alert": "Приложение будет закрыто...",
 	"UserInvited_Alert": "Пользователь приглашен",
 	"InviteAccepted_Alert": "Приглашение принято",
-	
+	"VoiceConversionNotSupported_Alert": "Голосовые сообщения не поддерживаются сервером",
+
 	// Chat form
 	"ChatMedia_Title": "Медиафайлы",
 	"Search_TitlePrefix": "Поиск - ",
@@ -427,6 +429,7 @@
 	"Playlist_Title": "Плейлист",
 	"Volume": "Громкость",
 	"TogglePlaylistOrder": "Поменять порядок воспр.",
+	"VoiceMessageFrom": "Голосовое сообщение от %",
 	
 	// Profile/chat info
 	"Online": "в сети",

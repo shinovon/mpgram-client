@@ -158,6 +158,7 @@
 	"Ok": "D'acord",
 	"Cancel": "Canceŀla",
 	"Open": "Obre",
+	"Close": "Close", // Untranslated
 	
 	// Pagination commands
 	"NextPage": "Pàgina següent",
@@ -350,6 +351,7 @@
 	"ApplicationWillClose_Alert": "Application will close...", // Untranslated
 	"UserInvited_Alert": "User invited", // Untranslated
 	"InviteAccepted_Alert": "Invite accepted", // Untranslated
+	"VoiceConversionNotSupported_Alert": "Voice messages not supported by server", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Mèdia",
@@ -427,6 +429,7 @@
 	"Playlist_Title": "Llista de reproducció",
 	"Volume": "Volum",
 	"TogglePlaylistOrder": "Commuta ordre",
+	"VoiceMessageFrom": "Voice message from %", // Untranslated
 	
 	// Profile/chat info
 	"Online": "en línia",

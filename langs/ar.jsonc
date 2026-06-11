@@ -158,6 +158,7 @@
 	"Ok": "تأكيد",
 	"Cancel": "الغاء",
 	"Open": "Open", // Untranslated
+	"Close": "Close", // Untranslated
 	
 	// Pagination commands
 	"NextPage": "الصفحة التالية",
@@ -350,6 +351,7 @@
 	"ApplicationWillClose_Alert": "Application will close...", // Untranslated
 	"UserInvited_Alert": "User invited", // Untranslated
 	"InviteAccepted_Alert": "Invite accepted", // Untranslated
+	"VoiceConversionNotSupported_Alert": "Voice messages not supported by server", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "الوسائط",
@@ -427,6 +429,7 @@
 	"Playlist_Title": "قائمة تشغيل", 
 	"Volume": "Volume", // Untranslated
 	"TogglePlaylistOrder": "Toggle order", // Untranslated
+	"VoiceMessageFrom": "Voice message from %", // Untranslated
 	
 	// Profile/chat info
 	"Online": "متصل",

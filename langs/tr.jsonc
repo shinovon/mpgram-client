@@ -158,6 +158,7 @@
 	"Ok": "Tamam",
 	"Cancel": "İptal",
 	"Open": "Aç",
+	"Close": "Close", // Untranslated
 
 	// Pagination commands
 	"NextPage": "Sonraki sayfa",
@@ -350,6 +351,7 @@
 	"ApplicationWillClose_Alert": "Uygulama kapanacak...",
 	"UserInvited_Alert": "Kullanıcı davet edildi",
 	"InviteAccepted_Alert": "Davet kabul edildi",
+	"VoiceConversionNotSupported_Alert": "Voice messages not supported by server", // Untranslated
 
 	// Chat form
 	"ChatMedia_Title": "Medya",
@@ -427,6 +429,7 @@
 	"Playlist_Title": "Çalma listesi",
 	"Volume": "Ses",
 	"TogglePlaylistOrder": "Sıralamayı değiştir",
+	"VoiceMessageFrom": "Voice message from %", // Untranslated
 
 	// Profile/chat info
 	"Online": "çevrimiçi",

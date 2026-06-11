@@ -486,6 +486,7 @@ public class MP extends MIDlet
 
 	// voice playback
 	private static String voicePeer;
+	private static String voiceFrom;
 	private static int voiceMessageId;
 	private static int voiceState;
 	private static int voiceDuration;
@@ -946,7 +947,7 @@ public class MP extends MIDlet
 
 		voicePlayCmd = new Command(L[LPlay_Player], Command.OK, 1);
 		voicePauseCmd = new Command(L[LPause_Player], Command.OK, 2);
-		voiceCloseCmd = new Command(L[LCancel], Command.CANCEL, 3); // TODO localize
+		voiceCloseCmd = new Command(L[LClose], Command.CANCEL, 3);
 
 		loadingForm = new Form(L[Lmpgram]);
 		loadingForm.append(L[LLoading]);
@@ -2621,8 +2622,7 @@ public class MP extends MIDlet
 					p.prefetch();
 					p.start();
 					voiceState = 1;
-
-					voiceAlert.setString("Playing"); // TODO localize
+					voiceAlert.setString(localizeFormatted(LVoiceMessageFrom, voiceFrom));
 				}
 			} catch (Exception e) {
 				display(errorAlert(e), current);
@@ -4589,7 +4589,7 @@ public class MP extends MIDlet
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 
-			startVoiceMessage(s[0], Integer.parseInt(s[1]), 0);
+			startVoiceMessage(s[0], Integer.parseInt(s[1]), 0, MP.getName(s[1], true));
 			return;
 		}
 		if (c == postCommentsCmd) {
@@ -4659,13 +4659,11 @@ public class MP extends MIDlet
 				return;
 			}
 			if (PlayerListener.STARTED.equals(event)) {
-				voiceAlert.setString("Playing"); // TODO localize
 				voiceState = 1;
 				voiceAlert.removeCommand(voicePlayCmd);
 				voiceAlert.addCommand(voicePauseCmd);
 				start(RUN_VOICE_LOOP, player);
 			} else if (PlayerListener.STOPPED.equals(event) || PlayerListener.STOPPED_AT_TIME.equals(event)) {
-				voiceAlert.setString("Paused"); // TODO localize
 				voiceState = 2;
 				voiceAlert.removeCommand(voicePauseCmd);
 				voiceAlert.addCommand(voicePlayCmd);
@@ -4812,9 +4810,9 @@ public class MP extends MIDlet
 
 	// region Voice player
 
-	static void startVoiceMessage(String peer, int id, int duration) { // TODO
+	static void startVoiceMessage(String peer, int id, int duration, String from) { // TODO
 		if (!voiceConversion) {
-			display(errorAlert("Voice conversion not supported by server"), null);
+			display(errorAlert(L[LVoiceConversionNotSupported_Alert]), null);
 			return;
 		}
 //		browseUser(VOICE_URL + "?c=" + s[0] + "&m=" + s[1]);
@@ -4830,11 +4828,12 @@ public class MP extends MIDlet
 		voiceState = 3;
 
 		voicePeer = peer;
+		voiceFrom = from;
 		voiceMessageId = id;
 		voiceDuration = duration;
 
 		Gauge gauge = new Gauge(null, false, 100, 0);
-		Alert alert = new Alert("voice");
+		Alert alert = new Alert(L[LVoiceMessage]);
 		alert.setString(L[LLoading]);
 		alert.setCommandListener(midlet);
 		alert.setTimeout(Alert.FOREVER);

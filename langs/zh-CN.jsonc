@@ -158,6 +158,7 @@
 	"Ok": "确定",
 	"Cancel": "取消",
 	"Open": "打开",
+	"Close": "Close", // Untranslated
 	
 	// Pagination commands
 	"NextPage": "下一页",
@@ -350,6 +351,7 @@
 	"ApplicationWillClose_Alert": "应用即将关闭...",
 	"UserInvited_Alert": "邀请发送成功",
 	"InviteAccepted_Alert": "已接受邀请",
+	"VoiceConversionNotSupported_Alert": "Voice messages not supported by server", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "媒体文件",
@@ -427,6 +429,7 @@
 	"Playlist_Title": "播放列表",
 	"Volume": "音量",
 	"TogglePlaylistOrder": "切换播放顺序",
+	"VoiceMessageFrom": "Voice message from %", // Untranslated
 	
 	// Profile/chat info
 	"Online": "在线",

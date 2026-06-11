@@ -158,6 +158,7 @@
 	"Ok": "Aceptar",
 	"Cancel": "Cancelar",
 	"Open": "Abrir",
+	"Close": "Close", // Untranslated
 	
 	// Pagination commands
 	"NextPage": "Página siguiente",
@@ -350,6 +351,7 @@
 	"ApplicationWillClose_Alert": "La aplicación se cerrará...",
 	"UserInvited_Alert": "Usuario invitado",
 	"InviteAccepted_Alert": "Invitación aceptada",
+	"VoiceConversionNotSupported_Alert": "Voice messages not supported by server", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Archivos",
@@ -427,6 +429,7 @@
 	"Playlist_Title": "Lista de reproducción",
 	"Volume": "Volumen",
 	"TogglePlaylistOrder": "Alternar orden",
+	"VoiceMessageFrom": "Voice message from %", // Untranslated
 	
 	// Profile/chat info
 	"Online": "en linea",

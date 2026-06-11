@@ -158,6 +158,7 @@
 	"Ok": "Ok",
 	"Cancel": "Cancel",
 	"Open": "Open",
+	"Close": "Close",
 	
 	// Pagination commands
 	"NextPage": "Next page",
@@ -350,6 +351,7 @@
 	"ApplicationWillClose_Alert": "Application will close...",
 	"UserInvited_Alert": "User invited",
 	"InviteAccepted_Alert": "Invite accepted",
+	"VoiceConversionNotSupported_Alert": "Voice messages not supported by server",
 	
 	// Chat form
 	"ChatMedia_Title": "Media",
@@ -427,7 +429,8 @@
 	"Playlist_Title": "Playlist",
 	"Volume": "Volume",
 	"TogglePlaylistOrder": "Toggle order",
-	
+	"VoiceMessageFrom": "Voice message from %",
+
 	// Profile/chat info
 	"Online": "online",
 	"Offline": "offline",
