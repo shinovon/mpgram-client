@@ -2689,7 +2689,7 @@ public class MP extends MIDlet
 			} catch (Exception ignored) {}
 			break;
 		}
-//#ifndef NO_RECORDER
+//#ifndef NO_RECORD
 		case RUN_VOICE_RECORDER: {
 			Alert alert = recordAlert;
 			String s = System.getProperty("audio.encodings");
@@ -6843,6 +6843,8 @@ public class MP extends MIDlet
 
 	// endregion
 
+//#ifndef NO_NOTIFY
+//#ifndef NO_NOKIAUI
 	// region Notifier
 
 	static Hashtable nokiaIds = new Hashtable();
@@ -6914,6 +6916,8 @@ public class MP extends MIDlet
 	}
 
 	// endregion Notifier
+//#endif
+//#endif
 
 	// region Localizations
 
