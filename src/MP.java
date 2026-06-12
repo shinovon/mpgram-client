@@ -2666,6 +2666,12 @@ public class MP extends MIDlet
 				p.prefetch();
 				p.start();
 				voiceState = 1;
+				if (threadUnsafeUI) {
+					temp = voiceFrom;
+					startLCDUI(RUN_SET_ALERT_STRING, voiceAlert);
+				} else {
+					voiceAlert.setString(voiceFrom);
+				}
 			} catch (Exception e) {
 				display(errorAlert(e), current);
 				closeVoicePlayer();
