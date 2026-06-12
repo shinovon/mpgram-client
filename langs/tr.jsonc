@@ -133,7 +133,7 @@
 	"Menu": "Menü",
 	"Write": "Yaz",
 	"AttachFile": "Dosya ekle",
-	"SendVoiceMessage": "Send voice message", // Untranslated
+	"SendVoiceMessage": "Sesli mesaj gönder",
 
 	// Message writing form commands
 	"Send": "Gönder",
@@ -159,9 +159,9 @@
 	"Ok": "Tamam",
 	"Cancel": "İptal",
 	"Open": "Aç",
-	"Close": "Close", // Untranslated
-	"Start": "Start", // Untranslated
-	"Stop": "Stop", // Untranslated
+	"Close": "Kapat",
+	"Start": "Başlat",
+	"Stop": "Durdur",
 
 	// Pagination commands
 	"NextPage": "Sonraki sayfa",
@@ -241,7 +241,7 @@
 	"ChatAvatar": "Sohbette avatar göster",
 	"ChatWallpaper": "Sohbet duvarkağıdı",
 	"12HourTimeFormat": "12-saat formatı",
-	"StickerPreviewSize": "Sticker preview size", // Untranslated
+	"StickerPreviewSize": "Etiket önizleme boyutu"
 
 	// Behaviour settings
 	"WaitForPageToLoad": "Sayfa yüklenmesini bekle",
@@ -303,11 +303,11 @@
 	"Author": "Yazar",
 	"Donate": "Bağış yap",
 	"Chat": "Sohbet",
-	"Web": "Web", // Untranslated
-	"CommunityTranslations": "Community translations:", // Untranslated
-	"License": "Released under the MIT license.\nCopyright (C) %", // Untranslated
-	"ImagelibLicense": "Contains parts of the TUBE42 imagelib, licensed under the LGPL.\nCopyright (C) %", // Untranslated
-	"GNUClasspathLicense": "Contains parts of GNU Classpath, licensed under the GPL v2\nCopyright (C) %", // Untranslated
+	"Web": "Web",
+	"CommunityTranslations": "Topluluk çevirileri:",
+	"License": "MIT lisansı altında yayınlanmıştır.\nCopyright (C) %",
+	"ImagelibLicense": "LGPL lisansı altında yayınlanan TUBE42 imagelib'in bazı bölümlerini içerir.\nCopyright (C) %",
+	"GNUClasspathLicense": "GPL v2 lisansı altında yayınlanan GNU Classpath'in bazı bölümlerini içerir.\nCopyright (C) %",
 
 	// Write form
 	"Reply_Title": "Yanıtla",
@@ -354,11 +354,11 @@
 	"ApplicationWillClose_Alert": "Uygulama kapanacak...",
 	"UserInvited_Alert": "Kullanıcı davet edildi",
 	"InviteAccepted_Alert": "Davet kabul edildi",
-	"VoiceConversionNotSupported_Alert": "Voice messages not supported by server", // Untranslated
-	"Ready_Alert": "Ready", // Untranslated
-	"RecorderInitFailed_Alert": "Failed to initialize voice recorder", // Untranslated
-	"Recording_Alert": "Recording...", // Untranslated
-	"VoiceMessageRecorded_Alert": "Voice message has been recorded", // Untranslated
+	"VoiceConversionNotSupported_Alert": "Sunucu sesli mesajları desteklemiyor",
+	"Ready_Alert": "Hazır,
+	"RecorderInitFailed_Alert": "Ses kaydedici başlatılamadı.",
+	"Recording_Alert": "Kaydediyor...",
+	"VoiceMessageRecorded_Alert": "Sesli mesaj kaydedildi.",
 
 	// Chat form
 	"ChatMedia_Title": "Medya",
@@ -436,7 +436,7 @@
 	"Playlist_Title": "Çalma listesi",
 	"Volume": "Ses",
 	"TogglePlaylistOrder": "Sıralamayı değiştir",
-	"VoiceMessageFrom": "Voice message from %", // Untranslated
+	"VoiceMessageFrom": "% kişisinden sesli mesaj",
 
 	// Profile/chat info
 	"Online": "çevrimiçi",
