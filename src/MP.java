@@ -4428,6 +4428,7 @@ public class MP extends MIDlet
 			if (c == recorderStartCmd) {
 				try {
 					recordAlert.removeCommand(recorderStartCmd);
+					Thread.sleep(500);
 					((RecordControl) recordControl).startRecord();
 					recordPlayer.start();
 				} catch (Exception e) {
@@ -4837,6 +4838,7 @@ public class MP extends MIDlet
 //#ifndef NO_RECORD
 		if (recordPlayer != null) {
 			// TODO
+			if (recordControl == null) return;
 			if (PlayerListener.STARTED.equals(event)) {
 				recordAlert.addCommand(recorderStopCmd);
 				recordAlert.setString(L[LRecording_Alert]);
@@ -5183,17 +5185,16 @@ public class MP extends MIDlet
 	}
 
 	static void closeVoiceRecorder() {
-		if (recordPlayer != null) {
-			Player p = recordPlayer;
-			recordPlayer = null;
-			try {
-				p.stop();
-			} catch (Throwable ignored) {}
-			try {
-				p.close();
-			} catch (Throwable ignored) {}
-		}
 		recordControl = null;
+		if (recordPlayer != null) {
+			try {
+				recordPlayer.stop();
+			} catch (Throwable ignored) {}
+			try {
+				recordPlayer.close();
+			} catch (Throwable ignored) {}
+			recordPlayer = null;
+		}
 		if (display.getCurrent() == recordAlert) {
 			display(current);
 		}
