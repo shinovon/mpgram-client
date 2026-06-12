@@ -2772,13 +2772,13 @@ public class MP extends MIDlet
 			recordPlayer = p;
 			recordControl = r;
 
+			alert.addCommand(recorderStartCmd);
 			if (threadUnsafeUI) {
 				temp = L[LReady_Alert];
 				midlet.startLCDUI(RUN_SET_ALERT_STRING, alert);
 			} else {
 				alert.setString(L[LReady_Alert]);
 			}
-			alert.addCommand(recorderStartCmd);
 			display(alert, null);
 			break;
 		}
@@ -4838,8 +4838,8 @@ public class MP extends MIDlet
 		if (recordPlayer != null) {
 			// TODO
 			if (PlayerListener.STARTED.equals(event)) {
-				recordAlert.setString(L[LRecording_Alert]);
 				recordAlert.addCommand(recorderStopCmd);
+				recordAlert.setString(L[LRecording_Alert]);
 				display(recordAlert, null);
 			} else if (PlayerListener.STOPPED.equals(event) || PlayerListener.STOPPED_AT_TIME.equals(event)) {
 				try {
