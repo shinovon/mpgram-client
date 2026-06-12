@@ -2694,26 +2694,33 @@ public class MP extends MIDlet
 			Alert alert = recordAlert;
 			String s = System.getProperty("audio.encodings");
 			if (s == null) s = "";
+			String o = null;
 
 			Player p = null;
 			try {
 				if (s.indexOf("audio/aac") != -1) {
 					p = tryCreatePlayer("capture://audio?encoding=audio/aac");
+					if (p != null) o = ".aac";
 				}
 				if (s.indexOf("audio/amr") != -1 && s.indexOf("16000") != -1) {
 					p = tryCreatePlayer("capture://audio?encoding=audio/amr&rate=16000");
+					if (p != null) o = ".amr";
 				}
 				if (p == null && s.indexOf("audio/amr") != -1) {
 					p = tryCreatePlayer("capture://audio?encoding=audio/amr");
+					if (p != null) o = ".amr";
 				}
 				if (p == null && s.indexOf("amr") != -1) {
 					p = tryCreatePlayer("capture://audio?encoding=amr");
+					if (p != null) o = ".amr";
 				}
 				if (p == null && s.indexOf("audio/wav") != -1) {
 					p = tryCreatePlayer("capture://audio?encoding=audio/wav");
+					if (p != null) o = ".wav";
 				}
 				if (p == null && s.indexOf("wav") != -1) {
 					p = tryCreatePlayer("capture://audio?encoding=wav");
+					if (p != null) o = ".wav";
 				}
 				if (p == null) {
 					p = tryCreatePlayer("capture://audio");
@@ -2729,28 +2736,32 @@ public class MP extends MIDlet
 			RecordControl r;
 			try {
 				r = (RecordControl) p.getControl("RecordControl");
-				s = null;
 				String mime = p.getContentType();
-				if (mime != null) {
+				if (o == null && mime != null) {
 					if (mime.indexOf("amr") != -1) {
-						s = ".amr";
+						o = ".amr";
 					} else if (mime.indexOf("wav") != -1) {
-						s = ".wav";
+						o = ".wav";
+					} else if (mime.indexOf("aac") != -1) {
+						o = ".aac";
+					} else if (series40) {
+						// assume amr for s40, because it returns uninformative "audio" in getContentType()
+						o = ".amr";
 					}
 				}
-				if (s == null) {
+				if (o == null) {
 					display(errorAlert(L[LRecorderInitFailed_Alert] + " \nUnknown type: " + mime), null);
 					recordAlert = null;
 					return;
 				}
-				s = getAudioCacheDir().concat("temp".concat(s));
-				FileConnection fc = (FileConnection) Connector.open(s);
+				o = getAudioCacheDir().concat("temp".concat(o));
+				FileConnection fc = (FileConnection) Connector.open(o);
 				try {
 					if (!fc.exists()) fc.create();
 				} finally {
 					fc.close();
 				}
-				r.setRecordLocation(recordPath = s);
+				r.setRecordLocation(recordPath = o);
 				p.addPlayerListener(midlet);
 			} catch (Exception e) {
 				display(errorAlert(L[LRecorderInitFailed_Alert] + " \n" + e), null);
