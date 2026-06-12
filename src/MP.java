@@ -2779,6 +2779,7 @@ public class MP extends MIDlet
 				alert.setString(L[LReady_Alert]);
 			}
 			alert.addCommand(recorderStartCmd);
+			display(alert, null);
 			break;
 		}
 //#endif
@@ -4839,11 +4840,14 @@ public class MP extends MIDlet
 			if (PlayerListener.STARTED.equals(event)) {
 				recordAlert.setString(L[LRecording_Alert]);
 				recordAlert.addCommand(recorderStopCmd);
+				display(recordAlert, null);
 			} else if (PlayerListener.STOPPED.equals(event) || PlayerListener.STOPPED_AT_TIME.equals(event)) {
 				try {
 					((RecordControl) recordControl).commit();
+					if (series40) Thread.sleep(1500);
 					recordAlert.addCommand(recorderSendCmd);
 					recordAlert.setString(L[LVoiceMessageRecorded_Alert]);
+					display(recordAlert, null);
 				} catch (Exception e) {
 					closeVoiceRecorder();
 					display(errorAlert(e), null);
