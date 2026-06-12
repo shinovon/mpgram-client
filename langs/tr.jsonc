@@ -355,7 +355,7 @@
 	"UserInvited_Alert": "Kullanıcı davet edildi",
 	"InviteAccepted_Alert": "Davet kabul edildi",
 	"VoiceConversionNotSupported_Alert": "Sunucu sesli mesajları desteklemiyor",
-	"Ready_Alert": "Hazır,
+	"Ready_Alert": "Hazır",
 	"RecorderInitFailed_Alert": "Ses kaydedici başlatılamadı.",
 	"Recording_Alert": "Kaydediyor...",
 	"VoiceMessageRecorded_Alert": "Sesli mesaj kaydedildi.",
