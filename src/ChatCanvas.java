@@ -1196,7 +1196,8 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		}
 //#ifndef NO_RECORD
 		case LSendVoiceMessage: {
-			MP.openVoiceRecorder(id, null);
+			int r = Math.max(replyMsgId, topMsgId);
+			MP.openVoiceRecorder(id, r == 0 ? null : Integer.toString(r));
 			break;
 		}
 //#endif

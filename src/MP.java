@@ -4837,7 +4837,6 @@ public class MP extends MIDlet
 	public void playerUpdate(Player player, String event, Object eventData) {
 //#ifndef NO_RECORD
 		if (recordPlayer != null) {
-			// TODO
 			if (recordControl == null) return;
 			if (PlayerListener.STARTED.equals(event)) {
 				recordAlert.addCommand(recorderStopCmd);
@@ -5080,7 +5079,7 @@ public class MP extends MIDlet
 	private static int voiceDuration;
 	private static Player voicePlayer;
 
-	static void startVoiceMessage(String peer, int id, int duration, String from) { // TODO
+	static void startVoiceMessage(String peer, int id, int duration, String from) {
 		if (!voiceConversion) {
 			display(errorAlert(L[LVoiceConversionNotSupported_Alert]), null);
 			return;
@@ -5145,7 +5144,7 @@ public class MP extends MIDlet
 	private static Control recordControl;
 	private static String recordPath;
 
-	static void openVoiceRecorder(String peerId, String reply) { // TODO
+	static void openVoiceRecorder(String peerId, String reply) {
 		if (!voiceConversion) {
 			display(errorAlert(L[LVoiceConversionNotSupported_Alert]), null);
 			return;
