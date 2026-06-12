@@ -6383,6 +6383,9 @@ public class MP extends MIDlet
 
 		try {
 			http = openHttpConnection(instanceUrl.concat(API_URL + "?v=" + API_VERSION + "&method=").concat(url));
+			if (chunkedUpload && http.getClass().getName().indexOf("com.nokia.mj.impl.http.HttpConnectionNative") != -1) {
+				chunkedUpload = false;
+			}
 			http.setRequestMethod("POST");
 			http.setRequestProperty("Content-Type", "multipart/form-data; charset=UTF-8; boundary=".concat(boundary));
 
