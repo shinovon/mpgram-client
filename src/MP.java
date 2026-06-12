@@ -2697,6 +2697,9 @@ public class MP extends MIDlet
 
 			Player p = null;
 			try {
+				if (s.indexOf("audio/aac") != -1) {
+					p = tryCreatePlayer("capture://audio?encoding=audio/aac");
+				}
 				if (s.indexOf("audio/amr") != -1 && s.indexOf("16000") != -1) {
 					p = tryCreatePlayer("capture://audio?encoding=audio/amr&rate=16000");
 				}
