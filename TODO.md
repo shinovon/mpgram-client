@@ -86,6 +86,7 @@ Post-release todo:
 - [x] message read list
 - [x] delete stickerpack
 - [x] chats list canvas
+- [x] send voice messages
 - [ ] chats list pagination
 - [ ] other media: ~~geo~~, poll (#32)
 - [ ] built-in camera
@@ -97,5 +98,4 @@ Post-release todo:
 - [ ] folders cache
 - [ ] peers cache
 - [ ] voice transcription
-- [ ] send voice messages
 - [ ] custom themes
