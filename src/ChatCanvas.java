@@ -1142,6 +1142,11 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			// refresh
 			MP.midlet.commandAction(MP.latestCmd, this);
 			return true;
+		} else if (key == Canvas.KEY_NUM7) {
+			// send voice message
+			int r = Math.max(replyMsgId, topMsgId);
+			MP.openVoiceRecorder(id, r == 0 ? null : Integer.toString(r));
+			return true;
 		} else if (game == -10) {
 			send();
 			queueRepaint();
