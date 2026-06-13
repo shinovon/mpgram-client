@@ -322,6 +322,7 @@ public class MP extends MIDlet
 	static Command latestCmd;
 	static Command searchMsgCmd;
 	static Command sendStickerCmd;
+	static Command sendVoiceCmd;
 
 	static Command sendCmd;
 	static Command openTextBoxCmd;
@@ -895,12 +896,13 @@ public class MP extends MIDlet
 		playVoiceCmd = new Command(L[LPlay_Item], Command.ITEM, 1);
 
 		writeCmd = new Command(L[LWriteMessage], Command.SCREEN, 5);
-		latestCmd = new Command(L[LLatestMessages_Cmd], Command.SCREEN, 7);
-		chatInfoCmd = new Command(L[LChatInfo], Command.SCREEN, 8);
+		latestCmd = new Command(L[LLatestMessages_Cmd], Command.SCREEN, 8);
+		chatInfoCmd = new Command(L[LChatInfo], Command.SCREEN, 9);
 		olderMessagesCmd = new Command(L[LOlder], Command.ITEM, 1);
 		newerMessagesCmd = new Command(L[LNewer], Command.ITEM, 1);
 		searchMsgCmd = new Command(L[LSearch], Command.SCREEN, 10);
 		sendStickerCmd = new Command(L[LSendSticker], Command.SCREEN, 6);
+		sendVoiceCmd = new Command(L[LSendVoiceMessage], Command.SCREEN, 7);
 
 		sendCmd = new Command(L[LSend], Command.OK, 1);
 		openTextBoxCmd = new Command(L[LOpenTextBox], Command.ITEM, 1);
@@ -3085,6 +3087,11 @@ public class MP extends MIDlet
 			}
 			if (c == sendStickerCmd) {
 				openLoad(new StickerPacksList((MPChat) d));
+				return;
+			}
+			if (c == sendVoiceCmd) {
+				int r = ((MPChat) d).topMsgId();
+				openVoiceRecorder(((MPChat) d).id(), r == 0 ? null : Integer.toString(r));
 				return;
 			}
 			if (c == backCmd && ((MPChat) d).query() != null && ((MPChat) d).switched()) {

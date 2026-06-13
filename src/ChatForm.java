@@ -238,6 +238,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 		} else if (canWrite) {
 			addCommand(MP.writeCmd);
 			addCommand(MP.sendStickerCmd);
+			addCommand(MP.sendVoiceCmd);
 		}
 		
 		setTitle(title);
