@@ -4775,7 +4775,7 @@ public class MP extends MIDlet
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 
-			startVoiceMessage(s[0], Integer.parseInt(s[1]), 0, MP.getName(s[1], true));
+			startVoiceMessage(s[0], Integer.parseInt(s[1]), s[3] == null ? 0 : Integer.parseInt(s[3]), MP.getName(s[2], true));
 			return;
 		}
 		if (c == postCommentsCmd) {

@@ -653,6 +653,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 							JSONObject audio = media.getObject("audio");
 							if (audio.getBoolean("voice", false)) {
 								int time = audio.getInt("time");
+								key[3] = Integer.toString(time);
 								sb.append(MP.L[LVoiceMessage]).append('\n')
 								.append(time / 60).append(':').append(MP.n(time % 60));
 								nameSet = true;
