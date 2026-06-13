@@ -2702,10 +2702,6 @@ public class MP extends MIDlet
 					p = tryCreatePlayer("capture://audio?encoding=audio/aac");
 					if (p != null) o = ".aac";
 				}
-				if (p == null && s.indexOf("audio/amr") != -1 && s.indexOf("16000") != -1) {
-					p = tryCreatePlayer("capture://audio?encoding=audio/amr&rate=16000");
-					if (p != null) o = ".amr";
-				}
 				if (p == null && s.indexOf("audio/amr") != -1) {
 					p = tryCreatePlayer("capture://audio?encoding=audio/amr");
 					if (p != null) o = ".amr";
@@ -2736,7 +2732,7 @@ public class MP extends MIDlet
 			RecordControl r;
 			try {
 				r = (RecordControl) p.getControl("RecordControl");
-				String mime = p.getContentType();
+				String mime = r.getContentType();
 				if (o == null && mime != null) {
 					if (mime.indexOf("amr") != -1) {
 						o = ".amr";
@@ -2745,7 +2741,7 @@ public class MP extends MIDlet
 					} else if (mime.indexOf("aac") != -1) {
 						o = ".aac";
 					} else if (series40) {
-						// assume amr for s40, because it returns uninformative "audio" in getContentType()
+						// s40 only supports amr
 						o = ".amr";
 					}
 				}
@@ -4925,6 +4921,12 @@ public class MP extends MIDlet
 					}
 				} catch (Exception ignored) {}
 			}
+			return;
+		}
+		if ("com.nokia.audiooutputchange.event".equals(event)) {
+			try {
+				player.stop();
+			} catch (Exception ignored) {}
 			return;
 		}
 		if (PlayerListener.END_OF_MEDIA.equals(event)) {
