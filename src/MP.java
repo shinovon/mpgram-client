@@ -2757,10 +2757,12 @@ public class MP extends MIDlet
 				o = getAudioCacheDir().concat("temp".concat(o));
 				FileConnection fc = (FileConnection) Connector.open(o);
 				try {
-					if (!fc.exists()) fc.create();
+					if (fc.exists()) fc.delete();
+					fc.create();
 				} finally {
 					fc.close();
 				}
+				Thread.sleep(100);
 				r.setRecordLocation(recordPath = o);
 				p.addPlayerListener(midlet);
 			} catch (Exception e) {
