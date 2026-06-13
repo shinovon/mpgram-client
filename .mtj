@@ -20,6 +20,7 @@
             <symbol name="NO_FILE" value="true"/>
             <symbol name="NO_ZIP" value="true"/>
             <symbol name="NO_NOKIAUI" value="true"/>
+            <symbol name="NO_RECORD" value="true"/>
          </symbolSet>
       </configuration>
       <configuration active="false" name="BlackBerry">
