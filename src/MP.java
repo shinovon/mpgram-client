@@ -4422,13 +4422,16 @@ public class MP extends MIDlet
 			}
 		}
 //#ifndef NO_RECORD
-		{ // voice recorder commands TODO
+		{ // voice recorder commands
 			if (c == recorderStartCmd) {
 				try {
 					recordAlert.removeCommand(recorderStartCmd);
 					Thread.sleep(500);
 					((RecordControl) recordControl).startRecord();
 					recordPlayer.start();
+					if (sendTyping) {
+						start(RUN_SET_TYPING, "RecordAudio");
+					}
 				} catch (Exception e) {
 					closeVoiceRecorder();
 					display(errorAlert(e), null);
@@ -4761,7 +4764,7 @@ public class MP extends MIDlet
 			return;
 		}
 		if (c == playVoiceCmd) {
-			// play voice message TODO
+			// play voice message
 			String[] s = (String[]) ((MPForm) current).urls.get(item);
 			if (s == null) return;
 
