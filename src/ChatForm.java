@@ -238,7 +238,11 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 		} else if (canWrite) {
 			addCommand(MP.writeCmd);
 			addCommand(MP.sendStickerCmd);
-			addCommand(MP.sendVoiceCmd);
+//#ifndef NO_RECORD
+			if (MP.voiceConversion && MP.supportsAudioRecording) {
+				addCommand(MP.sendVoiceCmd);
+			}
+//#endif
 		}
 		
 		setTitle(title);

@@ -322,7 +322,9 @@ public class MP extends MIDlet
 	static Command latestCmd;
 	static Command searchMsgCmd;
 	static Command sendStickerCmd;
+//#ifndef NO_RECORD
 	static Command sendVoiceCmd;
+//#endif
 
 	static Command sendCmd;
 	static Command openTextBoxCmd;
@@ -902,7 +904,9 @@ public class MP extends MIDlet
 		newerMessagesCmd = new Command(L[LNewer], Command.ITEM, 1);
 		searchMsgCmd = new Command(L[LSearch], Command.SCREEN, 10);
 		sendStickerCmd = new Command(L[LSendSticker], Command.SCREEN, 6);
+//#ifndef NO_RECORD
 		sendVoiceCmd = new Command(L[LSendVoiceMessage], Command.SCREEN, 7);
+//#endif
 
 		sendCmd = new Command(L[LSend], Command.OK, 1);
 		openTextBoxCmd = new Command(L[LOpenTextBox], Command.ITEM, 1);
@@ -3089,11 +3093,13 @@ public class MP extends MIDlet
 				openLoad(new StickerPacksList((MPChat) d));
 				return;
 			}
+//#ifndef NO_RECORD
 			if (c == sendVoiceCmd) {
 				int r = ((MPChat) d).topMsgId();
 				openVoiceRecorder(((MPChat) d).id(), r == 0 ? null : Integer.toString(r));
 				return;
 			}
+//#endif
 			if (c == backCmd && ((MPChat) d).query() != null && ((MPChat) d).switched()) {
 				// close search
 				((MPChat) current).resetChat();
