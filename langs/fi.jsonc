@@ -188,7 +188,7 @@
 	"Auth_Btn": "Kirjaudu",
 	"InvalidCode_Alert": "Väärä koodi!",
 	"CodeExpired_Alert": "Koodi vanhentui!",
-	"Auth_Hint1": "(jätä tyhjäksi jos käytät palvelinta mp.nnchan.ru tai jos palvelimesi ei vaadi salasanaa)",
+	"Auth_Hint1": "(jätä tyhjäksi jos käytät palvelinta mp.nnproject.cc tai jos palvelimesi ei vaadi salasanaa)",
 	"InvalidInstance_Alert": "Palvelimen osoite ei kelpaa!",
 	"InvalidPhoneNumber_Alert": "Puhelinnumero ei kelpaa!",
 	"InvalidCaptcha_Alert": "Captcha-vastaus ei kelpaa!",

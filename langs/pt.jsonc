@@ -188,7 +188,7 @@
 	"Auth_Btn": "Autenticar",
 	"InvalidCode_Alert": "Código inválido!",
 	"CodeExpired_Alert": "Código expirado",
-	"Auth_Hint1": "(Deixe em branco se estiver usando mp.nnchan.ru ou se sua instância não tiver senha)",
+	"Auth_Hint1": "(Deixe em branco se estiver usando mp.nnproject.cc ou se sua instância não tiver senha)",
 	"InvalidInstance_Alert": "URL da instância inválido!",
 	"InvalidPhoneNumber_Alert": "Número de telefone inválido!",
 	"InvalidCaptcha_Alert": "Captcha inválido!",

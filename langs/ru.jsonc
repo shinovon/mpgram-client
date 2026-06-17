@@ -188,7 +188,7 @@
 	"Auth_Btn": "Авторизоваться",
 	"InvalidCode_Alert": "Неправильный код!",
 	"CodeExpired_Alert": "Код истек!",
-	"Auth_Hint1": "(оставьте пустым если используете mp.nnchan.ru или у вашего инстанса нет пароля)",
+	"Auth_Hint1": "(оставьте пустым если используете mp.nnproject.cc или у вашего инстанса нет пароля)",
 	"InvalidInstance_Alert": "Неправильный URL инстанса!",
 	"InvalidPhoneNumber_Alert": "Недопустимый номер телефона!",
 	"InvalidCaptcha_Alert": "Неправильная капча!",

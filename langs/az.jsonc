@@ -188,7 +188,7 @@
 	"Auth_Btn": "Avtorizasiyə ed",
 	"InvalidCode_Alert": "Invalid code!", // Untranslated
 	"CodeExpired_Alert": "Code expired!", // Untranslated
-	"Auth_Hint1": "(leave empty if using mp.nnchan.ru or your instance doesn't have a password)", // Untranslated
+	"Auth_Hint1": "(leave empty if using mp.nnproject.cc or your instance doesn't have a password)", // Untranslated
 	"InvalidInstance_Alert": "Invalid instance URL!", // Untranslated
 	"InvalidPhoneNumber_Alert": "Invalid phone number!", // Untranslated
 	"InvalidCaptcha_Alert": "Invalid captcha!", // Untranslated

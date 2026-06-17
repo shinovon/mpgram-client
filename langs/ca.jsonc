@@ -188,7 +188,7 @@
 	"Auth_Btn": "Autoritza",
 	"InvalidCode_Alert": "Codi no vàlid!",
 	"CodeExpired_Alert": "Codi caducat!",
-	"Auth_Hint1": "(deixa en blanc si utilitzes mp.nnchan.ru o teu instància no té un mot de pas)",
+	"Auth_Hint1": "(deixa en blanc si utilitzes mp.nnproject.cc o teu instància no té un mot de pas)",
 	"InvalidInstance_Alert": "URL d'instància no vàlid!",
 	"InvalidPhoneNumber_Alert": "Número de telèfon no vàlid!",
 	"InvalidCaptcha_Alert": "CAPTCHA no vàlid!",

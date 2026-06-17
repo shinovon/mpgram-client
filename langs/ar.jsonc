@@ -188,7 +188,7 @@
 	"Auth_Btn": "مصادقة",
 	"InvalidCode_Alert": "الرمز غير صالح !", 
 	"CodeExpired_Alert": "الرمز منتهي الصلاحية",
-	"Auth_Hint1": "(اتركه فارغًا إذا كنت تستخدم mp.nnchan.ru أو إذا لم يكن للنموذج الخاص بك كلمة مرور)",
+	"Auth_Hint1": "(اتركه فارغًا إذا كنت تستخدم mp.nnproject.cc أو إذا لم يكن للنموذج الخاص بك كلمة مرور)",
 	"InvalidInstance_Alert": "رابط نموذج غير صالح!",
 	"InvalidPhoneNumber_Alert": "رقم هاتف غير صالح!",
 	"InvalidCaptcha_Alert": "captcha غير صالحة!",

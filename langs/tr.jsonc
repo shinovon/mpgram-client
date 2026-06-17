@@ -188,7 +188,7 @@
 	"Auth_Btn": "Giriş yap",
 	"InvalidCode_Alert": "Geçersiz kod!",
 	"CodeExpired_Alert": "Kodun süresi doldu!",
-	"Auth_Hint1": "(mp.nnchan.ru veya şifresiz sunucularda boş bırakın)",
+	"Auth_Hint1": "(mp.nnproject.cc veya şifresiz sunucularda boş bırakın)",
 	"InvalidInstance_Alert": "Geçersiz sunucu URL’si!",
 	"InvalidPhoneNumber_Alert": "Geçersiz telefon numarası!",
 	"InvalidCaptcha_Alert": "Geçersiz captcha!",
