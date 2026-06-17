@@ -73,6 +73,7 @@ public class MP extends MIDlet
 			"en_gb",
 			"en",
 			"es",
+			"fa",
 			"fi",
 			"pt",
 			"tr",
@@ -88,6 +89,7 @@ public class MP extends MIDlet
 			"English (UK)",
 			"English (US)",
 			"Español",
+			"فارسی",
 			"Suomi",
 			"Português",
 			"Türkçe",
@@ -4185,6 +4187,7 @@ public class MP extends MIDlet
 			f.append(s);
 
 			s = new StringItem(null, L[LCommunityTranslations].concat("\n\n"
+					+ "Persian: Alireza.M (Dante)\n"
 					+ "Arabic: ZAIOOD999, nourhan5908\n"
 					+ "Azerbaijani: Red Fixrai\n"
 					+ "Catalan: Dragan232\n"
