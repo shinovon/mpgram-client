@@ -394,7 +394,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		if (thread != this.thread) throw MP.cancelException;
 
 		idOffset = j.getInt("off", Integer.MIN_VALUE);
-		if (idOffset != Integer.MIN_VALUE && addOffset < 0) {
+		if (idOffset != Integer.MIN_VALUE && addOffset != 0) {
 			idOffset += addOffset;
 		}
 		endReached = idOffset == 0 || (idOffset == Integer.MIN_VALUE && addOffset <= 0);
@@ -403,6 +403,10 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		JSONArray messages = j.getArray("messages");
 		int l = messages.size();
 		table = new Hashtable();
+
+		if (l != 0 && messages.getObject(0).getInt("id") == messageId && addOffset < 0) {
+			endReached = true;
+		}
 
 		if (!endReached && hasOffset) {
 			add(new UIPageButton(1));
@@ -432,7 +436,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			} while (true);
 		}
 
-		if (l == limit && j.has("count")) {
+		if ((l == limit || (addOffset < 0 && endReached)) && j.has("count")) {
 			add(new UIPageButton(-1));
 		}
 
@@ -1830,6 +1834,9 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 				addOffset = -limit - 1;
 				offsetId = firstMsgId;
 			}
+		} else if (addOffset != 0) {
+			offsetId = lastMsgId;
+			addOffset = 0;
 		} else {
 			offsetId = firstMsgId;
 			addOffset = limit - 1;
