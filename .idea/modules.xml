@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/ThemeEditor/ThemeEditor.iml" filepath="$PROJECT_DIR$/ThemeEditor/ThemeEditor.iml" />
       <module fileurl="file://$PROJECT_DIR$/mpgram-client.iml" filepath="$PROJECT_DIR$/mpgram-client.iml" />
     </modules>
   </component>
