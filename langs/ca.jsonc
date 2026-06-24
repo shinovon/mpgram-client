@@ -85,7 +85,7 @@
 	"ClearCache": "Esborra memòria cau",
 	"Locate": "Localitza",
 	"ShowSessionCode": "Mostra codi de sessió",
-	"ResetSettings": "Reset settings", // Untranslated
+	"ResetSettings": "Restableix configuració",
 	
 	// Chats list commands
 	"Folders": "Carpetes",
@@ -94,7 +94,7 @@
 	"Contacts": "Contactes",
 	"Search": "Cerca",
 	"OpenByLink": "Obre per enllaç",
-	"Select_OK": "Select", // Untranslated
+	"Select_OK": "Selecciona",
 	
 	// Message commands
 	"OpenChat": "Obre xat",
@@ -112,7 +112,7 @@
 	"Copy": "Copia",
 	"CopyLink": "Copia enllaç",
 	"Select": "Selecciona",
-	"SeenList": "Seen list", // Untranslated
+	"SeenList": "Llista de vistos",
 	
 	// Item commands
 	"Link_Cmd": "Enllaç", // assuming noun, if verb - Enllaça
@@ -132,8 +132,8 @@
 	"SendSticker": "Envia adhesiu",
 	"Menu": "Menú",
 	"Write": "Escriu",
-	"AttachFile": "Attach file", // Untranslated
-	"SendVoiceMessage": "Send voice message", // Untranslated
+	"AttachFile": "Adjunta fitxer",
+	"SendVoiceMessage": "Envia missatge de veu",
 	
 	// Message writing form commands
 	"Send": "Envia",
@@ -152,16 +152,16 @@
 	"Files": "Fitxers",
 	"AudioFiles": "Música",
 	"VoiceMessages": "Missatges de veu",
-	"AddMember": "Add member", // Untranslated
-	"ViewInviteLink": "View invite link", // Untranslated
+	"AddMember": "Afegeix membre",
+	"ViewInviteLink": "Veges enllaç d'invitació",
 	
 	// Dialog commands
 	"Ok": "D'acord",
 	"Cancel": "Canceŀla",
 	"Open": "Obre",
-	"Close": "Close", // Untranslated
-	"Start": "Start", // Untranslated
-	"Stop": "Stop", // Untranslated
+	"Close": "Tanca",
+	"Start": "Comença",
+	"Stop": "Atura",
 	
 	// Pagination commands
 	"NextPage": "Pàgina següent",
@@ -238,10 +238,10 @@
 	"Theme": "Tema",
 	"InputLanguages": "Idiomes d'entrada",
 	"ForceKeyInput": "Forçar entrada de teclat",
-	"ChatAvatar": "Show avatar in chat", // Untranslated
-	"ChatWallpaper": "Chat wallpaper", // Untranslated
-	"12HourTimeFormat": "12-hour time format", // Untranslated
-	"StickerPreviewSize": "Sticker preview size", // Untranslated
+	"ChatAvatar": "Mostra avatar a xat",
+	"ChatWallpaper": "Fons de xat",
+	"12HourTimeFormat": "Format de 12 hores",
+	"StickerPreviewSize": "Mida de vista prèvia d'adhesiu",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Espera que pàgina es carregui",
@@ -303,11 +303,11 @@
 	"Author": "Autor",
 	"Donate": "Dona diners",
 	"Chat": "Xat", // assuming noun, if verb - Xateja
-	"Web": "Web", // Untranslated
-	"CommunityTranslations": "Community translations:", // Untranslated
-	"License": "Released under the MIT license.\nCopyright (C) %", // Untranslated
-	"ImagelibLicense": "Contains parts of the TUBE42 imagelib, licensed under the LGPL.\nCopyright (C) %", // Untranslated
-	"GNUClasspathLicense": "Contains parts of GNU Classpath, licensed under the GPL v2\nCopyright (C) %", // Untranslated
+	"Web": "Web",
+	"CommunityTranslations": "Traduccions comunitàries:",
+	"License": "Publicat sota la llicència MIT.\nDrets d'autor (C) %",
+	"ImagelibLicense": "Conté parts de la biblioteca d'imatges TUBE42, amb llicència LGPL.\nDrets d'autor (C) %",
+	"GNUClasspathLicense": "Conté parts de GNU Classpath, amb llicència GPL v2\nDrets d'autor (C) %",
  	
 	// Write form
 	"Reply_Title": "Respon",
@@ -349,16 +349,16 @@
 	"Logout_Alert": "Segur que vols tancar sessió?",
 	"RewriteFile_Alert": "Fitxer ja existeix, reescriu-lo?",
 	"OpenThisLink_Alert": "Obre aquest enllaç?",
-	"Remove_Alert": "Remove \"%\"?", // Untranslated
-	"ResetSettings_Alert": "Reset settings?", // Untranslated
-	"ApplicationWillClose_Alert": "Application will close...", // Untranslated
-	"UserInvited_Alert": "User invited", // Untranslated
-	"InviteAccepted_Alert": "Invite accepted", // Untranslated
-	"VoiceConversionNotSupported_Alert": "Voice messages not supported by server", // Untranslated
-	"Ready_Alert": "Ready", // Untranslated
-	"RecorderInitFailed_Alert": "Failed to initialize voice recorder", // Untranslated
-	"Recording_Alert": "Recording...", // Untranslated
-	"VoiceMessageRecorded_Alert": "Voice message has been recorded", // Untranslated
+	"Remove_Alert": "Eliminar \"%\"?",
+	"ResetSettings_Alert": "Restableix configuració?",
+	"ApplicationWillClose_Alert": "Aplicació es tancarà...",
+	"UserInvited_Alert": "Usuari invitat",
+	"InviteAccepted_Alert": "Invitació acceptada",
+	"VoiceConversionNotSupported_Alert": "Missatges de veu no compatibles amb servidor",
+	"Ready_Alert": "Llest",
+	"RecorderInitFailed_Alert": "No s'ha pogut inicialitzar gravadora de veu",
+	"Recording_Alert": "Gravant...",
+	"VoiceMessageRecorded_Alert": "S'ha enregistrat missatge de veu",
 	
 	// Chat form
 	"ChatMedia_Title": "Mèdia",
@@ -368,12 +368,12 @@
 	"SavedMessages": "Missatges desats",
 	"SomeoneIsTyping": "Algú està escrivint...",
 	"Typing": "escrivint...",
-	"_isTyping": "% is typing..", // Untranslated
-	"_areTyping": "% and % are typing...", // Untranslated
-	"_peopleAreTyping": "", // Untranslated
-	"_peopleAreTyping_1": "% people are typing...", // Untranslated
+	"_isTyping": "% escrivint...",
+	"_areTyping": "% i % escrivint...",
+	"_peopleAreTyping": "",
+	"_peopleAreTyping_1": "% persones escrivint...",
 	"_peopleAreTyping_2": "",
-	"ManyPeopleAreTyping": "Many people are typing...", // Untranslated
+	"ManyPeopleAreTyping": "Molta persones escrivint...",
 	
 	// Message
 	"ForwardedFrom": "Reenviat des ",
@@ -389,7 +389,7 @@
 	"_react": " reacció",
 	"_reacts": " reaccions",
 	"_reacts2": "",
-	"SeenList_Title": "Seen List", // Untranslated
+	"SeenList_Title": "Llista de vistos",
 	
 	// Message media
 	"Media": "Mèdia",
@@ -421,8 +421,8 @@
 	"Stickers_Title": "Adhesius",
 	"Sticker": "Adhesiu",
 	"AddStickers": "Afegeix adhesius",
-	"Remove": "Remove", // Untranslated
-	"Share": "Share", // Untranslated
+	"Remove": "Elimina",
+	"Share": "Comparteix",
 	
 	// Music player
 	"Player_Title": "Reproductor de música",
@@ -436,7 +436,7 @@
 	"Playlist_Title": "Llista de reproducció",
 	"Volume": "Volum",
 	"TogglePlaylistOrder": "Commuta ordre",
-	"VoiceMessageFrom": "Voice message from %", // Untranslated
+	"VoiceMessageFrom": "Missatge de veu de %",
 	
 	// Profile/chat info
 	"Online": "en línia",
@@ -457,7 +457,7 @@
 	"GroupInfo": "Info de grup",
 	"ChannelInfo": "Info de canal",
 	"TopicInfo": "Informació de tema",
-	"AddMember_Title": "Add Member", // Untranslated
+	"AddMember_Title": "Afegeix membre",
 	
 	"_member": " membre",
 	"_members": " membres",
