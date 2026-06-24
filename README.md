@@ -9,19 +9,19 @@ Telegram client for J2ME platform based on [MPGram Web API](https://github.com/s
 ## Features
 
 - Chat with automatic updates
-- Music player with playlists
+- Music player with playlists and streaming
 - Bot interactions
-- Notifications (Pigler API, NokiaUI)
-- Image viewer
+- Notifications ([Pigler API](https://nproject.cc/pna), NokiaUI)
 - Basic administration (message deletion, member banning)
 - Forum chats
+- File downloads and sending
+- Image viewer
+- Voice messages
+- Stickers
 - Folders
-- File downloads
-- Sticker sending
-- File uploads
 - Message search
 - Contact list
-- Voice messages
+- Customization: Themes, Custom wallpapers
 
 ## Device support
 
@@ -32,6 +32,13 @@ Telegram client for J2ME platform based on [MPGram Web API](https://github.com/s
 - Screen size: at least 176x220 (for smaller screens use legacy UI)
 
 Does not work on most Samsung phones.
+
+### Optional requirements
+
+- JSR-75 (Files)
+- JSR-135 (Audio recording)
+- Nokia UI (Clipboard, Keyboard, Notifications)
+- Pigler API (Symbian Belle Notifications)
 
 ### Platform-specific versions
 
