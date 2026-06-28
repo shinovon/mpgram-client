@@ -2427,6 +2427,8 @@ public class MP extends MIDlet
 									// mmf (s60v3.2-)
 									method = 2;
 								}
+							} else if (blackberry) {
+								method = 2;
 							}
 						}
 					}
@@ -2630,6 +2632,8 @@ public class MP extends MIDlet
 									// mmf (s60v3.2-)
 									method = 2;
 								}
+							} else if (blackberry) {
+								method = 2;
 							}
 						}
 					}
