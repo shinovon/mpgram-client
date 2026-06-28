@@ -264,9 +264,14 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 				zoom = 3;
 				MP.midlet.start(MP.RUN_ZOOM_VIEW, this);
 			}
+			
+			int g = 0;
+			try {
+				g = getGameAction(k);
+			} catch (Exception ignored) {}
 	
 			// zoom is active
-			if (k == -5 || getGameAction(k) == FIRE) {
+			if (k == -5 || g == FIRE) {
 				if (zoom == 1) {
 					zoom = 2;
 					x = 0;
@@ -274,14 +279,13 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 				} else if (++zoom > 3) zoom = 1;
 				MP.midlet.start(MP.RUN_ZOOM_VIEW, this);
 			} else if (zoom != 1) {
-				if (k == -1 || k == KEY_NUM2 || k == 'w') {
-					// up
+				if (k == -1 || k == KEY_NUM2 || k == 'w' || g == UP) {
 					y += getHeight() / 4;
-				} else if (k == -2 || k == KEY_NUM8 || k == 's') {
+				} else if (k == -2 || k == KEY_NUM8 || k == 's' || g == DOWN) {
 					y -= getHeight() / 4;
-				} else if (k == -3 || k == KEY_NUM4 || k == 'a') {
+				} else if (k == -3 || k == KEY_NUM4 || k == 'a' || g == LEFT) {
 					x += getWidth() / 4;
-				} else if (k == -4 || k == KEY_NUM6 || k == 'd') {
+				} else if (k == -4 || k == KEY_NUM6 || k == 'd' || g == RIGHT) {
 					x -= getWidth() / 4;
 				}
 			}
@@ -296,16 +300,20 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 			repaint();
 			return;
 		}
+		int g = 0;
+		try {
+			g = getGameAction(k);
+		} catch (Exception ignored) {}
+		
 		// zoom is active
 		if (zoom != 1) {
-			if (k == -1 || k == KEY_NUM2 || k == 'w') {
-				// up
+			if (k == -1 || k == KEY_NUM2 || k == 'w' || g == UP) {
 				y += getHeight() / 4;
-			} else if (k == -2 || k == KEY_NUM8 || k == 's') {
+			} else if (k == -2 || k == KEY_NUM8 || k == 's' || g == DOWN) {
 				y -= getHeight() / 4;
-			} else if (k == -3 || k == KEY_NUM4 || k == 'a') {
+			} else if (k == -3 || k == KEY_NUM4 || k == 'a' || g == LEFT) {
 				x += getWidth() / 4;
-			} else if (k == -4 || k == KEY_NUM6 || k == 'd') {
+			} else if (k == -4 || k == KEY_NUM6 || k == 'd' || g == RIGHT) {
 				x -= getWidth() / 4;
 			}
 		}
