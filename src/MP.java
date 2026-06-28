@@ -230,7 +230,6 @@ public class MP extends MIDlet
 	static boolean time12;
 	static boolean migrateAsked;
 	static int stickerPreviewSize = 32;
-	static boolean threadUnsafeUI;
 	static int voiceVolume = 50;
 
 	private static boolean needWriteConfig;
@@ -476,8 +475,6 @@ public class MP extends MIDlet
 	private static String[] downloadMessage;
 	private static String downloadCurrentPath;
 	private static String downloadedPath;
-	private static int tempInt;
-	private static Object temp;
 
 	static int confirmationTask;
 	static Object confirmationParam;
@@ -585,6 +582,9 @@ public class MP extends MIDlet
 				// low end chinese phones and/or impl returns incorrect value in hasPointerEvents
 				forceKeyUI = true;
 				fastScrolling = true;
+			} else if (blackberry) {
+				// repaint() inside paint() is ignored on blackberry
+				fastScrolling = true;
 			}
 //#endif
 			deviceName = d;
@@ -658,7 +658,6 @@ public class MP extends MIDlet
 		useLoadingForm = !symbianJrt;
 		jsonStream = symbianJrt || !symbian;
 		threadedImages = symbianJrt;
-		threadUnsafeUI = blackberry;
 
 //#ifndef NO_AVATARS
 		avatarSize = Math.min(display.getBestImageHeight(Display.LIST_ELEMENT), display.getBestImageWidth(Display.LIST_ELEMENT));
@@ -2323,7 +2322,6 @@ public class MP extends MIDlet
 			break;
 		}
 		case RUN_START_PLAYER: {
-			// TODO: check for threadUnsafeUI
 			try {
 				JSONObject msg = (JSONObject) param;
 
@@ -2561,18 +2559,6 @@ public class MP extends MIDlet
 			}
 			break;
 		}
-		case RUN_SET_GAUGE_VALUE: {
-			((Gauge) param).setValue(tempInt);
-			break;
-		}
-		case RUN_SET_ALERT_STRING: {
-			((Alert) param).setString((String) temp);
-			break;
-		}
-		case RUN_SET_ALERT_INDICATOR: {
-			((Alert) param).setIndicator((Gauge) temp);
-			break;
-		}
 		case RUN_START_VOICE_PLAYER: {
 			try {
 				try {
@@ -2589,12 +2575,7 @@ public class MP extends MIDlet
 				Player p;
 //#ifndef NO_FILE
 				if (playMethod == 1) { // file
-					if (threadUnsafeUI) {
-						temp = L[LDownloading];
-						startLCDUI(RUN_SET_ALERT_STRING, voiceAlert);
-					} else {
-						voiceAlert.setString(L[LDownloading]);
-					}
+					voiceAlert.setString(L[LDownloading]);
 					try {
 						voiceProgress.setValue(0);
 						playerProgress.setMaxValue(100);
@@ -2674,12 +2655,7 @@ public class MP extends MIDlet
 				p.prefetch();
 				p.start();
 				voiceState = 1;
-				if (threadUnsafeUI) {
-					temp = voiceFrom;
-					startLCDUI(RUN_SET_ALERT_STRING, voiceAlert);
-				} else {
-					voiceAlert.setString(voiceFrom);
-				}
+				voiceAlert.setString(voiceFrom);
 			} catch (Exception e) {
 				display(errorAlert(e), current);
 				closeVoicePlayer();
@@ -2779,12 +2755,7 @@ public class MP extends MIDlet
 			recordControl = r;
 
 			alert.addCommand(recorderStartCmd);
-			if (threadUnsafeUI) {
-				temp = L[LReady_Alert];
-				midlet.startLCDUI(RUN_SET_ALERT_STRING, alert);
-			} else {
-				alert.setString(L[LReady_Alert]);
-			}
+			alert.setString(L[LReady_Alert]);
 			display(alert, null);
 			break;
 		}
@@ -2947,9 +2918,8 @@ public class MP extends MIDlet
 			synchronized (this) {
 				run = i;
 				runParam = param;
-				display.callSerially(this);
-				wait();
 			}
+			display.callSerially(this);
 		} catch (Exception ignored) {}
 	}
 
@@ -4882,12 +4852,7 @@ public class MP extends MIDlet
 			if (PlayerListener.END_OF_MEDIA.equals(event)) {
 				voiceState = 2;
 				if (voiceProgress != null) {
-					if (threadUnsafeUI) {
-						tempInt = 100;
-						startLCDUI(RUN_SET_GAUGE_VALUE, voiceProgress);
-					} else {
-						voiceProgress.setValue(100);
-					}
+					voiceProgress.setValue(100);
 				}
 				voiceAlert.removeCommand(voicePauseCmd);
 				closeVoicePlayer();
@@ -4932,12 +4897,7 @@ public class MP extends MIDlet
 //						voiceAlert.setString(sb.toString());
 //					}
 
-					if (threadUnsafeUI) {
-						tempInt = progress;
-						startLCDUI(RUN_SET_GAUGE_VALUE, voiceProgress);
-					} else {
-						voiceProgress.setValue(progress);
-					}
+					voiceProgress.setValue(progress);
 				} catch (Exception ignored) {}
 			}
 			return;
@@ -4951,12 +4911,7 @@ public class MP extends MIDlet
 		if (PlayerListener.END_OF_MEDIA.equals(event)) {
 			playerState = 2;
 			if (playerProgress != null) {
-				if (threadUnsafeUI) {
-					tempInt = 100;
-					startLCDUI(RUN_SET_GAUGE_VALUE, playerProgress);
-				} else {
-					playerProgress.setValue(100);
-				}
+				playerProgress.setValue(100);
 			}
 			if (playerPlaypauseBtn != null) {
 				playerPlaypauseBtn.setText(L[LPlay_Player]);
@@ -4995,12 +4950,7 @@ public class MP extends MIDlet
 				}
 				int progress = (int) ((player.getMediaTime() * 100) / duration);
 				progress = progress < 0 ? 0 : progress > 100 ? 100 : progress;
-				if (threadUnsafeUI) {
-					tempInt = progress;
-					startLCDUI(RUN_SET_GAUGE_VALUE, playerProgress);
-				} else {
-					playerProgress.setValue(progress);
-				}
+				playerProgress.setValue(progress);
 			} catch (Exception ignored) {}
 		}
 	}
@@ -6395,12 +6345,12 @@ public class MP extends MIDlet
 		Gauge gauge = null;
 		try {
 			if (alert != null) {
-				gauge = new Gauge(null, false, 100, 0);
-				if (threadUnsafeUI) {
-					temp = gauge;
-					midlet.startLCDUI(RUN_SET_ALERT_INDICATOR, alert);
+				if (blackberry) {
+					gauge = alert.getIndicator();
+					gauge.setMaxValue(100);
+					gauge.setValue(0);
 				} else {
-					alert.setIndicator(gauge);
+					alert.setIndicator(gauge = new Gauge(null, false, 100, 0));
 				}
 			}
 		} catch (Exception ignored) {}
@@ -6487,13 +6437,7 @@ public class MP extends MIDlet
 							}
 							fileSent += i;
 							if (gauge != null) {
-								int v = Math.min((fileSent * 100) / fileTotal, 100);
-								if (threadUnsafeUI) {
-									tempInt = v;
-									midlet.startLCDUI(RUN_SET_GAUGE_VALUE, gauge);
-								} else {
-									gauge.setValue(v);
-								}
+								gauge.setValue(Math.min((fileSent * 100) / fileTotal, 100));
 							}
 							if (!sending) throw cancelException;
 						}
@@ -6784,23 +6728,18 @@ public class MP extends MIDlet
 							}
 							if (size > 0) {
 								if (gauge == null) {
-									gauge = new Gauge(null, false, 100, 0);
-									if (threadUnsafeUI) {
-										temp = gauge;
-										midlet.startLCDUI(RUN_SET_ALERT_INDICATOR, alert);
+									if (blackberry) {
+										gauge = alert.getIndicator();
+										gauge.setMaxValue(100);
+										gauge.setValue(0);
 									} else {
-										alert.setIndicator(gauge);
+										alert.setIndicator(gauge = new Gauge(null, false, 100, 0));
 									}
 								}
 							} else {
 								gauge = null;
 							}
-							if (threadUnsafeUI) {
-								temp = L[LDownloading];
-								midlet.startLCDUI(RUN_SET_ALERT_STRING, alert);
-							} else {
-								alert.setString(L[LDownloading]);
-							}
+							alert.setString(L[LDownloading]);
 						}
 
 						byte[] buf = new byte[4096];
@@ -6810,13 +6749,7 @@ public class MP extends MIDlet
 						while ((read = in.read(buf)) != -1) {
 							out.write(buf, 0, read);
 							if (gauge != null && (c++ & 3) == 0) {
-								int v = Math.min((int) ((readTotal * 100) / size), 100);
-								if (threadUnsafeUI) {
-									tempInt = v;
-									midlet.startLCDUI(RUN_SET_GAUGE_VALUE, gauge);
-								} else {
-									gauge.setValue(v);
-								}
+								gauge.setValue(Math.min((int) ((readTotal * 100) / size), 100));
 							}
 							if (!downloading) throw cancelException;
 							readTotal += read;
@@ -6837,7 +6770,7 @@ public class MP extends MIDlet
 								alert.addCommand(okDownloadCmd);
 								if (!series40) alert.addCommand(openDownloadedCmd);
 //								alert.removeCommand(cancelDownloadCmd);
-								alert.setString(L[LDownloadedTo] + downloadPath);
+								alert.setString(L[LDownloadedTo] + dest);
 								display(alert, current);
 							}
 						}
