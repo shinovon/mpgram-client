@@ -582,9 +582,6 @@ public class MP extends MIDlet
 				// low end chinese phones and/or impl returns incorrect value in hasPointerEvents
 				forceKeyUI = true;
 				fastScrolling = true;
-			} else if (blackberry) {
-				// repaint() inside paint() is ignored on blackberry
-				fastScrolling = true;
 			}
 //#endif
 			deviceName = d;
