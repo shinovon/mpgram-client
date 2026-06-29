@@ -2561,6 +2561,12 @@ public class MP extends MIDlet
 			}
 			break;
 		}
+		case RUN_REPAINT_CANVAS: {
+			try {
+				((Canvas) param).repaint();
+			} catch (Exception ignored) {}
+			break;
+		}
 		case RUN_START_VOICE_PLAYER: {
 			try {
 				try {
@@ -5003,7 +5009,7 @@ public class MP extends MIDlet
 		closePlayer();
 		playerState = 3;
 
-		MP.midlet.start(RUN_START_PLAYER, msg);
+		MP.midlet.startLCDUI(RUN_START_PLAYER, msg);
 	}
 
 	static void closePlayer() {

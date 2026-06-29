@@ -658,7 +658,11 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 		}
 		animating = animate;
 		if (animate) {
-			repaint();
+			if (MP.blackberry) {
+				MP.midlet.start(Constants.RUN_REPAINT_CANVAS, this);
+			} else {
+				repaint();
+			}
 		}
 		lastPaintTime = now;
 	}
