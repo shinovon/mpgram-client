@@ -4,6 +4,8 @@ Telegram client for J2ME platform based on [MPGram Web API](https://github.com/s
 
 Originally written in MIDletPascal in 2020 and later rewritten in Java, hence the name MPGram.
 
+[Download](https://nnproject.cc/mp)
+
 ![img](/img/chat.jpg) ![img](/img/image_viewer.jpg) ![img](/img/music_player.jpg)
 
 ![img](/img/notification.jpg) ![img](/img/chat_info.jpg) ![img](/img/bot.jpg)
@@ -44,9 +46,10 @@ Does not work on most Samsung phones.
 
 ### Platform-specific versions
 
-- If you want to hide virtual keyboard on Samsung or LG touchscreen phones, use Samsung version.
-- If installation fails with verification error, use BlackBerry version.
-- If your device does not support CLDC 1.1 or JSR-75, use Lite version.
+- Nokia: Full version with usage of Nokia OEM APIs.
+- Samsung: Use this if you want to hide virtual keyboard on Samsung or LG touchscreen phones.
+- Generic: Use this if installation fails with verification error (e. g BlackBerry, or Sony Ericsson).
+- Lite: Use this if your device does not support CLDC 1.1 or JSR-75.
 
 ### Lite version limitations
 
