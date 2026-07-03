@@ -67,7 +67,8 @@ public class StickerPackForm extends MPForm {
 		
 		for (int i = 0; i < l; ++i) {
 			JSONObject s = arr.getObject(i);
-			
+
+			// TODO: image items aren't focusable on blackberry
 			ImageItem img = new ImageItem("", null, 0, null);
 			try {
 				img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP);

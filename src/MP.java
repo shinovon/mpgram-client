@@ -326,6 +326,7 @@ public class MP extends MIDlet
 //#ifndef NO_RECORD
 	static Command sendVoiceCmd;
 //#endif
+	static Command canvasBackCmd;
 
 	static Command sendCmd;
 	static Command openTextBoxCmd;
@@ -905,6 +906,7 @@ public class MP extends MIDlet
 //#ifndef NO_RECORD
 		sendVoiceCmd = new Command(L[LSendVoiceMessage], Command.SCREEN, 7);
 //#endif
+		canvasBackCmd = new Command(L[LBack], Command.BACK, 20);
 
 		sendCmd = new Command(L[LSend], Command.OK, 1);
 		openTextBoxCmd = new Command(L[LOpenTextBox], Command.ITEM, 1);
@@ -4557,6 +4559,10 @@ public class MP extends MIDlet
 			display(p, true);
 			return;
 		}
+		if (c == canvasBackCmd) {
+			((MPCanvas) d).key(-1000000011, false);
+			return;
+		}
 		if (c == exitCmd) {
 			destroyApp(true);
 		}
@@ -5932,7 +5938,7 @@ public class MP extends MIDlet
 				if (playerState == 1 && (series40 || reopenChat)) {
 					closePlayer();
 					d.removeCommand(playerCmd);
-				} else if (!(d instanceof Canvas) || d == chatsList) {
+				} else if (blackberry || !(d instanceof Canvas) || d == chatsList) {
 					d.addCommand(playerCmd);
 				}
 			} else {

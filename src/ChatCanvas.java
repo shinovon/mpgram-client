@@ -187,6 +187,11 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 
 	private void init(boolean input) {
 		hasInput = input;
+
+		if (MP.blackberry) {
+			addCommand(MP.canvasBackCmd);
+			setCommandListener(MP.midlet);
+		}
 	}
 
 	public boolean loadInternal(Thread thread) throws Exception {
@@ -919,6 +924,10 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 	}
 
 	private void back() {
+		if (menuFocused) {
+			closeMenu();
+			return;
+		}
 		if (inputFocused) {
 			if (editMsgId != 0) {
 				text = "";

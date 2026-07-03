@@ -805,6 +805,8 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 
 	private int mapGameAction(int key) {
 		switch (key) {
+		case -1000000011:
+			return -11;
 		case -1:
 			return Canvas.UP;
 		case -2:
