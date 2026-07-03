@@ -99,3 +99,4 @@ Post-release todo:
 - [ ] peers cache
 - [ ] voice transcription
 - [ ] custom themes
+- [ ] updater state label in chat
