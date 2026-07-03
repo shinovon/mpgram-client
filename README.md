@@ -15,7 +15,7 @@ Originally written in MIDletPascal in 2020 and later rewritten in Java, hence th
 - Chat with automatic updates
 - Music player with playlists and streaming
 - Bot interactions
-- Notifications ([Pigler API](https://nproject.cc/pna), NokiaUI)
+- Notifications (Pigler API, NokiaUI)
 - Basic administration (message deletion, member banning)
 - Forum chats
 - File downloads and sending
@@ -42,7 +42,7 @@ Does not work on most Samsung phones.
 - JSR-75 (Files)
 - JSR-135 (Audio recording)
 - Nokia UI (Clipboard, Keyboard, Notifications)
-- Pigler API (Symbian Belle Notifications)
+- [Pigler API](https://nproject.cc/pna) (Symbian Belle Notifications)
 
 ### Platform-specific versions
 
