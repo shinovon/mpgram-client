@@ -2925,16 +2925,6 @@ public class MP extends MIDlet
 		} catch (Exception ignored) {}
 	}
 
-	void startLCDUI(int i, Object param) {
-		try {
-			synchronized (this) {
-				run = i;
-				runParam = param;
-			}
-			display.callSerially(this);
-		} catch (Exception ignored) {}
-	}
-
 	void cancel(Thread thread, boolean updates) {
 		if (thread == null) return;
 		if (updates) {
@@ -5015,7 +5005,7 @@ public class MP extends MIDlet
 		closePlayer();
 		playerState = 3;
 
-		MP.midlet.startLCDUI(RUN_START_PLAYER, msg);
+		MP.midlet.start(RUN_START_PLAYER, msg);
 	}
 
 	static void closePlayer() {
