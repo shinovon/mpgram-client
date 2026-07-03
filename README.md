@@ -48,7 +48,7 @@ Does not work on most Samsung phones.
 
 - Nokia: Full version with usage of Nokia OEM APIs.
 - Samsung: Use this if you want to hide virtual keyboard on Samsung or LG touchscreen phones.
-- Generic: Use this if installation fails with verification error (e. g BlackBerry, or Sony Ericsson).
+- Generic: Use this if installation fails with verification error (e.g. BlackBerry, or Sony Ericsson).
 - Lite: Use this if your device does not support CLDC 1.1 or JSR-75.
 
 ### Lite version limitations
