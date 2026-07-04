@@ -525,7 +525,8 @@ public class MP extends MIDlet
 		display = Display.getDisplay(this);
 
 		// sanity check
-		if (!"nnproject".equals(getAppProperty("MIDlet-Vendor")))
+		if (!"nnproject".equals(getAppProperty("MIDlet-Vendor"))
+				|| checkClass("javay.microedition.lcdui.Canvas"))
 			throw new RuntimeException();
 
 		Form f = new Form("MPGram");
