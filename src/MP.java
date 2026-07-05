@@ -7876,73 +7876,66 @@ public class MP extends MIDlet
 				int i = start + 1;
 				end--;
 				// parse escaped chars in string
-				loop: {
-					while (i < end) {
-						char c = str.charAt(i);
-						switch (c) {
-						case '\\': {
-							next: {
-								replace: {
-									if (end < i + 1) {
-										sb.append(c);
-										break loop;
-									}
-									char c1 = str.charAt(i + 1);
-									switch (c1) {
-									case 'u':
-										i+=2;
-										sb.append((char) Integer.parseInt(
-												new String(new char[] {str.charAt(i++), str.charAt(i++), str.charAt(i++), str.charAt(i++)}),
-												16));
-										break replace;
-									case 'x':
-										i+=2;
-										sb.append((char) Integer.parseInt(
-												new String(new char[] {str.charAt(i++), str.charAt(i++)}),
-												16));
-										break replace;
-									case 'n':
-										sb.append('\n');
-										i+=2;
-										break replace;
-									case 'r':
-										sb.append('\r');
-										i+=2;
-										break replace;
-									case 't':
-										sb.append('\t');
-										i+=2;
-										break replace;
-									case 'f':
-										sb.append('\f');
-										i+=2;
-										break replace;
-									case 'b':
-										sb.append('\b');
-										i+=2;
-										break replace;
-									case '\"':
-									case '\'':
-									case '\\':
-									case '/':
-										i+=2;
-										sb.append((char) c1);
-										break replace;
-									default:
-										break next;
-									}
-								}
+				while (i < end) {
+					char c = str.charAt(i);
+					if (c == '\\') {
+						next: {
+							if (end < i + 1) {
+								sb.append(c);
 								break;
 							}
-							sb.append(c);
-							i++;
-							break;
+							char n = str.charAt(i + 1);
+							switch (n) {
+							case 'u':
+								i += 2;
+								sb.append((char) Integer.parseInt(
+										new String(new char[] { str.charAt(i++), str.charAt(i++), str.charAt(i++), str.charAt(i++) }),
+										16));
+								break;
+							case 'x':
+								i += 2;
+								sb.append((char) Integer.parseInt(
+										new String(new char[] { str.charAt(i++), str.charAt(i++) }),
+										16));
+								break;
+							case 'n':
+								sb.append('\n');
+								i += 2;
+								break;
+							case 'r':
+								sb.append('\r');
+								i += 2;
+								break;
+							case 't':
+								sb.append('\t');
+								i += 2;
+								break;
+							case 'f':
+								sb.append('\f');
+								i += 2;
+								break;
+							case 'b':
+								sb.append('\b');
+								i += 2;
+								break;
+							case '\"':
+							case '\'':
+							case '\\':
+							case '/':
+								i += 2;
+								sb.append((char) n);
+								break;
+							default:
+								break next;
+							}
+							continue;
 						}
-						default:
-							sb.append(c);
-							i++;
-						}
+						sb.append(c);
+						i++;
+						continue;
 					}
+					sb.append(c);
+					i++;
 				}
 				str = sb.toString();
 				sb = null;
