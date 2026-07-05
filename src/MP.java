@@ -7918,7 +7918,7 @@ public class MP extends MIDlet
 								sb.append('\b');
 								i += 2;
 								break;
-							case '\"':
+							case '"':
 							case '\'':
 							case '\\':
 							case '/':

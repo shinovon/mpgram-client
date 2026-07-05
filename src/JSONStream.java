@@ -589,12 +589,12 @@ public class JSONStream extends Reader {
 	// Reader
 
 	private char[] buffer;
-	private int bufferSize;
+	private int bufferLength;
 	private int bufferIndex;
 
 	public void close() throws IOException {
 		buffer = null;
-		bufferSize = 0;
+		bufferLength = 0;
 		bufferIndex = 0;
 		if (reader != null) {
 			reader.close();
@@ -605,85 +605,70 @@ public class JSONStream extends Reader {
 	}
 
 	public int read() throws IOException {
-		int res = 0;
-		if (bufferIndex >= bufferSize) {
-			res = fill();
+		if (bufferIndex >= bufferLength && !fill()) {
+			return -1;
 		}
-		if (res != -1) {
-			res = buffer[bufferIndex++];
-		}
-		return res;
+		return buffer[bufferIndex++];
 	}
 
-	public int read(char[] buf) throws IOException {
-		return read(buf, 0, buf.length);
+	public int read(char[] b) throws IOException {
+		return read(b, 0, b.length);
 	}
 
-	public int read(char[] buf, int off, int len) throws IOException {
-		if (off < 0 || off >= buf.length) throw new IllegalArgumentException();
-		int charsToRead = buf.length - off;
-		if (charsToRead > len) {
-			charsToRead = len;
+	public int read(char[] b, int off, int len) throws IOException {
+		if (off < 0 || len < 0 || len > b.length - off) {
+			throw new IllegalArgumentException();
 		}
-		int bufCharCount = bufferSize - bufferIndex;
-		int readCount = 0;
-		if (charsToRead <= bufCharCount) {
-			for (int i = 0; i < charsToRead; i++) {
-				buf[off + i] = buffer[bufferIndex++];
-			}
-			readCount += charsToRead;
-		} else {
-			for (int i = 0; i < bufCharCount; i++) {
-				buf[off + i] = buffer[bufferIndex++];
-			}
-			readCount += bufCharCount;
-			if (fill() != -1) {
-				readCount += read(buf, off + readCount, len - readCount);
-			}
+		if (len == 0) return 0;
+
+		int n = b.length - off;
+		if (n > len) n = len;
+		int left = bufferLength - bufferIndex;
+
+		if (n <= left) {
+			System.arraycopy(buffer, bufferIndex, b, off, n);
+			bufferIndex += n;
+			return n;
 		}
-		if (readCount <= 0) {
-			readCount = -1;
+
+		if (left != 0) {
+			System.arraycopy(buffer, bufferIndex, b, off, left);
+			bufferIndex += left;
 		}
-		return readCount;
+
+		if (fill()) {
+			return left + read(b, off + left, len - left);
+		}
+
+		return left == 0 ? -1 : left;
+	}
+	public long skip(long n) throws IOException {
+		if (n < 0) {
+			throw new IllegalArgumentException();
+		}
+
+		int left = bufferLength - bufferIndex;
+		if (n <= left) {
+			bufferIndex += n;
+			return n;
+		}
+
+		bufferIndex += left;
+		return left + reader.skip(n - left);
 	}
 
 	public boolean ready() throws IOException {
-		if (bufferIndex < bufferSize) {
+		return bufferIndex < bufferLength || reader.ready();
+	}
+
+	private boolean fill() throws IOException {
+		int r = reader.read(buffer);
+		if (r != -1) {
+			bufferIndex = 0;
+			bufferLength = r;
 			return true;
 		}
-		if (reader != null) {
-			return reader.ready();
-		}
 		return false;
-	}
-
-	public long skip(long count) throws IOException {
-		if (count < 0) throw new IllegalArgumentException();
-		long skipped = 0;
-		int bufCharCount = bufferSize - bufferIndex;
-		if (count <= bufCharCount) {
-			bufferIndex += (int) count;
-			skipped += count;
-		} else {
-			bufferIndex += bufCharCount;
-			skipped += bufCharCount;
-			if (reader != null) {
-				skipped += reader.skip(count - skipped);
-			}
-		}
-		return skipped;
-	}
-
-	private int fill() throws IOException {
-		if (reader == null) {
-			return -1;
-		}
-		int readCount = reader.read(buffer);
-		if (readCount != -1) {
-			bufferSize = readCount;
-			bufferIndex = 0;
-		}
-		return readCount;
 	}
 
 }
