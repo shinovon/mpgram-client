@@ -1949,6 +1949,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 				} else {
 					s = null;
 				}
+				//noinspection StringEquality
 				if (s != this.status) {
 					this.status = s;
 					queueRepaint();

@@ -45,11 +45,11 @@ public class ChatInfoForm extends MPForm {
 		}
 	}
 	
-	public ChatInfoForm(String id, String title, int mode) {
-		super(title);
-		this.id = id;
-		this.mode = mode;
-	}
+//	public ChatInfoForm(String id, String title, int mode) {
+//		super(title);
+//		this.id = id;
+//		this.mode = mode;
+//	}
 	
 	public ChatInfoForm(JSONObject info, String invite, int mode) {
 		super(info.getString("title"));
