@@ -1507,7 +1507,7 @@ public class MP extends MIDlet
 				}
 //#endif
 				String[] s = (String[]) param;
-				MP.api("deleteMessage&peer=".concat(s[0].concat("&id=").concat(s[1])));
+				MP.api("deleteMessage&revoke=1&peer=".concat(s[0].concat("&id=").concat(s[1])));
 
 				// refresh chat after deleting
 				commandAction(refreshCmd, current);
@@ -1714,7 +1714,16 @@ public class MP extends MIDlet
 					updateUrl = j.getString("download_url");
 					Alert a = new Alert("", "", null, AlertType.INFO);
 					a.setTimeout(Alert.FOREVER);
-					a.setString(j.getString("message", L[LUpdateAvailable_Alert]));
+					String text;
+					if (j.has("message")) {
+						text = j.getString("message");
+					} else {
+						text = L[LUpdateAvailable_Alert];
+						if (j.has("description")) {
+							text = text.concat(" \n\n").concat(j.getString("description"));
+						}
+					}
+					a.setString(text);
 					a.addCommand(cancelCmd);
 					a.addCommand(updateCmd);
 					a.setCommandListener(this);
