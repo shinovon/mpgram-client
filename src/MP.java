@@ -580,7 +580,8 @@ public class MP extends MIDlet
 			}
 //#ifndef NO_CHAT_CANVAS
 			if (p.toLowerCase().indexOf("maui") != -1 || p.toLowerCase().indexOf("fastbcc") != -1
-					|| p.toLowerCase().indexOf("itel") != -1 || p.indexOf("S7350") != -1) {
+					|| p.toLowerCase().indexOf("itel") != -1 || p.indexOf("S7350") != -1
+					|| "nokia".equals(p)) {
 				// low end chinese phones and/or impl returns incorrect value in hasPointerEvents
 				forceKeyUI = true;
 				fastScrolling = true;
