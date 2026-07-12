@@ -89,7 +89,7 @@ Post-release todo:
 - [x] send voice messages
 - [x] updater state label in chat
 - [ ] chats list pagination
-- [ ] other media: ~~geo~~, poll (#32)
+- [ ] polls
 - [ ] built-in camera
 - [ ] user friendly error messages
 - [ ] file picker preview
