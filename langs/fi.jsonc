@@ -176,6 +176,8 @@
 	"Sending": "Lähetetään",
 	"WaitingForPrevChat": "Odotetaan yhteyden sulkeutumista...",
 	"Downloading": "Ladataan",
+	"Connecting": "Connecting...", // Untranslated
+	"Disconnected": "Disconnected", // Untranslated
 	
 	// Authorization process
 	"Auth_Title": "Kirjaudu",

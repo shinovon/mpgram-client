@@ -176,6 +176,8 @@
 	"Sending": "Enviant...",
 	"WaitingForPrevChat": "Esperant que xat anterior es desconnecti...",
 	"Downloading": "Descarregant",
+	"Connecting": "Connecting...", // Untranslated
+	"Disconnected": "Disconnected", // Untranslated
 	
 	// Authorization process
 	"Auth_Title": "Autorització",

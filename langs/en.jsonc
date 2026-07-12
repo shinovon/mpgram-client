@@ -176,6 +176,8 @@
 	"Sending": "Sending...",
 	"WaitingForPrevChat": "Waiting for previous chat to disconnect...",
 	"Downloading": "Downloading",
+	"Connecting": "Connecting...",
+	"Disconnected": "Disconnected",
 	
 	// Authorization process
 	"Auth_Title": "Auth",

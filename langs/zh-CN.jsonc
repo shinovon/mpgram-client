@@ -176,6 +176,8 @@
 	"Sending": "发送中...",
 	"WaitingForPrevChat": "等待上一聊天断开连接...",
 	"Downloading": "下载中",
+	"Connecting": "Connecting...", // Untranslated
+	"Disconnected": "Disconnected", // Untranslated
 	
 	// Authorization process
 	"Auth_Title": "授权登录",

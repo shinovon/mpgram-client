@@ -1276,8 +1276,11 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 		switched = true;
 	}
 	
-	public void setUpdate(boolean b) {
+	public void setUpdating(boolean b) {
 		update = b;
+	}
+
+	public void setConnecting(boolean b) {
 	}
 	
 	public void setBotAnswer(JSONObject j) {

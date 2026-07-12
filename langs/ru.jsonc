@@ -40,8 +40,8 @@
 	"LastMonth": "в этом месяце",
 	"ALongTimeAgo": "давно",
 	"Recently": "недавно",
-	"AM": " AM", // Untranslated
-	"PM": " PM", // Untranslated
+	"AM": " AM",
+	"PM": " PM",
 	// Date suffixes
 	"on_Date": "",
 	"at_Time": " в ",
@@ -176,6 +176,8 @@
 	"Sending": "Отправка...",
 	"WaitingForPrevChat": "Отключение от предыдущего чата...",
 	"Downloading": "Скачивание",
+	"Connecting": "Подключение...",
+	"Disconnected": "Отключено",
 	
 	// Authorization process
 	"Auth_Title": "Авторизация",

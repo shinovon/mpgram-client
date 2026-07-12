@@ -176,6 +176,8 @@
 	"Sending": "يتم الارسال",
 	"WaitingForPrevChat": "في انتظار قطع الاتصال بالمحادثة السابقة....",
 	"Downloading": "Downloading", // Untranslated
+	"Connecting": "Connecting...", // Untranslated
+	"Disconnected": "Disconnected", // Untranslated
 	
 	// Authorization process
 	"Auth_Title": "التحقق",

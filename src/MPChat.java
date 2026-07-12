@@ -50,7 +50,8 @@ public interface MPChat {
 	// setters
 	void setParent(MPChat parent);
 	void setQuery(String s);
-	void setUpdate(boolean b);
+	void setUpdating(boolean b);
+	void setConnecting(boolean b);
 	void setBotAnswer(JSONObject j);
 	void setStartBot(String s);
 	

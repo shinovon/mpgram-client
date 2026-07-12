@@ -176,6 +176,8 @@
 	"Sending": "Enviando",
 	"WaitingForPrevChat": "Esperando a qué se desconecte el chat anterior...",
 	"Downloading": "Descargando",
+	"Connecting": "Connecting...", // Untranslated
+	"Disconnected": "Disconnected", // Untranslated
 	
 	// Authorization process
 	"Auth_Title": "Autorización",

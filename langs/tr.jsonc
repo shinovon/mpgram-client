@@ -176,6 +176,8 @@
 	"Sending": "Gönderiliyor...",
 	"WaitingForPrevChat": "Önceki sohbetin kapanması bekleniyor...",
 	"Downloading": "İndiriliyor",
+	"Connecting": "Connecting...", // Untranslated
+	"Disconnected": "Disconnected", // Untranslated
 
 	// Authorization process
 	"Auth_Title": "Yetkilendirme",

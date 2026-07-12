@@ -476,6 +476,7 @@ public class MP extends MIDlet
 	private static String[] downloadMessage;
 	private static String downloadCurrentPath;
 	private static String downloadedPath;
+	static long lastUpdateFail;
 
 	static int confirmationTask;
 	static Object confirmationParam;
@@ -706,7 +707,7 @@ public class MP extends MIDlet
 		// load settings
 		try {
 			RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, false);
-			JSONObject j = parseObject(new String(r.getRecord(1), "UTF-8"));
+			JSONObject j = parseObject(new String(r.getRecord(1), encoding));
 			r.closeRecordStore();
 
 			reverseChat = j.getBoolean("reverseChat", reverseChat);
@@ -806,7 +807,7 @@ public class MP extends MIDlet
 		// load auth
 		try {
 			RecordStore r = RecordStore.openRecordStore(AUTH_RECORD_NAME, false);
-			JSONObject j = parseObject(new String(r.getRecord(1), "UTF-8"));
+			JSONObject j = parseObject(new String(r.getRecord(1), encoding));
 			r.closeRecordStore();
 
 			user = j.getString("user", user);
@@ -1767,6 +1768,7 @@ public class MP extends MIDlet
 						//noinspection BusyWait
 						Thread.sleep(10);
 						if (check) {
+							form.setConnecting(true);
 							sb.setLength(0);
 							sb.append("getLastUpdate&peer=").append(form.id());
 							if (offset <= 0) {
@@ -1779,6 +1781,7 @@ public class MP extends MIDlet
 									off -= 1;
 								if (offset <= 0 || off < offset)
 									offset = off;
+								form.setConnecting(false);
 							} catch (Exception ignored) {}
 							check = false;
 						}
@@ -1798,6 +1801,8 @@ public class MP extends MIDlet
 						}
 
 						j = (JSONObject) api(sb.toString());
+
+						form.setConnecting(false);
 
 						if (j.has("cancel")) {
 							throw cancelException;
@@ -1840,18 +1845,21 @@ public class MP extends MIDlet
 						if (fails != 0) --fails;
 					} catch (Exception e) {
 						if (e.toString().indexOf("Interrupted") != -1 || e == cancelException) {
-							form.setUpdate(false);
+							form.setUpdating(false);
 							break;
 						}
 						e.printStackTrace();
 						check = true;
 						if (++fails >= 5 && form.updating()) {
-							form.setUpdate(false);
+							form.setConnecting(false);
+							form.setUpdating(false);
 							if (form.isShown()) {
-								display(errorAlert("Updates thread died!\n".concat(e.toString())), null);
+								MP.lastUpdateFail = System.currentTimeMillis();
+								display(errorAlert("Updates thread died! \n".concat(e.toString())), null);
 							}
 							break;
 						}
+						form.setConnecting(true);
 						updatesSleeping = true;
 						//noinspection BusyWait
 						Thread.sleep(updatesDelay);
@@ -1862,7 +1870,7 @@ public class MP extends MIDlet
 				e.printStackTrace();
 			} finally {
 				if (form != null && form.updating()) {
-					form.setUpdate(false);
+					form.setUpdating(false);
 				}
 				if (updatesThread == thread)
 					updatesThread = null;
@@ -6897,7 +6905,7 @@ public class MP extends MIDlet
 	static String[] L;
 
 	private void loadLocale(String lang) throws IOException {
-		InputStreamReader r = new InputStreamReader(getClass().getResourceAsStream("/l/".concat(lang)), "UTF-8");
+		InputStreamReader r = new InputStreamReader(getClass().getResourceAsStream("/l/".concat(lang)), encoding);
 		StringBuffer s = new StringBuffer();
 		int c;
 		int i = 1;
@@ -7242,7 +7250,7 @@ public class MP extends MIDlet
 			j.put("url", instanceUrl);
 			j.put("instPass", instancePassword);
 
-			byte[] b = j.toString().getBytes("UTF-8");
+			byte[] b = j.toString().getBytes(encoding);
 			RecordStore r = RecordStore.openRecordStore(AUTH_RECORD_NAME, true);
 			r.addRecord(b, 0, b.length);
 			r.closeRecordStore();
@@ -7338,7 +7346,7 @@ public class MP extends MIDlet
 
 		j.put("v", 1);
 
-		byte[] b = j.toString().getBytes("UTF-8");
+		byte[] b = j.toString().getBytes(encoding);
 		RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
 		r.addRecord(b, 0, b.length);
 		r.closeRecordStore();

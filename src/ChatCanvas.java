@@ -64,6 +64,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 
 	boolean switched;
 	boolean update, shouldUpdate;
+	boolean connecting;
 
 	boolean selfChat;
 	boolean user;
@@ -472,6 +473,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 				&& MP.chatUpdates && !update) {
 			// start updater thread
 			update = shouldUpdate = true;
+			MP.lastUpdateFail = 0;
 			MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
 			(typingThread = new Thread(this)).start();
 		}
@@ -531,7 +533,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 	}
 
 	public void showNotify() {
-		if (shouldUpdate && !update && !loading) {
+		if (shouldUpdate && !update && !loading && System.currentTimeMillis() - MP.lastUpdateFail > 10000L) {
 			update = true;
 			MP.midlet.start(MP.RUN_CHAT_UPDATES, this);
 			if (typingThread == null) {
@@ -714,6 +716,13 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 						status = this.status;
 						if (status == null) {
 							status = this.defaultStatus;
+						}
+						if (shouldUpdate && MP.longpoll) {
+							if (connecting) {
+								status = MP.L[LConnecting];
+							} else if (!update) {
+								status = MP.L[LDisconnected];
+							}
 						}
 						if (status != null) {
 							statusRender = status = UILabel.ellipsis(status, MP.smallPlainFont, tw - 4);
@@ -1535,8 +1544,17 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		switched = true;
 	}
 
-	public void setUpdate(boolean b) {
+	public void setUpdating(boolean b) {
 		this.update = b;
+		statusRender = null;
+		queueRepaint();
+	}
+
+	public void setConnecting(boolean b) {
+		if (b == this.connecting) return;
+		this.connecting = b;
+		statusRender = null;
+		queueRepaint();
 	}
 
 	public void setBotAnswer(JSONObject j) {

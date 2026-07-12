@@ -176,6 +176,8 @@
 	"Sending": "Надсилання...",
 	"WaitingForPrevChat": "Відключення від попереднього чату...",	
 	"Downloading": "Downloading", // Untranslated
+	"Connecting": "Connecting...", // Untranslated
+	"Disconnected": "Disconnected", // Untranslated
 	
 	// Authorization process
 	"Auth_Title": "Авторизація",

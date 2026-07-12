@@ -176,6 +176,8 @@
 	"Sending": "در حال ارسال...",
 	"WaitingForPrevChat": "در حال بستن چت قبلی...",
 	"Downloading": "در حال دانلود",
+	"Connecting": "Connecting...", // Untranslated
+	"Disconnected": "Disconnected", // Untranslated
 	
 	// Authorization process
 	"Auth_Title": "ورود به حساب",
