@@ -87,6 +87,7 @@ Post-release todo:
 - [x] delete stickerpack
 - [x] chats list canvas
 - [x] send voice messages
+- [x] updater state label in chat
 - [ ] chats list pagination
 - [ ] other media: ~~geo~~, poll (#32)
 - [ ] built-in camera
@@ -99,4 +100,3 @@ Post-release todo:
 - [ ] peers cache
 - [ ] voice transcription
 - [ ] custom themes
-- [ ] updater state label in chat
