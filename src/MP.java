@@ -544,7 +544,7 @@ public class MP extends MIDlet
 				if (v.charAt(0) == '5') {
 					switch (v.charAt(2)) {
 					case '2':
-						systemName = (p.indexOf("java_build_version=2.2") != -1) ? "Symbian Anna" : "Symbian^3";
+						systemName = (p.startsWith("Nokia") && p.indexOf("java_build_version=2.2") != -1) ? "Symbian Anna" : "Symbian^3";
 						break;
 					case '3':
 						systemName = "Symbian Belle";
@@ -6943,7 +6943,7 @@ public class MP extends MIDlet
 			return sb.append(hour == 0 ? 12 : hour == 12 ? 12 : (hour % 12))
 					.append(':')
 					.append(n((int) date % 60))
-					.append(hour < 12 ? " AM" : " PM");
+					.append(L[hour < 12 ? LAM : LPM]);
 		}
 		return sb.append(n(hour))
 				.append(':')

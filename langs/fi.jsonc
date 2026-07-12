@@ -40,6 +40,8 @@
 	"LastMonth": "viime kuussa",
 	"ALongTimeAgo": "kauan sitten",
 	"Recently": "hiljattain",
+	"AM": " AM", // Untranslated
+	"PM": " PM", // Untranslated
 	// Date suffixes
 	"on_Date": "",
 	"at_Time": " klo ",

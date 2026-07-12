@@ -40,6 +40,8 @@
 	"LastMonth": "last month",
 	"ALongTimeAgo": "a long time ago",
 	"Recently": "recently",
+	"AM": " AM",
+	"PM": " PM",
 	// Date suffixes
 	"on_Date": "on ",
 	"at_Time": " at ",

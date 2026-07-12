@@ -40,6 +40,8 @@
 	"LastMonth": "в этом месяце",
 	"ALongTimeAgo": "давно",
 	"Recently": "недавно",
+	"AM": " AM", // Untranslated
+	"PM": " PM", // Untranslated
 	// Date suffixes
 	"on_Date": "",
 	"at_Time": " в ",

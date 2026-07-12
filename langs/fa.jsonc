@@ -40,6 +40,8 @@
 	"LastMonth": "ماه قبل",
 	"ALongTimeAgo": "مدت زیادی قبل",
 	"Recently": "اخیراً",
+	"AM": " AM", // Untranslated
+	"PM": " PM", // Untranslated
 	// Date suffixes
 	"on_Date": "در ",
 	"at_Time": " در ",

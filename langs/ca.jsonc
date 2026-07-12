@@ -40,6 +40,8 @@
 	"LastMonth": "el mes passat",
 	"ALongTimeAgo": "fa molt de temps",
 	"Recently": "recentment",
+	"AM": " AM", // Untranslated
+	"PM": " PM", // Untranslated
 	// Date suffixes
 	"on_Date": "el ",
 	"at_Time": " a ",

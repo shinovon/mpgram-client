@@ -40,6 +40,8 @@
 	"LastMonth": "geçen ay",
 	"ALongTimeAgo": "uzun zaman önce",
 	"Recently": "yakınlarda",
+	"AM": " AM", // Untranslated
+	"PM": " PM", // Untranslated
 	// Date suffixes
 	"on_Date": "tarihinde ",
 	"at_Time": " saat ",

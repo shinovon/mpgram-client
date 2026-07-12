@@ -40,6 +40,8 @@
 	"LastMonth": "上月",
 	"ALongTimeAgo": "很久以前",
 	"Recently": "近期",
+	"AM": " AM", // Untranslated
+	"PM": " PM", // Untranslated
 	// Date suffixes
 	"on_Date": "日期：",
 	"at_Time": " 时间：",

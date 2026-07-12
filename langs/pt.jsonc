@@ -40,6 +40,8 @@
 	"LastMonth": "mês passado", 
 	"ALongTimeAgo": "há muito tempo",
 	"Recently": "recentemente",
+	"AM": " AM", // Untranslated
+	"PM": " PM", // Untranslated
 	// Date suffixes
 	"on_Date": "em ",
 	"at_Time": " às",
