@@ -6520,7 +6520,7 @@ public class MP extends MIDlet
 		return Image.createImage(b, 0, b.length);
 	}
 
-	private static String readUtf(InputStream in, int i) throws IOException {
+	public static String readUtf(InputStream in, int i) throws IOException {
 		byte[] buf = new byte[i <= 0 ? 1024 : i];
 		i = 0;
 		int j;

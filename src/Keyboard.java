@@ -22,7 +22,6 @@ SOFTWARE.
 // modified j2mekeyboard for mpgram client
 //#ifndef NO_CHAT_CANVAS
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
@@ -1983,15 +1982,8 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 
 	private static Object readJSONRes(String res) throws IOException {
 		InputStream is = "".getClass().getResourceAsStream(KEYBOARD_LAYOUTS_DIR + res);
-		ByteArrayOutputStream o = new ByteArrayOutputStream();
-		byte[] buf = new byte[128];
-		int i;
-		while ((i = is.read(buf)) != -1) {
-			o.write(buf, 0, i);
-		}
+		String s = MP.readUtf(is, 0);
 		is.close();
-		String s = new String(o.toByteArray(), "UTF-8");
-		o.close();
 		if (s.charAt(0) == '{')
 			return MP.parseObject(s);
 		else if (s.charAt(0) == '[')
