@@ -149,7 +149,6 @@ public class UIMessage extends UIItem implements LangConstants {
 		name = out && !chat.broadcast ? MP.L[LYou] : MP.getName(fromId, true).trim();
 		dateRender = MP.localizeDate(date, 0);
 		dateWidth = MP.smallBoldFont.stringWidth(dateRender);
-		edited = message.has("edit") && chat.mediaFilter == null;
 		peerId = chat.id;
 		showReadMark = out && !chat.selfChat;
 
@@ -255,6 +254,7 @@ public class UIMessage extends UIItem implements LangConstants {
 		}
 
 		if (chat.mediaFilter == null) {
+			edited = message.has("edit");
 			// forwarded from... label
 			if (message.has("fwd")) {
 				fwd = true;
@@ -1674,7 +1674,7 @@ public class UIMessage extends UIItem implements LangConstants {
 	}
 
 	public void edit(JSONObject msg, ChatCanvas chat) {
-		edited = true;
+//		edited = true;
 		init(msg, chat);
 	}
 
