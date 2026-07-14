@@ -23,7 +23,7 @@ SOFTWARE.
 import javax.microedition.lcdui.*;
 import java.util.Vector;
 
-public class UIMessage extends UIItem implements LangConstants {
+public class UIMessage extends UIItem implements LangConstants, Constants {
 
 	// colors enum
 	static final int COLOR_MESSAGE_BG = 20;
@@ -179,7 +179,7 @@ public class UIMessage extends UIItem implements LangConstants {
 				} else if ("ChatEditTitle".equals(type)) {
 					t = MP.L[LNameChanged_Action].concat(act.getString("t", ""));
 				} else {
-					label.append(name, MP.smallBoldFont, "t.me/".concat(fromId), 0);
+					label.append(name, MP.smallBoldFont, T_ME.concat(fromId), 0);
 					if ("PinMessage".equals(type)) {
 						t = MP.L[LPinnedMessage_Action];
 					} else if ("ChatJoinedByLink".equals(type)) {
@@ -193,7 +193,7 @@ public class UIMessage extends UIItem implements LangConstants {
 							} else {
 								label.append(MP.L["ChatAddUser".equals(type) ? LAdded_Action : LRemoved_Action], MP.smallPlainFont, null, 0);
 								label.append(" ", MP.smallPlainFont, null, 0);
-								label.append(MP.getName(user, false), MP.smallBoldFont, "t.me/".concat(user), 0);
+								label.append(MP.getName(user, false), MP.smallBoldFont, T_ME.concat(user), 0);
 								break l;
 							}
 						} else {

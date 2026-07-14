@@ -3003,7 +3003,7 @@ public class MP extends MIDlet
 				return;
 			}
 			if (c == openLinkCmd) {
-				TextBox t = new TextBox("", "https://t.me/", 200, TextField.URL);
+				TextBox t = new TextBox("", HTTPS_T_ME, 200, TextField.URL);
 				t.addCommand(cancelCmd);
 				t.addCommand(goCmd);
 				t.setCommandListener(this);
@@ -4071,7 +4071,7 @@ public class MP extends MIDlet
 			//noinspection DataFlowIssue
 			JSONObject set = ((StickerPacksList) d).sets.getObject(i);
 			if (set.has("short_name")) {
-				copy(set.getString("title"), "https://t.me/addstickers/" + set.getString("short_name"));
+				copy(set.getString("title"), HTTPS_T_ME + "addstickers/" + set.getString("short_name"));
 			}
 			return;
 		}
@@ -4170,7 +4170,7 @@ public class MP extends MIDlet
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
 
-			s = new StringItem(null, "t.me/nnmidletschat\n");
+			s = new StringItem(null, T_ME + "nnmidletschat\n");
 			s.setFont(medBoldFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			s.setDefaultCommand(richTextLinkCmd);
@@ -5691,7 +5691,7 @@ public class MP extends MIDlet
 	}
 
 	static void copyMessageLink(String peerId, String msgId) {
-		StringBuffer sb = new StringBuffer("https://t.me/");
+		StringBuffer sb = new StringBuffer(HTTPS_T_ME);
 		String username = ((MPChat) current).username();
 		if (peerId.charAt(0) == '-' && username == null) {
 			sb.append("c/");
@@ -6068,9 +6068,10 @@ public class MP extends MIDlet
 		String stickers = null;
 
 		try {
-			if ((i = url.indexOf("t.me")) == 0
+			boolean tme;
+			if (((tme = (i = url.indexOf("t.me")) == 0) || (i = url.indexOf("telegram.me")) == 0)
 					|| (url.startsWith("http") && (i == 7 || i == 8))) {
-				url = url.substring(i + 5);
+				url = url.substring(i + (tme ? 5 : 12));
 				if ((i = url.indexOf('#')) != -1) {
 					url = url.substring(0, i);
 				}

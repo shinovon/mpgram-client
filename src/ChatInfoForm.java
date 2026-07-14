@@ -209,7 +209,7 @@ public class ChatInfoForm extends MPForm {
 				}
 				
 				if (info.has("username")) {
-					String t = "t.me/".concat(info.getString("username"));
+					String t = T_ME.concat(info.getString("username"));
 					s = new StringItem(MP.L[LLink], topic ? t.concat("/").concat(Integer.toString(chatForm.topMsgId())) : t);
 					s.setFont(MP.medPlainFont);
 					s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);

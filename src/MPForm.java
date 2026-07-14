@@ -26,7 +26,7 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.Ticker;
 
-public abstract class MPForm extends Form implements LangConstants {
+public abstract class MPForm extends Form implements LangConstants, Constants {
 
 	boolean loaded, finished, canceled;
 	Thread thread;

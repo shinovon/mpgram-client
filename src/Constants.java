@@ -75,6 +75,9 @@ public interface Constants {
 	String OTA_URL = "http://nnproject.cc/mp/upd.php";
 
 	String API_VERSION = "11";
+	
+	String T_ME = "t.me/";
+	String HTTPS_T_ME = "https://t.me/";
 
 //#ifdef MINI
 //#	boolean MINI_BUILD = true;
