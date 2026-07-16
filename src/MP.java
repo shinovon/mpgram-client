@@ -2667,6 +2667,9 @@ public class MP extends MIDlet
 					if (method == 2) { // pass connector stream
 						p = Manager.createPlayer(openHttpConnection(url.toString()).openInputStream(), "audio/mpeg");
 					} else { // pass url
+						if (blackberry && blackberryNetwork == 1) {
+							url.append(";deviceside=true;interface=wifi");
+						}
 						p = Manager.createPlayer(url.toString());
 					}
 				}
