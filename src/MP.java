@@ -1950,6 +1950,7 @@ public class MP extends MIDlet
 								if (offset <= 0 || off < offset)
 									offset = off;
 							} catch (Exception ignored) {
+								Thread.sleep(2000);
 								continue;
 							}
 							check = false;
