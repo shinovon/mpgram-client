@@ -2607,15 +2607,15 @@ public class MP extends MIDlet
 					voiceAlert.setString(L[LDownloading]);
 					try {
 						voiceProgress.setValue(0);
-						playerProgress.setMaxValue(100);
+						voiceProgress.setMaxValue(100);
 					} catch (Exception ignored) {}
 
 					String fileUrl = getAudioCacheDir();
-					MP.downloadDocument(url.toString(), fileUrl = fileUrl.concat("temp.mp3"), null, playerProgress, 0, false);
+					MP.downloadDocument(url.toString(), fileUrl = fileUrl.concat("temp.mp3"), null, voiceProgress, 0, false);
 
 					try {
-						playerProgress.setValue(Gauge.CONTINUOUS_RUNNING);
-						playerProgress.setMaxValue(Gauge.INDEFINITE);
+						voiceProgress.setValue(Gauge.CONTINUOUS_RUNNING);
+						voiceProgress.setMaxValue(Gauge.INDEFINITE);
 					} catch (Exception ignored) {}
 
 					int method = playerCreateMethod;
@@ -2651,7 +2651,7 @@ public class MP extends MIDlet
 								String platform = System.getProperty("microedition.platform");
 								if (symbianJrt &&
 										(platform.indexOf("java_build_version=2.") != -1
-												|| platform.indexOf("java_build_version=1.4") != -1)) {
+												/* || platform.indexOf("java_build_version=1.4") != -1 */)) {
 									// emc (s60v5+), supports mp3 streaming
 								} else if (checkClass("com.symbian.mmapi.PlayerImpl")) {
 									// uiq
@@ -6748,25 +6748,23 @@ public class MP extends MIDlet
 				try {
 					InputStream in = openInputStream(hc);
 					try {
-						if (alert != null) {
-							if (size <= 0) {
-								size = (int) hc.getLength();
-							}
-							if (size > 0) {
-								if (gauge == null) {
-									if (blackberry) {
-										gauge = alert.getIndicator();
-										gauge.setMaxValue(100);
-										gauge.setValue(0);
-									} else {
-										alert.setIndicator(gauge = new Gauge(null, false, 100, 0));
-									}
-								}
-							} else {
-								gauge = null;
-							}
-							alert.setString(L[LDownloading]);
+						if (size <= 0) {
+							size = (int) hc.getLength();
 						}
+						if (size > 0) {
+							if (gauge == null) {
+								if (blackberry) {
+									gauge = alert.getIndicator();
+									gauge.setMaxValue(100);
+									gauge.setValue(0);
+								} else if (alert != null) {
+									alert.setIndicator(gauge = new Gauge(null, false, 100, 0));
+								}
+							}
+						} else {
+							gauge = null;
+						}
+						if (alert != null) alert.setString(L[LDownloading]);
 
 						byte[] buf = new byte[4096];
 						int readTotal = 0;
