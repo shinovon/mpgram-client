@@ -874,7 +874,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 						aw = topButtonWidth = inputFieldHeight;
 					}
 
-					if ((text != null && text.trim().length() != 0) || file != null || forwardMsgs != null || forwardMsg != null) {
+					if ((textInputNotEmpty()) || file != null || forwardMsgs != null || forwardMsg != null) {
 						// send icon
 						int ty = iy + ((ih - 20) >> 1);
 
@@ -1065,7 +1065,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 	protected boolean handleLeftSoft() {
 		if (inputFocused) {
 			showMenu(null,
-					(text != null && text.trim().length() != 0) || file != null || forwardMsgs != null || forwardMsg != null ?
+					(textInputNotEmpty()) || file != null || forwardMsgs != null || forwardMsg != null ?
 							new int[] {
 									LSend,
 									LFullscreenTextBox,
@@ -1422,7 +1422,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		if (!canWrite || !hasInput) return;
 		if (!touch && !inputFocused) {
 			focusInput(true);
-		} else if ((text != null && text.trim().length() != 0) || file != null || forwardMsgs != null || forwardMsg != null) {
+		} else if ((textInputNotEmpty()) || file != null || forwardMsgs != null || forwardMsg != null) {
 			synchronized (this) {
 				if (!MP.sending) {
 					MP.sending = true;
@@ -1901,7 +1901,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 
 	public void onKeyboardTextUpdated() {
 		text = keyboard.getText();
-		MP.midlet.sendTyping(text.trim().length() == 0);
+		MP.midlet.sendTyping(textInputNotEmpty());
 		queueRepaint();
 	}
 
@@ -1936,7 +1936,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			String p = text;
 			text = NokiaAPI.TextEditor_getContent(nokiaEditor);
 			if (!text.equals(p) && (p != null || text.length() != 0)) {
-				MP.midlet.sendTyping(text.trim().length() == 0);
+				MP.midlet.sendTyping(textInputNotEmpty());
 			}
 			queueRepaint();
 		} else if ((actions & NokiaAPI.ACTION_PAINT_REQUEST) != 0) {
@@ -1990,6 +1990,21 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		this.status = s;
 		statusRender = null;
 		queueRepaint();
+	}
+
+	private boolean textInputNotEmpty() {
+		String text = this.text;
+		if (text == null) return false;
+
+		int l = text.length();
+		if (l == 0) return false;
+
+		int i = 0;
+		while (i < l) {
+			if (text.charAt(i++) > ' ') return true;
+		}
+
+		return false;
 	}
 
 	// typing timer loop

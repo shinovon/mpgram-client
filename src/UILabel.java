@@ -327,6 +327,21 @@ public class UILabel extends UIItem {
 		return "...";
 	}
 
+	private static boolean notEmpty(String s) {
+		if (s == null) return false;
+
+		int l = s.length();
+		if (l == 0) return false;
+		if (l > 3) return true;
+
+		int i = 0;
+		while (i < l) {
+			if (s.charAt(i++) > ' ') return true;
+		}
+
+		return true;
+	}
+
 	private static void split(String text, Font font, String url, int width, int x, int y, int idx, int mw, int ch, int sl, int fh, Vector res, boolean center, int style, int[] out) {
 		int dy = 0;
 		if (res.size() != 0 && x != 0) {
@@ -342,7 +357,7 @@ public class UILabel extends UIItem {
 			int ew = font.substringWidth(text, ch, sl - ch);
 			if (x + ew < width) {
 				String t = text.substring(ch, sl);
-				if (t.length() > 3 || t.trim().length() != 0) {
+				if (notEmpty(t)) {
 					res.addElement(new Object[] { t, font, url, new int[] {x, y + dy, ew, fh, style} });
 					idx ++;
 				}
@@ -360,7 +375,7 @@ public class UILabel extends UIItem {
 									if (center) {
 										x = centerRow(width, tw, x, y, res);
 									}
-									if (t.length() > 3 || t.trim().length() != 0) {
+									if (notEmpty(t)) {
 										res.addElement(new Object[] { t, font, url, new int[] {x, y + dy, tw, fh, style} });
 										idx ++;
 									}
@@ -377,7 +392,7 @@ public class UILabel extends UIItem {
 							if (center) {
 								x = centerRow(width, tw, x, y, res);
 							}
-							if (t.length() > 3 || t.trim().length() != 0) {
+							if (notEmpty(t)) {
 								res.addElement(new Object[] { t, font, url, new int[] {x, y + dy, tw, fh, style} });
 								idx ++;
 							}
@@ -390,7 +405,7 @@ public class UILabel extends UIItem {
 				if (ch != sl) {
 					String t = text.substring(ch, sl);
 					int tw = font.stringWidth(t);
-					if (t.length() > 3 || t.trim().length() != 0) {
+					if (notEmpty(t)) {
 						res.addElement(new Object[] { t, font, url, new int[] {x, y + dy, tw, fh, style} });
 						idx ++;
 					}
