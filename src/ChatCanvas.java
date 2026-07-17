@@ -435,7 +435,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 							: (i == 0 ? ((endReached && dir == 0) || dir == -1) : (i == l - 1 && dir == 1)));
 					break;
 				} catch (OutOfMemoryError e) {
-					MP.gc();
+					MP.emergencyGc();
 					if (a++ == 0) continue;
 					MP.display(MP.errorAlert(MP.L[LNotEnoughMemory_Alert]), this);
 					return false;

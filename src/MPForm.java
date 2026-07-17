@@ -75,6 +75,7 @@ public abstract class MPForm extends Form implements LangConstants, Constants {
 			MP.display(MP.errorAlert(e), this);
 			e.printStackTrace();
 		} finally {
+			MP.normalGc();
 			if (getTicker() == ticker) {
 				setTicker(null);
 			}

@@ -1341,7 +1341,7 @@ public class MP extends MIDlet
 
 							putImage(target, img);
 						} catch (OutOfMemoryError e) {
-							gc();
+							emergencyGc();
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -1609,7 +1609,7 @@ public class MP extends MIDlet
 				{
 //#ifndef NO_FILE
 					if (e instanceof OutOfMemoryError) {
-						gc();
+						emergencyGc();
 						display(errorAlert(L[LNotEnoughMemory_Alert]), current);
 						break;
 					}
@@ -7366,7 +7366,11 @@ public class MP extends MIDlet
 		}
 	}
 
-	static void gc() {
+	static void normalGc() {
+		System.gc();
+	}
+
+	static void emergencyGc() {
 		System.out.println("EMERGENCY COLLECTION");
 		imagesToLoad.removeAllElements();
 		usersCache.clear();

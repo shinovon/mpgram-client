@@ -351,6 +351,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 			MP.display(MP.errorAlert(e), this);
 			e.printStackTrace();
 		} finally {
+			MP.normalGc();
 			if (this.thread == thread) {
 				loading = false;
 				this.thread = null;
