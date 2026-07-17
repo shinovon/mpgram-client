@@ -104,6 +104,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 	String forwardPeer, forwardMsg;
 	boolean editorShown;
 	boolean funcWasFocused;
+	boolean keyboardTextUpdated;
 
 	UIMessage[] forwardMsgsOnLoad;
 	String forwardPeerOnLoad, forwardMsgOnLoad;
@@ -773,7 +774,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					bh -= 1;
 					g.drawString(MP.L[LMenu], 2, h - bh, Graphics.TOP | Graphics.LEFT);
 					g.drawString(MP.L[LEdit], w >> 1, h - bh, Graphics.TOP | Graphics.HCENTER);
-					g.drawString(MP.L[keyboard != null && text != null && text.length() != 0
+					g.drawString(MP.L[keyboard != null && textInputNotEmpty(false)
 							&& keyboard.getPhysicalKeyboardType() == Keyboard.PHYSICAL_KEYBOARD_PHONE_KEYPAD ?
 							LClear : LCancel], w - 2, h - bh, Graphics.TOP | Graphics.RIGHT);
 				}
@@ -860,13 +861,13 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 						}
 						keyboard.drawTextBox(g, 10, iy, w - 40, ih);
 						if (keyboard.isVisible()) keyboard.drawOverlay(g);
-					} else if (text == null || text.length() == 0) {
-						g.setFont(MP.medPlainFont);
-						g.drawString(MP.L[LTextField_Hint], 10, iy + ((ih - MP.medPlainFontHeight) >> 1), 0);
-					} else {
+					} else if (textInputNotEmpty(false)) {
 						g.setFont(MP.smallPlainFont);
 						g.setColor(colors[COLOR_CHAT_PANEL_FG]);
 						g.drawString(text, 10, iy + ((ih - MP.smallPlainFontHeight) >> 1), 0);
+					} else {
+						g.setFont(MP.medPlainFont);
+						g.drawString(MP.L[LTextField_Hint], 10, iy + ((ih - MP.medPlainFontHeight) >> 1), 0);
 					}
 
 					int aw = topButtonWidth;
@@ -874,7 +875,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 						aw = topButtonWidth = inputFieldHeight;
 					}
 
-					if ((textInputNotEmpty()) || file != null || forwardMsgs != null || forwardMsg != null) {
+					if ((textInputNotEmpty(true)) || file != null || forwardMsgs != null || forwardMsg != null) {
 						// send icon
 						int ty = iy + ((ih - 20) >> 1);
 
@@ -1065,7 +1066,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 	protected boolean handleLeftSoft() {
 		if (inputFocused) {
 			showMenu(null,
-					(textInputNotEmpty()) || file != null || forwardMsgs != null || forwardMsg != null ?
+					(textInputNotEmpty(true)) || file != null || forwardMsgs != null || forwardMsg != null ?
 							new int[] {
 									LSend,
 									LFullscreenTextBox,
@@ -1185,6 +1186,10 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 
 	private void showTextBox() {
 		if (text == null) text = "";
+		if (keyboard != null && keyboardTextUpdated) {
+			keyboardTextUpdated = false;
+			text = keyboard.getText();
+		}
 		TextBox t = new TextBox("", text, 500, TextField.ANY);
 		t.addCommand(MP.okCmd);
 		t.addCommand(MP.cancelCmd);
@@ -1210,6 +1215,10 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		case LWriteMessage:
 			if (replyMsgId != 0 || editMsgId != 0 || topMsgId != 0) {
 				int r = Math.max(replyMsgId, topMsgId);
+				if (keyboard != null && keyboardTextUpdated) {
+					keyboardTextUpdated = false;
+					text = keyboard.getText();
+				}
 				MP.display(MP.writeForm(id, r == 0 ? null : Integer.toString(r), text, editMsgId == 0 ? null : Integer.toString(editMsgId), null, null));
 				resetInput();
 				break;
@@ -1392,6 +1401,10 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			h += MP.smallBoldFontHeight + 8;
 		}
 		if (text == null) text = "";
+		if (keyboard != null && keyboardTextUpdated) {
+			keyboardTextUpdated = false;
+			text = keyboard.getText();
+		}
 		if (!touch) {
 			bottomAnimTarget = h + MP.smallBoldFontHeight + 4;
 			keyGuide = false;
@@ -1422,11 +1435,15 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		if (!canWrite || !hasInput) return;
 		if (!touch && !inputFocused) {
 			focusInput(true);
-		} else if ((textInputNotEmpty()) || file != null || forwardMsgs != null || forwardMsg != null) {
+		} else if ((textInputNotEmpty(true)) || file != null || forwardMsgs != null || forwardMsg != null) {
 			synchronized (this) {
 				if (!MP.sending) {
 					MP.sending = true;
 					int r = Math.max(replyMsgId, topMsgId);
+					if (keyboard != null && keyboardTextUpdated) {
+						keyboardTextUpdated = false;
+						text = keyboard.getText();
+					}
 					MP.midlet.start(MP.RUN_SEND_MESSAGE, new Object[] {
 							text, id,
 							r == 0 ? null : Integer.toString(r),
@@ -1900,8 +1917,8 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 	}
 
 	public void onKeyboardTextUpdated() {
-		text = keyboard.getText();
-		MP.midlet.sendTyping(textInputNotEmpty());
+		keyboardTextUpdated = true;
+		MP.midlet.sendTyping(textInputNotEmpty(true));
 		queueRepaint();
 	}
 
@@ -1936,7 +1953,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			String p = text;
 			text = NokiaAPI.TextEditor_getContent(nokiaEditor);
 			if (!text.equals(p) && (p != null || text.length() != 0)) {
-				MP.midlet.sendTyping(textInputNotEmpty());
+				MP.midlet.sendTyping(textInputNotEmpty(true));
 			}
 			queueRepaint();
 		} else if ((actions & NokiaAPI.ACTION_PAINT_REQUEST) != 0) {
@@ -1992,12 +2009,17 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		queueRepaint();
 	}
 
-	private boolean textInputNotEmpty() {
+	private boolean textInputNotEmpty(boolean trim) {
+		if (keyboard != null && keyboardTextUpdated) {
+			return !keyboard.isEmpty(trim);
+		}
+
 		String text = this.text;
 		if (text == null) return false;
 
 		int l = text.length();
 		if (l == 0) return false;
+		if (!trim) return true;
 
 		int i = 0;
 		while (i < l) {
