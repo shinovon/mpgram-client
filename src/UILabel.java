@@ -34,7 +34,7 @@ public class UILabel extends UIItem {
 			STYLE_SPOILER = 2, // TODO
 			STYLE_SPOILER_UNHIDDEN = 4;
 
-	Vector parsed = new Vector(); // Object[] {text, font, url, int[] {style} }
+	Vector parsed; // Object[] {text, font, url, int[] {style} }
 	Vector render; // Object[] { text, font, url, int[] {x, y, width, height, style} }
 	Vector urls; // Object[] { url, Vector(elements of render) }
 	Vector selectedParts; String selectedUrl;
@@ -44,7 +44,9 @@ public class UILabel extends UIItem {
 
 	int focusIndex;
 
-	public UILabel() {}
+	public UILabel() {
+		this.parsed = new Vector();
+	}
 
 	public UILabel(String text, Font font, String url) {
 		(this.parsed = new Vector())
