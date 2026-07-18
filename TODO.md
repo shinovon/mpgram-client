@@ -100,3 +100,4 @@ Post-release todo:
 - [ ] peers cache
 - [ ] voice transcription
 - [ ] custom themes
+- [ ] spoilers support
