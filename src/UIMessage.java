@@ -1497,6 +1497,10 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 				break;
 			}
 		case LDownload:
+			if (voice) {
+				MP.midlet.browseUser(VOICE_URL + "?c=" + peerId + "&m=" + id);
+				break;
+			}
 			String name = mediaFileName;
 			if (name == null && photo) {
 				name = peerId + '_' + id + ".jpg";
@@ -1538,7 +1542,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 	private int[] subMenu(int focus) {
 		if (focus == FOCUS_MEDIA) {
 			if (voice && MP.voiceConversion) {
-				return new int[] { LPlay_Item };
+				return new int[] { LPlay_Item, LDownload };
 			} else if (mediaPlayable) {
 				return new int[] { LPlay_Item, LDownload };
 			} else if (photo) {
