@@ -833,6 +833,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 		}
 	}
 
+	// FIXME NPE somewhere!
 	public int layout(int width) {
 		if (!layoutRequest && layoutWidth == width) {
 			return contentHeight;
