@@ -6072,10 +6072,9 @@ public class MP extends MIDlet
 		String stickers = null;
 
 		try {
-			boolean tme;
-			if (((tme = (i = url.indexOf("t.me")) == 0) || (i = url.indexOf("telegram.me")) == 0)
+			if (((i = url.indexOf("t.me")) == 0)
 					|| (url.startsWith("http") && (i == 7 || i == 8))) {
-				url = url.substring(i + (tme ? 5 : 12));
+				url = url.substring(i + 5);
 				if ((i = url.indexOf('#')) != -1) {
 					url = url.substring(0, i);
 				}
