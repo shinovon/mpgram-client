@@ -284,6 +284,11 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 		if (l == 0) return false;
 		if (!trim) return true;
 
+		int i = 0;
+		while (i < l) {
+			if (text.charAt(i++) > ' ') return false;
+		}
+
 		return true;
 	}
 
