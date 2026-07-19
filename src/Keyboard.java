@@ -303,10 +303,11 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 		// clear selection
 		selectionStart = -1;
 		selectionEnd = -1;
-		int newSize = size > 0 ? Math.max(s.length(), size) : s.length();
+		int length = size > 0 ? Math.max(s.length(), size) : s.length();
 		text.setLength(0);
-		text.append(s, 0, newSize);
-		caretPosition = newSize;
+		text.append(s);
+		if (length != text.length()) text.setLength(length);
+		caretPosition = length;
 		updateText = true;
 		if (caretPosition == 0) resetShift();
 	}
@@ -670,12 +671,12 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 			} else {
 				removedTextWidth = 0;
 			}
-			g.drawString(s == null ? text.substring(start) : s, x + 2, textY, 0);
+			g.drawString(s == null ? substring(text, start, text.length()) : s, x + 2, textY, 0);
 			if (selectionEnd != -1) {
 				start = Math.min(selectionStart, selectionEnd);
 				int end = Math.max(selectionStart, selectionEnd);
-				int startX = textFont.stringWidth(text.substring(0, start)) - removedTextWidth;
-				String selected = text.substring(start, end);
+				int startX = textFont.stringWidth(substring(text, 0, start)) - removedTextWidth;
+				String selected = substring(text, start, end);
 				int selectedW = textFont.stringWidth(selected);
 				g.setColor(caretColor);
 				g.fillRect(x + 2 + startX, textY, selectedW, th);
@@ -683,7 +684,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 				g.drawString(selected, x + 2 + startX, textY, 0);
 			}
 			if (l > 0 && caretPosition != l) {
-				s = text.substring(0, caretPosition);
+				s = substring(text, 0, caretPosition);
 			} else {
 				s = text.toString();
 			}
@@ -1638,7 +1639,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 		int xx = x + removedTextWidth;
 		int i;
 		for (i = text.length(); i > 0; i--) {
-			if (textFont.stringWidth(text.substring(0, i - 1)) + (textFont.charWidth(text.charAt(i - 1)) >> 1) + 1 < xx) {
+			if (textFont.stringWidth(substring(text, 0, i - 1)) + (textFont.charWidth(text.charAt(i - 1)) >> 1) + 1 < xx) {
 				break;
 			}
 		}
@@ -2027,20 +2028,20 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 		int mw = 0;
 		int ch = 0;
 		if (ch != sl) {
-			int ew = font.stringWidth(text.substring(ch, sl - ch));
+			int ew = font.stringWidth(substring(text, ch, sl - ch));
 			if (x + ew < width) {
-				String t = text.substring(ch, sl);
+				String t = substring(text, ch, sl);
 				res.addElement(t);
 				x += ew;
 				mw = Math.max(mw, x);
 			} else {
 				for (int i = ch; i < sl; i++) {
-					if (x + font.stringWidth(text.substring(ch, i+1)) >= width) {
+					if (x + font.stringWidth(substring(text, ch, i+1)) >= width) {
 						w: {
 							for (int j = i; j > ch; j--) {
 								char c = text.charAt(j);
 								if (c == ' ' || (c >= ',' && c <= '/')) {
-									String t = text.substring(ch, ++ j);
+									String t = substring(text, ch, ++ j);
 									int tw = font.stringWidth(t);
 									res.addElement(t);
 									mw = Math.max(mw, x + tw);
@@ -2051,7 +2052,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 								}
 							}
 
-							String t = text.substring(ch, i);
+							String t = substring(text, ch, i);
 							int tw = font.stringWidth(t);
 							res.addElement(t);
 							mw = Math.max(mw, x + tw);
@@ -2061,7 +2062,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 					}
 				}
 				if (ch != sl) {
-					String t = text.substring(ch, sl);
+					String t = substring(text, ch, sl);
 					int tw = font.stringWidth(t);
 					res.addElement(t);
 					x += tw;
@@ -2069,6 +2070,12 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 				}
 			}
 		}
+	}
+	
+	private static String substring(StringBuffer sb, int a, int b) {
+		char[] c = new char[b - a];
+		sb.getChars(a, b, c, 0);
+		return new String(c);
 	}
 
 	// деление без остатка
