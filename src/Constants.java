@@ -74,7 +74,7 @@ public interface Constants {
 	String VOICE_URL = "voice.php";
 	String OTA_URL = "http://nnproject.cc/mp/upd.php";
 
-	String API_VERSION = "11";
+	String API_VERSION = "12";
 	
 	String T_ME = "t.me/";
 	String HTTPS_T_ME = "https://t.me/";

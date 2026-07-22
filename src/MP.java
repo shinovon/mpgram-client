@@ -2522,16 +2522,16 @@ public class MP extends MIDlet
 		case RUN_RESET_SETTINGS: {
 			display(loadingAlert(L[LApplicationWillClose_Alert]));
 			try {
-				try {
-					String[] s = RecordStore.listRecordStores();
-					for (int i = 0; i < s.length; ++i) {
-						if (AUTH_RECORD_NAME.equals(s[i])) continue;
+				String[] s = RecordStore.listRecordStores();
+				for (int i = 0; i < s.length; ++i) {
+					if (AUTH_RECORD_NAME.equals(s[i])) continue;
 
-						try {
-							RecordStore.deleteRecordStore(s[i]);
-						} catch (Exception ignored) {}
-					}
-				} catch (Exception ignored) {}
+					try {
+						RecordStore.deleteRecordStore(s[i]);
+					} catch (Exception ignored) {}
+				}
+			} catch (Exception ignored) {}
+			try {
 				Thread.sleep(1000);
 			} catch (Exception ignored) {}
 			notifyDestroyed();
