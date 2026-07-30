@@ -281,8 +281,8 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 
 	public boolean isEmpty(boolean trim) {
 		int l = text.length();
-		if (l == 0) return false;
-		if (!trim) return true;
+		if (l == 0) return true;
+		if (!trim) return false;
 
 		int i = 0;
 		while (i < l) {
