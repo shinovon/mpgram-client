@@ -2079,6 +2079,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 	
 	private static String substring(StringBuffer sb, int a, int b) {
 		char[] c = new char[b - a];
+		//noinspection Since15
 		sb.getChars(a, b, c, 0);
 		return new String(c);
 	}
