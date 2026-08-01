@@ -101,3 +101,4 @@ Post-release todo:
 - [ ] voice transcription
 - [ ] custom themes
 - [ ] spoilers support
+- [ ] password encryption
