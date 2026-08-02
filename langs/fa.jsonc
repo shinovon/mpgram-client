@@ -40,8 +40,8 @@
 	"LastMonth": "ماه قبل",
 	"ALongTimeAgo": "مدت زیادی قبل",
 	"Recently": "اخیراً",
-	"AM": " AM", // Untranslated
-	"PM": " PM", // Untranslated
+	"AM": " ق.ظهر",
+	"PM": " ب.ظهر",
 	// Date suffixes
 	"on_Date": "در ",
 	"at_Time": " در ",
@@ -95,7 +95,7 @@
 	"ArchivedChats": "چتهای ارشیوی",
 	"Contacts": "مخاطبین",
 	"Search": "جستجو",
-	"OpenByLink": "باز کردن با لینک",
+	"OpenByLink": "باز کردن لینک",
 	"Select_OK": "انتخاب",
 	
 	// Message commands
@@ -123,7 +123,7 @@
 	"Download": "دانلود",
 	"Play_Item": "پخش",
 	"RunBotAction": "اجرا",
-	"SaveHere": "ذخیره ذر اینجا",
+	"SaveHere": "ذخیره در اینجا",
 	
 	// Chat form commands
 	"WriteMessage": "نوشتن پیام",
@@ -176,8 +176,8 @@
 	"Sending": "در حال ارسال...",
 	"WaitingForPrevChat": "در حال بستن چت قبلی...",
 	"Downloading": "در حال دانلود",
-	"Connecting": "Connecting...", // Untranslated
-	"Disconnected": "Disconnected", // Untranslated
+	"Connecting": "اتصال...",
+	"Disconnected": "اتصال قطع است",
 	
 	// Authorization process
 	"Auth_Title": "ورود به حساب",
@@ -270,7 +270,7 @@
 	"PartialUpload": "آپلود بخش بخش",
 	"PlaybackMethod": "روش پخش",
 	"Stream": "استریم",
-	"CacheToFile": "دخیره و پخش",
+	"CacheToFile": "ذخیره و پخش",
 	"PlayerCreationMethod": "نحوه ساخت پخش کننده",
 	"PassURL": "Pass URL",
 	"PassConnectionStream": "Pass connection stream",
@@ -342,7 +342,7 @@
 	"DownloadCanceled_Alert": "دانلود لغو شد",
 	"DownloadedTo": "دانلود شد در ",
 	"ChooseDownloadMethod_Alert": "روش دانلود را تعیین کنید",
-	"FailedToSaveSettings_Alert": "خطای دخیره تنظیمات",
+	"FailedToSaveSettings_Alert": "خطای ذخیره تنظیمات",
 	"PiglerNotAvailable_Alert": "Pigler API انتخاب شد ولی نصب نشده، \nاز https://nnproject.cc/pna دانلودش کنید",
 	"DeleteNMessage_Alert": "% پیام حذف شود؟",
 	"DeleteNMessages_Alert": "% پیام حذف شود؟",
@@ -405,9 +405,9 @@
 	
 	// Chat actions
 	"PinnedMessage_Action": " پیامی پین کرد",
-	"Joined_Action": " عضو گروه شد",
+	"Joined_Action": "عضو گروه شد ",
 	"Added_Action": " اضافه شد",
-	"Left_Action": " گروه را ترک کرد",
+	"Left_Action": "گروه را ترک کرد ",
 	"Removed_Action": " حذف شد",
 	"JoinedByLink_Action": " با لینک دعوت عضو شد",
 	"JoinedByRequest_Action": " عضویتش  تایید شد",
