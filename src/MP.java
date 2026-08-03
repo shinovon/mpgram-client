@@ -707,8 +707,12 @@ public class MP extends MIDlet
 		// load settings
 		try {
 			RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, false);
-			JSONObject j = parseObject(new String(r.getRecord(1), encoding));
-			r.closeRecordStore();
+			JSONObject j;
+			try {
+				j = parseObject(new String(r.getRecord(1), encoding));
+			} finally {
+				r.closeRecordStore();
+			}
 
 			reverseChat = j.getBoolean("reverseChat", reverseChat);
 //#ifndef NO_AVATARS
@@ -807,8 +811,12 @@ public class MP extends MIDlet
 		// load auth
 		try {
 			RecordStore r = RecordStore.openRecordStore(AUTH_RECORD_NAME, false);
-			JSONObject j = parseObject(new String(r.getRecord(1), encoding));
-			r.closeRecordStore();
+			JSONObject j;
+			try {
+				j = parseObject(new String(r.getRecord(1), encoding));
+			} finally {
+				r.closeRecordStore();
+			}
 
 			user = j.getString("user", user);
 			userState = j.getInt("state", 0);
@@ -7254,8 +7262,11 @@ public class MP extends MIDlet
 
 			byte[] b = j.toString().getBytes(encoding);
 			RecordStore r = RecordStore.openRecordStore(AUTH_RECORD_NAME, true);
-			r.addRecord(b, 0, b.length);
-			r.closeRecordStore();
+			try {
+				r.addRecord(b, 0, b.length);
+			} finally {
+				r.closeRecordStore();
+			}
 		} catch (Exception ignored) {}
 	}
 
@@ -7350,8 +7361,11 @@ public class MP extends MIDlet
 
 		byte[] b = j.toString().getBytes(encoding);
 		RecordStore r = RecordStore.openRecordStore(SETTINGS_RECORD_NAME, true);
-		r.addRecord(b, 0, b.length);
-		r.closeRecordStore();
+		try {
+			r.addRecord(b, 0, b.length);
+		} finally {
+			r.closeRecordStore();
+		}
 
 		needWriteConfig = false;
 	}
