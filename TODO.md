@@ -102,3 +102,5 @@ Post-release todo:
 - [ ] custom themes
 - [ ] spoilers support
 - [ ] password encryption
+- [ ] integration with mahomaps
+- [ ] switch ids from string to long
