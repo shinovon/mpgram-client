@@ -231,6 +231,7 @@ public class MP extends MIDlet
 	static boolean migrateAsked;
 	static int stickerPreviewSize = 32;
 	static int voiceVolume = 50;
+	static boolean newQrLogin = true;
 
 	private static boolean needWriteConfig;
 
@@ -1448,7 +1449,7 @@ public class MP extends MIDlet
 						}
 					} else {
 						// check code
-						if (param instanceof Alert) {
+						if (param instanceof Alert || param instanceof ViewCanvas) {
 							sb.append("qrLogin");
 						} else {
 							sb.append("completePhoneLogin&code=").append((String) param);
@@ -5783,7 +5784,15 @@ public class MP extends MIDlet
 	}
 
 	static void showQrLogin(String text) {
-		// TODO: check by timer
+		if (newQrLogin) {
+			if (current instanceof ViewCanvas) {
+				((ViewCanvas) current).id = text;
+				((ViewCanvas) current).run();
+				return;
+			}
+			new ViewCanvas(text);
+			return;
+		}
 		Alert a = new Alert(L[Lmpgram]);
 		a.setCommandListener(midlet);
 		a.addCommand(authCheckQrCmd);

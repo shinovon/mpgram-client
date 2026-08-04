@@ -26,7 +26,8 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 	private boolean rotate;
 	
 	private final String peer;
-	private final String id;
+	String id;
+	boolean qr;
 
 
 	public ViewCanvas(String peer, String id) {
@@ -37,7 +38,16 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 		loader = new Thread(this);
 		loader.start();
 		setFullScreenMode(true);
-		// TODO qr mode
+	}
+
+	// qr login mode
+	public ViewCanvas(String text) {
+		peer = null;
+		id = text;
+		qr = true;
+		setFullScreenMode(true);
+		MP.display(this);
+		run();
 	}
 
 	public final void run() {
@@ -47,7 +57,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 				zoom = 1;
 				x = 0;
 				y = 0;
-				toDraw = null;
+				if (!qr) toDraw = null;
 				try {
 					repaint();
 					resize();
@@ -58,6 +68,13 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 				}
 				repaint();
 			}
+			if (qr) {
+				touchCtrlShown = false;
+				Thread.sleep(5000);
+				if (MP.display.getCurrent() == this) {
+					MP.midlet.start(MP.RUN_AUTH, this);
+				}
+			}
 		} catch (OutOfMemoryError e) {
 			MP.emergencyGc();
 			toDraw = null;
@@ -67,6 +84,8 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 			} catch (Exception ignored) {}
 			MP.display(MP.errorAlert(MP.L[LNotEnoughMemory_Alert]), this);
 //			return;
+		} catch (Exception e) {
+			MP.display(MP.errorAlert(e), null);
 		}
 	}
 
@@ -74,15 +93,25 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 		if (resizing) return;
 		resizing = true;
 		try {
-			toDraw = null;
+			if (!qr) toDraw = null;
 			System.gc();
 			repaint();
 			Image origImg;
 			int l = -1;
-			byte[] b;
 			try {
-				b = MP.get(MP.instanceUrl + MP.FILE_URL + "?a&c=" + peer + "&m=" + id + "&p=rview&s="
-						+ (Math.min(getWidth(), getHeight()) * zoom) + "&tw=" + (getWidth() * zoom) + "&th=" + (getHeight() * zoom));
+				StringBuffer sb = new StringBuffer(MP.instanceUrl);
+				int s = Math.min(getWidth(), getHeight());
+				if (qr) {
+					sb.append("qrcode.php?t=").append(id)
+							.append(s > 480 ? "&s=8" : s > 320 ? "&s=6" : "&s=4");
+				} else {
+					sb.append(MP.FILE_URL + "?a&p=rview&c=").append(peer)
+							.append("&m=").append(id)
+							.append("&s=").append(s * zoom);
+				}
+				sb.append("&tw=").append(getWidth() * zoom)
+				.append("&th=").append(getHeight() * zoom);
+				byte[] b = MP.get(sb.toString());
 				l = b.length;
 				origImg = Image.createImage(b, 0, b.length);
 				//noinspection UnusedAssignment
@@ -99,7 +128,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 				toDraw = null;
 				return;
 			}
-			
+
 			toDraw = origImg;
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -154,8 +183,8 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 				g.fillRect(0, 0, w, h);
 				
 				// limit offset
-				int hw = (toDraw.getWidth() - w) / 2;
-				int hh = (toDraw.getHeight() - h) / 2;
+				int hw = (toDraw.getWidth() - w) >> 1;
+				int hh = (toDraw.getHeight() - h) >> 1;
 				if (hw < 0) hw = 0;
 				if (hh < 0) hh = 0;
 				
@@ -168,10 +197,11 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 					g.drawImage(toDraw, (int) x + w / 2, (int) y + h / 2,
 							Graphics.HCENTER | Graphics.VCENTER);
 				} else {
-					g.drawImage(toDraw, (w - toDraw.getWidth()) / 2, (h - toDraw.getHeight()) / 2,
+					g.drawImage(toDraw, (w - toDraw.getWidth()) >> 1, (h - toDraw.getHeight()) >> 1,
 							0);
 				}
 			}
+
 			// touch captions
 			if (hasPointerEvents() && touchCtrlShown) {
 
@@ -182,6 +212,8 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 				g.setGrayScale(255);
 				g.drawString(touchCaps[3], w * (1 + 3 * 2) / 8,
 						h - 25 - fh / 2, Graphics.TOP | Graphics.HCENTER);
+
+				if (qr) return;
 				g.setGrayScale(255);
 				g.drawLine(w * 3 / 4, h - 50, w, h - 50);
 				g.drawLine(w * 3 / 4, h - 50, w * 3 / 4, h);
@@ -199,6 +231,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 				g.drawLine(w / 3, 0, w / 3, 50);
 				g.drawLine(w * 2 / 3, 0, w * 2 / 3, 50);
 			}
+			if (qr) return;
 			
 			// hud
 			String zoomN = Integer.toString((int) zoom);
@@ -251,6 +284,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 				repaint();
 				return;
 			}
+			if (qr) return;
 			// zooming via *0#
 			if (k == KEY_STAR) {
 				zoom = 1;
@@ -295,6 +329,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 	}
 
 	protected final void keyRepeated(int k) {
+		if (qr) return;
 		k = qwertyToNum(k);
 		if (toDraw == null) {
 			repaint();
@@ -343,6 +378,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 			keyPressed(-7);
 			return;
 		}
+		if (qr) return;
 		touchHoldPos = 0;
 		lx = (sx = tx);
 		ly = (sy = ty);
@@ -424,7 +460,7 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 			zone = b;
 		}
 		if (zone == touchHoldPos) {
-			if (zone >= 1 && zone <= 3 && !resizing) {
+			if (zone >= 1 && zone <= 3 && !resizing && !qr) {
 				zoom = zone;
 				MP.midlet.start(MP.RUN_ZOOM_VIEW, this);
 			} else if (zone == 7) {
