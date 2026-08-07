@@ -341,7 +341,7 @@ public class UILabel extends UIItem {
 			if (s.charAt(i++) > ' ') return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	private static void split(String text, Font font, String url, int width, int x, int y, int idx, int mw, int ch, int sl, int fh, Vector res, boolean center, int style, int[] out) {
