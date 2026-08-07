@@ -5076,6 +5076,13 @@ public class MP extends MIDlet
 			s = System.getProperty("fileconn.dir.music");
 		}
 		if (s == null) {
+			s = System.getProperty("fileconn.dir.memorycard");
+		}
+		if (downloadPath != null && downloadPath.length() > 1) {
+			s = "file:///".concat(downloadPath);
+			if (!s.endsWith("/")) s = s.concat("/");
+		}
+		if (s == null) {
 			s = "file:///C:/";
 		}
 		return s;
