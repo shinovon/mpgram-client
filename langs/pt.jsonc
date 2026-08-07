@@ -363,6 +363,8 @@
 	"RecorderInitFailed_Alert": "Failed to initialize voice recorder", // Untranslated
 	"Recording_Alert": "Recording...", // Untranslated
 	"VoiceMessageRecorded_Alert": "Voice message has been recorded", // Untranslated
+	"DownloadFailed_Alert": "Failed to download file", // Untranslated
+	"MessageSendFailed_Alert": "Failed to send message", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Mídia",

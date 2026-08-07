@@ -363,6 +363,8 @@
 	"RecorderInitFailed_Alert": "Ses kaydedici başlatılamadı.",
 	"Recording_Alert": "Kaydediyor...",
 	"VoiceMessageRecorded_Alert": "Sesli mesaj kaydedildi.",
+	"DownloadFailed_Alert": "Failed to download file", // Untranslated
+	"MessageSendFailed_Alert": "Failed to send message", // Untranslated
 
 	// Chat form
 	"ChatMedia_Title": "Medya",

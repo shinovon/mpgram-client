@@ -1652,7 +1652,7 @@ public class MP extends MIDlet
 				if (e == cancelException) {
 					display(alert(null, L[LDownloadCanceled_Alert], AlertType.WARNING), current);
 				} else {
-					display(errorAlert(e), current);
+					display(errorAlert(L[LMessageSendFailed_Alert] + " \n" + e), current);
 				}
 			} finally {
 				sending = false;
@@ -2327,7 +2327,7 @@ public class MP extends MIDlet
 				downloading = false;
 			}
 
-			display(errorAlert(error), current);
+			display(errorAlert(L[LDownloadFailed_Alert] + " \n" + error), current);
 			break;
 		}
 //#endif
@@ -2401,15 +2401,21 @@ public class MP extends MIDlet
 						playerProgress.setMaxValue(100);
 					} catch (Exception ignored) {}
 
-					String fileUrl = getAudioCacheDir();
-					String ext = media.getString("name", "");
-					int i;
-					if ((i = ext.lastIndexOf('.')) != -1) {
-						ext = ext.substring(i + 1);
-					} else {
-						ext = "mp3";
+					String fileUrl;
+					try {
+						fileUrl = getAudioCacheDir();
+						String ext = media.getString("name", "");
+						int i;
+						if ((i = ext.lastIndexOf('.')) != -1) {
+							ext = ext.substring(i + 1);
+						} else {
+							ext = "mp3";
+						}
+						MP.downloadDocument(url.toString(), fileUrl = fileUrl.concat("temp.".concat(ext)), null, playerProgress, media.getInt("size", 0), false);
+					} catch (Exception e) {
+						display(errorAlert(L[LDownloadFailed_Alert] + " \n" + e), current);
+						throw cancelException;
 					}
-					MP.downloadDocument(url.toString(), fileUrl = fileUrl.concat("temp.".concat(ext)), null, playerProgress, media.getInt("size", 0), false);
 
 					try {
 						playerProgress.setValue(Gauge.CONTINUOUS_RUNNING);
@@ -2505,7 +2511,9 @@ public class MP extends MIDlet
 				p.start();
 				playerState = 1;
 			} catch (Exception e) {
-				display(errorAlert(e), current);
+				if (e != cancelException) {
+					display(errorAlert(e), current);
+				}
 				closePlayer();
 				playerState = 0;
 			}
@@ -2622,8 +2630,14 @@ public class MP extends MIDlet
 						voiceProgress.setMaxValue(100);
 					} catch (Exception ignored) {}
 
-					String fileUrl = getAudioCacheDir();
-					MP.downloadDocument(url.toString(), fileUrl = fileUrl.concat("temp.mp3"), null, voiceProgress, 0, false);
+					String fileUrl;
+					try {
+						fileUrl = getAudioCacheDir();
+						MP.downloadDocument(url.toString(), fileUrl = fileUrl.concat("temp.mp3"), null, voiceProgress, 0, false);
+					} catch (Exception e) {
+						display(errorAlert(L[LDownloadFailed_Alert] + " \n" + e), current);
+						throw cancelException;
+					}
 
 					try {
 						voiceProgress.setValue(Gauge.CONTINUOUS_RUNNING);

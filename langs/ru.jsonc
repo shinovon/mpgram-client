@@ -363,6 +363,8 @@
 	"RecorderInitFailed_Alert": "Не удалось инициализировать запись",
 	"Recording_Alert": "Запись...",
 	"VoiceMessageRecorded_Alert": "Голосовое сообщение записано",
+	"DownloadFailed_Alert": "Не удалось скачать файл",
+	"MessageSendFailed_Alert": "Не удалось отправить сообщение",
 
 	// Chat form
 	"ChatMedia_Title": "Медиафайлы",

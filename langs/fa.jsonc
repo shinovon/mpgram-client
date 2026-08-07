@@ -363,6 +363,8 @@
 	"RecorderInitFailed_Alert": "خطا در ضبط کننده صوتی",
 	"Recording_Alert": "در حال ضبط...",
 	"VoiceMessageRecorded_Alert": "پیام صوتی ضبط شد",
+	"DownloadFailed_Alert": "Failed to download file", // Untranslated
+	"MessageSendFailed_Alert": "Failed to send message", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "رسانه",

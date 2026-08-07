@@ -363,6 +363,8 @@
 	"RecorderInitFailed_Alert": "No s'ha pogut inicialitzar gravadora de veu",
 	"Recording_Alert": "Gravant...",
 	"VoiceMessageRecorded_Alert": "S'ha enregistrat missatge de veu",
+	"DownloadFailed_Alert": "Failed to download file", // Untranslated
+	"MessageSendFailed_Alert": "Failed to send message", // Untranslated
 	
 	// Chat form
 	"ChatMedia_Title": "Mèdia",
