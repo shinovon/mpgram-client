@@ -1544,6 +1544,7 @@ public class MP extends MIDlet
 				String top = ((Object[]) param).length < 10 ? null : (String) ((Object[]) param)[9];
 
 				Alert alert = null;
+				boolean voice = false;
 				try {
 					if (sendChoice != null || file != null) {
 						alert = new Alert(symbian ? L[Lmpgram] : "");
@@ -1585,6 +1586,7 @@ public class MP extends MIDlet
 						}
 						if (sendChoice.length > 2 && sendChoice[2]) {
 							sb.append("&voice=1");
+							voice = true;
 						}
 					}
 //#ifndef NO_CHAT_CANVAS
@@ -1612,7 +1614,7 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 				try {
 					if (!checkClass("javax.microedition.io.file.FileConnection")) throw new Error();
-					postMessage(sb.toString(), file, text, alert);
+					postMessage(sb.toString(), file, text, alert, voice);
 				} catch (Error e)
 //#endif
 				{
@@ -6382,7 +6384,7 @@ public class MP extends MIDlet
 	}
 
 //#ifndef NO_FILE
-	static void postMessage(String url, String fileUrl, String text, Alert alert) throws IOException {
+	static void postMessage(String url, String fileUrl, String text, Alert alert, boolean delete) throws IOException {
 		HttpConnection http = null;
 		InputStream httpIn = null;
 
@@ -6505,6 +6507,11 @@ public class MP extends MIDlet
 			readResponse(httpIn = openInputStream(http), http, http.getResponseCode(), url);
 		} finally {
 			if (file != null) try {
+				if (delete) {
+					try {
+						file.delete();
+					} catch (Exception ignored) {}
+				}
 				file.close();
 			} catch (IOException ignored) {}
 			if (httpIn != null) try {
