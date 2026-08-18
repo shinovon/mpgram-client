@@ -217,6 +217,7 @@
 	"Images": "图片",
 	"Authorization": "授权",
 	"Notifications": "通知",
+	"Advanced_Settings": "Advanced", // Untranslated
 	
 	// UI Settings
 	"Language": "语言",
@@ -246,6 +247,8 @@
 	"ChatWallpaper": "聊天壁纸",
 	"12HourTimeFormat": "12小时制",
 	"StickerPreviewSize": "Sticker preview size", // Untranslated
+	"LegacyUISettings": "Legacy UI settings", // Untranslated
+	"j2mekeyboardSettings": "j2mekeyboard settings:", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "等待页面加载完成",

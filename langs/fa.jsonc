@@ -217,6 +217,7 @@
 	"Images": "تصاویر",
 	"Authorization": "حساب کاربر",
 	"Notifications": "اعلانات",
+	"Advanced_Settings": "Advanced", // Untranslated
 	
 	// UI Settings
 	"Language": "زبان",
@@ -246,6 +247,8 @@
 	"ChatWallpaper": "پس زمینه چت",
 	"12HourTimeFormat": "فرمت زمان 12 ساعتی",
 	"StickerPreviewSize": "ابعاد پیش نمایش استیکر",
+	"LegacyUISettings": "Legacy UI settings", // Untranslated
+	"j2mekeyboardSettings": "j2mekeyboard settings:", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "صبر کردن برای بارگیری صفحه",

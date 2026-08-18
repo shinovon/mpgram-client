@@ -217,6 +217,7 @@
 	"Images": "Картинки",
 	"Authorization": "Авторизация",
 	"Notifications": "Уведомления",
+	"Advanced_Settings": "Продвинутые настройки",
 	
 	// UI Settings
 	"Language": "Язык",
@@ -242,10 +243,12 @@
 	"Theme": "Тема",
 	"InputLanguages": "Языки ввода",
 	"ForceKeyInput": "Исп. кнопочный ввод",
-	"ChatAvatar": "Показ. аватарку в чате",
+	"ChatAvatar": "Показ. аватарку чата",
 	"ChatWallpaper": "Обои чата",
 	"12HourTimeFormat": "12-час. формат времени",
 	"StickerPreviewSize": "Размер стикеров в предпросмотре",
+	"LegacyUISettings": "Настройки старого интерфейса",
+	"j2mekeyboardSettings": "Настройки j2mekeyboard:",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Ждать полной загрузки",

@@ -217,6 +217,7 @@
 	"Images": "Resimler",
 	"Authorization": "Yetkilendirme",
 	"Notifications": "Bildirimler",
+	"Advanced_Settings": "Advanced", // Untranslated
 
 	// UI Settings
 	"Language": "Dil",
@@ -246,6 +247,8 @@
 	"ChatWallpaper": "Sohbet duvarkağıdı",
 	"12HourTimeFormat": "12-saat formatı",
 	"StickerPreviewSize": "Etiket önizleme boyutu",
+	"LegacyUISettings": "Legacy UI settings", // Untranslated
+	"j2mekeyboardSettings": "j2mekeyboard settings:", // Untranslated
 
 	// Behaviour settings
 	"WaitForPageToLoad": "Sayfa yüklenmesini bekle",

@@ -217,6 +217,7 @@
 	"Images": "Imagens",
 	"Authorization": "Autenticação",
 	"Notifications": "Notificações",
+	"Advanced_Settings": "Advanced", // Untranslated
 	
 	// UI Settings
 	"Language": "Idioma",
@@ -246,6 +247,8 @@
 	"ChatWallpaper": "Chat wallpaper", // Untranslated
 	"12HourTimeFormat": "12-hour time format", // Untranslated
 	"StickerPreviewSize": "Sticker preview size", // Untranslated
+	"LegacyUISettings": "Legacy UI settings", // Untranslated
+	"j2mekeyboardSettings": "j2mekeyboard settings:", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Aguardar carregamento da página",

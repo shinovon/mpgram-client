@@ -217,6 +217,7 @@
 	"Images": "Imatges",
 	"Authorization": "Autorització",
 	"Notifications": "Notificacions",
+	"Advanced_Settings": "Advanced", // Untranslated
 	
 	// UI Settings
 	"Language": "Idioma",
@@ -246,6 +247,8 @@
 	"ChatWallpaper": "Fons de xat",
 	"12HourTimeFormat": "Format de 12 hores",
 	"StickerPreviewSize": "Mida de vista prèvia d'adhesiu",
+	"LegacyUISettings": "Legacy UI settings", // Untranslated
+	"j2mekeyboardSettings": "j2mekeyboard settings:", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Espera que pàgina es carregui",

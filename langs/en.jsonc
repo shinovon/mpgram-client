@@ -217,6 +217,7 @@
 	"Images": "Images",
 	"Authorization": "Authorization",
 	"Notifications": "Notifications",
+	"Advanced_Settings": "Advanced",
 	
 	// UI Settings
 	"Language": "Language",
@@ -242,10 +243,12 @@
 	"Theme": "Theme",
 	"InputLanguages": "Input languages",
 	"ForceKeyInput": "Force keypad input",
-	"ChatAvatar": "Show avatar in chat",
+	"ChatAvatar": "Show chat avatar",
 	"ChatWallpaper": "Chat wallpaper",
 	"12HourTimeFormat": "12-hour time format",
 	"StickerPreviewSize": "Sticker preview size",
+	"LegacyUISettings": "Legacy UI settings",
+	"j2mekeyboardSettings": "j2mekeyboard settings:",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Wait for page to load",

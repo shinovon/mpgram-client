@@ -82,20 +82,20 @@ public class MP extends MIDlet
 			"zh-CN",
 		},
 		{
-			"العربية",
+			"\u0627\u0644\u0639\u0631\u0628\u064a\u0629",
 			"Azərbaycan",
 			"Català",
 			"Deutsch",
 			"English (UK)",
 			"English (US)",
 			"Español",
-			"فارسی",
+			"\u0641\u0627\u0631\u0633\u06cc",
 			"Suomi",
 			"Português",
 			"Türkçe",
 			"Русский",
 			"Українська",
-			"简体中文",
+			"\u7b80\u4f53\u4e2d\u6587",
 		}
 	};
 //#endif
@@ -261,6 +261,10 @@ public class MP extends MIDlet
 	static Command backCmd;
 
 	private static Command settingsCmd;
+	private static Command settingsNotifCmd;
+	private static Command settingsUiCmd;
+	private static Command settingsBehCmd;
+	private static Command settingsAdvCmd;
 	private static Command aboutCmd;
 
 	private static Command authCmd;
@@ -398,6 +402,10 @@ public class MP extends MIDlet
 	private static Form playerForm;
 	private static List playlistList;
 	private static final Vector formHistory = new Vector();
+	private static Form settingsUiForm;
+	private static Form settingsNotifForm;
+	private static Form settingsBehForm;
+	private static Form settingsAdvForm;
 
 	// auth items
 	private static TextField instanceField;
@@ -413,6 +421,8 @@ public class MP extends MIDlet
 	private static ChoiceGroup networkChoice;
 	private static ChoiceGroup playMethodChoice;
 	private static ChoiceGroup playerCreateMethodChoice;
+	private static ChoiceGroup advChoice;
+	private static ChoiceGroup legacyUiChoice;
 	private static Gauge avaCacheGauge;
 	private static Gauge photoSizeGauge;
 	private static Gauge profileCacheGauge;
@@ -852,6 +862,10 @@ public class MP extends MIDlet
 		backCmd = new Command(L[LBack], Command.BACK, 25);
 
 		settingsCmd = new Command(L[LSettings], Command.SCREEN, 20);
+		settingsUiCmd = new Command(L[LUI], Command.ITEM, 1);
+		settingsNotifCmd = new Command(L[LNotifications], Command.ITEM, 1);
+		settingsBehCmd = new Command(L[LBehaviour], Command.ITEM, 1);
+		settingsAdvCmd = new Command(L[LAdvanced_Settings], Command.ITEM, 1);
 		aboutCmd = new Command(L[LAbout], Command.SCREEN, 21);
 
 		authCmd = new Command(L[LAuth], Command.ITEM, 1);
@@ -3408,19 +3422,12 @@ public class MP extends MIDlet
 		{ // settings
 			if (c == settingsCmd) {
 				if (settingsForm == null) {
-					Form f = new Form(L[LSettings]);
+					Form f = settingsForm = new Form(L[LSettings]);
 					f.addCommand(backCmd);
 					f.setCommandListener(this);
-//					f.setItemStateListener(this);
 					StringItem s;
 					int i;
 
-					// ui
-
-					s = new StringItem(null, L[LUI]);
-					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					s.setFont(medBoldFont);
-					f.append(s);
 
 //#ifndef NO_LANGS
 					langChoice = new ChoiceGroup(L[LLanguage], Choice.POPUP, LANGS[1], null);
@@ -3433,298 +3440,356 @@ public class MP extends MIDlet
 					langChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(langChoice);
 //#endif
+
+					// UI
+					{
+						Form ui = settingsUiForm = new Form(L[LSettings]);
+						ui.addCommand(backCmd);
+						ui.setCommandListener(this);
+
 //#ifndef NO_CHAT_CANVAS
-					themeChoice = new ChoiceGroup(L[LTheme], Choice.POPUP, THEMES[1], null);
-					for (i = 0; i < THEMES[0].length; ++i) {
-						if (theme.equals(THEMES[0][i])) {
-							themeChoice.setSelectedIndex(i, true);
-							break;
+						themeChoice = new ChoiceGroup(L[LTheme], Choice.POPUP, THEMES[1], null);
+						for (i = 0; i < THEMES[0].length; ++i) {
+							if (theme.equals(THEMES[0][i])) {
+								themeChoice.setSelectedIndex(i, true);
+								break;
+							}
 						}
-					}
-					themeChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(themeChoice);
+						themeChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						ui.append(themeChoice);
 
 //#ifndef NO_FILE
-					wallpaperPathField = new TextField(L[LChatWallpaper], wallpaperPath, 500, TextField.ANY);
-					wallpaperPathField.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(wallpaperPathField);
+						wallpaperPathField = new TextField(L[LChatWallpaper], wallpaperPath, 500, TextField.ANY);
+						wallpaperPathField.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						ui.append(wallpaperPathField);
 
-					s = new StringItem(null, "...", Item.BUTTON);
-					s.setDefaultCommand(wallpaperPathCmd);
-					s.setItemCommandListener(this);
-					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(s);
+						s = new StringItem(null, "...", Item.BUTTON);
+						s.setDefaultCommand(wallpaperPathCmd);
+						s.setItemCommandListener(this);
+						s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						ui.append(s);
 //#endif
 //#endif
 
-					uiChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
-							L[LReversedChat],
-							L[LShowMedia],
-							L[LShowChatStatus],
-							L[LFocusNewMessages],
-							L[LChatTextField],
-							L[LBuiltinImageViewer],
-							L[LLargeMusicCover],
+						uiChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
 //#ifndef NO_CHAT_CANVAS
-							L[LLegacyUI],
-							L[LFastScrolling],
-							L[LForceKeyInput],
-							L[LChatAvatar],
+								L[LLegacyUI],
 //#endif
-							L[L12HourTimeFormat],
-					}, null);
-					uiChoice.setSelectedIndex(i = 0, reverseChat);
-					uiChoice.setSelectedIndex(++i, showMedia);
-					uiChoice.setSelectedIndex(++i, chatStatus);
-					uiChoice.setSelectedIndex(++i, focusNewMessages);
-					uiChoice.setSelectedIndex(++i, chatField);
-					uiChoice.setSelectedIndex(++i, useView);
-					uiChoice.setSelectedIndex(++i, fullPlayerCover);
+								L[LReversedChat],
+								L[LShowMedia],
+								L[LShowChatStatus],
+								L[LBuiltinImageViewer],
+								L[LLargeMusicCover],
 //#ifndef NO_CHAT_CANVAS
-					uiChoice.setSelectedIndex(++i, legacyChatUI);
-					uiChoice.setSelectedIndex(++i, fastScrolling);
-					uiChoice.setSelectedIndex(++i, forceKeyUI);
-					uiChoice.setSelectedIndex(++i, chatAvatar);
+								L[LFastScrolling],
+								L[LChatAvatar],
 //#endif
-					uiChoice.setSelectedIndex(++i, time12);
-					uiChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(uiChoice);
+								L[L12HourTimeFormat],
+						}, null);
+						i = 0;
+//#ifndef NO_CHAT_CANVAS
+						uiChoice.setSelectedIndex(i++, legacyChatUI);
+//#endif
+						uiChoice.setSelectedIndex(i++, reverseChat);
+						uiChoice.setSelectedIndex(i++, showMedia);
+						uiChoice.setSelectedIndex(i++, chatStatus);
+						uiChoice.setSelectedIndex(i++, useView);
+						uiChoice.setSelectedIndex(i++, fullPlayerCover);
+//#ifndef NO_CHAT_CANVAS
+						uiChoice.setSelectedIndex(i++, fastScrolling);
+						uiChoice.setSelectedIndex(i++, chatAvatar);
+//#endif
+						uiChoice.setSelectedIndex(i, time12);
+						uiChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						ui.append(uiChoice);
 
-					photoSizeGauge = new Gauge(L[LThumbnailsSize], true, 64, Math.min(64, photoSize / 8));
-					photoSizeGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(photoSizeGauge);
+						legacyUiChoice = new ChoiceGroup(L[LLegacyUISettings], Choice.MULTIPLE, new String[] {
+								L[LFocusNewMessages],
+								L[LChatTextField],
+						}, null);
 
-					stickerPreviewSizeGauge = new Gauge(L[LStickerPreviewSize], true, 32, Math.min(32, stickerPreviewSize / 8));
-					stickerPreviewSizeGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(stickerPreviewSizeGauge);
+						i = 0;
+						legacyUiChoice.setSelectedIndex(i++, focusNewMessages);
+						legacyUiChoice.setSelectedIndex(i, chatField);
+						ui.append(legacyUiChoice);
 
-					chatsGauge = new Gauge(L[LChatsCount], true, 50, chatsLimit);
-					chatsGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(chatsGauge);
+						photoSizeGauge = new Gauge(L[LThumbnailsSize], true, 64, Math.min(64, photoSize / 8));
+						photoSizeGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						ui.append(photoSizeGauge);
 
-					msgsGauge = new Gauge(L[LMessagesCount], true, 50, messagesLimit);
-					msgsGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(msgsGauge);
+						stickerPreviewSizeGauge = new Gauge(L[LStickerPreviewSize], true, 32, Math.min(32, stickerPreviewSize / 8));
+						stickerPreviewSizeGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						ui.append(stickerPreviewSizeGauge);
 
-					chatsFontSizeCoice = new ChoiceGroup(L[LChatsListFontSize], Choice.POPUP, new String[] {
-						L[LDefault],
-						L[LSmall],
-						L[LMedium]
-					}, null);
-					chatsFontSizeCoice.setSelectedIndex(chatsListFontSize, true);
-					f.append(chatsFontSizeCoice);
+						chatsGauge = new Gauge(L[LChatsCount], true, 50, chatsLimit);
+						chatsGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						ui.append(chatsGauge);
+
+						msgsGauge = new Gauge(L[LMessagesCount], true, 50, messagesLimit);
+						msgsGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						ui.append(msgsGauge);
+
+						chatsFontSizeCoice = new ChoiceGroup(L[LChatsListFontSize], Choice.POPUP, new String[] {
+								L[LDefault],
+								L[LSmall],
+								L[LMedium]
+						}, null);
+						chatsFontSizeCoice.setSelectedIndex(chatsListFontSize, true);
+						ui.append(chatsFontSizeCoice);
 
 //#ifndef NO_CHAT_CANVAS
-					textMethodChoice = new ChoiceGroup(L[LKeyboard], Choice.POPUP, new String[] {
-							L[LAuto],
-							"Nokia UI",
-							"j2mekeyboard",
-							L[LFullscreenTextBox]
-					}, null);
-					textMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					textMethodChoice.setSelectedIndex(textMethod, true);
-					f.append(textMethodChoice);
+						textMethodChoice = new ChoiceGroup(L[LKeyboard], Choice.POPUP, new String[] {
+								L[LAuto],
+								"Nokia UI",
+								"j2mekeyboard",
+								L[LFullscreenTextBox]
+						}, null);
+						textMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						textMethodChoice.setSelectedIndex(textMethod, true);
+						ui.append(textMethodChoice);
 
-					s = new StringItem(null, L[LInputLanguages], Item.BUTTON);
-					s.setDefaultCommand(keyboardLanguagesCmd);
-					s.setItemCommandListener(this);
+						s = new StringItem(null, L[Lj2mekeyboardSettings]);
+						s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						s.setFont(smallBoldFont);
+						ui.append(s);
+
+						s = new StringItem(null, L[LInputLanguages], Item.BUTTON);
+						s.setDefaultCommand(keyboardLanguagesCmd);
+						s.setItemCommandListener(this);
+						s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						ui.append(s);
+//#endif
+					}
+					s = new StringItem(null, L[LUI], Item.BUTTON);
 					s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					s.setItemCommandListener(this);
+					s.setDefaultCommand(settingsUiCmd);
 					f.append(s);
-//#endif
 
 //#ifndef NO_NOTIFY
-					// notifications
+					// Notifications
+					{
+						Form notif = settingsNotifForm = new Form(L[LSettings]);
+						notif.addCommand(backCmd);
+						notif.setCommandListener(this);
 
-					s = new StringItem(null, L[LNotifications]);
-					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					s.setFont(medBoldFont);
-					f.append(new Spacer(8, 8));
-					f.append(s);
-
-					notifyChoice = new ChoiceGroup("", ChoiceGroup.MULTIPLE, new String[] {
-							L[LEnableNotifications],
-							L[LEnableSound]
-					}, null);
-					notifyChoice.setSelectedIndex(0, notifications);
-					notifyChoice.setSelectedIndex(1, notifySound);
-					notifyChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(notifyChoice);
-
-					notifyMethodChoice = new ChoiceGroup(L[LNotificationMethod], ChoiceGroup.POPUP, new String[] {
-							L[LOff],
-							L[LAlertWindow],
-//#ifndef NO_NOKIAUI
-							"Nokia UI",
-							"Pigler API"
-//#endif
-					}, null);
-					notifyMethodChoice.setSelectedIndex(Math.min(notifyMethod, notifyMethodChoice.size() - 1), true);
-					notifyMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(notifyMethodChoice);
-
-					notificationVolumeGauge = new Gauge(L[LVolume], true, 100, notificationVolume);
-					notificationVolumeGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(notificationVolumeGauge);
-
-					pushIntervalGauge = new Gauge(L[LPushInterval], true, 120, (int) (pushInterval / 1000));
-					pushIntervalGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(pushIntervalGauge);
-
-					pushBgIntervalGauge = new Gauge(L[LPushBackgroundInterval], true, 120, (int) (pushBgInterval / 1000));
-					pushBgIntervalGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(pushBgIntervalGauge);
-//#endif
-
-					// behaviour
-
-					s = new StringItem(null, L[LBehaviour]);
-					s.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					s.setFont(medBoldFont);
-					f.append(new Spacer(8, 8));
-					f.append(s);
-
-					if (blackberry) {
-						networkChoice = new ChoiceGroup(L[LNetworkAccess], Choice.POPUP, new String[] {
-								L[LMobileData],
-								L[LWiFi]
+						notifyChoice = new ChoiceGroup("", ChoiceGroup.MULTIPLE, new String[] {
+								L[LEnableNotifications],
+								L[LEnableSound]
 						}, null);
-						networkChoice.setSelectedIndex(blackberryNetwork == -1 ? 0 : blackberryNetwork, true);
-						networkChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-						f.append(networkChoice);
+						notifyChoice.setSelectedIndex(0, notifications);
+						notifyChoice.setSelectedIndex(1, notifySound);
+						notifyChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						notif.append(notifyChoice);
+
+						notifyMethodChoice = new ChoiceGroup(L[LNotificationMethod], ChoiceGroup.POPUP, new String[] {
+								L[LOff],
+								L[LAlertWindow],
+//#ifndef NO_NOKIAUI
+								"Nokia UI",
+								"Pigler API"
+//#endif
+						}, null);
+						notifyMethodChoice.setSelectedIndex(Math.min(notifyMethod, notifyMethodChoice.size() - 1), true);
+						notifyMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						notif.append(notifyMethodChoice);
+
+						notificationVolumeGauge = new Gauge(L[LVolume], true, 100, notificationVolume);
+						notificationVolumeGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						notif.append(notificationVolumeGauge);
+
+						pushIntervalGauge = new Gauge(L[LPushInterval], true, 120, (int) (pushInterval / 1000));
+						pushIntervalGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						notif.append(pushIntervalGauge);
+
+						pushBgIntervalGauge = new Gauge(L[LPushBackgroundInterval], true, 120, (int) (pushBgInterval / 1000));
+						pushBgIntervalGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						notif.append(pushBgIntervalGauge);
 					}
-
-					behChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
-							L[LWaitForPageToLoad],
-							L[LUseJSONStream],
-							L[LFormatText],
-							L[LParseLinks],
-							L[LChatAutoUpdate],
-							L[LKeepSessionAlive],
-							L[LUseUnicode],
-							L[LLongpoll],
-//#ifndef NO_ZIP
-							L[LUseCompression],
-//#endif
-//#ifndef NO_FILE
-							L[LPartialUpload],
-//#endif
-					}, null);
-					behChoice.setSelectedIndex(i = 0, useLoadingForm);
-					behChoice.setSelectedIndex(++i, jsonStream);
-					behChoice.setSelectedIndex(++i, parseRichtext);
-					behChoice.setSelectedIndex(++i, parseLinks);
-					behChoice.setSelectedIndex(++i, chatUpdates);
-					behChoice.setSelectedIndex(++i, keepAlive);
-					behChoice.setSelectedIndex(++i, utf);
-					behChoice.setSelectedIndex(++i, longpoll);
-//#ifndef NO_ZIP
-					behChoice.setSelectedIndex(++i, compress);
-//#endif
-//#ifndef NO_FILE
-					behChoice.setSelectedIndex(++i, chunkedUpload);
-//#endif
-					behChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(behChoice);
-
-					updateTimeoutGauge = new Gauge(L[longpoll ? LUpdatesTimeout : LUpdatesInterval], true, 20, updatesTimeout / 5);
-					updateTimeoutGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(updateTimeoutGauge);
-
-					// images
-
-					imagesChoice = new ChoiceGroup(L[LImages], Choice.MULTIPLE, new String[] {
-							L[LLoadMediaThumbnails],
-//#ifndef NO_AVATARS
-							L[LLoadAvatars],
-							L[LRoundAvatars],
-//#endif
-							L[LMultiThreadedLoading],
-//#ifndef NO_CHAT_CANVAS
-							L[LLazyLoading],
-//#endif
-					}, null);
-					imagesChoice.setSelectedIndex(i = 0, loadThumbs);
-//#ifndef NO_AVATARS
-					imagesChoice.setSelectedIndex(++i, loadAvatars);
-					imagesChoice.setSelectedIndex(++i, roundAvatars);
-//#endif
-					imagesChoice.setSelectedIndex(++i, threadedImages);
-//#ifndef NO_CHAT_CANVAS
-					imagesChoice.setSelectedIndex(++i, lazyLoading);
-//#endif
-					imagesChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(imagesChoice);
-
-					// cache
-
-//#ifndef NO_AVATARS
-					avaCacheChoice = new ChoiceGroup(L[LAvatarsCaching], Choice.POPUP, new String[] {
-							L[LDisabled],
-							L[LHoldInRAM],
-							L[LStore],
-							L[LHoldInRAMandStore]
-					}, null);
-					avaCacheChoice.setSelectedIndex(avatarsCache, true);
-					avaCacheChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(avaCacheChoice);
-
-					avaCacheGauge = new Gauge(L[LAvatarsCacheThreshold], true, 20, avatarsCacheThreshold / 5);
-					avaCacheGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(avaCacheGauge);
-//#endif
-
-					profileCacheGauge = new Gauge(L[LProfilesCacheThreshold], true, 30, peersCacheThreshold / 10);
-					profileCacheGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(profileCacheGauge);
-
-					s = new StringItem(null, L[LClearCache], Item.BUTTON);
-					s.setDefaultCommand(clearCacheCmd);
-					s.setItemCommandListener(this);
+					s = new StringItem(null, L[LNotifications], Item.BUTTON);
 					s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(s);
-
-					// player
-//#ifndef NO_FILE
-					playMethodChoice = new ChoiceGroup(L[LPlaybackMethod], Choice.POPUP, new String[] {
-							L[LStream],
-							L[LCacheToFile]
-					}, null);
-					playMethodChoice.setSelectedIndex(playMethod, true);
-					playMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(playMethodChoice);
-//#endif
-
-					playerCreateMethodChoice = new ChoiceGroup(L[LPlayerCreationMethod], Choice.POPUP, new String[] {
-							L[LAuto],
-							L[LPassURL],
-							L[LPassConnectionStream]
-					}, null);
-					playerCreateMethodChoice.setSelectedIndex(playerCreateMethod, true);
-					playerCreateMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(playerCreateMethodChoice);
-
-//#ifndef NO_FILE
-					// downloads
-
-					downloadMethodChoice = new ChoiceGroup(L[LDownloadMethod], Choice.POPUP, new String[] {
-							L[LAlwaysAsk],
-							L[LInApp],
-							L[LWithBrowser]
-					}, null);
-					downloadMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					downloadMethodChoice.setSelectedIndex(downloadMethod, true);
-					f.append(downloadMethodChoice);
-
-					downloadPathField = new TextField(L[LDownloadPath], downloadPath, 500, TextField.ANY);
-					downloadPathField.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(downloadPathField);
-
-					s = new StringItem(null, "...", Item.BUTTON);
-					s.setDefaultCommand(downloadPathCmd);
 					s.setItemCommandListener(this);
-					s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					s.setDefaultCommand(settingsNotifCmd);
 					f.append(s);
 //#endif
+
+					// Behavior
+					{
+						Form beh = settingsBehForm = new Form(L[LSettings]);
+						beh.addCommand(backCmd);
+						beh.setCommandListener(this);
+
+						if (blackberry) {
+							networkChoice = new ChoiceGroup(L[LNetworkAccess], Choice.POPUP, new String[] {
+									L[LMobileData],
+									L[LWiFi]
+							}, null);
+							networkChoice.setSelectedIndex(blackberryNetwork == -1 ? 0 : blackberryNetwork, true);
+							networkChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+							beh.append(networkChoice);
+						}
+
+						behChoice = new ChoiceGroup("", Choice.MULTIPLE, new String[] {
+//#ifndef NO_ZIP
+								L[LUseCompression],
+//#endif
+								L[LLoadMediaThumbnails],
+//#ifndef NO_AVATARS
+								L[LLoadAvatars],
+								L[LRoundAvatars],
+//#endif
+								L[LChatAutoUpdate],
+						}, null);
+						i = 0;
+//#ifndef NO_ZIP
+						behChoice.setSelectedIndex(i++, compress);
+//#endif
+						behChoice.setSelectedIndex(i++, loadThumbs);
+//#ifndef NO_AVATARS
+						behChoice.setSelectedIndex(i++, loadAvatars);
+						behChoice.setSelectedIndex(i++, roundAvatars);
+//#endif
+						behChoice.setSelectedIndex(i, chatUpdates);
+						behChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						beh.append(behChoice);
+
+						updateTimeoutGauge = new Gauge(L[longpoll ? LUpdatesTimeout : LUpdatesInterval], true, 20, updatesTimeout / 5);
+						updateTimeoutGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						beh.append(updateTimeoutGauge);
+
+//#ifndef NO_FILE
+						// downloads
+
+						downloadMethodChoice = new ChoiceGroup(L[LDownloadMethod], Choice.POPUP, new String[] {
+								L[LAlwaysAsk],
+								L[LInApp],
+								L[LWithBrowser]
+						}, null);
+						downloadMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						downloadMethodChoice.setSelectedIndex(downloadMethod, true);
+						beh.append(downloadMethodChoice);
+
+						downloadPathField = new TextField(L[LDownloadPath], downloadPath, 500, TextField.ANY);
+						downloadPathField.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						beh.append(downloadPathField);
+
+						s = new StringItem(null, "...", Item.BUTTON);
+						s.setDefaultCommand(downloadPathCmd);
+						s.setItemCommandListener(this);
+						s.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						beh.append(s);
+//#endif
+
+//#ifndef NO_FILE
+						playMethodChoice = new ChoiceGroup(L[LPlaybackMethod], Choice.POPUP, new String[] {
+								L[LStream],
+								L[LCacheToFile]
+						}, null);
+						playMethodChoice.setSelectedIndex(playMethod, true);
+						playMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						beh.append(playMethodChoice);
+//#endif
+
+//#ifndef NO_AVATARS
+						avaCacheChoice = new ChoiceGroup(L[LAvatarsCaching], Choice.POPUP, new String[] {
+								L[LDisabled],
+								L[LHoldInRAM],
+								L[LStore],
+								L[LHoldInRAMandStore]
+						}, null);
+						avaCacheChoice.setSelectedIndex(avatarsCache, true);
+						avaCacheChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						beh.append(avaCacheChoice);
+//#endif
+					}
+					s = new StringItem(null, L[LBehaviour], Item.BUTTON);
+					s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					s.setItemCommandListener(this);
+					s.setDefaultCommand(settingsBehCmd);
+					f.append(s);
+
+					// Advanced
+					{
+						Form adv = settingsAdvForm = new Form(L[LSettings]);
+						adv.addCommand(backCmd);
+						adv.setCommandListener(this);
+
+
+						advChoice = new ChoiceGroup("", ChoiceGroup.MULTIPLE, new String[] {
+								L[LForceKeyInput],
+								L[LLongpoll],
+								L[LWaitForPageToLoad],
+								L[LUseJSONStream],
+								L[LFormatText],
+								L[LParseLinks],
+								L[LKeepSessionAlive],
+								L[LUseUnicode],
+//#ifndef NO_FILE
+								L[LPartialUpload],
+//#endif
+						}, null);
+						advChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						adv.append(advChoice);
+
+						i = 0;
+						advChoice.setSelectedIndex(i++, forceKeyUI);
+						advChoice.setSelectedIndex(i++, longpoll);
+						advChoice.setSelectedIndex(i++, useLoadingForm);
+						advChoice.setSelectedIndex(i++, jsonStream);
+						advChoice.setSelectedIndex(i++, parseRichtext);
+						advChoice.setSelectedIndex(i++, parseLinks);
+						advChoice.setSelectedIndex(i++, keepAlive);
+						advChoice.setSelectedIndex(i++, utf);
+//#ifndef NO_FILE
+						advChoice.setSelectedIndex(i, chunkedUpload);
+//#endif
+
+						// images
+
+						imagesChoice = new ChoiceGroup(L[LImages], Choice.MULTIPLE, new String[] {
+								L[LMultiThreadedLoading],
+//#ifndef NO_CHAT_CANVAS
+								L[LLazyLoading],
+//#endif
+						}, null);
+
+						i = 0;
+						imagesChoice.setSelectedIndex(i++, threadedImages);
+//#ifndef NO_CHAT_CANVAS
+						imagesChoice.setSelectedIndex(i++, lazyLoading);
+//#endif
+						imagesChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						adv.append(imagesChoice);
+
+						// player
+
+						playerCreateMethodChoice = new ChoiceGroup(L[LPlayerCreationMethod], Choice.POPUP, new String[] {
+								L[LAuto],
+								L[LPassURL],
+								L[LPassConnectionStream]
+						}, null);
+						playerCreateMethodChoice.setSelectedIndex(playerCreateMethod, true);
+						playerCreateMethodChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						adv.append(playerCreateMethodChoice);
+
+						// cache
+
+//#ifndef NO_AVATARS
+						avaCacheGauge = new Gauge(L[LAvatarsCacheThreshold], true, 20, avatarsCacheThreshold / 5);
+						avaCacheGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						adv.append(avaCacheGauge);
+//#endif
+
+						profileCacheGauge = new Gauge(L[LProfilesCacheThreshold], true, 30, peersCacheThreshold / 10);
+						profileCacheGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						adv.append(profileCacheGauge);
+					}
+					s = new StringItem(null, L[LAdvanced_Settings], Item.BUTTON);
+					s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					s.setItemCommandListener(this);
+					s.setDefaultCommand(settingsAdvCmd);
+					f.append(s);
+
 
 					// authorization
 
@@ -3748,13 +3813,17 @@ public class MP extends MIDlet
 
 					f.append(new Spacer(8, 8));
 
+					s = new StringItem(null, L[LClearCache], Item.BUTTON);
+					s.setDefaultCommand(clearCacheCmd);
+					s.setItemCommandListener(this);
+					s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+					f.append(s);
+
 					s = new StringItem(null, L[LResetSettings], Item.BUTTON);
 					s.setDefaultCommand(resetCmd);
 					s.setItemCommandListener(this);
 					s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 					f.append(s);
-
-					settingsForm = f;
 				} else {
 					updateTimeoutGauge.setLabel(L[longpoll ? LUpdatesTimeout : LUpdatesInterval]);
 				}
@@ -3767,153 +3836,169 @@ public class MP extends MIDlet
 				}
 				return;
 			}
-			if (c == backCmd && d == settingsForm) {
-				// apply and save settings
-				try {
-					int i;
+			if (c == backCmd) {
+				if (d == settingsForm) {
+					// apply and save settings
+					try {
 //#ifndef NO_LANGS
-					lang = LANGS[0][Math.max(0, langChoice.getSelectedIndex())];
+						lang = LANGS[0][Math.max(0, langChoice.getSelectedIndex())];
 //#endif
 
-					reverseChat = uiChoice.isSelected(i = 0);
-					showMedia = uiChoice.isSelected(++i);
-					chatStatus = uiChoice.isSelected(++i);
-					focusNewMessages = uiChoice.isSelected(++i);
-					chatField = uiChoice.isSelected(++i);
-					useView = uiChoice.isSelected(++i);
-					fullPlayerCover = uiChoice.isSelected(++i);
+						int i = 0;
 //#ifndef NO_CHAT_CANVAS
-					boolean newLegacyUI = uiChoice.isSelected(++i);
-					if (newLegacyUI != legacyChatUI) {
-						legacyChatUI = newLegacyUI;
-						if (chatsList != null && selfId != null) {
-							midlet.start(RUN_LOAD_FORM, mainDisplayable = mainChatsList());
+						boolean newLegacyUI = uiChoice.isSelected(i++);
+						if (newLegacyUI != legacyChatUI) {
+							legacyChatUI = newLegacyUI;
+							if (chatsList != null && selfId != null) {
+								midlet.start(RUN_LOAD_FORM, mainDisplayable = mainChatsList());
+							}
 						}
-					}
-
-					fastScrolling = uiChoice.isSelected(++i);
-					forceKeyUI = uiChoice.isSelected(++i);
-					chatAvatar = uiChoice.isSelected(++i);
 //#endif
-					time12 = uiChoice.isSelected(++i);
+						reverseChat = uiChoice.isSelected(i++);
+						showMedia = uiChoice.isSelected(i++);
+						chatStatus = uiChoice.isSelected(i++);
+						useView = uiChoice.isSelected(i++);
+						fullPlayerCover = uiChoice.isSelected(i++);
+//#ifndef NO_CHAT_CANVAS
+						fastScrolling = uiChoice.isSelected(i++);
+						chatAvatar = uiChoice.isSelected(i++);
+//#endif
+						time12 = uiChoice.isSelected(i);
+
+						i = 0;
+						focusNewMessages = legacyUiChoice.isSelected(i++);
+						chatField = legacyUiChoice.isSelected(i);
 
 //#ifndef NO_CHAT_CANVAS
-					String prevTheme = theme;
-					theme = THEMES[0][Math.max(0, themeChoice.getSelectedIndex())];
-					if (!theme.equals(prevTheme)) {
-						MPCanvas.colorsCopy = null;
-						MPCanvas.loadTheme();
-					}
-					wallpaperPath = wallpaperPathField.getString().trim();
-//#endif
-					if ((photoSize = (photoSizeGauge.getValue() * 8)) < 16) {
-						photoSizeGauge.setValue((photoSize = 16) / 8);
-					}
-					if ((stickerPreviewSize = (stickerPreviewSizeGauge.getValue() * 8)) < 16) {
-						stickerPreviewSizeGauge.setValue((stickerPreviewSize = 16) / 8);
-					}
-					if ((chatsLimit = chatsGauge.getValue()) < 5) {
-						chatsGauge.setValue(chatsLimit = 5);
-					}
-					if (chatsList != null) {
-//#ifndef NO_CHAT_CANVAS
-						if (chatsList instanceof ChatsCanvas) {
-							((ChatsCanvas) chatsList).limit = chatsLimit;
-						} else
-//#endif
-						{
-							((ChatsList) chatsList).limit = chatsLimit;
+						String prevTheme = theme;
+						theme = THEMES[0][Math.max(0, themeChoice.getSelectedIndex())];
+						if (!theme.equals(prevTheme)) {
+							MPCanvas.colorsCopy = null;
+							MPCanvas.loadTheme();
 						}
-					}
+						wallpaperPath = wallpaperPathField.getString().trim();
+//#endif
+						if ((photoSize = (photoSizeGauge.getValue() * 8)) < 16) {
+							photoSizeGauge.setValue((photoSize = 16) / 8);
+						}
+						if ((stickerPreviewSize = (stickerPreviewSizeGauge.getValue() * 8)) < 16) {
+							stickerPreviewSizeGauge.setValue((stickerPreviewSize = 16) / 8);
+						}
+						if ((chatsLimit = chatsGauge.getValue()) < 5) {
+							chatsGauge.setValue(chatsLimit = 5);
+						}
+						if (chatsList != null) {
+//#ifndef NO_CHAT_CANVAS
+							if (chatsList instanceof ChatsCanvas) {
+								((ChatsCanvas) chatsList).limit = chatsLimit;
+							} else
+//#endif
+							{
+								((ChatsList) chatsList).limit = chatsLimit;
+							}
+						}
 
-					if ((messagesLimit = msgsGauge.getValue()) < 5) {
-						msgsGauge.setValue(messagesLimit = 5);
-					}
+						if ((messagesLimit = msgsGauge.getValue()) < 5) {
+							msgsGauge.setValue(messagesLimit = 5);
+						}
 
-					chatsListFontSize = chatsFontSizeCoice.getSelectedIndex();
+						chatsListFontSize = chatsFontSizeCoice.getSelectedIndex();
 
 //#ifndef NO_CHAT_CANVAS
-					textMethod = textMethodChoice.getSelectedIndex();
+						textMethod = textMethodChoice.getSelectedIndex();
 //#endif
 
 //#ifndef NO_NOTIFY
-					notifications = notifyChoice.isSelected(0);
-					notifySound = notifyChoice.isSelected(1);
+						notifications = notifyChoice.isSelected(0);
+						notifySound = notifyChoice.isSelected(1);
 
-					notifyMethod = notifyMethodChoice.getSelectedIndex();
+						notifyMethod = notifyMethodChoice.getSelectedIndex();
 
-					notificationVolume = notificationVolumeGauge.getValue();
+						notificationVolume = notificationVolumeGauge.getValue();
 
-					if ((pushInterval = pushIntervalGauge.getValue() * 1000L) < 5000L) {
-						pushIntervalGauge.setValue((int) ((pushInterval = 5000) / 1000L));
-					}
-					if ((pushBgInterval = pushBgIntervalGauge.getValue() * 1000L) < 5000L) {
-						pushBgIntervalGauge.setValue((int) ((pushBgInterval = 5000) / 1000L));
-					}
+						if ((pushInterval = pushIntervalGauge.getValue() * 1000L) < 5000L) {
+							pushIntervalGauge.setValue((int) ((pushInterval = 5000) / 1000L));
+						}
+						if ((pushBgInterval = pushBgIntervalGauge.getValue() * 1000L) < 5000L) {
+							pushBgIntervalGauge.setValue((int) ((pushBgInterval = 5000) / 1000L));
+						}
 //#endif
 
-					if (networkChoice != null)
-						blackberryNetwork = networkChoice.getSelectedIndex();
+						if (networkChoice != null)
+							blackberryNetwork = networkChoice.getSelectedIndex();
 
-					useLoadingForm = behChoice.isSelected(i = 0);
-					jsonStream = behChoice.isSelected(++i);
-					parseRichtext = behChoice.isSelected(++i);
-					parseLinks = behChoice.isSelected(++i);
-					chatUpdates = behChoice.isSelected(++i);
-					keepAlive = behChoice.isSelected(++i);
-					utf = behChoice.isSelected(++i);
-					longpoll = behChoice.isSelected(++i);
+						i = 0;
 //#ifndef NO_ZIP
-					compress = behChoice.isSelected(++i);
+						compress = behChoice.isSelected(i++);
 //#endif
-//#ifndef NO_FILE
-					chunkedUpload = behChoice.isSelected(++i);
-//#endif
-
-					if ((updatesTimeout = updateTimeoutGauge.getValue() * 5) < 5) {
-						updateTimeoutGauge.setValue((updatesTimeout = 5) / 5);
-					}
-
-					loadThumbs = imagesChoice.isSelected(i = 0);
+						loadThumbs = behChoice.isSelected(i++);
 //#ifndef NO_AVATARS
-					loadAvatars = imagesChoice.isSelected(++i);
-					roundAvatars = imagesChoice.isSelected(++i);
+						loadAvatars = behChoice.isSelected(i++);
+						roundAvatars = behChoice.isSelected(i++);
 //#endif
-					threadedImages = imagesChoice.isSelected(++i);
+						chatUpdates = behChoice.isSelected(i);
+
+						i = 0;
+						forceKeyUI = advChoice.isSelected(i++);
+						longpoll = advChoice.isSelected(i++);
+						useLoadingForm = advChoice.isSelected(i++);
+						jsonStream = advChoice.isSelected(i++);
+						parseRichtext = advChoice.isSelected(i++);
+						parseLinks = advChoice.isSelected(i++);
+						keepAlive = advChoice.isSelected(i++);
+						utf = advChoice.isSelected(i++);
+//#ifndef NO_FILE
+						chunkedUpload = advChoice.isSelected(i);
+//#endif
+
+						i = 0;
+						threadedImages = imagesChoice.isSelected(i++);
 //#ifndef NO_CHAT_CANVAS
-					lazyLoading = imagesChoice.isSelected(++i);
+						lazyLoading = imagesChoice.isSelected(i);
 //#endif
+
+						if ((updatesTimeout = updateTimeoutGauge.getValue() * 5) < 5) {
+							updateTimeoutGauge.setValue((updatesTimeout = 5) / 5);
+						}
 
 //#ifndef NO_AVATARS
-					avatarsCache = avaCacheChoice.getSelectedIndex();
-					avatarsCacheThreshold = avaCacheGauge.getValue() * 5;
+						avatarsCache = avaCacheChoice.getSelectedIndex();
+						avatarsCacheThreshold = avaCacheGauge.getValue() * 5;
 //#endif
-					peersCacheThreshold = profileCacheGauge.getValue() * 10;
+						peersCacheThreshold = profileCacheGauge.getValue() * 10;
 
 //#ifndef NO_FILE
-					playMethod = playMethodChoice.getSelectedIndex();
+						playMethod = playMethodChoice.getSelectedIndex();
 //#endif
-					playerCreateMethod = playerCreateMethodChoice.getSelectedIndex();
+						playerCreateMethod = playerCreateMethodChoice.getSelectedIndex();
 
 //#ifndef NO_FILE
-					downloadMethod = downloadMethodChoice.getSelectedIndex();
-					downloadPath = downloadPathField.getString();
+						downloadMethod = downloadMethodChoice.getSelectedIndex();
+						downloadPath = downloadPathField.getString();
 //#endif
 
-					writeConfig();
-				} catch (Exception e) {
-					e.printStackTrace();
-					display(errorAlert(L[LFailedToSaveSettings_Alert] + ": " + e));
-					return;
-				}
+						writeConfig();
+					} catch (Exception e) {
+						e.printStackTrace();
+						display(errorAlert(L[LFailedToSaveSettings_Alert] + ": " + e));
+						return;
+					}
 //#ifndef NO_NOTIFY
 //#ifndef NO_NOKIAUI
-			if (notifyMethod == 3 && symbianJrt && !checkClass("org.pigler.api.PiglerAPI")) {
-				display(alert(null, L[LPiglerNotAvailable_Alert], AlertType.WARNING), mainDisplayable);
-				return;
-			}
+					if (notifyMethod == 3 && symbianJrt && !checkClass("org.pigler.api.PiglerAPI")) {
+						display(alert(null, L[LPiglerNotAvailable_Alert], AlertType.WARNING), mainDisplayable);
+						return;
+					}
 //#endif
 //#endif
+				} else if (d == settingsUiForm || d == settingsBehForm || d == settingsAdvForm
+//#ifndef NO_NOTIFY
+						|| d == settingsNotifForm
+//#endif
+						) {
+					display(settingsForm, true);
+					return;
+				}
 			}
 			if (c == logoutCmd) {
 				if (userState == 0) return;
@@ -4018,6 +4103,24 @@ public class MP extends MIDlet
 			}
 //#endif
 //#endif
+			if (c == settingsUiCmd) {
+				display(settingsUiForm);
+				return;
+			}
+//#ifndef NO_NOTIFY
+			if (c == settingsNotifCmd) {
+				display(settingsNotifForm);
+				return;
+			}
+//#endif
+			if (c == settingsBehCmd) {
+				display(settingsBehForm);
+				return;
+			}
+			if (c == settingsAdvCmd) {
+				display(settingsAdvForm);
+				return;
+			}
 		}
 		{ // write form commands
 			if (c == sendCmd) {
