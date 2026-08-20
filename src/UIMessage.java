@@ -1295,6 +1295,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 						int t = (chat.reverse ? chat.height - chat.bottom + chat.scroll - (this.y + contentHeight)
 								: chat.top - chat.scroll + this.y) + replyMarkupPos;
 
+						// TODO vertical navigation
 						switch (dir) {
 						case Canvas.UP:
 						case Canvas.LEFT:

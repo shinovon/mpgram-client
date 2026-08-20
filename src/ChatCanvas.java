@@ -1859,6 +1859,14 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		if (j.has("url")) {
 			MP.openUrl(j.getString("url"), true);
 		}
+
+//		if (j.has("error")) {
+//			String error = "Unknown error!";
+//			try {
+//				error = j.getObject("error").getString("message");
+//			} catch (Exception ignored) {}
+//			MP.display(MP.errorAlert(error), this);
+//		}
 	}
 
 	public void paginate(int dir) {
