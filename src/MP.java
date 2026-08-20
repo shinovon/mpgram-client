@@ -5189,15 +5189,15 @@ public class MP extends MIDlet
 
 	static String getAudioCacheDir() {
 		String s = System.getProperty("fileconn.dir.private");
+		if (s == null && downloadPath != null && downloadPath.length() > 1) {
+			s = "file:///".concat(downloadPath);
+			if (!s.endsWith("/")) s = s.concat("/");
+		}
 		if (s == null) {
 			s = System.getProperty("fileconn.dir.music");
 		}
 		if (s == null) {
 			s = System.getProperty("fileconn.dir.memorycard");
-		}
-		if (downloadPath != null && downloadPath.length() > 1) {
-			s = "file:///".concat(downloadPath);
-			if (!s.endsWith("/")) s = s.concat("/");
 		}
 		if (s == null) {
 			s = "file:///C:/";
@@ -6457,7 +6457,7 @@ public class MP extends MIDlet
 					threadConnections.put(thread, hc = openHttpConnection(t));
 					hc.setRequestMethod("GET");
 					c = hc.getResponseCode();
-					if (b || (c != 502 && c != 504)) {
+					if (b || (c != 502 && c != 504 && c != 429)) {
 						break;
 					}
 				} catch (IOException e) {
