@@ -2021,20 +2021,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		if (keyboard != null && keyboardTextUpdated) {
 			return !keyboard.isEmpty(trim);
 		}
-
-		String text = this.text;
-		if (text == null) return false;
-
-		int l = text.length();
-		if (l == 0) return false;
-		if (!trim) return true;
-
-		int i = 0;
-		while (i < l) {
-			if (text.charAt(i++) > ' ') return true;
-		}
-
-		return false;
+		return !MP.isStringEmpty(text, trim);
 	}
 
 	// typing timer loop

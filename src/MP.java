@@ -4125,7 +4125,7 @@ public class MP extends MIDlet
 		{ // write form commands
 			if (c == sendCmd) {
 				String t = messageField.getString();
-				if (t.trim().length() == 0 && sendFile == null && fwdPeer == null) {
+				if (isStringEmpty(t, true) && sendFile == null && fwdPeer == null) {
 					return;
 				}
 
@@ -4928,15 +4928,13 @@ public class MP extends MIDlet
 	public void itemStateChanged(Item item) {
 		if (item == messageField
 				|| (current instanceof ChatForm && item instanceof TextField)) {
-			String s;
+			String s = ((TextField) item).getString();
 			// auto send on two returns
-			if (item != messageField &&
-				((s = ((TextField) item).getString()).endsWith("\n\n")
-					|| s.endsWith("\r\n\r\n"))) {
+			if (item != messageField && (s.endsWith("\n\n") || s.endsWith("\r\n\r\n"))) {
 				commandAction(sendCmd, item);
 				return;
 			}
-			sendTyping(((TextField) item).getString().trim().length() == 0);
+			sendTyping(isStringEmpty(s, true));
 			return;
 		}
 		if (item == playerVolumeGauge) {
@@ -5877,7 +5875,7 @@ public class MP extends MIDlet
 		try {
 			Class.forName("javax.microedition.io.file.FileConnection");
 			if (state == 1) {
-				if (downloadPath == null || downloadPath.trim().length() == 0) {
+				if (downloadPath == null || isStringEmpty(downloadPath, true)) {
 					openFilePicker(lastDownloadPath, 0);
 				} else {
 					start(RUN_DOWNLOAD_DOCUMENT, downloadCurrentPath = downloadPath);
@@ -7539,6 +7537,19 @@ public class MP extends MIDlet
 	static int getFontHeight(Font font) {
 		// TODO samsung
 		return font.getHeight();
+	}
+
+	static boolean isStringEmpty(String s, boolean trim) {
+		int l = s.length();
+		if (l == 0) return true;
+		if (!trim) return false;
+
+		int i = 0;
+		while (i < l) {
+			if (s.charAt(i++) > ' ') return false;
+		}
+
+		return true;
 	}
 
 	// endregion
