@@ -1926,7 +1926,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 
 	public void onKeyboardTextUpdated() {
 		keyboardTextUpdated = true;
-		MP.midlet.sendTyping(textInputNotEmpty(true));
+		MP.midlet.sendTyping(!textInputNotEmpty(true));
 		queueRepaint();
 	}
 
@@ -1961,7 +1961,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			String p = text;
 			text = NokiaAPI.TextEditor_getContent(nokiaEditor);
 			if (!text.equals(p) && (p != null || text.length() != 0)) {
-				MP.midlet.sendTyping(textInputNotEmpty(true));
+				MP.midlet.sendTyping(!textInputNotEmpty(true));
 			}
 			queueRepaint();
 		} else if ((actions & NokiaAPI.ACTION_PAINT_REQUEST) != 0) {
