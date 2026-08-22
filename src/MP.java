@@ -3476,13 +3476,15 @@ public class MP extends MIDlet
 								L[LLegacyUI],
 //#endif
 								L[LReversedChat],
-								L[LShowMedia],
+//#ifndef NO_CHAT_CANVAS
+								L[LChatAvatar],
+//#endif
 								L[LShowChatStatus],
+								L[LShowMedia],
 								L[LBuiltinImageViewer],
 								L[LLargeMusicCover],
 //#ifndef NO_CHAT_CANVAS
 								L[LFastScrolling],
-								L[LChatAvatar],
 //#endif
 								L[L12HourTimeFormat],
 						}, null);
@@ -3491,13 +3493,15 @@ public class MP extends MIDlet
 						uiChoice.setSelectedIndex(i++, legacyChatUI);
 //#endif
 						uiChoice.setSelectedIndex(i++, reverseChat);
-						uiChoice.setSelectedIndex(i++, showMedia);
+//#ifndef NO_CHAT_CANVAS
+						uiChoice.setSelectedIndex(i++, chatAvatar);
+//#endif
 						uiChoice.setSelectedIndex(i++, chatStatus);
+						uiChoice.setSelectedIndex(i++, showMedia);
 						uiChoice.setSelectedIndex(i++, useView);
 						uiChoice.setSelectedIndex(i++, fullPlayerCover);
 //#ifndef NO_CHAT_CANVAS
 						uiChoice.setSelectedIndex(i++, fastScrolling);
-						uiChoice.setSelectedIndex(i++, chatAvatar);
 //#endif
 						uiChoice.setSelectedIndex(i, time12);
 						uiChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -3783,6 +3787,12 @@ public class MP extends MIDlet
 						profileCacheGauge = new Gauge(L[LProfilesCacheThreshold], true, 30, peersCacheThreshold / 10);
 						profileCacheGauge.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 						adv.append(profileCacheGauge);
+
+						s = new StringItem(null, L[LClearCache], Item.BUTTON);
+						s.setDefaultCommand(clearCacheCmd);
+						s.setItemCommandListener(this);
+						s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
+						adv.append(s);
 					}
 					s = new StringItem(null, L[LAdvanced_Settings], Item.BUTTON);
 					s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -3812,12 +3822,6 @@ public class MP extends MIDlet
 					f.append(s);
 
 					f.append(new Spacer(8, 8));
-
-					s = new StringItem(null, L[LClearCache], Item.BUTTON);
-					s.setDefaultCommand(clearCacheCmd);
-					s.setItemCommandListener(this);
-					s.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
-					f.append(s);
 
 					s = new StringItem(null, L[LResetSettings], Item.BUTTON);
 					s.setDefaultCommand(resetCmd);
@@ -3855,13 +3859,15 @@ public class MP extends MIDlet
 						}
 //#endif
 						reverseChat = uiChoice.isSelected(i++);
-						showMedia = uiChoice.isSelected(i++);
+//#ifndef NO_CHAT_CANVAS
+						chatAvatar = uiChoice.isSelected(i++);
+//#endif
 						chatStatus = uiChoice.isSelected(i++);
+						showMedia = uiChoice.isSelected(i++);
 						useView = uiChoice.isSelected(i++);
 						fullPlayerCover = uiChoice.isSelected(i++);
 //#ifndef NO_CHAT_CANVAS
 						fastScrolling = uiChoice.isSelected(i++);
-						chatAvatar = uiChoice.isSelected(i++);
 //#endif
 						time12 = uiChoice.isSelected(i);
 

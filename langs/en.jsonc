@@ -212,7 +212,7 @@
 	"QrCode_Alert": "QR code is ready",
 	
 	// Settings sections
-	"UI": "UI",
+	"UI": "Appearance",
 	"Behaviour": "Behavior",
 	"Images": "Images",
 	"Authorization": "Authorization",
