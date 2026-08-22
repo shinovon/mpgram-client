@@ -89,6 +89,7 @@ Post-release todo:
 - [x] send voice messages
 - [x] updater state label in chat
 - [x] spoilers support
+- [x] folders cache
 - [ ] chats list pagination
 - [ ] polls
 - [ ] built-in camera
@@ -97,7 +98,6 @@ Post-release todo:
 - [ ] count rms cache entries
 - [ ] cache music
 - [ ] chats cache
-- [ ] folders cache
 - [ ] peers cache
 - [ ] voice transcription
 - [ ] custom themes
