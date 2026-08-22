@@ -1462,5 +1462,8 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 
 	void shown() {
 	}
+
+	void paginate(int dir) {
+	}
 }
 //#endif

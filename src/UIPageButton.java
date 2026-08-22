@@ -44,7 +44,7 @@ public class UIPageButton extends UIItem {
 	}
 	
 	boolean action() {
-		((ChatCanvas) container).paginate(dir);
+		((MPCanvas) container).paginate(dir);
 		return true;
 	}
 

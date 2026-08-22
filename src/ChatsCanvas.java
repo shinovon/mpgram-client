@@ -29,6 +29,7 @@ public class ChatsCanvas extends MPCanvas {
 
 	int limit = MP.chatsLimit;
 	int folder = -1;
+	long offsetDate;
 
 	Hashtable table;
 	int pinnedCount;
@@ -96,6 +97,9 @@ public class ChatsCanvas extends MPCanvas {
 		if (folder != -1) {
 			sb.append("&f=").append(folder);
 		}
+		if (offsetDate != 0) {
+			sb.append("&offset_date=").append(offsetDate);
+		}
 
 		JSONObject j = (JSONObject) MP.api(sb.toString());
 		MP.fillPeersCache(j);
@@ -104,6 +108,10 @@ public class ChatsCanvas extends MPCanvas {
 
 		JSONArray dialogs = j.getArray("dialogs");
 		int l = dialogs.size();
+
+		if (offsetDate != 0) {
+			safeAdd(thread, new UIPageButton(1), false);
+		}
 
 		for (int i = 0; i < l && thread == this.thread; ++i) {
 			JSONObject dialog = dialogs.getObject(i);
@@ -117,6 +125,10 @@ public class ChatsCanvas extends MPCanvas {
 
 			safeAdd(thread, item, !touch && i == 0);
 			if (MP.loadAvatars && !noAvas) MP.queueAvatar(id, item);
+		}
+
+		if (folder == 0 && l >= limit && j.getInt("count", 0) > limit) {
+			safeAdd(thread, new UIPageButton(-1), false);
 		}
 		return true;
 	}
@@ -200,6 +212,35 @@ public class ChatsCanvas extends MPCanvas {
 			if (!((UIDialog) item).enableImage || ((UIDialog) item).imageLoaded) continue;
 			MP.queueAvatar(((UIDialog) item).id, item);
 		} while ((item = item.next) != null);
+	}
+
+	void cancel() {
+		offsetDate = 0;
+		super.cancel();
+	}
+
+	void paginate(int dir) {
+		long date = 0;
+		if (dir == -1) {
+			UIItem item = lastItem;
+			if (item == null) return;
+
+			do {
+				if (item instanceof UIDialog) {
+					date = ((UIDialog) item).date;
+					break;
+				}
+			} while ((item = item.prev) != null);
+			if (date == 0) return;
+		}
+
+		cancel();
+		focusItem(null, 0);
+		firstItem = lastItem = null;
+		kineticScroll = scroll = 0;
+		offsetDate = date;
+
+		MP.openLoad(this);
 	}
 }
 //#endif

@@ -44,6 +44,7 @@ public class UIDialog extends UIItem implements LangConstants {
 	boolean media;
 	String unread;
 	boolean silent;
+	long date;
 
 	String titleRender;
 	String textRender;
@@ -84,7 +85,7 @@ public class UIDialog extends UIItem implements LangConstants {
 			if (unreadCount != 0) unread = Integer.toString(unreadCount);
 
 			JSONObject msg = dialog.getObject("msg", null);
-			time = MP.localizeDate(msg.getLong("date"), 2);
+			time = MP.localizeDate(date = msg.getLong("date"), 2);
 
 			if (!peer.getBoolean("c", false)) {
 				if (msg.getBoolean("out", false) && !id.equals(MP.selfId)) {
