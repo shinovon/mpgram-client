@@ -31,18 +31,21 @@ public class UILabel extends UIItem {
 
 	static final int
 			STYLE_STRIKETHROUGH = 1,
-			STYLE_SPOILER = 2, // TODO
-			STYLE_SPOILER_UNHIDDEN = 4;
+			STYLE_SPOILER = 2,
+			STYLE_MONOSPACE = 4,
+			STYLE_LINK = 8;
 
 	Vector parsed; // Object[] {text, font, url, int[] {style} }
 	Vector render; // Object[] { text, font, url, int[] {x, y, width, height, style} }
 	Vector urls; // Object[] { url, Vector(elements of render) }
 	Vector selectedParts; String selectedUrl;
 
-	int color = -1, bgColor, linkColor = 0x0000FF, focusColor = 0xABABAB;
+	int color = -1, bgColor, linkColor = 0x0000FF, focusColor = 0xABABAB, monospaceColor, spoilerColor;
 	boolean center, ellipsis, background;
 
 	int focusIndex;
+
+	boolean spoilersUnhidden;
 
 	public UILabel() {
 		this.parsed = new Vector();
@@ -59,7 +62,14 @@ public class UILabel extends UIItem {
 	}
 
 	void append(String text, Font font, String url, int style) {
-		if (url != null) focusable = true;
+		if (url != null) {
+			focusable = true;
+			style |= STYLE_LINK;
+		}
+		if ((style & STYLE_SPOILER) != 0) {
+			url = url == null ? "!" : "!".concat(url);
+			focusable = true;
+		}
 		parsed.addElement(new Object[] { text, font, url, style == 0 ? null : new int[] { style } });
 		requestLayout();
 	}
@@ -86,25 +96,34 @@ public class UILabel extends UIItem {
 			String text = (String) obj[0];
 			int tx = x + pos[0], ty = y + pos[1];
 			int tw = pos[2], th = pos[3];
-			if (background) {
-				g.setColor(bgColor);
+			int style = pos[4];
+			if ((style & STYLE_SPOILER) != 0 && !spoilersUnhidden) {
+				g.setColor(spoilerColor);
 				g.fillRect(tx, ty, tw, th);
 				g.setColor(color);
-			}
-			if (obj[2] != null) {
-				g.setColor(linkColor);
-			}
-			g.setFont(font);
-			g.drawString(text, tx, ty, 0);
-			if ((pos[4] & STYLE_STRIKETHROUGH) != 0) {
-				int ly = ty + (th >> 1) + 1;
-				g.drawLine(tx, ly, tx + tw, ly);
+			} else {
+				if (background) {
+					g.setColor(bgColor);
+					g.fillRect(tx, ty, tw, th);
+					g.setColor(color);
+				}
+				if ((style & STYLE_LINK) != 0) {
+					g.setColor(linkColor);
+				} else if ((style & STYLE_MONOSPACE) != 0) {
+					g.setColor(monospaceColor);
+				}
+				g.setFont(font);
+				g.drawString(text, tx, ty, 0);
+				if ((style & STYLE_STRIKETHROUGH) != 0) {
+					int ly = ty + (th >> 1) + 1;
+					g.drawLine(tx, ly, tx + tw, ly);
+				}
 			}
 			if (focus && selectedParts != null && selectedParts.contains(obj)) {
 				g.setColor(focusColor);
 				g.drawRect(tx, ty, tw, th);
 				g.setColor(color);
-			} else if (obj[2] != null) {
+			} else if ((style & STYLE_LINK) != 0 || (style & STYLE_MONOSPACE) != 0) {
 				g.setColor(color);
 			}
 		}
@@ -140,6 +159,9 @@ public class UILabel extends UIItem {
 			Font font = (Font) e[1];
 			String url = (String) e[2];
 			int style = e[3] == null ? 0 : ((int[]) e[3])[0];
+
+			String url2 = url;
+			if ("!".equals(url)) url = null;
 
 			fh = MP.getFontHeight(font);
 			if (text == null || "\n".equals(text)) {
@@ -194,12 +216,12 @@ public class UILabel extends UIItem {
 				}
 			}
 
-			if (url != null) {
+			if (url2 != null && (url != null || !spoilersUnhidden)) {
 				Vector v = new Vector();
 				for (int i = startIdx; i < idx; ++i) {
 					v.addElement(res.elementAt(i));
 				}
-				urls.addElement(new Object[] {url, v});
+				urls.addElement(new Object[] {url2, v});
 			}
 		}
 		if (center) centerRow(width, 0, x, y, res);
@@ -209,7 +231,7 @@ public class UILabel extends UIItem {
 	}
 
 	boolean grabFocus(int dir) {
-		if (!focusable) return false;
+		if (!focusable || urls.size() == 0) return false;
 		focus = true;
 		if (dir != 0) {
 			focusIndex = dir == -1 ? urls.size() - 1 : 0;
@@ -225,7 +247,7 @@ public class UILabel extends UIItem {
 	}
 
 	int traverse(int dir) {
-		if (!focusable || urls.size() == 0) return 0;
+		if (!focusable || urls.size() == 0) return Integer.MIN_VALUE;
 
 		int next;
 
@@ -242,7 +264,7 @@ public class UILabel extends UIItem {
 		} else if (dir == Canvas.DOWN) {
 			if (focusIndex >= urls.size() - 1) {
 				focusLink(focusIndex = urls.size() - 1);
-				if (getVisibility(getLinkPos(focusIndex, selectedParts.size() - 1)) == 1) {
+				if (getVisibility(getLinkPos(focusIndex, selectedParts.size() - 1)) == -1) {
 					return 0;
 				}
 				return Integer.MIN_VALUE;
@@ -269,6 +291,26 @@ public class UILabel extends UIItem {
 
 	boolean action() {
 		if (!focusable || selectedUrl == null) return false;
+		if (selectedUrl.startsWith("!")) {
+			// unhide spoilers
+			selectedUrl = selectedUrl.substring(1);
+			if (!spoilersUnhidden) {
+				int i = urls.size() - 1;
+				do {
+					if ("!".equals(((Object[]) urls.elementAt(i))[0])) {
+						urls.removeElementAt(i);
+					}
+				} while (i-- != 0);
+				spoilersUnhidden = true;
+				selectedUrl = null;
+				selectedParts = null;
+				focusIndex = 0;
+				return true;
+			}
+		}
+		if (selectedUrl.length() == 0) {
+			return false;
+		}
 		MP.openUrl(selectedUrl, true);
 		return true;
 	}
@@ -311,7 +353,8 @@ public class UILabel extends UIItem {
 		int t = (chat.reverse ? chat.height - chat.bottom + chat.scroll - (root.y + root.contentHeight)
 				: chat.top - chat.scroll + root.y) + this.y + pos[1];
 
-		return (t + pos[3]) <= chat.top ? 1 : t >= chat.height - chat.bottom ? -1 : 0;
+		int off = chat.clipHeight / 8;
+		return (t + pos[3]) <= chat.top + off ? 1 : t >= chat.height - chat.bottom - off ? -1 : 0;
 	}
 
 	static String ellipsis(String text, Font font, int width) {

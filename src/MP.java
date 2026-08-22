@@ -7689,6 +7689,9 @@ public class MP extends MIDlet
 			if (state[RT_SPOILER] != 0) {
 				style |= UILabel.STYLE_SPOILER;
 			}
+			if (state[RT_PRE] != 0) {
+				style |= UILabel.STYLE_MONOSPACE;
+			}
 		}
 //#endif
 		StringItem s;

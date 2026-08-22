@@ -970,10 +970,6 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 					// get next scroll target
 					scrollTargetItem = getFirstFocusableItemOnScreen(scrollCurrentItem, dir, 0);
 				}
-				UIItem item = scrollTargetItem;
-				if (item != null && isVisible(item)) {
-					focusItem(item, dir2);
-				}
 				if (scrollTargetItem != null && isVisible(scrollTargetItem)) {
 					repaint = true;
 					focusItem(scrollTargetItem, dir2);

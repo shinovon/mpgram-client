@@ -44,6 +44,8 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 	static final int COLOR_ACTION_BG = 35;
 	static final int COLOR_MESSAGE_OUT_READ = 36;
 	static final int COLOR_MESSAGE_VOICE_WAVEFORM = 37;
+	static final int COLOR_MESSAGE_MONOSPACE_TEXT = 38;
+	static final int COLOR_MESSAGE_SPOILER_TEXT = 39;
 
 	static final int STYLE_MESSAGE_FILL = 0;
 	static final int STYLE_MESSAGE_ROUND = 1;
@@ -163,6 +165,8 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 			label.linkColor = ChatCanvas.colors[COLOR_MESSAGE_FG];
 			label.bgColor = ChatCanvas.colors[COLOR_ACTION_BG];
 			label.focusColor = ChatCanvas.colors[COLOR_MESSAGE_LINK_FOCUS];
+			label.monospaceColor = ChatCanvas.colors[COLOR_MESSAGE_MONOSPACE_TEXT];
+			label.spoilerColor = ChatCanvas.colors[COLOR_MESSAGE_SPOILER_TEXT];
 //			label.background = true;
 			label.center = true;
 
@@ -461,6 +465,8 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 				label.color = ChatCanvas.colors[COLOR_MESSAGE_FG];
 				label.linkColor = ChatCanvas.colors[COLOR_MESSAGE_LINK];
 				label.focusColor = ChatCanvas.colors[COLOR_MESSAGE_LINK_FOCUS];
+				label.monospaceColor = ChatCanvas.colors[COLOR_MESSAGE_MONOSPACE_TEXT];
+				label.spoilerColor = ChatCanvas.colors[COLOR_MESSAGE_SPOILER_TEXT];
 				if (label.focusable) subFocus[order++] = FOCUS_TEXT;
 				label.container = this;
 				this.text = label;
@@ -559,6 +565,8 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 					text.linkColor = ChatCanvas.colors[COLOR_MESSAGE_FG];
 					text.bgColor = ChatCanvas.colors[COLOR_ACTION_BG];
 					text.focusColor = ChatCanvas.colors[COLOR_MESSAGE_LINK_FOCUS];
+					text.monospaceColor = ChatCanvas.colors[COLOR_MESSAGE_MONOSPACE_TEXT];
+					text.spoilerColor = ChatCanvas.colors[COLOR_MESSAGE_SPOILER_TEXT];
 				}
 				text.paint(g, x, y + PADDING_HEIGHT, w);
 			}
@@ -682,9 +690,10 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 					g.setClip(clipX, clipY, clipW, clipH);
 				}
 				if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_MEDIA) {
-					// TODO improve contrast
 					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_LINK_FOCUS]);
 					g.drawRect(x, y + 1, photoRenderWidth, photoRenderHeight);
+					g.setColor(0);
+					g.drawRect(x + 1, y + 2, photoRenderWidth - 2, photoRenderHeight - 2);
 				}
 				y += photoRenderHeight + 2;
 			} else {
@@ -1277,8 +1286,11 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 			if (t != Integer.MIN_VALUE) {
 				return t;
 			}
-			focusChild.lostFocus();
-			focusChild = null;
+			if (subFocusLength != 1 && ((dir == Canvas.DOWN && subFocusCurrent + 1 != subFocusLength)
+					|| (dir == Canvas.UP && subFocusCurrent != 0))) {
+				focusChild.lostFocus();
+				focusChild = null;
+			}
 		}
 
 		if (subFocusLength != 0) {
