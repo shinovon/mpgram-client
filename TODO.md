@@ -88,6 +88,7 @@ Post-release todo:
 - [x] chats list canvas
 - [x] send voice messages
 - [x] updater state label in chat
+- [x] spoilers support
 - [ ] chats list pagination
 - [ ] polls
 - [ ] built-in camera
@@ -100,7 +101,6 @@ Post-release todo:
 - [ ] peers cache
 - [ ] voice transcription
 - [ ] custom themes
-- [ ] spoilers support
 - [ ] password encryption
 - [ ] integration with mahomaps
 - [ ] switch ids from string to long
