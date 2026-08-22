@@ -20,7 +20,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-public class FoldersList extends MPList {
+import javax.microedition.rms.RecordStore;
+
+public class FoldersList extends MPList implements Constants {
 	
 	boolean hasArchive;
 	JSONArray folders;
@@ -31,7 +33,24 @@ public class FoldersList extends MPList {
 	}
 
 	void loadInternal(Thread thread) throws Exception {
-		JSONObject j = (JSONObject) MP.api("getFolders");
+		JSONObject j = null;
+		try {
+			RecordStore r = RecordStore.openRecordStore(FOLDERS_RECORD_NAME, true);
+			try {
+				if (r.getNumRecords() == 0) {
+					j = (JSONObject) MP.api("getFolders");
+					byte[] b = j.build().getBytes(MP.encoding);
+					r.addRecord(b, 0, b.length);
+				} else {
+					j = MP.parseObject(new String(r.getRecord(r.getNextRecordID() - 1), MP.encoding));
+					addCommand(MP.refreshCmd);
+				}
+			} finally {
+				r.closeRecordStore();
+			}
+		} catch (Exception e) {
+			if (j == null) j = (JSONObject) MP.api("getFolders");
+		}
 		JSONArray folders = j.getArray("res", null);
 		if (folders != null) {
 			this.folders = folders;

@@ -4020,7 +4020,7 @@ public class MP extends MIDlet
 					// clear avatars in storage
 					String[] s = RecordStore.listRecordStores();
 					for (int i = 0; i < s.length; ++i) {
-						if (s[i].startsWith(AVATAR_RECORD_PREFIX)) {
+						if (s[i].startsWith(CACHE_RECORD_PREFIX)) {
 							try {
 								RecordStore.deleteRecordStore(s[i]);
 							} catch (Exception ignored) {}
@@ -4468,6 +4468,11 @@ public class MP extends MIDlet
 			return;
 		}
 		if (c == refreshCmd) {
+			if (d instanceof FoldersList) {
+				try {
+					RecordStore.deleteRecordStore(FOLDERS_RECORD_NAME);
+				} catch (Exception ignored) {}
+			}
 			if (d instanceof MPForm) {
 				((MPForm) d).cancel();
 			}

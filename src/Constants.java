@@ -64,7 +64,9 @@ public interface Constants {
 	// RMS
 	String SETTINGS_RECORD_NAME = "mp4config";
 	String AUTH_RECORD_NAME = "mp4user";
+	String CACHE_RECORD_PREFIX = "mc";
 	String AVATAR_RECORD_PREFIX = "mcA";
+	String FOLDERS_RECORD_NAME = "mcFolders";
 
 	// URLs
 	String DEFAULT_INSTANCE_URL = "http://mp.nnproject.cc/";
