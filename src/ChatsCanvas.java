@@ -210,7 +210,8 @@ public class ChatsCanvas extends MPCanvas {
 			return;
 		UIItem item = firstItem;
 		do {
-			if (!((UIDialog) item).enableImage || ((UIDialog) item).imageLoaded) continue;
+			if (!(item instanceof UIDialog)
+					|| !((UIDialog) item).enableImage || ((UIDialog) item).imageLoaded) continue;
 			MP.queueAvatar(((UIDialog) item).id, item);
 		} while ((item = item.next) != null);
 	}

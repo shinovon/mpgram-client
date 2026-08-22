@@ -90,7 +90,7 @@ Post-release todo:
 - [x] updater state label in chat
 - [x] spoilers support
 - [x] folders cache
-- [ ] chats list pagination
+- [x] chats list pagination
 - [ ] polls
 - [ ] built-in camera
 - [ ] user friendly error messages
