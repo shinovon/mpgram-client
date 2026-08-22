@@ -127,7 +127,8 @@ public class ChatsCanvas extends MPCanvas {
 			if (MP.loadAvatars && !noAvas) MP.queueAvatar(id, item);
 		}
 
-		if (folder == 0 && l >= limit && j.getInt("count", 0) > limit) {
+		if ((folder == -1 || folder == 0 || folder == 1)
+				&& l >= limit && j.getInt("count", 0) > limit) {
 			safeAdd(thread, new UIPageButton(-1), false);
 		}
 		return true;
