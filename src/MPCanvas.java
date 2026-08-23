@@ -976,9 +976,17 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 					scrollTargetItem = null;
 					lastScrollDir = dir;
 				}
+				{
+					UIItem item = scrollTargetItem;
+					if (item != null && isVisible(item)) {
+						focusItem(item, dir2);
+					}
+				}
+				boolean b = false;
 				if (scrollCurrentItem != null && scrollTargetItem == null) {
 					// get next scroll target
 					scrollTargetItem = getFirstFocusableItemOnScreen(scrollCurrentItem, dir, 0);
+					b = true;
 				}
 				if (scrollTargetItem != null && isVisible(scrollTargetItem)) {
 					repaint = true;
@@ -991,6 +999,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 						}
 					}
 				}
+				if (b) break scroll;
 				repaint = true;
 				if (dir == 1) {
 					scrollTo(Math.min(scroll + scrollAmount, contentHeight - clipHeight));

@@ -30,6 +30,7 @@ public interface MPChat {
 	int UPDATE_DELETE_MESSAGES = 4;
 	int UPDATE_EDIT_MESSAGE = 5;
 	int UPDATE_READ_OUTBOX = 6;
+	int UPDATE_MESSAGE_POLL = 7;
 	
 	// getters
 	String id();

@@ -115,6 +115,7 @@
 	"CopyLink": "Копировать ссылку",
 	"Select": "Выбрать",
 	"SeenList": "Список прочитавших",
+	"RetractVote": "Отменить голос",
 	
 	// Item commands
 	"Link_Cmd": "Открыть",

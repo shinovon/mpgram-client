@@ -115,6 +115,7 @@
 	"CopyLink": "Copy link",
 	"Select": "Select",
 	"SeenList": "Seen list",
+	"RetractVote": "Retract vote",
 	
 	// Item commands
 	"Link_Cmd": "Link",

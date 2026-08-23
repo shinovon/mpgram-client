@@ -1817,7 +1817,7 @@ public class MP extends MIDlet
 						.append("&offset=").append(offset)
 						.append("&timeout=").append(longpoll ? updatesTimeout : 1)
 						.append("&message=").append(form.firstMsgId())
-						.append("&limit=200");
+						.append("&limit=200&p=2");
 						if (!longpoll) {
 							sb.append("&longpoll=0");
 						}
@@ -1858,6 +1858,8 @@ public class MP extends MIDlet
 							} else if ("updateReadHistoryOutbox".equals(type)
 									|| "updateReadChannelOutbox".equals(type)) {
 								form.handleUpdate(MPChat.UPDATE_READ_OUTBOX, update);
+							} else if ("updateMessagePoll".equals(type)) {
+								form.handleUpdate(MPChat.UPDATE_MESSAGE_POLL, update);
 							}
 						}
 
@@ -2834,6 +2836,37 @@ public class MP extends MIDlet
 			break;
 		}
 //#endif
+		case RUN_SEND_VOTE: {
+			try {
+				Object[] params = (Object[]) param;
+				StringBuffer sb = new StringBuffer("sendVote&peer=");
+				sb.append(params[0])
+						.append("&id=").append(params[1])
+						.append("&options=");
+				if (params[2] instanceof Vector) {
+					Vector v = (Vector) params[2];
+					int n = v.size();
+					for (int i = 0; i < n; ++i) {
+						sb.append((String) v.elementAt(i));
+						if (i != n - 1) sb.append(',');
+					}
+				} else if (params[2] != null) {
+					sb.append((String) params[2]);
+				}
+				MP.api(sb.toString());
+
+				if (reopenChat || !longpoll || !((MPChat) current).updating()) {
+					commandAction(latestCmd, current);
+				} else if (display.getCurrent() != current) {
+					display(current);
+				}
+			} catch (Exception e) {
+				display(errorAlert(e), current);
+			} finally {
+				sending = false;
+			}
+			break;
+		}
 		}
 //		running--;
 	}

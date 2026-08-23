@@ -58,6 +58,7 @@ public interface Constants {
 	int RUN_START_VOICE_PLAYER = 37;
 	int RUN_VOICE_LOOP = 38;
 	int RUN_VOICE_RECORDER = 39;
+	int RUN_SEND_VOTE = 40;
 
 	long ZERO_CHANNEL_ID = -1000000000000L;
 

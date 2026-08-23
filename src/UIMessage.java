@@ -122,6 +122,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 	byte[] waveform, waveformRender;
 	int audioDuration;
 	boolean poll;
+	String pollId;
 
 	String time, nameRender, dateRender;
 	String replyNameRender, replyTextRender, forwardRender;
@@ -453,44 +454,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 						mediaTitle = MP.L[LPhoto];
 					}
 				} else if (type.equals("poll")) {
-					// TODO
-					System.out.println(type);
-					mediaTitle = media.getString("text");
-					poll = true;
-					pollCalculated = false;
-					pollClosed = media.getBoolean("closed", false);
-					pollPublic = media.getBoolean("public", false);
-					pollMulti = media.getBoolean("multi", false);
-					pollQuiz = media.getBoolean("quiz", false);
-					pollVoters = media.getInt("voted", 0);
-					pollVoted = false;
-					JSONArray options = media.getArray("options");
-					int n = options.size();
-					pollOptionsNum = n;
-
-					String[] text = new String[n << 1];
-					int[] num = new int[n * 3];
-
-					for (int i = 0; i < n; ++i) {
-						JSONObject o = options.getObject(i);
-						text[i << 1] = o.getString("text");
-						text[(i << 1) | 1] = o.getString("data");
-
-						num[i * 3] = o.getInt("voters", 0);
-						num[i * 3 + 1] = (o.getBoolean("chosen", false) ? 1 : 0)
-								| (o.getBoolean("correct", false) ? 2 : 0);
-						num[i * 3 + 2] = 0;
-						if (o.getBoolean("chosen", false)) {
-							pollVoted = true;
-						}
-					}
-					pollOptionsText = text;
-					pollOptionsTextRender = new String[n << 1];
-					pollOptionsNumbers = num;
-					if (pollMulti && (pollSelected == null || pollSelected.length != n)) {
-						pollSelected = new boolean[n];
-					}
-					mediaSubtitle = pollClosed ? MP.L[LFinalResults] : pollPublic ? MP.L[LPoll] : MP.L[LAnonymousPoll];
+					parsePoll(media);
 				} else if (type.equals("geo")) {
 					mediaTitle = MP.L[LGeo];
 					mediaSubtitle = media.get("lat") + ", " + media.get("long");
@@ -576,6 +540,50 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 		}
 
 		subFocusLength = order;
+	}
+
+	private void parsePoll(JSONObject media) {
+		mediaTitle = media.getString("text");
+		pollId = media.getString("id");
+		poll = true;
+		pollCalculated = false;
+		pollResults = null;
+		pollClosed = media.getBoolean("closed", false);
+		pollPublic = media.getBoolean("public", false);
+		pollMulti = media.getBoolean("multi", false);
+		pollQuiz = media.getBoolean("quiz", false);
+		pollVoters = media.getInt("voted", 0);
+		pollVoted = false;
+		JSONArray options = media.getArray("options");
+		int n = options.size();
+		pollOptionsNum = n;
+
+		String[] text = new String[n << 1];
+		int[] num = new int[n * 3];
+
+		for (int i = 0; i < n; ++i) {
+			JSONObject o = options.getObject(i);
+			text[i << 1] = o.getString("text");
+			text[(i << 1) | 1] = o.getString("data");
+
+			num[i * 3] = o.getInt("voters", 0);
+			num[i * 3 + 1] = (o.getBoolean("chosen", false) ? 1 : 0)
+					| (o.getBoolean("correct", false) ? 2 : 0);
+			num[i * 3 + 2] = 0;
+			if (o.getBoolean("chosen", false)) {
+				pollVoted = true;
+			}
+		}
+		pollOptionsText = text;
+		pollOptionsTextRender = new String[n << 1];
+		pollOptionsNumbers = num;
+		if (pollMulti && (pollSelected == null || pollSelected.length != n)) {
+			pollSelected = new boolean[n];
+		}
+		mediaSubtitle = pollClosed ? MP.L[LFinalResults] : pollPublic ? MP.L[LPoll] : MP.L[LAnonymousPoll];
+		if (focusedPollOption >= pollOptionsNum || (focusedPollOption == -1 && !pollClosed && !pollVoted)) {
+			focusedPollOption = 0;
+		}
 	}
 
 	void paint(Graphics g, int x, int y, int w) {
@@ -741,7 +749,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 					g.drawImage(mediaImage, x, y + 1, 0);
 					g.setClip(clipX, clipY, clipW, clipH);
 				}
-				if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_MEDIA) {
+				if (focus && !poll && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_MEDIA) {
 					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_FOCUS_BG]);
 					g.drawRect(x, y + 1, photoRenderWidth, photoRenderHeight);
 					g.setColor(0);
@@ -749,12 +757,14 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 				}
 				y += photoRenderHeight + 2;
 			} else {
-				g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_BORDER]);
-				int rh = mediaRenderHeight;
-				g.fillRect(x, y, 2, rh);
-				if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_MEDIA) {
-					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_FOCUS_BG]);
-					g.fillRect(x + 2, y, cw - 4, rh);
+				if (!poll) {
+					int rh = mediaRenderHeight;
+					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_BORDER]);
+					g.fillRect(x, y, 2, rh);
+					if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_MEDIA) {
+						g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_FOCUS_BG]);
+						g.fillRect(x + 2, y, cw - 4, rh);
+					}
 				}
 				int px = x + 6;
 				if (mediaThumb) {
@@ -797,6 +807,10 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 					int l = pollOptionsNum;
 					boolean results = pollClosed || pollVoted;
 					for (int i = 0; i < l; ++i) {
+						if (focus && subFocus[subFocusCurrent] == FOCUS_MEDIA && focusedPollOption == i) {
+							g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_FOCUS_BG]);
+							g.fillRect(x, y, cw, 28 + MP.smallPlainFontHeight);
+						}
 						y += 12;
 						if (!results) {
 							if (pollMulti && pollSelected[i]) {
@@ -829,7 +843,11 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 					}
 					y += 2;
 					if (pollMulti && !results) {
-						g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_POLL_VOTE_BUTTON: COLOR_MESSAGE_POLL_VOTE_BUTTON]);
+						if (focus && subFocus[subFocusCurrent] == FOCUS_MEDIA && focusedPollOption == pollOptionsNum) {
+							g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_FOCUS_BG]);
+							g.fillRect(x, y, cw, MP.smallBoldFontHeight);
+						}
+						g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_POLL_VOTE_BUTTON : COLOR_MESSAGE_POLL_VOTE_BUTTON]);
 						g.setFont(MP.smallBoldFont);
 						g.drawString(MP.L[LVote], x + (cw >> 1), y, Graphics.TOP | Graphics.HCENTER);
 						y += MP.smallBoldFontHeight;
@@ -1387,6 +1405,18 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 				}
 			}
 			break;
+		case FOCUS_MEDIA:
+			if (!poll) break;
+			if (pollClosed || pollVoted) {
+				focusedPollOption = -1;
+				break;
+			}
+			if (dir == Canvas.UP) {
+				focusedPollOption = pollMulti && !pollClosed && !pollVoted ? pollOptionsNum : pollOptionsNum - 1;
+			} else {
+				focusedPollOption = 0;
+			}
+			break;
 		}
 	}
 
@@ -1466,6 +1496,45 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 								return Integer.MAX_VALUE;
 							}
 							break;
+						}
+					}
+				}
+
+				if (subFocus[subFocusCurrent] == FOCUS_MEDIA && poll && !pollClosed && !pollVoted) {
+					// TODO screen scroll
+					switch (dir) {
+					case Canvas.UP:
+						if (focusedPollOption != 0) {
+							--focusedPollOption;
+							return Integer.MAX_VALUE;
+						}
+						break;
+					case Canvas.DOWN:
+						if (pollMulti ? (focusedPollOption < pollOptionsNum) : (focusedPollOption < pollOptionsNum - 1)) {
+							++focusedPollOption;
+							return Integer.MAX_VALUE;
+						}
+						break;
+					}
+				}
+
+				{ // focus zone outside screen check
+					int touchZone = -1;
+					for (int i = 0; i < touchZones.length && touchZones[i] != Integer.MIN_VALUE; i += 5) {
+						if (touchZones[i + 4] == subFocus[subFocusCurrent]) {
+							touchZone = i;
+							break;
+						}
+					}
+
+					if (touchZone != -1) {
+						ChatCanvas chat = (ChatCanvas) container;
+						int t = (chat.reverse ? chat.height - chat.bottom + chat.scroll - (y + contentHeight)
+								: chat.top - chat.scroll + y);
+						if (t + touchZones[touchZone + 3] <= chat.top) {
+							if (dir == Canvas.UP) return 0;
+						} else if (t + touchZones[touchZone + 1] >= chat.height - chat.bottom) {
+							if (dir == Canvas.DOWN) return 0;
 						}
 					}
 				}
@@ -1563,6 +1632,35 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 				menuAction(LDownload);
 			} else if (mediaUrl != null) {
 				MP.openUrl(mediaUrl, true);
+			} else if (poll) {
+				if (focusedPollOption != -1) {
+					if (pollMulti) {
+						if (focusedPollOption == pollOptionsNum) {
+							// submit multiple choice vote
+							synchronized (this) {
+								if (MP.sending) return true;
+								MP.sending = true;
+							}
+
+							Vector v = new Vector(pollOptionsNum);
+							for (int i = 0; i < pollOptionsNum; ++i) {
+								if (pollSelected[i]) v.addElement(pollOptionsText[(i << 1) | 1]);
+							}
+							MP.midlet.start(MP.RUN_SEND_VOTE, new Object[] { this.peerId, Integer.toString(this.id), v });
+							return true;
+						}
+						pollSelected[focusedPollOption] = !pollSelected[focusedPollOption];
+						return true;
+					}
+					synchronized (this) {
+						if (MP.sending) return true;
+						MP.sending = true;
+					}
+
+					MP.midlet.start(MP.RUN_SEND_VOTE, new Object[] { this.peerId, Integer.toString(this.id),
+							pollOptionsText[(focusedPollOption << 1) | 1] });
+					return true;
+				}
 			}
 			return true;
 		case FOCUS_COMMENT:
@@ -1672,6 +1770,14 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 					"getMessageReadParticipants&peer=" + ((ChatCanvas) container).id + "&id=" + idStr,
 					null, false));
 			break;
+		case LRetractVote:
+			synchronized (this) {
+				if (MP.sending) break;
+				MP.sending = true;
+			}
+
+				MP.midlet.start(MP.RUN_SEND_VOTE, new Object[] { this.peerId, Integer.toString(this.id), null });
+			break;
 		}
 	}
 
@@ -1685,6 +1791,8 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 				return new int[] { LViewImage, LDownload };
 			} else if (mediaDownload) {
 				return new int[] { LDownload };
+			} else if (poll && pollVoted && !pollClosed) {
+				return new int[] { LRetractVote };
 			}
 		}
 		return null;
@@ -1816,6 +1924,10 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 	public void edit(JSONObject msg, ChatCanvas chat) {
 //		edited = true;
 		init(msg, chat);
+	}
+
+	public void updatePoll(JSONObject update) {
+		parsePoll(update.getObject("poll"));
 	}
 
 	void select() {

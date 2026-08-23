@@ -115,6 +115,7 @@
 	"CopyLink": "Kopioi linkki",
 	"Select": "Valitse",
 	"SeenList": "Seen list", // Untranslated
+	"RetractVote": "Retract vote", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "Linkki",

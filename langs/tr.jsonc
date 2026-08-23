@@ -115,6 +115,7 @@
 	"CopyLink": "Bağlantıyı kopyala",
 	"Select": "Seç",
 	"SeenList": "Görüntüleyenler",
+	"RetractVote": "Retract vote", // Untranslated
 
 	// Item commands
 	"Link_Cmd": "Bağlantı",

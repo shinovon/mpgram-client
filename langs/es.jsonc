@@ -115,6 +115,7 @@
 	"CopyLink": "Copiar enlace",
 	"Select": "Seleccionar",
 	"SeenList": "Lista vista",
+	"RetractVote": "Retract vote", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "Enlace",

@@ -115,6 +115,7 @@
 	"CopyLink": "复制链接",
 	"Select": "选择",
 	"SeenList": "已读名单",
+	"RetractVote": "Retract vote", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "链接",

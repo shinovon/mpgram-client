@@ -115,6 +115,7 @@
 	"CopyLink": "Copia enllaç",
 	"Select": "Selecciona",
 	"SeenList": "Llista de vistos",
+	"RetractVote": "Retract vote", // Untranslated
 	
 	// Item commands
 	"Link_Cmd": "Enllaç", // assuming noun, if verb - Enllaça
