@@ -651,16 +651,17 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 		if (focus && focusChild == null && subFocusCurrent == -1 && focusDir != 0) {
 			g.setColor(ChatCanvas.colors[COLOR_MESSAGE_FOCUS_BORDER]);
 			g.drawRect(x, y, cw - 1, h - 1);
-		} else if (sticker) {
-		} else if (ChatCanvas.style[STYLE_MESSAGE_BORDER] != 0) {
-			g.drawRect(x, y, cw - 1, h - 1);
-		} else if (ChatCanvas.style[STYLE_MESSAGE_ROUND] != 0 && !ChatCanvas.bg) {
-			// fake rounding
-			g.setColor(ChatCanvas.colors[ChatCanvas.COLOR_CHAT_BG]);
-			g.drawLine(x, y, x, y);
-			g.drawLine(x + cw - 1, y, x + cw - 1, y);
-			if (out) g.drawLine(x, y + h - 1, x, y + h - 1);
-			else g.drawLine(x + cw - 1, y + h - 1, x + cw - 1, y + h - 1);
+		} else if (!sticker) {
+			if (ChatCanvas.style[STYLE_MESSAGE_BORDER] != 0) {
+				g.drawRect(x, y, cw - 1, h - 1);
+			} else if (ChatCanvas.style[STYLE_MESSAGE_ROUND] != 0 && !ChatCanvas.bg) {
+				// fake rounding
+				g.setColor(ChatCanvas.colors[ChatCanvas.COLOR_CHAT_BG]);
+				g.drawLine(x, y, x, y);
+				g.drawLine(x + cw - 1, y, x + cw - 1, y);
+				if (out) g.drawLine(x, y + h - 1, x, y + h - 1);
+				else g.drawLine(x + cw - 1, y + h - 1, x + cw - 1, y + h - 1);
+			}
 		}
 
 		int rw = cw;
@@ -1413,7 +1414,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 				break;
 			}
 			if (dir == Canvas.UP) {
-				focusedPollOption = pollMulti && !pollClosed && !pollVoted ? pollOptionsNum : pollOptionsNum - 1;
+				focusedPollOption = pollMulti ? pollOptionsNum : pollOptionsNum - 1;
 			} else {
 				focusedPollOption = 0;
 			}

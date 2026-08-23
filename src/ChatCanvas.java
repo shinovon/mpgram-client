@@ -1842,7 +1842,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			queueRepaint();
 			break;
 		}
-		case UPDATE_MESSAGE_POLL: {;
+		case UPDATE_MESSAGE_POLL: {
 			UIMessage msg = null;
 			if (update.has("msg_id")) {
 				msg = (UIMessage) table.get(update.getString("msg_id"));
