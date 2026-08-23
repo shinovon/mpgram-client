@@ -46,6 +46,12 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 	static final int COLOR_MESSAGE_VOICE_WAVEFORM = 37;
 	static final int COLOR_MESSAGE_MONOSPACE_TEXT = 38;
 	static final int COLOR_MESSAGE_SPOILER_TEXT = 39;
+	static final int COLOR_MESSAGE_POLL_LINE = 40;
+	static final int COLOR_MESSAGE_POLL_VOTE_BUTTON = 41;
+	static final int COLOR_MESSAGE_POLL_CHECKBOX = 42;
+	static final int COLOR_MESSAGE_OUT_POLL_LINE = 43;
+	static final int COLOR_MESSAGE_OUT_POLL_VOTE_BUTTON = 44;
+	static final int COLOR_MESSAGE_OUT_POLL_CHECKBOX = 45;
 
 	static final int STYLE_MESSAGE_FILL = 0;
 	static final int STYLE_MESSAGE_ROUND = 1;
@@ -138,6 +144,15 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 	int replyMarkupHeight, replyMarkupPos, replyMarkupButtonHeight;
 	Object focusedButton;
 	int focusedButtonRow, focusedButtonCol;
+
+	boolean pollClosed, pollPublic, pollMulti, pollQuiz, pollVoted, pollCalculated;
+	int pollVoters, pollOptionsNum, pollX;
+	String[] pollOptionsText;
+	String[] pollOptionsTextRender;
+	int[] pollOptionsNumbers;
+	boolean[] pollSelected;
+	String pollResults;
+	int focusedPollOption;
 
 	UIMessage(JSONObject message, ChatCanvas chat) {
 		focusable = true;
@@ -440,8 +455,42 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 				} else if (type.equals("poll")) {
 					// TODO
 					System.out.println(type);
-					mediaTitle = MP.L[LPoll];
+					mediaTitle = media.getString("text");
 					poll = true;
+					pollCalculated = false;
+					pollClosed = media.getBoolean("closed", false);
+					pollPublic = media.getBoolean("public", false);
+					pollMulti = media.getBoolean("multi", false);
+					pollQuiz = media.getBoolean("quiz", false);
+					pollVoters = media.getInt("voted", 0);
+					pollVoted = false;
+					JSONArray options = media.getArray("options");
+					int n = options.size();
+					pollOptionsNum = n;
+
+					String[] text = new String[n << 1];
+					int[] num = new int[n * 3];
+
+					for (int i = 0; i < n; ++i) {
+						JSONObject o = options.getObject(i);
+						text[i << 1] = o.getString("text");
+						text[(i << 1) | 1] = o.getString("data");
+
+						num[i * 3] = o.getInt("voters", 0);
+						num[i * 3 + 1] = (o.getBoolean("chosen", false) ? 1 : 0)
+								| (o.getBoolean("correct", false) ? 2 : 0);
+						num[i * 3 + 2] = 0;
+						if (o.getBoolean("chosen", false)) {
+							pollVoted = true;
+						}
+					}
+					pollOptionsText = text;
+					pollOptionsTextRender = new String[n << 1];
+					pollOptionsNumbers = num;
+					if (pollMulti && (pollSelected == null || pollSelected.length != n)) {
+						pollSelected = new boolean[n];
+					}
+					mediaSubtitle = pollClosed ? MP.L[LFinalResults] : pollPublic ? MP.L[LPoll] : MP.L[LAnonymousPoll];
 				} else if (type.equals("geo")) {
 					mediaTitle = MP.L[LGeo];
 					mediaSubtitle = media.get("lat") + ", " + media.get("long");
@@ -742,6 +791,54 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 					g.setFont(MP.smallPlainFont);
 					g.drawString(mediaSubtitleRender, px, y, 0);
 					y += MP.smallPlainFontHeight;
+				}
+				if (poll) {
+					y += 4;
+					int l = pollOptionsNum;
+					boolean results = pollClosed || pollVoted;
+					for (int i = 0; i < l; ++i) {
+						y += 12;
+						if (!results) {
+							if (pollMulti && pollSelected[i]) {
+								g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_POLL_VOTE_BUTTON : COLOR_MESSAGE_POLL_VOTE_BUTTON]);
+								g.fillRect(px + 10, y, 17, 17);
+							} else {
+								g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_POLL_CHECKBOX :COLOR_MESSAGE_POLL_CHECKBOX]);
+								g.drawRect(px + 10, y, 17, 17);
+							}
+						}
+						g.setColor(ChatCanvas.colors[COLOR_MESSAGE_FG]);
+						g.setFont(MP.smallPlainFont);
+						if (results) g.drawString(pollOptionsTextRender[(i << 1) | 1], px + pollX - 6, y, Graphics.TOP | Graphics.RIGHT);
+						g.drawString(pollOptionsTextRender[i << 1], px + pollX, y, 0);
+						y += MP.smallPlainFontHeight;
+
+						y += 4;
+						if (results && (pollOptionsNumbers[i * 3 + 1] & 1) != 0) {
+							g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_POLL_LINE : COLOR_MESSAGE_POLL_LINE]);
+							g.fillRect(px + pollX - 17, y, 12, 12);
+						}
+						y += 4;
+						if (results) {
+							g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_POLL_LINE :COLOR_MESSAGE_POLL_LINE]);
+							g.fillRect(px + pollX, y, pollOptionsNumbers[i * 3 + 2], 4);
+						}
+						y += 4;
+
+						y += 4;
+					}
+					y += 2;
+					if (pollMulti && !results) {
+						g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_POLL_VOTE_BUTTON: COLOR_MESSAGE_POLL_VOTE_BUTTON]);
+						g.setFont(MP.smallBoldFont);
+						g.drawString(MP.L[LVote], x + (cw >> 1), y, Graphics.TOP | Graphics.HCENTER);
+						y += MP.smallBoldFontHeight;
+					} else {
+						g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_TIME : COLOR_MESSAGE_TIME]);
+						g.setFont(MP.smallPlainFont);
+						g.drawString(pollResults, x + (cw >> 1), y, Graphics.TOP | Graphics.HCENTER);
+						y += MP.smallBoldFontHeight;
+					}
 				}
 				y += 2;
 			}
@@ -1068,6 +1165,11 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 					maxW = Math.max(maxW, lastW = minW + MP.smallBoldFont.stringWidth(mediaSubtitleRender) + mx);
 					mh += MP.smallPlainFontHeight;
 				}
+				if (poll) {
+					pollX = MP.smallPlainFont.stringWidth("100%") + 6;
+					maxW = Math.max(maxW, lastW = minW + pollX + 200 + mx);
+					mh += (MP.smallPlainFontHeight + 28) * pollOptionsNum + 6 + MP.smallBoldFontHeight;
+				}
 
 				touchZones[order ++] = x + 2;
 				touchZones[order ++] = h + y;
@@ -1219,6 +1321,23 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 
 		touchZones[order] = Integer.MIN_VALUE;
 		contentWidth = maxW = Math.min(maxW, Math.min(MAX_WIDTH, width));
+
+		if (poll) {
+			boolean results = pollVoted || pollClosed;
+			int lw = maxW - 10 - minW - pollX;
+			for (int i = 0; i < pollOptionsNum; ++i) {
+				if (results && !pollCalculated) {
+					String s = Integer.toString(pollVoters == 0 ? 0 : ((pollOptionsNumbers[i * 3] * 100) / pollVoters)).concat("%");
+					pollOptionsTextRender[(i << 1) | 1] = s;
+				}
+				pollOptionsTextRender[i << 1] = UILabel.ellipsis(pollOptionsText[i << 1], MP.smallPlainFont, lw);
+				pollOptionsNumbers[i * 3 + 2] = Math.max(4, pollVoters == 0 ? 0 : (pollOptionsNumbers[i * 3] * lw) / pollVoters);
+			}
+			if (results) {
+				pollCalculated = true;
+			}
+			pollResults = MP.localizePlural(pollVoters, L_vote);
+		}
 
 		if (replyText != null) {
 			replyTextRender = UILabel.ellipsis(replyText, MP.smallPlainFont, maxW - minW - rw);

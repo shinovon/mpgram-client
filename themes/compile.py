@@ -42,17 +42,23 @@ enum_colors = {
     "MESSAGE_VOICE_WAVEFORM": 37,
     "MESSAGE_MONOSPACE_TEXT": 38,
     "MESSAGE_SPOILER_TEXT": 39,
+    "MESSAGE_POLL_LINE": 40,
+    "MESSAGE_POLL_VOTE_BUTTON": 41,
+    "MESSAGE_POLL_CHECKBOX": 42,
+    "MESSAGE_OUT_POLL_LINE": 43,
+    "MESSAGE_OUT_POLL_VOTE_BUTTON": 44,
+    "MESSAGE_OUT_POLL_CHECKBOX": 45,
 
-    "CHATS_BG": 40,
-    "CHATS_ITEM_HIGHLIGHT_BG": 41,
-    "CHATS_ITEM_HIGHLIGHT_FG": 42,
-    "CHATS_ITEM_TITLE": 43,
-    "CHATS_ITEM_TEXT": 44,
-    "CHATS_ITEM_MEDIA": 45,
-    "CHATS_ITEM_SEPARATOR": 46,
-    "CHATS_ITEM_UNREAD_BG": 47,
-    "CHATS_ITEM_UNREAD_FG": 48,
-    "CHATS_ITEM_UNREAD_MUTED_BG": 49
+    "CHATS_BG": 50,
+    "CHATS_ITEM_HIGHLIGHT_BG": 51,
+    "CHATS_ITEM_HIGHLIGHT_FG": 52,
+    "CHATS_ITEM_TITLE": 53,
+    "CHATS_ITEM_TEXT": 54,
+    "CHATS_ITEM_MEDIA": 55,
+    "CHATS_ITEM_SEPARATOR": 56,
+    "CHATS_ITEM_UNREAD_BG": 57,
+    "CHATS_ITEM_UNREAD_FG": 58,
+    "CHATS_ITEM_UNREAD_MUTED_BG": 59
 }
 
 enum_style = {
@@ -73,7 +79,7 @@ for n in listdir():
     with open(n, encoding="utf-8") as f:
         j = json.load(f)
     
-    theme = [0]*50
+    theme = [0]*60
     style = [0]*20
     name = j["name"]
     

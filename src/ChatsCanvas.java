@@ -25,7 +25,7 @@ import java.util.Hashtable;
 
 public class ChatsCanvas extends MPCanvas {
 
-	static final int COLOR_CHATS_BG = 40;
+	static final int COLOR_CHATS_BG = 50;
 
 	int limit = MP.chatsLimit;
 	int folder = -1;

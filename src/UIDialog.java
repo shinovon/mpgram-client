@@ -26,15 +26,15 @@ import javax.microedition.lcdui.Image;
 
 public class UIDialog extends UIItem implements LangConstants {
 
-	static final int COLOR_CHATS_ITEM_HIGHLIGHT_BG = 41;
-	static final int COLOR_CHATS_ITEM_HIGHLIGHT_FG = 42;
-	static final int COLOR_CHATS_ITEM_TITLE = 43;
-	static final int COLOR_CHATS_ITEM_TEXT = 44;
-	static final int COLOR_CHATS_ITEM_MEDIA = 45;
-	static final int COLOR_CHATS_ITEM_SEPARATOR = 46;
-	static final int COLOR_CHATS_ITEM_UNREAD_BG = 47;
-	static final int COLOR_CHATS_ITEM_UNREAD_FG = 48;
-	static final int COLOR_CHATS_ITEM_UNREAD_MUTED_BG = 49;
+	static final int COLOR_CHATS_ITEM_HIGHLIGHT_BG = 51;
+	static final int COLOR_CHATS_ITEM_HIGHLIGHT_FG = 52;
+	static final int COLOR_CHATS_ITEM_TITLE = 53;
+	static final int COLOR_CHATS_ITEM_TEXT = 54;
+	static final int COLOR_CHATS_ITEM_MEDIA = 55;
+	static final int COLOR_CHATS_ITEM_SEPARATOR = 56;
+	static final int COLOR_CHATS_ITEM_UNREAD_BG = 57;
+	static final int COLOR_CHATS_ITEM_UNREAD_FG = 58;
+	static final int COLOR_CHATS_ITEM_UNREAD_MUTED_BG = 59;
 
 	String id;
 	String title;

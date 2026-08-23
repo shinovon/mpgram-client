@@ -38,7 +38,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 	static final int COLOR_CHAT_MENU_SEPARATOR = 9;
 	static final int COLOR_CHAT_SCROLLBAR = 16;
 
-	static int[] colors = new int[50];
+	static int[] colors = new int[60];
 	static int[] colorsCopy;
 	static int[] style = new int[20];
 	static boolean bg;
@@ -128,7 +128,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 			try {
 				if ("random".equals(MP.theme)) {
 					Random rng = new Random();
-					for (int i = 0; i < 50; ++i) {
+					for (int i = 0; i < 60; ++i) {
 						colors[i] = (rng.nextInt(255) << 8) | (rng.nextInt(255) << 16) | (rng.nextInt(255));
 					}
 					for (int i = 0; i < 20; ++i) {
@@ -137,7 +137,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 				} else {
 					DataInputStream d = new DataInputStream("".getClass().getResourceAsStream("/c/".concat(MP.theme)));
 					d.readUTF();
-					for (int i = 0; i < 50; ++i) {
+					for (int i = 0; i < 60; ++i) {
 						colors[i] = d.readInt();
 					}
 					for (int i = 0; i < 20; ++i) {
@@ -178,6 +178,13 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 				colors[UIMessage.COLOR_MESSAGE_TIME] = 0x6D7F8F;
 				colors[UIMessage.COLOR_MESSAGE_OUT_TIME] = 0x7DA8D3;
 				colors[UIMessage.COLOR_ACTION_BG] = 0x1E2C3A;
+				colors[UIMessage.COLOR_MESSAGE_OUT_READ] = 0x6BBFFF;
+				colors[UIMessage.COLOR_MESSAGE_VOICE_WAVEFORM] = 0x4B7FB3;
+				colors[UIMessage.COLOR_MESSAGE_MONOSPACE_TEXT] = 0xAED1F3;
+				colors[UIMessage.COLOR_MESSAGE_SPOILER_TEXT] = 0x7DA8D3;
+				colors[UIMessage.COLOR_MESSAGE_POLL_LINE] = 0x4C9CE2;
+				colors[UIMessage.COLOR_MESSAGE_POLL_VOTE_BUTTON] = 0x6C9ECF;
+				colors[UIMessage.COLOR_MESSAGE_POLL_CHECKBOX] = 0x648EB8;
 
 				colors[ChatsCanvas.COLOR_CHATS_BG] = 0x0E1621;
 				colors[UIDialog.COLOR_CHATS_ITEM_HIGHLIGHT_BG] = 0x1A3756;
@@ -185,7 +192,10 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 				colors[UIDialog.COLOR_CHATS_ITEM_TITLE] = 0xF5F5F5;
 				colors[UIDialog.COLOR_CHATS_ITEM_TEXT] = 0x7F91A4;
 				colors[UIDialog.COLOR_CHATS_ITEM_MEDIA] = 0x73B9F5;
-				colors[UIDialog.COLOR_CHATS_ITEM_SEPARATOR] = 0x0A121B;
+				colors[UIDialog.COLOR_CHATS_ITEM_SEPARATOR] = 0x131B24;
+				colors[UIDialog.COLOR_CHATS_ITEM_UNREAD_BG] = 0x4082BC;
+				colors[UIDialog.COLOR_CHATS_ITEM_UNREAD_FG] = 0xF5F5F5;
+				colors[UIDialog.COLOR_CHATS_ITEM_UNREAD_MUTED_BG] = 0x3E546A;
 
 				style[UIMessage.STYLE_MESSAGE_FILL] = 1;
 				style[UIMessage.STYLE_MESSAGE_ROUND] = 1;
