@@ -147,7 +147,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 	int focusedButtonRow, focusedButtonCol;
 
 	boolean pollClosed, pollPublic, pollMulti, pollQuiz, pollVoted, pollCalculated;
-	int pollVoters, pollOptionsNum, pollX;
+	int pollVoters, pollOptionsNum, pollX, pollY;
 	String[] pollOptionsText;
 	String[] pollOptionsTextRender;
 	int[] pollOptionsNumbers;
@@ -807,7 +807,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 					int l = pollOptionsNum;
 					boolean results = pollClosed || pollVoted;
 					for (int i = 0; i < l; ++i) {
-						if (focus && subFocus[subFocusCurrent] == FOCUS_MEDIA && focusedPollOption == i) {
+						if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_MEDIA && focusedPollOption == i) {
 							g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_FOCUS_BG]);
 							g.fillRect(x, y, cw, 28 + MP.smallPlainFontHeight);
 						}
@@ -843,7 +843,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 					}
 					y += 2;
 					if (pollMulti && !results) {
-						if (focus && subFocus[subFocusCurrent] == FOCUS_MEDIA && focusedPollOption == pollOptionsNum) {
+						if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_MEDIA && focusedPollOption == pollOptionsNum) {
 							g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_FOCUS_BG]);
 							g.fillRect(x, y, cw, MP.smallBoldFontHeight);
 						}
@@ -1185,6 +1185,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 				}
 				if (poll) {
 					pollX = MP.smallPlainFont.stringWidth("100%") + 6;
+					pollY = mh + 4;
 					maxW = Math.max(maxW, lastW = minW + pollX + 200 + mx);
 					mh += (MP.smallPlainFontHeight + 28) * pollOptionsNum + 6 + MP.smallBoldFontHeight;
 				}
@@ -1502,19 +1503,23 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 
 				if (subFocus[subFocusCurrent] == FOCUS_MEDIA && poll && !pollClosed && !pollVoted) {
 					// TODO screen scroll
-					switch (dir) {
-					case Canvas.UP:
-						if (focusedPollOption != 0) {
-							--focusedPollOption;
-							return Integer.MAX_VALUE;
+					if (focusedPollOption == -1) {
+						focusedPollOption = 0;
+					} else {
+						switch (dir) {
+						case Canvas.UP:
+							if (focusedPollOption != 0) {
+								--focusedPollOption;
+								return Integer.MAX_VALUE;
+							}
+							break;
+						case Canvas.DOWN:
+							if (pollMulti ? (focusedPollOption < pollOptionsNum) : (focusedPollOption < pollOptionsNum - 1)) {
+								++focusedPollOption;
+								return Integer.MAX_VALUE;
+							}
+							break;
 						}
-						break;
-					case Canvas.DOWN:
-						if (pollMulti ? (focusedPollOption < pollOptionsNum) : (focusedPollOption < pollOptionsNum - 1)) {
-							++focusedPollOption;
-							return Integer.MAX_VALUE;
-						}
-						break;
 					}
 				}
 
@@ -1633,7 +1638,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 			} else if (mediaUrl != null) {
 				MP.openUrl(mediaUrl, true);
 			} else if (poll) {
-				if (focusedPollOption != -1) {
+				if (focusedPollOption != -1 && !pollVoted && !pollClosed) {
 					if (pollMulti) {
 						if (focusedPollOption == pollOptionsNum) {
 							// submit multiple choice vote
@@ -1886,6 +1891,15 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 								focusedButton = replyMarkupRender[j][2];
 								break;
 							}
+						}
+					}
+					if (focus == FOCUS_MEDIA && poll) {
+						y -= touchZones[i + 1] + pollY;
+						int ih = 28 + MP.smallPlainFontHeight;
+						if (y >= 0 && y < pollOptionsNum * ih) {
+							focusedPollOption = y / ih;
+						} else {
+							focusedPollOption = -1;
 						}
 					}
 					int[] menu;
