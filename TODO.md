@@ -91,7 +91,7 @@ Post-release todo:
 - [x] spoilers support
 - [x] folders cache
 - [x] chats list pagination
-- [ ] polls
+- [x] polls
 - [ ] built-in camera
 - [ ] user friendly error messages
 - [ ] file picker preview
