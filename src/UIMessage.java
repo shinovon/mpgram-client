@@ -115,6 +115,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 	boolean audio;
 	byte[] waveform, waveformRender;
 	int audioDuration;
+	boolean poll;
 
 	String time, nameRender, dateRender;
 	String replyNameRender, replyTextRender, forwardRender;
@@ -438,7 +439,9 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 					}
 				} else if (type.equals("poll")) {
 					// TODO
+					System.out.println(type);
 					mediaTitle = MP.L[LPoll];
+					poll = true;
 				} else if (type.equals("geo")) {
 					mediaTitle = MP.L[LGeo];
 					mediaSubtitle = media.get("lat") + ", " + media.get("long");
@@ -690,7 +693,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 					g.setClip(clipX, clipY, clipW, clipH);
 				}
 				if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_MEDIA) {
-					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_LINK_FOCUS]);
+					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_FOCUS_BG]);
 					g.drawRect(x, y + 1, photoRenderWidth, photoRenderHeight);
 					g.setColor(0);
 					g.drawRect(x + 1, y + 2, photoRenderWidth - 2, photoRenderHeight - 2);

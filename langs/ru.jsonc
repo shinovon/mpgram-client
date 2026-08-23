@@ -407,6 +407,14 @@
 	"Photo": "Фото",
 	"Video": "Видео",
 	"VoiceMessage": "Голосовое сообщение",
+	"AnonymousPoll": "Анонимный опрос",
+	"FinalResults": "Результаты",
+	"Vote": "Голосовать",
+	"ViewResults": "Результаты",
+	"NoVotes": "Нет голосов",
+	"_vote": " голос",
+	"_votes": " голоса",
+	"_votes2": " голосов",
 	
 	// Chat actions
 	"PinnedMessage_Action": " закрепил(а) сообщение",

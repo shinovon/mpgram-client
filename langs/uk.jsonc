@@ -407,6 +407,14 @@
 	"Photo": "Photo", // Untranslated
 	"Video": "Video", // Untranslated
 	"VoiceMessage": "Voice message", // Untranslated
+	"AnonymousPoll": "Anonymous Poll", // Untranslated
+	"FinalResults": "Final results", // Untranslated
+	"Vote": "Vote", // Untranslated
+	"ViewResults": "View results", // Untranslated
+	"NoVotes": "No votes", // Untranslated
+	"_vote": " vote", // Untranslated
+	"_votes": " votes", // Untranslated
+	"_votes2": "",
 	
 	// Chat actions
 	"PinnedMessage_Action": " закріпив повідомлення", 

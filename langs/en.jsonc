@@ -407,6 +407,14 @@
 	"Photo": "Photo",
 	"Video": "Video",
 	"VoiceMessage": "Voice message",
+	"AnonymousPoll": "Anonymous Poll",
+	"FinalResults": "Final results",
+	"Vote": "Vote",
+	"ViewResults": "View results",
+	"NoVotes": "No votes",
+	"_vote": " vote",
+	"_votes": " votes",
+	"_votes2": "",
 	
 	// Chat actions
 	"PinnedMessage_Action": " pinned message",

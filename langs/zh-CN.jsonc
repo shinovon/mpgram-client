@@ -407,6 +407,14 @@
 	"Photo": "图片",
 	"Video": "视频",
 	"VoiceMessage": "语音",
+	"AnonymousPoll": "Anonymous Poll", // Untranslated
+	"FinalResults": "Final results", // Untranslated
+	"Vote": "Vote", // Untranslated
+	"ViewResults": "View results", // Untranslated
+	"NoVotes": "No votes", // Untranslated
+	"_vote": " vote", // Untranslated
+	"_votes": " votes", // Untranslated
+	"_votes2": "",
 	
 	// Chat actions
 	"PinnedMessage_Action": " 置顶了消息",
