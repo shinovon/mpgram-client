@@ -1188,7 +1188,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 				}
 				if (poll) {
 					pollX = MP.smallPlainFont.stringWidth("100%") + 6;
-					pollY = mh + 4;
+					pollY = h + y + mh + 4;
 					maxW = Math.max(maxW, lastW = minW + pollX + 200 + mx);
 					mh += (MP.smallPlainFontHeight + 28) * pollOptionsNum + 6 + MP.smallBoldFontHeight;
 				}
@@ -1457,17 +1457,18 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 					subFocusCurrent = 0;
 				}
 
+				ChatCanvas chat = (ChatCanvas) container;
+				int t = (chat.reverse ? chat.height - chat.bottom + chat.scroll - (this.y + contentHeight)
+						: chat.top - chat.scroll + this.y) + replyMarkupPos;
+
 				if (subFocus[subFocusCurrent] == FOCUS_REPLY_MARKUP && replyMarkup != null) {
 					if (replyMarkupRender != null) {
-						ChatCanvas chat = (ChatCanvas) container;
-						int t = (chat.reverse ? chat.height - chat.bottom + chat.scroll - (this.y + contentHeight)
-								: chat.top - chat.scroll + this.y) + replyMarkupPos;
 
 						// TODO vertical navigation
 						switch (dir) {
 						case Canvas.UP:
 						case Canvas.LEFT:
-							if (t + getReplyMarkupY(focusedButton) <= chat.top) {
+							if (t + replyMarkupPos + getReplyMarkupY(focusedButton) <= chat.top) {
 								return 0;
 							}
 							if (focusedButtonRow != 0 || focusedButtonCol != 0) {
@@ -1476,7 +1477,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 								}
 								focusedButton = replyMarkup[focusedButtonRow][focusedButtonCol];
 
-								if (t + getReplyMarkupY(focusedButton) <= chat.top) {
+								if (t + replyMarkupPos + getReplyMarkupY(focusedButton) <= chat.top) {
 									return 0;
 								}
 								return Integer.MAX_VALUE;
@@ -1484,7 +1485,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 							break;
 						case Canvas.DOWN:
 						case Canvas.RIGHT:
-							if ((t += replyMarkupButtonHeight) + getReplyMarkupY(focusedButton) >= chat.height - chat.bottom) {
+							if (t + replyMarkupPos + replyMarkupButtonHeight + getReplyMarkupY(focusedButton) >= chat.height - chat.bottom) {
 								return 0;
 							}
 							if (focusedButtonRow != replyMarkup.length - 1 || focusedButtonCol != replyMarkup[replyMarkup.length - 1].length - 1) {
@@ -1494,7 +1495,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 								}
 								focusedButton = replyMarkup[focusedButtonRow][focusedButtonCol];
 
-								if (t + getReplyMarkupY(focusedButton) >= chat.height - chat.bottom) {
+								if (t + replyMarkupPos + replyMarkupButtonHeight + getReplyMarkupY(focusedButton) >= chat.height - chat.bottom) {
 									return 0;
 								}
 								return Integer.MAX_VALUE;
@@ -1505,20 +1506,31 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 				}
 
 				if (subFocus[subFocusCurrent] == FOCUS_MEDIA && poll && !pollClosed && !pollVoted) {
-					// TODO screen scroll
 					if (focusedPollOption == -1) {
 						focusedPollOption = 0;
 					} else {
 						switch (dir) {
 						case Canvas.UP:
 							if (focusedPollOption != 0) {
+								if (t + pollY + focusedPollOption * (28 + MP.smallPlainFontHeight) <= chat.top) {
+									return 0;
+								}
 								--focusedPollOption;
+								if (t + pollY + focusedPollOption * (28 + MP.smallPlainFontHeight) <= chat.top) {
+									return 0;
+								}
 								return Integer.MAX_VALUE;
 							}
 							break;
 						case Canvas.DOWN:
 							if (pollMulti ? (focusedPollOption < pollOptionsNum) : (focusedPollOption < pollOptionsNum - 1)) {
+								if (t + pollY + (focusedPollOption + 1) * (28 + MP.smallPlainFontHeight) >= chat.height - chat.bottom) {
+									return 0;
+								}
 								++focusedPollOption;
+								if (t + pollY + (focusedPollOption + 1) * (28 + MP.smallPlainFontHeight) >= chat.height - chat.bottom) {
+									return 0;
+								}
 								return Integer.MAX_VALUE;
 							}
 							break;
@@ -1536,9 +1548,6 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 					}
 
 					if (touchZone != -1) {
-						ChatCanvas chat = (ChatCanvas) container;
-						int t = (chat.reverse ? chat.height - chat.bottom + chat.scroll - (y + contentHeight)
-								: chat.top - chat.scroll + y);
 						if (t + touchZones[touchZone + 3] <= chat.top) {
 							if (dir == Canvas.UP) return 0;
 						} else if (t + touchZones[touchZone + 1] >= chat.height - chat.bottom) {
@@ -1897,7 +1906,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 						}
 					}
 					if (focus == FOCUS_MEDIA && poll) {
-						y -= touchZones[i + 1] + pollY;
+						y -= pollY;
 						int ih = 28 + MP.smallPlainFontHeight;
 						if (y >= 0 && y < pollOptionsNum * ih) {
 							focusedPollOption = y / ih;
