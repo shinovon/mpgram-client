@@ -543,28 +543,28 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 	}
 
 	private void parsePoll(JSONObject media) {
-		mediaTitle = media.getString("text");
-		pollId = media.getString("id");
+		if (media.has("text")) mediaTitle = media.getString("text");
+		if (media.has("id")) pollId = media.getString("id");
 		poll = true;
 		pollCalculated = false;
 		pollResults = null;
-		pollClosed = media.getBoolean("closed", false);
-		pollPublic = media.getBoolean("public", false);
-		pollMulti = media.getBoolean("multi", false);
-		pollQuiz = media.getBoolean("quiz", false);
-		pollVoters = media.getInt("voted", 0);
+		pollClosed = media.getBoolean("closed", pollClosed);
+		pollPublic = media.getBoolean("public", pollPublic);
+		pollMulti = media.getBoolean("multi", pollMulti);
+		pollQuiz = media.getBoolean("quiz", pollQuiz);
+		pollVoters = media.getInt("voted", pollVoters);
 		pollVoted = false;
 		JSONArray options = media.getArray("options");
 		int n = options.size();
 		pollOptionsNum = n;
 
-		String[] text = new String[n << 1];
+		String[] text = pollOptionsText != null && pollOptionsText.length == n << 1 ? pollOptionsText : new String[n << 1];
 		int[] num = new int[n * 3];
 
 		for (int i = 0; i < n; ++i) {
 			JSONObject o = options.getObject(i);
-			text[i << 1] = o.getString("text");
-			text[(i << 1) | 1] = o.getString("data");
+			if (o.has("text")) text[i << 1] = o.getString("text");
+			if (o.has("data")) text[(i << 1) | 1] = o.getString("data");
 
 			num[i * 3] = o.getInt("voters", 0);
 			num[i * 3 + 1] = (o.getBoolean("chosen", false) ? 1 : 0)
@@ -575,7 +575,9 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 			}
 		}
 		pollOptionsText = text;
-		pollOptionsTextRender = new String[n << 1];
+		if (pollOptionsTextRender == null || pollOptionsTextRender.length == n << 1) {
+			pollOptionsTextRender = new String[n << 1];
+		}
 		pollOptionsNumbers = num;
 		if (pollMulti && (pollSelected == null || pollSelected.length != n)) {
 			pollSelected = new boolean[n];
