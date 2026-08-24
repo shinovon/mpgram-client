@@ -992,8 +992,8 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 							break scroll;
 						}
 					}
+					if (b) break scroll;
 				}
-				if (b) break scroll;
 				repaint = true;
 				if (dir == 1) {
 					scrollTo(Math.min(scroll + scrollAmount, contentHeight - clipHeight));
