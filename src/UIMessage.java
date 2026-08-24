@@ -1459,11 +1459,10 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 
 				ChatCanvas chat = (ChatCanvas) container;
 				int t = (chat.reverse ? chat.height - chat.bottom + chat.scroll - (this.y + contentHeight)
-						: chat.top - chat.scroll + this.y) + replyMarkupPos;
+						: chat.top - chat.scroll + this.y);
 
 				if (subFocus[subFocusCurrent] == FOCUS_REPLY_MARKUP && replyMarkup != null) {
 					if (replyMarkupRender != null) {
-
 						// TODO vertical navigation
 						switch (dir) {
 						case Canvas.UP:
@@ -1472,6 +1471,11 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 								return 0;
 							}
 							if (focusedButtonRow != 0 || focusedButtonCol != 0) {
+//								if (dir == Canvas.UP && focusedButtonRow != 0) { // this won't do, have to count laid out position
+//									if (focusedButtonCol >= replyMarkup[--focusedButtonRow].length) {
+//										focusedButtonCol = replyMarkup[focusedButtonRow].length - 1;
+//									}
+//								} else
 								if (focusedButtonCol-- == 0) {
 									focusedButtonCol = replyMarkup[--focusedButtonRow].length - 1;
 								}
@@ -1489,6 +1493,11 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 								return 0;
 							}
 							if (focusedButtonRow != replyMarkup.length - 1 || focusedButtonCol != replyMarkup[replyMarkup.length - 1].length - 1) {
+//								if (dir == Canvas.DOWN && focusedButtonRow != replyMarkup.length - 1) {
+//									if (focusedButtonCol >= replyMarkup[++focusedButtonRow].length) {
+//										focusedButtonCol = replyMarkup[focusedButtonRow].length - 1;
+//									}
+//								} else
 								if (++focusedButtonCol == replyMarkup[focusedButtonRow].length) {
 									++focusedButtonRow;
 									focusedButtonCol = 0;

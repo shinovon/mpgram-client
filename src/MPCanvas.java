@@ -1006,7 +1006,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 				}
 			}
 		} else if (game == Canvas.LEFT || game == Canvas.RIGHT) {
-			if (focusedItem != null && focusedItem.traverse(game) == Integer.MAX_VALUE) {
+			if (focusedItem != null && focusedItem.traverse(game) != Integer.MIN_VALUE) {
 				repaint = true;
 			}
 		}
