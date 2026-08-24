@@ -36,6 +36,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 	static final int COLOR_MESSAGE_ATTACHMENT_TITLE = 27;
 	static final int COLOR_MESSAGE_ATTACHMENT_SUBTITLE = 28;
 	static final int COLOR_MESSAGE_ATTACHMENT_FOCUS_BG = 29;
+	static final int COLOR_MESSAGE_OUT_ATTACHMENT_FOCUS_BG = 48;
 	static final int COLOR_MESSAGE_COMMENT_BORDER = 30;
 	static final int COLOR_MESSAGE_IMAGE = 31;
 	static final int COLOR_MESSAGE_FOCUS_BORDER = 32;
@@ -48,10 +49,12 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 	static final int COLOR_MESSAGE_SPOILER_TEXT = 39;
 	static final int COLOR_MESSAGE_POLL_LINE = 40;
 	static final int COLOR_MESSAGE_POLL_VOTE_BUTTON = 41;
-	static final int COLOR_MESSAGE_POLL_CHECKBOX = 42;
-	static final int COLOR_MESSAGE_OUT_POLL_LINE = 43;
-	static final int COLOR_MESSAGE_OUT_POLL_VOTE_BUTTON = 44;
-	static final int COLOR_MESSAGE_OUT_POLL_CHECKBOX = 45;
+	static final int COLOR_MESSAGE_POLL_VOTE_BUTTON_INACTIVE = 42;
+	static final int COLOR_MESSAGE_POLL_CHECKBOX = 43;
+	static final int COLOR_MESSAGE_OUT_POLL_LINE = 44;
+	static final int COLOR_MESSAGE_OUT_POLL_VOTE_BUTTON = 45;
+	static final int COLOR_MESSAGE_OUT_POLL_CHECKBOX = 46;
+	static final int COLOR_MESSAGE_OUT_POLL_VOTE_BUTTON_INACTIVE = 47;
 
 	static final int STYLE_MESSAGE_FILL = 0;
 	static final int STYLE_MESSAGE_ROUND = 1;
@@ -714,7 +717,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 			}
 			g.fillRect(x, y, 2, rh);
 			if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_REPLY) {
-				g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_FOCUS_BG]);
+				g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_ATTACHMENT_FOCUS_BG : COLOR_MESSAGE_ATTACHMENT_FOCUS_BG]);
 				g.fillRect(x + 2, y, cw - 4, rh);
 			}
 			int px = x + 6;
@@ -753,7 +756,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 					g.setClip(clipX, clipY, clipW, clipH);
 				}
 				if (focus && !poll && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_MEDIA) {
-					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_FOCUS_BG]);
+					g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_ATTACHMENT_FOCUS_BG : COLOR_MESSAGE_ATTACHMENT_FOCUS_BG]);
 					g.drawRect(x, y + 1, photoRenderWidth, photoRenderHeight);
 					g.setColor(0);
 					g.drawRect(x + 1, y + 2, photoRenderWidth - 2, photoRenderHeight - 2);
@@ -765,7 +768,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_BORDER]);
 					g.fillRect(x, y, 2, rh);
 					if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_MEDIA) {
-						g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_FOCUS_BG]);
+						g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_ATTACHMENT_FOCUS_BG : COLOR_MESSAGE_ATTACHMENT_FOCUS_BG]);
 						g.fillRect(x + 2, y, cw - 4, rh);
 					}
 				}
@@ -794,15 +797,15 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 					}
 					y += fh;
 				} else if (mediaTitleRender != null) {
-					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_TITLE]);
+					g.setColor(ChatCanvas.colors[poll ? COLOR_MESSAGE_FG : COLOR_MESSAGE_ATTACHMENT_TITLE]);
 					g.setFont(MP.smallBoldFont);
-					g.drawString(mediaTitleRender, px, y, 0);
+					g.drawString(mediaTitleRender, poll ? x : px, y, 0);
 					y += MP.smallBoldFontHeight;
 				}
 				if (mediaSubtitleRender != null) {
-					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_SUBTITLE]);
+					g.setColor(ChatCanvas.colors[poll ? (out ? COLOR_MESSAGE_OUT_TIME : COLOR_MESSAGE_TIME) : COLOR_MESSAGE_ATTACHMENT_SUBTITLE]);
 					g.setFont(MP.smallPlainFont);
-					g.drawString(mediaSubtitleRender, px, y, 0);
+					g.drawString(mediaSubtitleRender, poll ? x : px, y, 0);
 					y += MP.smallPlainFontHeight;
 				}
 				if (poll) {
@@ -811,7 +814,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 					boolean results = pollClosed || pollVoted;
 					for (int i = 0; i < l; ++i) {
 						if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_MEDIA && focusedPollOption == i) {
-							g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_FOCUS_BG]);
+							g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_ATTACHMENT_FOCUS_BG : COLOR_MESSAGE_ATTACHMENT_FOCUS_BG]);
 							g.fillRect(x, y, cw, 28 + MP.smallPlainFontHeight);
 						}
 						y += 12;
@@ -847,7 +850,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 					y += 2;
 					if (pollMulti && !results) {
 						if (focus && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_MEDIA && focusedPollOption == pollOptionsNum) {
-							g.setColor(ChatCanvas.colors[COLOR_MESSAGE_ATTACHMENT_FOCUS_BG]);
+							g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_ATTACHMENT_FOCUS_BG : COLOR_MESSAGE_ATTACHMENT_FOCUS_BG]);
 							g.fillRect(x, y, cw, MP.smallBoldFontHeight);
 						}
 						g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_POLL_VOTE_BUTTON : COLOR_MESSAGE_POLL_VOTE_BUTTON]);

@@ -110,7 +110,7 @@ public class ChatsCanvas extends MPCanvas {
 		int l = dialogs.size();
 
 		if (offsetDate != 0) {
-			safeAdd(thread, new UIPageButton(1), false);
+			safeAdd(thread, new UIPageButton(1, false), false);
 		}
 
 		for (int i = 0; i < l && thread == this.thread; ++i) {
@@ -129,7 +129,7 @@ public class ChatsCanvas extends MPCanvas {
 
 		if ((folder == -1 || folder == 0 || folder == 1)
 				&& l >= limit && j.getInt("count", 0) > limit) {
-			safeAdd(thread, new UIPageButton(-1), false);
+			safeAdd(thread, new UIPageButton(-1, false), false);
 		}
 		return true;
 	}

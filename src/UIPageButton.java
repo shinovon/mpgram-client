@@ -25,19 +25,22 @@ import javax.microedition.lcdui.Graphics;
 public class UIPageButton extends UIItem {
 	
 	private final int dir;
+	private final boolean chat;
 
-	public UIPageButton(int dir) {
+	public UIPageButton(int dir, boolean chat) {
 		this.dir = dir;
+		this.chat = chat;
 		contentHeight = MP.medBoldFontHeight + 4;
 		focusable = true;
 	}
 	
 	void paint(Graphics g, int x, int y, int w) {
 		if (focus) {
-			g.setColor(ChatCanvas.colors[ChatCanvas.COLOR_CHAT_HIGHLIGHT_BG]);
+			g.setColor(ChatCanvas.colors[chat ? ChatCanvas.COLOR_CHAT_HIGHLIGHT_BG : UIDialog.COLOR_CHATS_ITEM_HIGHLIGHT_BG]);
 			g.fillRect(x, y, w, contentHeight);
 		}
-		g.setColor(ChatCanvas.colors[ChatCanvas.COLOR_CHAT_FG]);
+		g.setColor(ChatCanvas.colors[chat ? ChatCanvas.COLOR_CHAT_FG :
+				(focus ? UIDialog.COLOR_CHATS_ITEM_HIGHLIGHT_FG : UIDialog.COLOR_CHATS_ITEM_TITLE)]);
 		g.setFont(MP.medBoldFont);
 		g.drawString(MP.L[dir == -1 ? LangConstants.LOlderMessages : LangConstants.LNewerMessages],
 				x + (w >> 1), y + 2, Graphics.HCENTER | Graphics.TOP);

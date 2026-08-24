@@ -114,7 +114,7 @@ public class MP extends MIDlet
 			"Dark",
 			"Light",
 			"Edges",
-			"Desktop Light (nallion)",
+			"Desktop Light",
 		}
 	};
 //#endif
@@ -7861,7 +7861,7 @@ public class MP extends MIDlet
 			}
 		}
 
-		if (space != 0 /* && instanceof MPForm */ ) {
+		if (space != 0 /* && instanceof MPForm */) {
 			//noinspection DataFlowIssue // checked above
 			((MPForm) form).safeInsert(thread, insert++, new Spacer(f.charWidth(' ') * space, f.getBaselinePosition()));
 		}
@@ -7874,7 +7874,12 @@ public class MP extends MIDlet
 		int face = 0, style = 0, size = Font.SIZE_SMALL;
 		if (state[RT_PRE] != 0) {
 			face = Font.FACE_MONOSPACE;
-			style = Font.STYLE_BOLD;
+//#ifndef NO_CHAT_CANVAS
+			if (legacyChatUI)
+//#endif
+			{
+				style = Font.STYLE_BOLD;
+			}
 //			size = Font.SIZE_SMALL;
 		} else {
 			if (state[RT_BOLD] != 0) {

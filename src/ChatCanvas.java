@@ -416,7 +416,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		}
 
 		if (!endReached && hasOffset) {
-			add(new UIPageButton(1));
+			add(new UIPageButton(1, true));
 		}
 
 		for (int i = 0; i < l; i++) {
@@ -444,7 +444,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		}
 
 		if ((l == limit || (addOffset < 0 && endReached)) && j.has("count")) {
-			add(new UIPageButton(-1));
+			add(new UIPageButton(-1, true));
 		}
 
 		finished = true;
