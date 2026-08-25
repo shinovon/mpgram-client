@@ -1366,6 +1366,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 
 	public void startEdit(UIMessage item) {
 		resetInput();
+		keyboardTextUpdated = false;
 		text = item.origText;
 		editMsgId = item.id;
 		focusInput(true);
@@ -1417,6 +1418,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 				editorShown = true;
 				updateEditor = true;
 				bottomAnimProgress = bottom = h;
+				bottomAnimTarget = -1;
 			} else
 //#endif
 			{
