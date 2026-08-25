@@ -1813,7 +1813,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 				MP.sending = true;
 			}
 
-				MP.midlet.start(MP.RUN_SEND_VOTE, new Object[] { this.peerId, Integer.toString(this.id), null });
+			MP.midlet.start(MP.RUN_SEND_VOTE, new Object[] { this.peerId, Integer.toString(this.id), null });
 			break;
 		}
 	}
@@ -1828,8 +1828,8 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 				return new int[] { LViewImage, LDownload };
 			} else if (mediaDownload) {
 				return new int[] { LDownload };
-			} else if (poll && pollVoted && !pollClosed) {
-				return new int[] { LRetractVote };
+//			} else if (poll && pollVoted && !pollClosed) {
+//				return new int[] { LRetractVote };
 			}
 		}
 		return null;
@@ -1860,13 +1860,14 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 			if (chat.canDelete) general[count++] = LDelete;
 		} else {
 			if (chat.canWrite) general[count++] = LReply;
-			if (out && !fwd) general[count++] = LEdit;
+			if (out && !fwd && !poll) general[count++] = LEdit;
 			if (chat.canPin) general[count++] = LPin;
+			if (poll && !pollClosed && pollVoted) general[count++] = LRetractVote;
 			if (origText != null && origText.length() != 0) general[count++] = LCopyMessage;
 			if (!chat.selfChat && !chat.user) general[count++] = LCopyMessageLink;
 			general[count++] = LForward;
 			if (chat.canDelete || out) general[count++] = LDelete;
-			if (out && chat.canSeeRead && read) general[count++] = LSeenList;
+			if (out && chat.canSeeRead && read && !poll) general[count++] = LSeenList;
 		}
 		general[count++] = LSelect;
 		general[count] = Integer.MIN_VALUE;
