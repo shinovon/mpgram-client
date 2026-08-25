@@ -1350,16 +1350,21 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 		if (poll) {
 			boolean results = pollVoted || pollClosed;
 			int lw = maxW - 10 - minW - pollX;
-			for (int i = 0; i < pollOptionsNum; ++i) {
-				if (results && !pollCalculated) {
-					String s = Integer.toString(pollVoters == 0 ? 0 : ((pollOptionsNumbers[i * 3] * 100) / pollVoters)).concat("%");
-					pollOptionsTextRender[(i << 1) | 1] = s;
-				}
-				pollOptionsTextRender[i << 1] = UILabel.ellipsis(pollOptionsText[i << 1], MP.smallPlainFont, lw);
-				pollOptionsNumbers[i * 3 + 2] = Math.max(4, pollVoters == 0 ? 0 : (pollOptionsNumbers[i * 3] * lw) / pollVoters);
-			}
+			int m = 0;
+			int n = pollOptionsNum;
 			if (results) {
+				for (int i = 0; i < n; ++i) {
+					if (!pollCalculated) {
+						String s = Integer.toString(pollVoters == 0 ? 0 : ((pollOptionsNumbers[i * 3] * 100) / pollVoters)).concat("%");
+						pollOptionsTextRender[(i << 1) | 1] = s;
+					}
+					if (pollOptionsNumbers[i * 3] > m) m = pollOptionsNumbers[i * 3];
+				}
 				pollCalculated = true;
+			}
+			for (int i = 0; i < n; ++i) {
+				pollOptionsTextRender[i << 1] = UILabel.ellipsis(pollOptionsText[i << 1], MP.smallPlainFont, lw);
+				if (results) pollOptionsNumbers[i * 3 + 2] = Math.max(4, pollVoters == 0 ? 0 : (pollOptionsNumbers[i * 3] * lw) / m);
 			}
 			pollResults = MP.localizePlural(pollVoters, L_vote);
 		}
