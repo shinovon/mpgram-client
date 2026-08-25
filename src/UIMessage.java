@@ -1857,7 +1857,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 			if (chat.canDelete) general[count++] = LDelete;
 		} else {
 			if (chat.canWrite) general[count++] = LReply;
-			if (out) general[count++] = LEdit;
+			if (out && !fwd) general[count++] = LEdit;
 			if (chat.canPin) general[count++] = LPin;
 			if (origText != null && origText.length() != 0) general[count++] = LCopyMessage;
 			if (!chat.selfChat && !chat.user) general[count++] = LCopyMessageLink;

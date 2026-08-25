@@ -481,7 +481,7 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 				}
 				if (out || selfChat) {
 					s.addCommand(MP.deleteMsgCmd);
-					s.addCommand(MP.editMsgCmd);
+					if (!message.has("fwd")) s.addCommand(MP.editMsgCmd);
 				} else {
 					if (!broadcast) {
 						s.setDefaultCommand(MP.itemChatCmd);
