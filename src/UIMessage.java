@@ -1920,7 +1920,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 					if (focus == FOCUS_MEDIA && poll) {
 						y -= pollY;
 						int ih = 28 + MP.smallPlainFontHeight;
-						if (y >= 0 && y < pollOptionsNum * ih) {
+						if (y >= 0 && y <= (pollOptionsNum + 1) * ih) {
 							focusedPollOption = y / ih;
 						} else {
 							focusedPollOption = -1;
