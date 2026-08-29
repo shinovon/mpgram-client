@@ -542,6 +542,9 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 			read = id <= chat.readOutboxId;
 		}
 
+		if (order == 1 && focus) {
+			subFocus(subFocusCurrent = 0, 0);
+		}
 		subFocusLength = order;
 	}
 
