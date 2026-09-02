@@ -191,7 +191,7 @@ public class UILabel extends UIItem {
 			if (ellipsis) {
 				int tw;
 				boolean end = false;
-				if (x + (tw = font.stringWidth(text = text.substring(ch).replace('\n', ' '))) < width) {
+				if (x + (tw = font.stringWidth(text = text.substring(ch).replace('\n', ' '))) >= width) {
 					tw = font.stringWidth(text = ellipsis(text, font, width - x));
 					end = true;
 				}
@@ -365,7 +365,7 @@ public class UILabel extends UIItem {
 		int l = text.length();
 		width -= font.stringWidth("...");
 		for (int i = 1; i < l; ++i) {
-			if (font.stringWidth(text.substring(0, i)) > width) {
+			if (font.substringWidth(text, 0, i) > width) {
 				return text.substring(0, i - 1).concat("...");
 			}
 		}
@@ -425,7 +425,7 @@ public class UILabel extends UIItem {
 										idx ++;
 									}
 									mw = Math.max(mw, x + tw);
-									x = 0; y += fh;
+									x = 0; y += fh; dy = 0;
 			
 									i = ch = j;
 									break w;
@@ -442,7 +442,7 @@ public class UILabel extends UIItem {
 								idx ++;
 							}
 							mw = Math.max(mw, x + tw);
-							x = 0; y += fh;
+							x = 0; y += fh; dy = 0;
 							ch = i;
 						}
 					}
