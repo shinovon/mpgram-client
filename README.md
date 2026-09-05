@@ -16,7 +16,7 @@ Originally written in MIDletPascal in 2020 and later rewritten in Java, hence th
 - Music player with playlists and streaming
 - Bot interactions
 - Notifications (Pigler API, NokiaUI)
-- Basic administration (message deletion, member banning)
+- Basic administration (message deletion, member banning & inviting)
 - Forum chats
 - File downloads and sending
 - Image viewer
@@ -35,7 +35,7 @@ Originally written in MIDletPascal in 2020 and later rewritten in Java, hence th
 - Heap memory: at least 1 MB
 - Screen size: at least 176x220 (for smaller screens use legacy UI)
 
-Does not work on most Samsung phones.
+Does not work on most of Samsung phones.
 
 ### Optional requirements
 
