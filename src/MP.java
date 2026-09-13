@@ -484,8 +484,10 @@ public class MP extends MIDlet
 	private static String updateUrl;
 	private static long lastType;
 	private static String[] downloadMessage;
+	//#ifndef NO_FILE
 	private static String downloadCurrentPath;
 	private static String downloadedPath;
+//#endif
 	static long lastUpdateFail;
 
 	static int confirmationTask;
@@ -3718,7 +3720,9 @@ public class MP extends MIDlet
 
 
 						advChoice = new ChoiceGroup("", ChoiceGroup.MULTIPLE, new String[] {
+//#ifndef NO_CHAT_CANVAS
 								L[LForceKeyInput],
+//#endif
 								L[LLongpoll],
 								L[LWaitForPageToLoad],
 								L[LUseJSONStream],
@@ -3734,7 +3738,9 @@ public class MP extends MIDlet
 						adv.append(advChoice);
 
 						i = 0;
+//#ifndef NO_CHAT_CANVAS
 						advChoice.setSelectedIndex(i++, forceKeyUI);
+//#endif
 						advChoice.setSelectedIndex(i++, longpoll);
 						advChoice.setSelectedIndex(i++, useLoadingForm);
 						advChoice.setSelectedIndex(i++, jsonStream);
@@ -3943,7 +3949,9 @@ public class MP extends MIDlet
 						chatUpdates = behChoice.isSelected(i);
 
 						i = 0;
+//#ifndef NO_CHAT_CANVAS
 						forceKeyUI = advChoice.isSelected(i++);
+//#endif
 						longpoll = advChoice.isSelected(i++);
 						useLoadingForm = advChoice.isSelected(i++);
 						jsonStream = advChoice.isSelected(i++);
@@ -4712,10 +4720,12 @@ public class MP extends MIDlet
 			display(p, true);
 			return;
 		}
+//#ifndef NO_CHAT_CANVAS
 		if (c == canvasBackCmd) {
 			((MPCanvas) d).key(-1000000011, false);
 			return;
 		}
+//#endif
 		if (c == exitCmd) {
 			destroyApp(true);
 		}
@@ -5194,6 +5204,7 @@ public class MP extends MIDlet
 		}
 	}
 
+//#ifndef NO_FILE
 	static String getAudioCacheDir() {
 		String s = System.getProperty("fileconn.dir.private");
 		if (s == null && downloadPath != null && downloadPath.length() > 1) {
@@ -5211,6 +5222,7 @@ public class MP extends MIDlet
 		}
 		return s;
 	}
+//#endif
 
 	// endregion
 
