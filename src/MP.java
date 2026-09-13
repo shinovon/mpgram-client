@@ -484,7 +484,7 @@ public class MP extends MIDlet
 	private static String updateUrl;
 	private static long lastType;
 	private static String[] downloadMessage;
-	//#ifndef NO_FILE
+//#ifndef NO_FILE
 	private static String downloadCurrentPath;
 	private static String downloadedPath;
 //#endif
