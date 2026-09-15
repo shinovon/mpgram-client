@@ -289,9 +289,9 @@
 	// Cache settings
 	"AvatarsCaching": "Кэшаванне аватараў",
 	"Disabled": "Адключана",
-	"HoldInRAM": "Утрымліваць у аператыўнай памяці",
+	"HoldInRAM": "Утрымл. у апер. памяці",
 	"Store": "Захоўваць",
-	"HoldInRAMandStore": "Утрымліваць у аператыўнай памяці і захоўваць",
+	"HoldInRAMandStore": "У апер. памяці і захоўваць",
 	"AvatarsCacheThreshold": "Парог кэшу аватараў",
 	"ProfilesCacheThreshold": "Парог кэшу профіляў",
 	"RMSCacheCount": "Захавана кэшу: ",
@@ -373,8 +373,8 @@
 	// Chat form
 	"ChatMedia_Title": "Медыяфайлы",
 	"Search_TitlePrefix": "Пошук — ",
-	"OlderMessages": "Старыя паведамленні",
-	"NewerMessages": "Новыя паведамленні",
+	"OlderMessages": "Старэйшыя паведамленні",
+	"NewerMessages": "Навейшыя паведамленні",
 	"SavedMessages": "Захаванае",
 	"SomeoneIsTyping": "Хтосьці піша…",
 	"Typing": "піша…",
