@@ -535,7 +535,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 							} else if (markupItem.has("url")) {
 								this.replyMarkup[i][j] = new String[] { t, markupItem.getString("url") };
 							} else {
-								this.replyMarkup[i][j] = new String[] { t, t };
+								this.replyMarkup[i][j] = new String[] { t, null };
 							}
 						}
 					}
@@ -1718,6 +1718,15 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 				}
 
 				MP.midlet.start(MP.RUN_BOT_CALLBACK, new String[] { this.peerId, Integer.toString(this.id), ((String[]) focusedButton)[2]});
+			} else if (((String[]) focusedButton)[1] == null) {
+				synchronized (this) {
+					if (MP.sending) return true;
+					MP.sending = true;
+				}
+
+				MP.midlet.start(MP.RUN_SEND_MESSAGE, new Object[] {
+						((String[]) focusedButton)[0], peerId, null, null, null, null, null, null, null, null
+				});
 			} else {
 				MP.openUrl(((String[]) focusedButton)[1], true);
 			}
