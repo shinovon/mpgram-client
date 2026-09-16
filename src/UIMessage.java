@@ -534,6 +534,8 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 								this.replyMarkup[i][j] = new String[] { t, "", markupItem.getString("data") };
 							} else if (markupItem.has("url")) {
 								this.replyMarkup[i][j] = new String[] { t, markupItem.getString("url") };
+							} else {
+								this.replyMarkup[i][j] = new String[] { t, t };
 							}
 						}
 					}
