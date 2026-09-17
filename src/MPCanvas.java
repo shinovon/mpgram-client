@@ -295,18 +295,16 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 			case 0: // auto
 			case 1: // nokiaui
 //#ifndef NO_NOKIAUI
-				if (touch) {
-					try {
-						nokiaEditor = NokiaAPI.createTextEditor(500, TextField.ANY, 40, 40);
-						if (nokiaEditor != null) {
-							NokiaAPI.TextEditor_setContent(nokiaEditor, "");
-						}
-					} catch (Throwable ignored) {}
+				try {
+					nokiaEditor = NokiaAPI.createTextEditor(500, TextField.ANY, 40, 40);
 					if (nokiaEditor != null) {
-						updateEditor = true;
-						keyboard = null;
-						break;
+						NokiaAPI.TextEditor_setContent(nokiaEditor, "");
 					}
+				} catch (Throwable ignored) {}
+				if (nokiaEditor != null) {
+					updateEditor = true;
+					keyboard = null;
+					break;
 				}
 //#endif
 				if (MP.textMethod == 1) break;

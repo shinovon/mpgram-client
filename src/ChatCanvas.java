@@ -519,6 +519,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		super.closed(destroy);
 //#ifndef NO_NOKIAUI
 		if (nokiaEditor != null) {
+			editorShown = false;
 			try {
 				NokiaAPI.TextEditor_setFocus(nokiaEditor, false);
 				NokiaAPI.TextEditor_setVisible(nokiaEditor, false);
@@ -773,10 +774,20 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					iy -= bh;
 					bh -= 1;
 					g.drawString(MP.L[LMenu], 2, h - bh, Graphics.TOP | Graphics.LEFT);
-					g.drawString(MP.L[LEdit], w >> 1, h - bh, Graphics.TOP | Graphics.HCENTER);
-					g.drawString(MP.L[keyboard != null && textInputNotEmpty(false)
-							&& keyboard.getPhysicalKeyboardType() == Keyboard.PHYSICAL_KEYBOARD_PHONE_KEYPAD ?
-							LClear : LCancel], w - 2, h - bh, Graphics.TOP | Graphics.RIGHT);
+//#ifndef NO_NOKIAUI
+					if (nokiaEditor == null)
+//#endif
+					{
+						g.drawString(MP.L[LEdit], w >> 1, h - bh, Graphics.TOP | Graphics.HCENTER);
+					}
+					g.drawString(MP.L[((keyboard != null
+							&& keyboard.getPhysicalKeyboardType() == Keyboard.PHYSICAL_KEYBOARD_PHONE_KEYPAD
+							&& textInputNotEmpty(false))
+//#ifndef NO_NOKIAUI
+							|| (nokiaEditor != null && editorShown && textInputNotEmpty(false))
+//#endif
+							) ? LClear : LCancel],
+							w - 2, h - bh, Graphics.TOP | Graphics.RIGHT);
 				}
 				if (bottomAnimTarget != -1) {
 					// don't draw input field when animation is in progress
@@ -956,6 +967,16 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			} else {
 				bottomAnimTarget = 0;
 			}
+//#ifndef NO_NOKIAUI
+			if (nokiaEditor != null && editorShown) {
+				editorShown = false;
+				try {
+					NokiaAPI.TextEditor_setFocus(nokiaEditor, false);
+					NokiaAPI.TextEditor_setVisible(nokiaEditor, false);
+					NokiaAPI.TextEditor_setParent(nokiaEditor, null);
+				} catch (Throwable ignored) {}
+			}
+//#endif
 			if (keyboard != null) {
 				onKeyboardCancel();
 			}
@@ -1018,12 +1039,15 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 				} else if (x > width - 48) {
 					send();
 				} else {
+//#ifndef NO_NOKIAUI
 					if (nokiaEditor != null) {
 						if (!editorShown) {
 							editorShown = true;
 							updateEditor = true;
 						}
-					} else if (keyboard != null) {
+					} else
+//#endif
+					if (keyboard != null) {
 						keyboard.show();
 					} else {
 						showTextBox();
@@ -1105,6 +1129,12 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 
 	protected boolean handleRightSoft() {
 		if (inputFocused) {
+//#ifndef NO_NOKIAUI
+			if (nokiaEditor != null && editorShown && !textInputNotEmpty(false)) {
+				NokiaAPI.backspace(nokiaEditor);
+				return true;
+			}
+//#endif
 			back();
 		} else if (keyboard != null && keyboard.isVisible()) {
 			onKeyboardCancel();
@@ -1257,6 +1287,11 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		}
 		case LClear: {
 			text = "";
+//#ifndef NO_NOKIAUI
+			if (nokiaEditor != null) {
+				NokiaAPI.TextEditor_setContent(nokiaEditor, "");
+			}
+//#endif
 			if (keyboard != null) {
 				keyboard.setText("");
 			}
@@ -1407,10 +1442,21 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			text = keyboard.getText();
 		}
 		if (!touch) {
-			bottomAnimTarget = h + MP.smallBoldFontHeight + 4;
 			keyGuide = false;
 			inputFocused = true;
 			funcWasFocused = funcFocused;
+//#ifndef NO_NOKIAUI
+			if (nokiaEditor != null) {
+				NokiaAPI.TextEditor_setContent(nokiaEditor, text);
+				editorShown = true;
+				updateEditor = true;
+				bottomAnimProgress = bottom = h + MP.smallBoldFontHeight + 4;
+				bottomAnimTarget = -1;
+			} else
+//#endif
+			{
+				bottomAnimTarget = h + MP.smallBoldFontHeight + 4;
+			}
 		} else {
 //#ifndef NO_NOKIAUI
 			if (nokiaEditor != null) {

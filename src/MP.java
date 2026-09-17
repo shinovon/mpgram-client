@@ -247,6 +247,9 @@ public class MP extends MIDlet
 //#ifndef NO_RECORD
 	static boolean supportsAudioRecording;
 //#endif
+//#ifndef NO_CHAT_CANVAS
+	static boolean needsBackspace;
+//#endif
 
 	// endregion Settings
 
@@ -577,7 +580,8 @@ public class MP extends MIDlet
 				}
 			}
 
-			blackberry = p.toLowerCase().startsWith("blackberry");
+			String l;
+			blackberry = (l = p.toLowerCase()).startsWith("blackberry");
 			try {
 				Class.forName("emulator.custom.CustomMethod");
 				d = "KEmulator";
@@ -592,8 +596,8 @@ public class MP extends MIDlet
 				}
 			}
 //#ifndef NO_CHAT_CANVAS
-			if (p.toLowerCase().indexOf("maui") != -1 || p.toLowerCase().indexOf("fastbcc") != -1
-					|| p.toLowerCase().indexOf("itel") != -1 || p.indexOf("S7350") != -1
+			if (l.indexOf("maui") != -1 || l.indexOf("fastbcc") != -1
+					|| l.indexOf("itel") != -1 || p.indexOf("S7350") != -1
 					|| "nokia".equals(p)) {
 				// low end chinese phones and/or impl returns incorrect value in hasPointerEvents
 				forceKeyUI = true;
@@ -617,6 +621,11 @@ public class MP extends MIDlet
 		if (checkClass("com.nokia.mid.impl.isa.jam.Jam")) {
 			series40 = s40 = true;
 			systemName = "Series 40";
+//#ifndef NO_CHAT_CANVAS
+			needsBackspace = p.startsWith("NokiaX3-02") || p.startsWith("NokiaC3-01") || p.startsWith("Nokia300")
+					|| p.startsWith("Nokia202") || p.startsWith("Nokia203")
+					|| p.startsWith("NokiaC2-02") || p.startsWith("NokiaC2-03") || p.startsWith("NokiaC2-06");
+//#endif
 		}
 
 		if (systemName == null && (p = System.getProperty("os.name")) != null) {
@@ -700,9 +709,10 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 //		chunkedUpload = (!symbian || anna) && (!s40 || checkClass("javax.microedition.location.Location"));
 		if (blackberry) textMethod = 3;
-		else if (s40 && System.getProperty("com.nokia.mid.ui.version") == null) {
-			textMethod = 2;
-		}
+		// TODO use MP.needsBackspace
+//		else if (s40 && System.getProperty("com.nokia.mid.ui.version") == null) {
+//			textMethod = 2;
+//		}
 //#endif
 
 //#ifndef NO_CHAT_CANVAS
