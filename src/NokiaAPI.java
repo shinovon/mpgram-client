@@ -133,10 +133,13 @@ public class NokiaAPI {
 	}
 
 	public static void backspace(Object editor) {
-		TextEditor e = (TextEditor) editor;
-		int pos = e.getCaretPosition();
-		if (pos == 0) return;
-		e.delete(pos - 1, 1);
+		try {
+			TextEditor e = (TextEditor) editor;
+			int pos = e.getCaretPosition();
+			if (pos == 0) return;
+			e.delete(pos - 1, 1);
+			if (--pos > 0) e.setCaret(pos);
+		} catch (Throwable ignored) {}
 	}
 	
 }

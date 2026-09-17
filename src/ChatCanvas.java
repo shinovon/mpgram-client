@@ -852,7 +852,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 									NokiaAPI.TextEditor_setParent(nokiaEditor, this);
 									NokiaAPI.TextEditor_setMultiline(nokiaEditor, true);
 									int yo = ih / 6;
-									NokiaAPI.TextEditor_setSize(nokiaEditor, 10, iy + yo, w - topButtonWidth - 8, ih - yo);
+									NokiaAPI.TextEditor_setSize(nokiaEditor, 10, iy + yo, w - topButtonWidth * (MP.needsBackspace ? 2 : 1) - 8, ih - yo);
 									NokiaAPI.TextEditor_setIndicatorVisibility(nokiaEditor, false);
 									NokiaAPI.TextEditor_setBackgroundColor(nokiaEditor, colors[COLOR_CHAT_PANEL_BG] | 0xFF000000);
 									NokiaAPI.TextEditor_setForegroundColor(nokiaEditor, colors[COLOR_CHAT_PANEL_FG] | 0xFF000000);
@@ -886,7 +886,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 						aw = topButtonWidth = inputFieldHeight;
 					}
 
-					if ((textInputNotEmpty(true)) || file != null || forwardMsgs != null || forwardMsg != null) {
+					if (textInputNotEmpty(true) || file != null || forwardMsgs != null || forwardMsg != null) {
 						// send icon
 						int ty = iy + ((ih - 20) >> 1);
 
@@ -925,6 +925,20 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 						}
 //						}
 					}
+
+//#ifndef NO_NOKIAUI
+					if (MP.needsBackspace && textInputNotEmpty(false) && nokiaEditor != null) {
+						// backspace
+						g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
+						int bty = iy + ((ih - 2) >> 1);
+						int bx = w - aw * 2 + ((aw - 20) >> 1);
+						g.fillRect(bx, bty, 16, 2);
+						g.drawLine(bx, bty, bx + 7, bty-7);
+						g.drawLine(bx, bty + 1, bx + 8, bty-7);
+						g.drawLine(bx, bty, bx + 8, bty+8);
+						g.drawLine(bx, bty + 1, bx + 7, bty+8);
+					}
+//#endif
 				} else if (left) {
 					g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
 					g.drawString(MP.L[LJoinGroup], w >> 1, iy + ((ih - MP.medPlainFontHeight) >> 1), Graphics.TOP | Graphics.HCENTER);
@@ -1038,6 +1052,11 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					}
 				} else if (x > width - 48) {
 					send();
+//#ifndef NO_NOKIAUI
+				} else if (x > width - topButtonWidth * 2 && MP.needsBackspace
+						&& nokiaEditor != null && editorShown && textInputNotEmpty(false)) {
+					NokiaAPI.backspace(nokiaEditor);
+//#endif
 				} else {
 //#ifndef NO_NOKIAUI
 					if (nokiaEditor != null) {

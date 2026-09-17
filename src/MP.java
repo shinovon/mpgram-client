@@ -248,7 +248,7 @@ public class MP extends MIDlet
 	static boolean supportsAudioRecording;
 //#endif
 //#ifndef NO_CHAT_CANVAS
-	static boolean needsBackspace;
+	static boolean needsBackspace; // for nokiaui text editor usability on touch and type devices without softkeys
 //#endif
 
 	// endregion Settings
@@ -709,10 +709,6 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 //		chunkedUpload = (!symbian || anna) && (!s40 || checkClass("javax.microedition.location.Location"));
 		if (blackberry) textMethod = 3;
-		// TODO use MP.needsBackspace
-//		else if (s40 && System.getProperty("com.nokia.mid.ui.version") == null) {
-//			textMethod = 2;
-//		}
 //#endif
 
 //#ifndef NO_CHAT_CANVAS
