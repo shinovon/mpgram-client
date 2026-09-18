@@ -1307,7 +1307,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 		if (!loading) queueRepaint();
 	}
 
-	private void layout(UIItem offsetItem, int w, int h) {
+	private synchronized void layout(UIItem offsetItem, int w, int h) {
 		if (count == 0 || offsetItem == null) return;
 		boolean offset = false;
 		if (offsetItem.prev != null) {
@@ -1381,7 +1381,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 		requestLayout(item);
 	}
 
-	void remove(UIItem item) {
+	synchronized void remove(UIItem item) {
 		if (item == null) return;
 		UIItem i = firstItem;
 		if (i == null) return;
