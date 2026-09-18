@@ -299,6 +299,7 @@
 	// Notifications settings
 	"EnableNotifications": "Вкл. уведомления",
 	"EnableSound": "Звук",
+	"EnableVibration": "Вибрация",
 	"NotificationMethod": "Способ уведомления",
 	"Off": "Выкл.",
 	"AlertWindow": "Диалоговое окно",

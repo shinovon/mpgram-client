@@ -299,6 +299,7 @@
 	// Notifications settings
 	"EnableNotifications": "اعلان ها",
 	"EnableSound": "صدا",
+	"EnableVibration": "Vibration", // Untranslated
 	"NotificationMethod": "حالت اعلان",
 	"Off": "خاموش",
 	"AlertWindow": "پنجره هشدار",

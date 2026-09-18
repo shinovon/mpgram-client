@@ -299,6 +299,7 @@
 	// Notifications settings
 	"EnableNotifications": "Bildirimleri aç",
 	"EnableSound": "Ses",
+	"EnableVibration": "Vibration", // Untranslated
 	"NotificationMethod": "Bildirim yöntemi",
 	"Off": "Kapalı",
 	"AlertWindow": "Uyarı penceresi",

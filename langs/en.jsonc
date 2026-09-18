@@ -299,6 +299,7 @@
 	// Notifications settings
 	"EnableNotifications": "Notifications",
 	"EnableSound": "Sound",
+	"EnableVibration": "Vibration",
 	"NotificationMethod": "Notification method",
 	"Off": "Off",
 	"AlertWindow": "Alert window",

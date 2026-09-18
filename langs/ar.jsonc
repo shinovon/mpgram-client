@@ -299,6 +299,7 @@
 	// Notifications settings
 	"EnableNotifications": "الاشعارات", 
 	"EnableSound": "الصوت",
+	"EnableVibration": "Vibration", // Untranslated
 	"NotificationMethod": "اسلوب الاشعارات", 
 	"Off": "مغلق", 
 	"AlertWindow": "نافذة التنبيه",

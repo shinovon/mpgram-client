@@ -199,6 +199,7 @@ public class MP extends MIDlet
 	static boolean muteUsers, muteChats, muteBroadcasts;
 //#ifndef NO_NOTIFY
 	static boolean notifySound = true;
+	static boolean notifyVibrate = false;
 	static int notifyMethod = 1; // 0: off, 1: alert, 2: nokiaui, 3: pigler api
 	static boolean notifyAvas = true;
 	static int notificationVolume = 100;
@@ -775,6 +776,7 @@ public class MP extends MIDlet
 //#ifndef NO_NOTIFY
 			notifications = j.getBoolean("notifications", notifications);
 			notifySound = j.getBoolean("notifySound", notifySound);
+			notifyVibrate = j.getBoolean("notifyVibrate", notifyVibrate);
 			pushInterval = j.getLong("pushInterval", pushInterval);
 			pushBgInterval = j.getLong("pushBgInterval", pushBgInterval);
 			notifyMethod = j.getInt("notifyMethod", notifyMethod);
@@ -2982,21 +2984,26 @@ public class MP extends MIDlet
 				notified = true;
 			}
 
-			if (notified && notifySound) {
-				try {
-					if (notificationPlayer == null) {
-						notificationPlayer = Manager.createPlayer(getClass().getResourceAsStream("/msg.mid"), "audio/midi");
-						notificationPlayer.realize();
-						notificationPlayer.prefetch();
-					}
-					notificationPlayer.stop();
+			if (notified) {
+				if (notifyVibrate) {
+					display.vibrate(50);
+				}
+				if (notifySound) {
 					try {
-						((VolumeControl) notificationPlayer.getControl("VolumeControl")).setLevel(notificationVolume);
-					} catch (Throwable ignored) {}
-					notificationPlayer.setMediaTime(0);
-					notificationPlayer.start();
-				} catch (Exception e) {
-					AlertType.ALARM.playSound(display);
+						if (notificationPlayer == null) {
+							notificationPlayer = Manager.createPlayer(getClass().getResourceAsStream("/msg.mid"), "audio/midi");
+							notificationPlayer.realize();
+							notificationPlayer.prefetch();
+						}
+						notificationPlayer.stop();
+						try {
+							((VolumeControl) notificationPlayer.getControl("VolumeControl")).setLevel(notificationVolume);
+						} catch (Throwable ignored) {}
+						notificationPlayer.setMediaTime(0);
+						notificationPlayer.start();
+					} catch (Exception e) {
+						AlertType.ALARM.playSound(display);
+					}
 				}
 			}
 		}
@@ -3585,10 +3592,12 @@ public class MP extends MIDlet
 
 						notifyChoice = new ChoiceGroup("", ChoiceGroup.MULTIPLE, new String[] {
 								L[LEnableNotifications],
-								L[LEnableSound]
+								L[LEnableSound],
+								L[LEnableVibration],
 						}, null);
 						notifyChoice.setSelectedIndex(0, notifications);
 						notifyChoice.setSelectedIndex(1, notifySound);
+						notifyChoice.setSelectedIndex(2, notifyVibrate);
 						notifyChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 						notif.append(notifyChoice);
 
@@ -3927,6 +3936,7 @@ public class MP extends MIDlet
 //#ifndef NO_NOTIFY
 						notifications = notifyChoice.isSelected(0);
 						notifySound = notifyChoice.isSelected(1);
+						notifyVibrate = notifyChoice.isSelected(2);
 
 						notifyMethod = notifyMethodChoice.getSelectedIndex();
 
@@ -7482,6 +7492,7 @@ public class MP extends MIDlet
 //#ifndef NO_NOTIFY
 		j.put("notifications", notifications);
 		j.put("notifySound", notifySound);
+		j.put("notifyVibrate", notifyVibrate);
 		j.put("pushInterval", pushInterval);
 		j.put("pushBgInterval", pushBgInterval);
 		j.put("notifyMethod", notifyMethod);

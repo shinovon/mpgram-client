@@ -299,6 +299,7 @@
 	// Notifications settings
 	"EnableNotifications": "Ilmoitukset",
 	"EnableSound": "Ääni",
+	"EnableVibration": "Vibration", // Untranslated
 	"NotificationMethod": "Ilmoitustapa",
 	"Off": "Pois",
 	"AlertWindow": "Ponnahdusikkuna",

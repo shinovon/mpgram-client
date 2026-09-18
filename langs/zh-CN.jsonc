@@ -299,6 +299,7 @@
 	// Notifications settings
 	"EnableNotifications": "通知开关",
 	"EnableSound": "提示音",
+	"EnableVibration": "Vibration", // Untranslated
 	"NotificationMethod": "通知方式",
 	"Off": "关闭",
 	"AlertWindow": "弹窗提醒",
