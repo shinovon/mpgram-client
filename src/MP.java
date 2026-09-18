@@ -623,9 +623,9 @@ public class MP extends MIDlet
 			series40 = s40 = true;
 			systemName = "Series 40";
 //#ifndef NO_CHAT_CANVAS
-			needsBackspace = p.startsWith("NokiaX3-02") || p.startsWith("NokiaC3-01") || p.startsWith("Nokia300")
+			needsBackspace = p != null && (p.startsWith("NokiaX3-02") || p.startsWith("NokiaC3-01") || p.startsWith("Nokia300")
 					|| p.startsWith("Nokia202") || p.startsWith("Nokia203")
-					|| p.startsWith("NokiaC2-02") || p.startsWith("NokiaC2-03") || p.startsWith("NokiaC2-06");
+					|| p.startsWith("NokiaC2-02") || p.startsWith("NokiaC2-03") || p.startsWith("NokiaC2-06"));
 //#endif
 		}
 
