@@ -927,7 +927,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					}
 
 //#ifndef NO_NOKIAUI
-					if (MP.needsBackspace && textInputNotEmpty(false) && nokiaEditor != null) {
+					if (MP.needsBackspace && nokiaEditor != null && textInputNotEmpty(false)) {
 						// backspace
 						g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
 						int bty = iy + ((ih - 2) >> 1);
@@ -1149,7 +1149,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 	protected boolean handleRightSoft() {
 		if (inputFocused) {
 //#ifndef NO_NOKIAUI
-			if (nokiaEditor != null && editorShown && !textInputNotEmpty(false)) {
+			if (nokiaEditor != null && editorShown && textInputNotEmpty(false)) {
 				NokiaAPI.backspace(nokiaEditor);
 				return true;
 			}
