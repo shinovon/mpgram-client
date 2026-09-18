@@ -4348,7 +4348,8 @@ public class MP extends MIDlet
 					+ "Portuguese: kefelili\n"
 					+ "Turkish: symbuzzer\n"
 					+ "Ukrainian: karusel33, PhantomHorror\n"
-					+ "Chinese Simplified: ginkgocore\n"));
+					+ "Chinese Simplified: ginkgocore\n"
+					+ "Belarusian: odags\n"));
 			s.setFont(smallPlainFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
