@@ -780,12 +780,12 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					{
 						g.drawString(MP.L[LEdit], w >> 1, h - bh, Graphics.TOP | Graphics.HCENTER);
 					}
-					g.drawString(MP.L[((keyboard != null
-							&& keyboard.getPhysicalKeyboardType() == Keyboard.PHYSICAL_KEYBOARD_PHONE_KEYPAD
-							&& textInputNotEmpty(false))
+					g.drawString(MP.L[(((keyboard != null
+							&& keyboard.getPhysicalKeyboardType() == Keyboard.PHYSICAL_KEYBOARD_PHONE_KEYPAD)
 //#ifndef NO_NOKIAUI
-							|| (nokiaEditor != null && editorShown && textInputNotEmpty(false))
+							|| (nokiaEditor != null && editorShown)
 //#endif
+							) && textInputNotEmpty(false)
 							) ? LClear : LCancel],
 							w - 2, h - bh, Graphics.TOP | Graphics.RIGHT);
 				}
@@ -1301,6 +1301,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			break;
 		}
 		case LCancel: {
+			closeMenu();
 			back();
 			break;
 		}
