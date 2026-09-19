@@ -1056,6 +1056,8 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 				} else if (x > width - topButtonWidth * 2 && MP.needsBackspace
 						&& nokiaEditor != null && editorShown && textInputNotEmpty(false)) {
 					NokiaAPI.backspace(nokiaEditor);
+					text = NokiaAPI.TextEditor_getContent(nokiaEditor);
+					queueRepaint();
 //#endif
 				} else {
 //#ifndef NO_NOKIAUI
@@ -1151,6 +1153,8 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 //#ifndef NO_NOKIAUI
 			if (nokiaEditor != null && editorShown && textInputNotEmpty(false)) {
 				NokiaAPI.backspace(nokiaEditor);
+				text = NokiaAPI.TextEditor_getContent(nokiaEditor);
+				queueRepaint();
 				return true;
 			}
 //#endif

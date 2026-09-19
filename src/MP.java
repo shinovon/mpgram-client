@@ -1153,9 +1153,10 @@ public class MP extends MIDlet
 //		running++;
 		switch (run) {
 		case RUN_VALIDATE_AUTH: {
-			if (param == null && instanceUrl.endsWith(".nnchan.ru/") && !"ru".equals(lang)) {
-				int i = instanceUrl.indexOf(".nnchan.ru");
-				instanceUrl = instanceUrl.substring(0, i) + ".nnproject.cc" + instanceUrl.substring(i + 10);
+			String s = instanceUrl;
+			if (param == null && s.endsWith(".nnchan.ru/") && !"ru".equals(lang)) {
+				int i = s.indexOf(".nnchan.ru");
+				instanceUrl = s.substring(0, i) + ".nnproject.cc/";
 				writeAuth();
 			}
 			Displayable returnTo = param == null ? authForm : current;
