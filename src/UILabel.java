@@ -450,6 +450,9 @@ public class UILabel extends UIItem {
 				if (ch != sl) {
 					String t = text.substring(ch, sl);
 					int tw = font.stringWidth(t);
+					if (center) {
+						x = centerRow(width, tw, x, y, res);
+					}
 					if (notEmpty(t)) {
 						res.addElement(new Object[] { t, font, url, new int[] {x, y + dy, tw, fh, style} });
 						idx ++;
