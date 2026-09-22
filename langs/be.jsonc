@@ -299,7 +299,7 @@
 	// Notifications settings
 	"EnableNotifications": "Апавяшчэнні",
 	"EnableSound": "Гук",
-	"EnableVibration": "Vibration", // Untranslated
+	"EnableVibration": "Вібрацыя",
 	"NotificationMethod": "Спосаб апавяшчэння",
 	"Off": "Выкл.",
 	"AlertWindow": "Акно абвесткі",
@@ -426,11 +426,11 @@
 	"Removed_Action": " выдаліў(-ла)",
 	"JoinedByLink_Action": " далучыўся(-лася) праз запрашальную спасылку",
 	"JoinedByRequest_Action": " быў(-ла) прыняты(-а) у суполку",
-	"ChatHistoryCleared_Action": "Гісторыя чата была ачышчана",
+	"ChatHistoryCleared_Action": "Гісторыя чата ачышчана",
 	"GroupCreated_Action": "Суполка створана",
 	"ChannelCreated_Action": "Канал створаны",
 	"PhotoUpdated_Action": "Фота зменена",
-	"NameChanged_Action": "Назва была зменена на ",
+	"NameChanged_Action": "Назва зменена на ",
 	
 	// Folders
 	"AllChats": "Усе чаты",
