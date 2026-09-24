@@ -83,10 +83,14 @@ public interface Constants {
 	String HTTPS_T_ME = "https://t.me/";
 
 //#ifdef MINI
-//#	boolean MINI_BUILD = true;
+//#	boolean LITE = true;
 //#else
-	boolean MINI_BUILD = false;
+	boolean LITE = false;
 //#endif
+//#ifdef EMOJI_SUPPORT
 	boolean EMOJI_SUPPORT = true;
+//#else
+//#	boolean EMOJI_SUPPORT = false;
+//#endif
 
 }

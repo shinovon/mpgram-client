@@ -234,6 +234,7 @@ public class MP extends MIDlet
 	static int stickerPreviewSize = 32;
 	static int voiceVolume = 50;
 	static boolean newQrLogin = true;
+	static int maxLoadedEmojis = 128;
 
 	private static boolean needWriteConfig;
 
@@ -1731,7 +1732,7 @@ public class MP extends MIDlet
 		case RUN_CHECK_OTA: { // check for client updates
 			try {
 				JSONObject j = parseObject(new String(get(OTA_URL + "?v=" + version + "&l=" + lang
-						+ (MINI_BUILD ? "&m=1" : "")
+						+ (LITE ? "&m=1" : "")
 						+ (midlet.getAppProperty("mpgram-blackberry-build") != null ? "&bb=1" : "")
 						+ (midlet.getAppProperty("mpgram-samsung-build") != null ? "&sams=1" : "")), encoding));
 				if (j.getBoolean("update_available", false) && checkUpdates) {

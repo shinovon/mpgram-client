@@ -38,7 +38,13 @@ public class UILabel extends UIItem implements Constants {
 			STYLE_MONOSPACE = 4,
 			STYLE_LINK = 8;
 
+//#ifdef EMOJI_SUPPORT
 	static Hashtable emojiTable;
+
+	// resets every frame
+	static int loadedEmojis;
+	static int renderedEmojis;
+//#endif
 
 	Vector parsed; // Object[] {text, font, url, int[] {style} }
 	Vector render; // Object[] { text, font, url, int[] {x, y, width, height, style} }
@@ -51,6 +57,8 @@ public class UILabel extends UIItem implements Constants {
 	int focusIndex;
 
 	boolean spoilersUnhidden;
+
+	int emojiCount;
 
 	public UILabel() {
 		this.parsed = new Vector();
@@ -148,10 +156,8 @@ public class UILabel extends UIItem implements Constants {
 							continue;
 						}
 					}
-				} else if ((c >= 0x2600 && c <= 0x27BF)
-						|| (c >= 0x2300 && c <= 0x23FF)
-						|| (c >= 0x2B05 && c <= 0x2B55)
-						|| (c >= 0x2190 && c <= 0x21FF)
+				} else if ((c >= 0x2600 && c <= 0x27BF) || (c >= 0x2300 && c <= 0x23FF)
+						|| (c >= 0x2B05 && c <= 0x2B55) || (c >= 0x2190 && c <= 0x21FF)
 						|| (c >= 0x25A0 && c <= 0x25FF)
 						|| c == 0x00A9 || c == 0x00AE || c == 0x203C || c == 0x2049 || c == 0x2122
 						|| c == 0x2139 || c == 0x3030 || c == 0x303D || c == 0x3297 || c == 0x3299) {
@@ -181,15 +187,16 @@ public class UILabel extends UIItem implements Constants {
 		parsed.addElement(new Object[] { text, font, url, style });
 	}
 
+//#ifdef EMOJI_SUPPORT
 	private int appendEmoji(String text, int i, int l, int start, StringBuffer sb) {
 		if (!EMOJI_SUPPORT) return 0;
+
+		emojiCount++;
 
 		while (i < l) {
 			char c = text.charAt(i);
 
-			if (c == 0xFE0E || c == 0xFE0F) {
-				i++;
-			} else if (c == 0x20E3) {
+			if (c == 0xFE0E || c == 0xFE0F || c == 0x20E3) {
 				i++;
 			} else if (c == 0x200D) {
 				i++;
@@ -209,11 +216,12 @@ public class UILabel extends UIItem implements Constants {
 			} else break;
 		}
 
-		String code = stringToHex(sb, text.substring(start, i));
-		sb.setLength(0);
+		if (emojiCount < 200) {
+			String code = stringToHex(sb, text.substring(start, i));
+			sb.setLength(0);
 
-		// TODO
-		append2(code, null, null, null);
+			append2(code, null, null, null);
+		}
 
 		return i;
 	}
@@ -223,7 +231,6 @@ public class UILabel extends UIItem implements Constants {
 
 		char[] c = s.toCharArray();
 		sb.setLength(0);
-		sb.append('/');
 		int l = c.length;
 		for (int i = 0; i < l; i++) {
 			if (c[i] == 0xFE0F) continue;
@@ -232,6 +239,7 @@ public class UILabel extends UIItem implements Constants {
 		sb.append(".png");
 		return sb.toString();
 	}
+//#endif
 
 	void paint(Graphics g, int x, int y, int w) {
 		if (render == null) return;
@@ -274,19 +282,21 @@ public class UILabel extends UIItem implements Constants {
 				if (EMOJI_SUPPORT && font == null) {
 					emoji: {
 						img: {
-							if (text == null) break img;
+							if (text == null || ++renderedEmojis >= MP.maxLoadedEmojis) break img;
 
 							Object img = null;
 							if (emojiTable.containsKey(text)) {
 								img = emojiTable.get(text);
 								if (img == MP.json_null) break img;
 							} else {
+								if (++loadedEmojis >= 8) break img;
 								try {
 									int s = emojiTable.size();
-									if (s > 128) {
+									if (s > MP.maxLoadedEmojis) {
 										Enumeration e = emojiTable.keys();
 
-										while (s > 64 && e.hasMoreElements()) {
+										int m = MP.maxLoadedEmojis >> 1;
+										while (s > m && e.hasMoreElements()) {
 											emojiTable.remove(e.nextElement());
 											s--;
 										}
@@ -309,7 +319,6 @@ public class UILabel extends UIItem implements Constants {
 						}
 						g.fillRect(tx, ty, 16, 16);
 					}
-
 				} else {
 					g.setFont(font);
 					g.drawString(text, tx, ty, 0);

@@ -580,6 +580,11 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			arrowShown = false;
 		}
 
+		if (Constants.EMOJI_SUPPORT) {
+			UILabel.loadedEmojis = 0;
+			UILabel.renderedEmojis = 0;
+		}
+
 		boolean animate = false;
 
 		// top panel

@@ -3,7 +3,6 @@ import cc.nnproject.json.JSONObject;
 import cc.nnproject.json.JSONStream;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,10 +27,9 @@ public class Main {
 				char[] n = sb.toString().toCharArray();
 				sb.setLength(0);
 				sb.append("../emoji/");
-				int h = n.length;
-				for (int k = 0; k < h; k++) {
-					if (n[k] == 0xFE0F) continue;
-					sb.append(Integer.toHexString(n[k] & 0xFFFF));
+				for (char k : n) {
+					if (k == 0xFE0F) continue;
+					sb.append(Integer.toHexString(k & 0xFFFF));
 				}
 				sb.append(".png");
 				ImageIO.write(img, "png", new File(sb.toString()));
