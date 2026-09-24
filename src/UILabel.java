@@ -198,16 +198,13 @@ public class UILabel extends UIItem implements Constants {
 
 			if (c == 0xFE0E || c == 0xFE0F || c == 0x20E3) {
 				i++;
-			} else if (c == 0x200D) {
-				i++;
-				if (i < l) {
-					c = text.charAt(i);
-					if (c >= 0xD800 && c <= 0xDBFF) {
-						if (i + 1 < l && text.charAt(i + 1) >= 0xDC00 && text.charAt(i + 1) <= 0xDFFF) {
-							i += 2;
-						} else i++;
+			} else if (c == 0x200D && ++i < l) {
+				c = text.charAt(i);
+				if (c >= 0xD800 && c <= 0xDBFF) {
+					if (i + 1 < l && text.charAt(i + 1) >= 0xDC00 && text.charAt(i + 1) <= 0xDFFF) {
+						i += 2;
 					} else i++;
-				}
+				} else i++;
 			} else if (c == 0xD83C && i + 1 < l) {
 				char next = text.charAt(i + 1);
 				if (next >= 0xDFFB && next <= 0xDFFF) {
