@@ -218,18 +218,12 @@ public class UILabel extends UIItem implements Constants {
 	private static String stringToHex(StringBuffer sb, String s) {
 		if (!EMOJI_SUPPORT) return null;
 
-		byte[] b;
-		try {
-			b = s.getBytes(MP.encoding);
-		} catch (Exception ignored) {
-			return null;
-		}
+		char[] c = s.toCharArray();
 		sb.setLength(0);
 		sb.append('/');
-		int l = b.length;
+		int l = c.length;
 		for (int i = 0; i < l; i++) {
-			sb.append(Integer.toHexString(b[i] >> 4 & 0xf));
-			sb.append(Integer.toHexString(b[i] & 0xf));
+			sb.append(Integer.toHexString(c[i] & 0xFFFF));
 		}
 		sb.append(".png");
 		return sb.toString();

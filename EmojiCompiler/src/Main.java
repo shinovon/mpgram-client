@@ -24,13 +24,13 @@ public class Main {
 				for (String u: c) {
 					sb.append(Character.toChars(Integer.parseInt(u, 16)));
 				}
-				byte[] b = sb.toString().getBytes("UTF-8");
+				new File("../emoji").mkdir();
+				char[] n = sb.toString().toCharArray();
 				sb.setLength(0);
-				sb.append("./out/");
-				int h = b.length;
+				sb.append("../emoji/");
+				int h = n.length;
 				for (int k = 0; k < h; k++) {
-					sb.append(Integer.toHexString(b[k] >> 4 & 0xf));
-					sb.append(Integer.toHexString(b[k] & 0xf));
+					sb.append(Integer.toHexString(n[k] & 0xFFFF));
 				};
 				sb.append(".png");
 				ImageIO.write(img, "png", new File(sb.toString()));
