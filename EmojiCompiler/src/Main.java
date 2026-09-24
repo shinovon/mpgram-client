@@ -30,8 +30,9 @@ public class Main {
 				sb.append("../emoji/");
 				int h = n.length;
 				for (int k = 0; k < h; k++) {
+					if (n[k] == 0xFE0F) continue;
 					sb.append(Integer.toHexString(n[k] & 0xFFFF));
-				};
+				}
 				sb.append(".png");
 				ImageIO.write(img, "png", new File(sb.toString()));
 			}

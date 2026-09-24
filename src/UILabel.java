@@ -191,12 +191,15 @@ public class UILabel extends UIItem implements Constants {
 				i++;
 			} else if (c == 0x20E3) {
 				i++;
-			} else if (c == 0x200D && i + 1 < l) {
-				c = text.charAt(++i);
-				if (i + 1 < l && c >= 0xD800 && c <= 0xDBFF) {
-					i += 2;
-				} else if (i < l) {
-					i++;
+			} else if (c == 0x200D) {
+				i++;
+				if (i < l) {
+					c = text.charAt(i);
+					if (c >= 0xD800 && c <= 0xDBFF) {
+						if (i + 1 < l && text.charAt(i + 1) >= 0xDC00 && text.charAt(i + 1) <= 0xDFFF) {
+							i += 2;
+						} else i++;
+					} else i++;
 				}
 			} else if (c == 0xD83C && i + 1 < l) {
 				char next = text.charAt(i + 1);
@@ -223,6 +226,7 @@ public class UILabel extends UIItem implements Constants {
 		sb.append('/');
 		int l = c.length;
 		for (int i = 0; i < l; i++) {
+			if (c[i] == 0xFE0F) continue;
 			sb.append(Integer.toHexString(c[i] & 0xFFFF));
 		}
 		sb.append(".png");
