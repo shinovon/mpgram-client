@@ -87,5 +87,6 @@ public interface Constants {
 //#else
 	boolean MINI_BUILD = false;
 //#endif
+	boolean EMOJI_SUPPORT = true;
 
 }
