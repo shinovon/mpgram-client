@@ -68,6 +68,7 @@ public interface Constants {
 	String CACHE_RECORD_PREFIX = "mc";
 	String AVATAR_RECORD_PREFIX = "mcA";
 	String FOLDERS_RECORD_NAME = "mcFolders";
+	String EMOJI_RECORD_PREFIX = "mcE";
 
 	// URLs
 	String DEFAULT_INSTANCE_URL = "http://mp.nnproject.cc/";
@@ -76,6 +77,7 @@ public interface Constants {
 	String FILE_URL = "file.php";
 	String VOICE_URL = "voice.php";
 	String OTA_URL = "http://nnproject.cc/mp/upd.php";
+	String EMOJI_URL = "http://d.nnproject.cc/mp/e/";
 
 	String API_VERSION = "12";
 	
@@ -86,11 +88,6 @@ public interface Constants {
 //#	boolean LITE = true;
 //#else
 	boolean LITE = false;
-//#endif
-//#ifdef EMOJI_SUPPORT
-	boolean EMOJI_SUPPORT = true;
-//#else
-//#	boolean EMOJI_SUPPORT = false;
 //#endif
 
 }

@@ -5,7 +5,7 @@
       <alias/>
    </signing>
    <configurations>
-      <configuration active="true" name="Regular">
+      <configuration active="false" name="Regular">
          <device group="KEmulator nnmod" name="KEmulator"/>
          <symbolSet name="KEmulator"/>
       </configuration>
@@ -33,6 +33,10 @@
       <configuration active="false" name="OnDeviceDebug">
          <device group="Nokia Symbian3 SDK v1.0 " name="SymbianDevice"/>
          <symbolSet name="SymbianDevice"/>
+      </configuration>
+      <configuration active="true" name="Emoji">
+         <device group="KEmulator nnmod" name="KEmulator"/>
+         <symbolSet name="KEmulator"/>
       </configuration>
    </configurations>
    <liblets/>

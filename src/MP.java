@@ -234,7 +234,11 @@ public class MP extends MIDlet
 	static int stickerPreviewSize = 32;
 	static int voiceVolume = 50;
 	static boolean newQrLogin = true;
+//#ifdef EMOJI_SUPPORT
+	static boolean emoji = true;
+	static boolean emojiBundled;
 	static int maxLoadedEmojis = 128;
+//#endif
 
 	private static boolean needWriteConfig;
 
@@ -1244,25 +1248,56 @@ public class MP extends MIDlet
 							Image img = null;
 							String recordName = null;
 //#ifndef NO_AVATARS
-							if (src instanceof String) { // avatar
-								recordName = AVATAR_RECORD_PREFIX + avatarSize + "r" + (String) src;
-								url = instanceUrl + AVA_URL + "?a&c=" + ((String) src)
-										+ "&p=r" + /*(roundAvatars ? "c" : "") +*/ avatarSize;
+							if (src instanceof String) { // avatar or emoji
+//#ifdef EMOJI_SUPPORT
+								if (target instanceof UILabel) {
+									// emoji
+									if (MP.emojiBundled) {
+										img = Image.createImage('/' + (String) src + ".png");
 
-								// load avatar from cache
-								if ((avatarsCache & 1) == 1 && imagesCache.containsKey(src)) {
-									img = (Image) imagesCache.get(src);
-								} else if ((avatarsCache & 2) == 2) {
+										((UILabel) target).requestPaint();
+										continue;
+									}
+
+									recordName = EMOJI_RECORD_PREFIX.concat((String) src);
+									url = EMOJI_URL + (String) src + ".png";
+
 									try {
 										RecordStore r = RecordStore.openRecordStore(recordName, false);
 										try {
 											byte[] b = r.getRecord(1);
 											img = Image.createImage(b, 0, b.length);
-											if (roundAvatars) img = roundImage(img);
+
+											UILabel.emojiTable.put(src, img);
+											((UILabel) target).requestPaint();
+											continue;
 										} finally {
 											r.closeRecordStore();
 										}
 									} catch (Exception ignored) {}
+								} else
+//#endif
+								{
+									// avatar
+									recordName = AVATAR_RECORD_PREFIX + avatarSize + "r" + (String) src;
+									url = instanceUrl + AVA_URL + "?a&c=" + ((String) src)
+											+ "&p=r" + /*(roundAvatars ? "c" : "") +*/ avatarSize;
+
+									// load avatar from cache
+									if ((avatarsCache & 1) == 1 && imagesCache.containsKey(src)) {
+										img = (Image) imagesCache.get(src);
+									} else if ((avatarsCache & 2) == 2) {
+										try {
+											RecordStore r = RecordStore.openRecordStore(recordName, false);
+											try {
+												byte[] b = r.getRecord(1);
+												img = Image.createImage(b, 0, b.length);
+												if (roundAvatars) img = roundImage(img);
+											} finally {
+												r.closeRecordStore();
+											}
+										} catch (Exception ignored) {}
+									}
 								}
 							} else
 //#endif
@@ -1337,6 +1372,13 @@ public class MP extends MIDlet
 									}
 //#endif
 									img = Image.createImage(b, 0, b.length);
+//#ifdef EMOJI_SUPPORT
+									if (target instanceof UILabel) {
+										UILabel.emojiTable.put(src, img);
+										((UILabel) target).requestPaint();
+										continue;
+									}
+//#endif
 //#ifndef NO_AVATARS
 									if (recordName != null && roundAvatars)
 										img = roundImage(img);
@@ -4056,6 +4098,9 @@ public class MP extends MIDlet
 				chatsCache.clear();
 				imagesCache.clear();
 				imagesToLoad.removeAllElements();
+//#ifdef EMOJI_SUPPORT
+				UILabel.emojiTable.clear();
+//#endif
 				commandAction(backCmd, d);
 				return;
 			}

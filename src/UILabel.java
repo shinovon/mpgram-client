@@ -1,7 +1,6 @@
 /*
 Copyright (c) 2025-2026 Arman Jussupgaliyev
 
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -21,14 +20,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 //#ifndef NO_CHAT_CANVAS
-import java.util.Enumeration;
+
 import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
+
+//#ifdef EMOJI_SUPPORT
+import java.util.Enumeration;
 import javax.microedition.lcdui.Image;
+//#endif
 
 public class UILabel extends UIItem implements Constants {
 
@@ -38,13 +41,11 @@ public class UILabel extends UIItem implements Constants {
 			STYLE_MONOSPACE = 4,
 			STYLE_LINK = 8;
 
-//#ifdef EMOJI_SUPPORT
 	static Hashtable emojiTable;
 
 	// resets every frame
 	static int loadedEmojis;
 	static int renderedEmojis;
-//#endif
 
 	Vector parsed; // Object[] {text, font, url, int[] {style} }
 	Vector render; // Object[] { text, font, url, int[] {x, y, width, height, style} }
@@ -65,11 +66,13 @@ public class UILabel extends UIItem implements Constants {
 	}
 
 	public UILabel(String text, Font font, String url) {
-		if (EMOJI_SUPPORT) {
+//#ifdef EMOJI_SUPPORT
+		if (MP.emoji) {
 			parsed = new Vector();
 			append(text, font, url, 0);
 			return;
 		}
+//#endif
 		(this.parsed = new Vector())
 		.addElement(new Object[] { text, font, url, null });
 	}
@@ -90,7 +93,8 @@ public class UILabel extends UIItem implements Constants {
 		}
 		Object styleObj = style == 0 ? null : new int[] { style };
 
-		if (EMOJI_SUPPORT) {
+//#ifdef EMOJI_SUPPORT
+		if (MP.emoji) {
 			if (emojiTable == null) {
 				emojiTable = new Hashtable();
 			}
@@ -177,7 +181,9 @@ public class UILabel extends UIItem implements Constants {
 			if (sb.length() != 0) {
 				append2(sb.toString(), font, url, styleObj);
 			}
-		} else {
+		} else
+//#endif
+		{
 			append2(text, font, url, styleObj);
 		}
 		requestLayout();
@@ -189,8 +195,6 @@ public class UILabel extends UIItem implements Constants {
 
 //#ifdef EMOJI_SUPPORT
 	private int appendEmoji(String text, int i, int l, int start, StringBuffer sb) {
-		if (!EMOJI_SUPPORT) return 0;
-
 		emojiCount++;
 
 		while (i < l) {
@@ -224,8 +228,6 @@ public class UILabel extends UIItem implements Constants {
 	}
 
 	private static String stringToHex(StringBuffer sb, String s) {
-		if (!EMOJI_SUPPORT) return null;
-
 		char[] c = s.toCharArray();
 		sb.setLength(0);
 		int l = c.length;
@@ -233,7 +235,6 @@ public class UILabel extends UIItem implements Constants {
 			if (c[i] == 0xFE0F) continue;
 			sb.append(Integer.toHexString(c[i] & 0xFFFF));
 		}
-		sb.append(".png");
 		return sb.toString();
 	}
 //#endif
@@ -276,7 +277,8 @@ public class UILabel extends UIItem implements Constants {
 				} else if ((style & STYLE_MONOSPACE) != 0) {
 					g.setColor(monospaceColor);
 				}
-				if (EMOJI_SUPPORT && font == null) {
+//#ifdef EMOJI_SUPPORT
+				if (MP.emoji && font == null) {
 					emoji: {
 						img: {
 							if (text == null || ++renderedEmojis >= MP.maxLoadedEmojis) break img;
@@ -300,15 +302,18 @@ public class UILabel extends UIItem implements Constants {
 									}
 								} catch (Exception ignored) {}
 
-								try {
-									img = Image.createImage(text);
-								} catch (Throwable ignored) {}
-								if (img == null) {
-									obj[0] = null;
-									emojiTable.put(text, MP.json_null);
-									break img;
-								}
-								emojiTable.put(text, img);
+								emojiTable.put(text, MP.json_null);
+								MP.queueImage(text, this);
+//								try {
+//									img = Image.createImage(text);
+//								} catch (Throwable ignored) {}
+//								if (img == null) {
+//									obj[0] = null;
+//									emojiTable.put(text, MP.json_null);
+//									break img;
+//								}
+//								emojiTable.put(text, img);
+								break img;
 							}
 
 							g.drawImage((Image) img, tx, ty, 0);
@@ -316,7 +321,9 @@ public class UILabel extends UIItem implements Constants {
 						}
 						g.fillRect(tx, ty, 16, 16);
 					}
-				} else {
+				} else
+//#endif
+				{
 					g.setFont(font);
 					g.drawString(text, tx, ty, 0);
 				}
