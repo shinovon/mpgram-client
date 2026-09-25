@@ -23,7 +23,6 @@ SOFTWARE.
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
-import javax.microedition.lcdui.TextField;
 import java.io.DataInputStream;
 import java.util.Random;
 
@@ -42,8 +41,10 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 	static int[] colorsCopy;
 	static int[] style = new int[20];
 	static boolean bg;
+//#ifndef NO_FILE
 	static Image bgImg;
 	static int bgWidth, bgHeight;
+//#endif
 
 	static Keyboard keyboard;
 
@@ -266,6 +267,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 		loadTheme();
 
 		if (chat) {
+//#ifndef NO_FILE
 			if (bgImg == null) {
 				try {
 					String p = MP.wallpaperPath;
@@ -289,6 +291,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 					bg = false;
 				}
 			}
+//#endif
 
 			// initialize keyboard
 			switch (MP.textMethod) {
@@ -296,7 +299,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 			case 1: // nokiaui
 //#ifndef NO_NOKIAUI
 				try {
-					nokiaEditor = NokiaAPI.createTextEditor(500, TextField.ANY, 40, 40);
+					nokiaEditor = NokiaAPI.createTextEditor(500, 0 /*TextField.ANY*/, 40, 40);
 					if (nokiaEditor != null) {
 						NokiaAPI.TextEditor_setContent(nokiaEditor, "");
 					}
@@ -531,6 +534,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 			// background
 			g.setColor(colors[chat ? ChatCanvas.COLOR_CHAT_BG : ChatsCanvas.COLOR_CHATS_BG]);
 			g.fillRect(0, 0, w, h);
+//#ifndef NO_FILE
 			if (bgImg != null && chat) {
 //				g.drawImage(bgImg, (w - bgWidth) >> 1, (h - bgHeight) >> 1, 0);
 				int bgWidth = MPCanvas.bgWidth;
@@ -540,6 +544,7 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 						Math.min(bgWidth, w), Math.min(bgHeight, h), 0,
 						Math.max(0, (w - bgWidth) >> 1), Math.max(0, (h - bgHeight) >> 1), 0);
 			}
+//#endif
 			g.setColor(colors[COLOR_CHAT_FG]);
 
 			// render items

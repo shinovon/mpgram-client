@@ -5,7 +5,7 @@
       <alias/>
    </signing>
    <configurations>
-      <configuration active="false" name="Regular">
+      <configuration active="true" name="Regular">
          <device group="KEmulator nnmod" name="KEmulator"/>
          <symbolSet name="KEmulator"/>
       </configuration>
@@ -19,6 +19,7 @@
             <symbol name="NO_NOTIFY" value="true"/>
             <symbol name="NO_FILE" value="true"/>
             <symbol name="NO_ZIP" value="true"/>
+            <symbol name="NO_EMOJI" value="true"/>
             <symbol name="NO_NOKIAUI" value="true"/>
             <symbol name="NO_RECORD" value="true"/>
          </symbolSet>
@@ -33,10 +34,6 @@
       <configuration active="false" name="OnDeviceDebug">
          <device group="Nokia Symbian3 SDK v1.0 " name="SymbianDevice"/>
          <symbolSet name="SymbianDevice"/>
-      </configuration>
-      <configuration active="true" name="Emoji">
-         <device group="KEmulator nnmod" name="KEmulator"/>
-         <symbolSet name="KEmulator"/>
       </configuration>
    </configurations>
    <liblets/>

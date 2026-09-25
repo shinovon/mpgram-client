@@ -580,7 +580,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			arrowShown = false;
 		}
 
-//#ifdef EMOJI_SUPPORT
+//#ifndef NO_EMOJI
 		{
 			UILabel.loadedEmojis = 0;
 			UILabel.renderedEmojis = 0;

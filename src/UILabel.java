@@ -28,7 +28,7 @@ import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
-//#ifdef EMOJI_SUPPORT
+//#ifndef NO_EMOJI
 import java.util.Enumeration;
 import javax.microedition.lcdui.Image;
 //#endif
@@ -66,7 +66,7 @@ public class UILabel extends UIItem implements Constants {
 	}
 
 	public UILabel(String text, Font font, String url) {
-//#ifdef EMOJI_SUPPORT
+//#ifndef NO_EMOJI
 		if (MP.emoji) {
 			parsed = new Vector();
 			append(text, font, url, 0);
@@ -93,7 +93,7 @@ public class UILabel extends UIItem implements Constants {
 		}
 		Object styleObj = style == 0 ? null : new int[] { style };
 
-//#ifdef EMOJI_SUPPORT
+//#ifndef NO_EMOJI
 		if (MP.emoji) {
 			if (emojiTable == null) {
 				emojiTable = new Hashtable();
@@ -193,7 +193,7 @@ public class UILabel extends UIItem implements Constants {
 		parsed.addElement(new Object[] { text, font, url, style });
 	}
 
-//#ifdef EMOJI_SUPPORT
+//#ifndef NO_EMOJI
 	private int appendEmoji(String text, int i, int l, int start, StringBuffer sb) {
 		emojiCount++;
 
@@ -277,7 +277,7 @@ public class UILabel extends UIItem implements Constants {
 				} else if ((style & STYLE_MONOSPACE) != 0) {
 					g.setColor(monospaceColor);
 				}
-//#ifdef EMOJI_SUPPORT
+//#ifndef NO_EMOJI
 				if (MP.emoji && font == null) {
 					emoji: {
 						img: {
