@@ -9,7 +9,7 @@ cd Regular || exit 1
 cp mpgram.jar "$MPGRAM_DEPLOY_DIR/mpgram.jar"
 
 # regular jad
-sed -i "s/MIDlet-Jar-URL: mpgram.jar/MIDlet-Jar-URL: http:\/\/nnproject.cc\/dl\/mpgram.jar/g" mpgram.jad && \
+sed -i "s/MIDlet-Jar-URL: mpgram.jar/MIDlet-Jar-URL: http:\/\/d.nnproject.cc\/mpgram.jar/g" mpgram.jad && \
 unix2dos mpgram.jad && \
 cp mpgram.jad "$MPGRAM_DEPLOY_DIR/mpgram.jad"
 
@@ -31,7 +31,7 @@ dos2unix mpgram.jad && \
 sed -i "/Nokia-Scalable-Icon: \/m.svg/d" mpgram.jad && \
 sed -i "/Nokia-Scalable-Icon-MIDlet-1: \/m.svg/d" mpgram.jad && \
 sed -i "/MIDlet-Jar-Size: /d" mpgram.jad && \
-sed -i "s/MIDlet-Jar-URL: mpgram.jar/MIDlet-Jar-URL: http:\/\/nnproject.cc\/dl\/mpgram_lite.jar/g" mpgram.jad && \
+sed -i "s/MIDlet-Jar-URL: mpgram.jar/MIDlet-Jar-URL: http:\/\/d.nnproject.cc\/mpgram_lite.jar/g" mpgram.jad && \
 size=$(stat -c %s "mpgram_lite.jar") && \
 echo -e "MIDlet-Jar-Size: $size\n" >> mpgram.jad && \
 unix2dos mpgram.jad && \

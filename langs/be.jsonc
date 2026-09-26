@@ -250,6 +250,7 @@
 	"StickerPreviewSize": "Памер наклеек у перадпраглядзе",
 	"LegacyUISettings": "Налады ранейшага інтэрфэйсу",
 	"j2mekeyboardSettings": "Налады j2mekeyboard:",
+	"ShowEmoji": "Show emoji", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Чакаць, пакуль загрузіцца старонка",

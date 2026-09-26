@@ -40,7 +40,9 @@ import javax.microedition.io.file.FileConnection;
 import javax.microedition.io.file.FileSystemRegistry;
 //#endif
 import javax.microedition.lcdui.*;
+//#ifndef NO_RECORD
 import javax.microedition.media.Control;
+//#endif
 import javax.microedition.media.Manager;
 import javax.microedition.media.Player;
 import javax.microedition.media.PlayerListener;
@@ -217,7 +219,9 @@ public class MP extends MIDlet
 	static boolean pngStickers;
 	static boolean lazyLoading = true;
 	static boolean chatAvatar;
+//#ifndef NO_FILE
 	static String wallpaperPath = "";
+//#endif
 	static boolean noSelectCommand;
 	static boolean compactChats;
 //#endif
@@ -234,6 +238,11 @@ public class MP extends MIDlet
 	static int stickerPreviewSize = 32;
 	static int voiceVolume = 50;
 	static boolean newQrLogin = true;
+//#ifndef NO_EMOJI
+	static boolean emoji;
+	static boolean emojiBundled;
+	static int maxLoadedEmojis = 128;
+//#endif
 
 	private static boolean needWriteConfig;
 
@@ -266,7 +275,9 @@ public class MP extends MIDlet
 	static Command backCmd;
 
 	private static Command settingsCmd;
+//#ifndef NO_NOTIFY
 	private static Command settingsNotifCmd;
+//#endif
 	private static Command settingsUiCmd;
 	private static Command settingsBehCmd;
 	private static Command settingsAdvCmd;
@@ -284,12 +295,16 @@ public class MP extends MIDlet
 
 	private static Command logoutCmd;
 	private static Command clearCacheCmd;
-	private static Command downloadPathCmd;
+//#ifndef NO_CHAT_CANVAS
 	private static Command keyboardLanguagesCmd;
 	private static Command saveLanguagesCmd;
+	//#endif
 	private static Command exportSessionCmd;
-	private static Command wallpaperPathCmd;
 	private static Command resetCmd;
+//#ifndef NO_FILE
+	private static Command downloadPathCmd;
+	private static Command wallpaperPathCmd;
+//#endif
 
 	static Command refreshCmd;
 	static Command archiveCmd;
@@ -406,7 +421,9 @@ public class MP extends MIDlet
 	private static List playlistList;
 	private static final Vector formHistory = new Vector();
 	private static Form settingsUiForm;
+//#ifndef NO_NOTIFY
 	private static Form settingsNotifForm;
+//#endif
 	private static Form settingsBehForm;
 	private static Form settingsAdvForm;
 
@@ -416,17 +433,25 @@ public class MP extends MIDlet
 
 	// settings items
 	private static ChoiceGroup imagesChoice;
+//#ifndef NO_AVATARS
 	private static ChoiceGroup avaCacheChoice;
+//#endif
 	private static ChoiceGroup uiChoice;
 	private static ChoiceGroup behChoice;
+//#ifndef NO_LANGS
 	private static ChoiceGroup langChoice;
+//#endif
 	private static ChoiceGroup chatsFontSizeCoice;
 	private static ChoiceGroup networkChoice;
+//#ifndef NO_FILE
 	private static ChoiceGroup playMethodChoice;
+//#endif
 	private static ChoiceGroup playerCreateMethodChoice;
 	private static ChoiceGroup advChoice;
 	private static ChoiceGroup legacyUiChoice;
+//#ifndef NO_AVATARS
 	private static Gauge avaCacheGauge;
+//#endif
 	private static Gauge photoSizeGauge;
 	private static Gauge profileCacheGauge;
 	private static Gauge chatsGauge;
@@ -447,14 +472,16 @@ public class MP extends MIDlet
 //#ifndef NO_CHAT_CANVAS
 	private static ChoiceGroup textMethodChoice;
 	private static ChoiceGroup themeChoice;
+//#ifndef NO_FILE
 	private static TextField wallpaperPathField;
+//#endif
 //#endif
 
 	// write items
 	private static TextField messageField;
 //	private static TextField fileField;
-	private static ChoiceGroup sendChoice;
 //#ifndef NO_FILE
+	private static ChoiceGroup sendChoice;
 	private static StringItem fileLabel;
 //#endif
 
@@ -549,6 +576,10 @@ public class MP extends MIDlet
 		Form f = new Form("MPGram");
 		f.append("Loading");
 		display.setCurrent(mainDisplayable = f);
+
+//#ifndef NO_EMOJI
+		emojiBundled = getAppProperty("mpgram-emoji-bundled") != null;
+//#endif
 
 		// get device name
 		String p, v, d = null;
@@ -799,7 +830,12 @@ public class MP extends MIDlet
 			fastScrolling = j.getBoolean("fastScrolling", fastScrolling);
 			forceKeyUI = j.getBoolean("forceKeyUI", forceKeyUI);
 			chatAvatar = j.getBoolean("chatAvatar", chatAvatar);
+//#ifndef NO_FILE
 			wallpaperPath = j.getString("wallpaperPath", wallpaperPath);
+//#endif
+//#ifndef NO_EMOJI
+			emoji = j.getBoolean("emoji", emoji);
+//#endif
 //#endif
 //#ifndef NO_FILE
 			downloadPath = j.getString("downloadPath", downloadPath);
@@ -871,7 +907,9 @@ public class MP extends MIDlet
 
 		settingsCmd = new Command(L[LSettings], Command.SCREEN, 20);
 		settingsUiCmd = new Command(L[LUI], Command.ITEM, 1);
+//#ifndef NO_NOTIFY
 		settingsNotifCmd = new Command(L[LNotifications], Command.ITEM, 1);
+//#endif
 		settingsBehCmd = new Command(L[LBehaviour], Command.ITEM, 1);
 		settingsAdvCmd = new Command(L[LAdvanced_Settings], Command.ITEM, 1);
 		aboutCmd = new Command(L[LAbout], Command.SCREEN, 21);
@@ -888,12 +926,16 @@ public class MP extends MIDlet
 
 		logoutCmd = new Command(L[LLogout], Command.ITEM, 1);
 		clearCacheCmd = new Command(L[LClearCache], Command.ITEM, 1);
-		downloadPathCmd = new Command(L[LLocate], Command.ITEM, 1);
+//#ifndef NO_CHAT_CANVAS
 		keyboardLanguagesCmd = new Command(L[LSelect], Command.ITEM, 1);
 		saveLanguagesCmd = new Command(L[LBack], Command.BACK, 1);
+//#endif
 		exportSessionCmd = new Command(L[LShowSessionCode], Command.ITEM, 1);
-		wallpaperPathCmd = new Command(L[LLocate], Command.ITEM, 1);
 		resetCmd = new Command(L[LResetSettings], Command.ITEM, 1);
+//#ifndef NO_FILE
+		downloadPathCmd = new Command(L[LLocate], Command.ITEM, 1);
+		wallpaperPathCmd = new Command(L[LLocate], Command.ITEM, 1);
+//#endif
 
 		foldersCmd = new Command(L[LFolders], Command.SCREEN, 4);
 		refreshCmd = new Command(L[LRefresh], Command.SCREEN, 5);
@@ -1241,27 +1283,58 @@ public class MP extends MIDlet
 						try {
 							String url;
 							Image img = null;
-							String recordName = null;
 //#ifndef NO_AVATARS
-							if (src instanceof String) { // avatar
-								recordName = AVATAR_RECORD_PREFIX + avatarSize + "r" + (String) src;
-								url = instanceUrl + AVA_URL + "?a&c=" + ((String) src)
-										+ "&p=r" + /*(roundAvatars ? "c" : "") +*/ avatarSize;
+							String recordName = null;
+							if (src instanceof String) { // avatar or emoji
+//#ifndef NO_EMOJI
+								if (target instanceof UILabel) {
+									// emoji
+									if (MP.emojiBundled) {
+										img = Image.createImage('/' + (String) src + ".png");
 
-								// load avatar from cache
-								if ((avatarsCache & 1) == 1 && imagesCache.containsKey(src)) {
-									img = (Image) imagesCache.get(src);
-								} else if ((avatarsCache & 2) == 2) {
+										((UILabel) target).requestPaint();
+										continue;
+									}
+
+									recordName = EMOJI_RECORD_PREFIX.concat((String) src);
+									url = EMOJI_URL + (String) src + ".png";
+
 									try {
 										RecordStore r = RecordStore.openRecordStore(recordName, false);
 										try {
 											byte[] b = r.getRecord(1);
 											img = Image.createImage(b, 0, b.length);
-											if (roundAvatars) img = roundImage(img);
+
+											UILabel.emojiTable.put(src, img);
+											((UILabel) target).requestPaint();
+											continue;
 										} finally {
 											r.closeRecordStore();
 										}
 									} catch (Exception ignored) {}
+								} else
+//#endif
+								{
+									// avatar
+									recordName = AVATAR_RECORD_PREFIX + avatarSize + "r" + (String) src;
+									url = instanceUrl + AVA_URL + "?a&c=" + ((String) src)
+											+ "&p=r" + /*(roundAvatars ? "c" : "") +*/ avatarSize;
+
+									// load avatar from cache
+									if ((avatarsCache & 1) == 1 && imagesCache.containsKey(src)) {
+										img = (Image) imagesCache.get(src);
+									} else if ((avatarsCache & 2) == 2) {
+										try {
+											RecordStore r = RecordStore.openRecordStore(recordName, false);
+											try {
+												byte[] b = r.getRecord(1);
+												img = Image.createImage(b, 0, b.length);
+												if (roundAvatars) img = roundImage(img);
+											} finally {
+												r.closeRecordStore();
+											}
+										} catch (Exception ignored) {}
+									}
 								}
 							} else
 //#endif
@@ -1336,6 +1409,13 @@ public class MP extends MIDlet
 									}
 //#endif
 									img = Image.createImage(b, 0, b.length);
+//#ifndef NO_EMOJI
+									if (target instanceof UILabel) {
+										UILabel.emojiTable.put(src, img);
+										((UILabel) target).requestPaint();
+										continue;
+									}
+//#endif
 //#ifndef NO_AVATARS
 									if (recordName != null && roundAvatars)
 										img = roundImage(img);
@@ -1546,7 +1626,6 @@ public class MP extends MIDlet
 				String replyTo = (String) ((Object[]) param)[2];
 				String edit = (String) ((Object[]) param)[3];
 				String file = (String) ((Object[]) param)[4];
-				boolean[] sendChoice = (boolean[]) ((Object[]) param)[5];
 				String fwdPeer = (String) ((Object[]) param)[6];
 				String fwdMsg = (String) ((Object[]) param)[7];
 //#ifndef NO_CHAT_CANVAS
@@ -1554,8 +1633,10 @@ public class MP extends MIDlet
 //#endif
 				String top = ((Object[]) param).length < 10 ? null : (String) ((Object[]) param)[9];
 
-				Alert alert = null;
+//#ifndef NO_FILE
+				boolean[] sendChoice = (boolean[]) ((Object[]) param)[5];
 				boolean voice = false;
+				Alert alert = null;
 				try {
 					if (sendChoice != null || file != null) {
 						alert = new Alert(symbian ? L[Lmpgram] : "");
@@ -1567,6 +1648,7 @@ public class MP extends MIDlet
 						display(alert, current);
 					}
 				} catch (Exception ignored) {}
+//#endif
 
 				if (file != null && file.length() <= 8) {
 					file = null;
@@ -1588,6 +1670,7 @@ public class MP extends MIDlet
 					if (top != null) {
 						sb.append("&top=").append(top);
 					}
+//#ifndef NO_FILE
 					if (sendChoice != null) {
 						if (sendChoice[0]) {
 							sb.append("&uncompressed=1");
@@ -1600,6 +1683,7 @@ public class MP extends MIDlet
 							voice = true;
 						}
 					}
+//#endif
 //#ifndef NO_CHAT_CANVAS
 					if (fwdMsgs != null && fwdMsgs.length != 0) {
 						if (fwdMsgs.length == 1) {
@@ -1731,7 +1815,7 @@ public class MP extends MIDlet
 		case RUN_CHECK_OTA: { // check for client updates
 			try {
 				JSONObject j = parseObject(new String(get(OTA_URL + "?v=" + version + "&l=" + lang
-						+ (MINI_BUILD ? "&m=1" : "")
+						+ (LITE ? "&m=1" : "")
 						+ (midlet.getAppProperty("mpgram-blackberry-build") != null ? "&bb=1" : "")
 						+ (midlet.getAppProperty("mpgram-samsung-build") != null ? "&sams=1" : "")), encoding));
 				if (j.getBoolean("update_available", false) && checkUpdates) {
@@ -3498,6 +3582,9 @@ public class MP extends MIDlet
 								L[LBuiltinImageViewer],
 								L[LLargeMusicCover],
 //#ifndef NO_CHAT_CANVAS
+//#ifndef NO_EMOJI
+								L[LShowEmoji],
+//#endif
 								L[LFastScrolling],
 //#endif
 								L[L12HourTimeFormat],
@@ -3515,6 +3602,9 @@ public class MP extends MIDlet
 						uiChoice.setSelectedIndex(i++, useView);
 						uiChoice.setSelectedIndex(i++, fullPlayerCover);
 //#ifndef NO_CHAT_CANVAS
+//#ifndef NO_EMOJI
+						uiChoice.setSelectedIndex(i++, emoji);
+//#endif
 						uiChoice.setSelectedIndex(i++, fastScrolling);
 //#endif
 						uiChoice.setSelectedIndex(i, time12);
@@ -3887,6 +3977,9 @@ public class MP extends MIDlet
 						useView = uiChoice.isSelected(i++);
 						fullPlayerCover = uiChoice.isSelected(i++);
 //#ifndef NO_CHAT_CANVAS
+//#ifndef NO_EMOJI
+						emoji = uiChoice.isSelected(i++);
+//#endif
 						fastScrolling = uiChoice.isSelected(i++);
 //#endif
 						time12 = uiChoice.isSelected(i);
@@ -3902,7 +3995,9 @@ public class MP extends MIDlet
 							MPCanvas.colorsCopy = null;
 							MPCanvas.loadTheme();
 						}
+//#ifndef NO_FILE
 						wallpaperPath = wallpaperPathField.getString().trim();
+//#endif
 //#endif
 						if ((photoSize = (photoSizeGauge.getValue() * 8)) < 16) {
 							photoSizeGauge.setValue((photoSize = 16) / 8);
@@ -4055,6 +4150,9 @@ public class MP extends MIDlet
 				chatsCache.clear();
 				imagesCache.clear();
 				imagesToLoad.removeAllElements();
+//#ifndef NO_EMOJI
+				UILabel.emojiTable.clear();
+//#endif
 				commandAction(backCmd, d);
 				return;
 			}
@@ -4168,7 +4266,9 @@ public class MP extends MIDlet
 					cancel(MP.updatesThread, true);
 				}
 				boolean[] sel = new boolean[2];
+//#ifndef NO_FILE
 				sendChoice.getSelectedFlags(sel);
+//#endif
 				start(RUN_SEND_MESSAGE, new Object[] { t, writeTo, replyTo, edit, sendFile, sel, fwdPeer, fwdMsg });
 				return;
 			}
@@ -7517,7 +7617,12 @@ public class MP extends MIDlet
 		j.put("fastScrolling", fastScrolling);
 		j.put("forceKeyUI", forceKeyUI);
 		j.put("chatAvatar", chatAvatar);
+//#ifndef NO_FILE
 		j.put("wallpaperPath", wallpaperPath);
+//#endif
+//#ifndef NO_EMOJI
+		j.put("emoji", emoji);
+//#endif
 //#endif
 //#ifndef NO_FILE
 		j.put("downloadPath", downloadPath);

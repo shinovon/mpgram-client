@@ -250,6 +250,7 @@
 	"StickerPreviewSize": "ابعاد پیش نمایش استیکر",
 	"LegacyUISettings": "Legacy UI settings", // Untranslated
 	"j2mekeyboardSettings": "j2mekeyboard settings:", // Untranslated
+	"ShowEmoji": "Show emoji", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "صبر کردن برای بارگیری صفحه",

@@ -250,6 +250,7 @@
 	"StickerPreviewSize": "Etiket önizleme boyutu",
 	"LegacyUISettings": "Legacy UI settings", // Untranslated
 	"j2mekeyboardSettings": "j2mekeyboard settings:", // Untranslated
+	"ShowEmoji": "Show emoji", // Untranslated
 
 	// Behaviour settings
 	"WaitForPageToLoad": "Sayfa yüklenmesini bekle",

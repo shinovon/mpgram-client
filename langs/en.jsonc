@@ -250,6 +250,7 @@
 	"StickerPreviewSize": "Sticker preview size",
 	"LegacyUISettings": "Legacy UI settings",
 	"j2mekeyboardSettings": "j2mekeyboard settings:",
+	"ShowEmoji": "Show emoji",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Wait for page to load",

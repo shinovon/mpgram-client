@@ -1,7 +1,6 @@
 /*
 Copyright (c) 2025-2026 Arman Jussupgaliyev
 
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -21,19 +20,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 //#ifndef NO_CHAT_CANVAS
+
+import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
-public class UILabel extends UIItem {
+//#ifndef NO_EMOJI
+import java.util.Enumeration;
+import javax.microedition.lcdui.Image;
+//#endif
+
+public class UILabel extends UIItem implements Constants {
 
 	static final int
 			STYLE_STRIKETHROUGH = 1,
 			STYLE_SPOILER = 2,
 			STYLE_MONOSPACE = 4,
 			STYLE_LINK = 8;
+
+	static Hashtable emojiTable;
+
+	// resets every frame
+	static int loadedEmojis;
+	static int renderedEmojis;
 
 	Vector parsed; // Object[] {text, font, url, int[] {style} }
 	Vector render; // Object[] { text, font, url, int[] {x, y, width, height, style} }
@@ -47,11 +59,20 @@ public class UILabel extends UIItem {
 
 	boolean spoilersUnhidden;
 
+	int emojiCount;
+
 	public UILabel() {
 		this.parsed = new Vector();
 	}
 
 	public UILabel(String text, Font font, String url) {
+//#ifndef NO_EMOJI
+		if (MP.emoji) {
+			parsed = new Vector();
+			append(text, font, url, 0);
+			return;
+		}
+//#endif
 		(this.parsed = new Vector())
 		.addElement(new Object[] { text, font, url, null });
 	}
@@ -70,9 +91,153 @@ public class UILabel extends UIItem {
 			url = url == null ? "!" : "!".concat(url);
 			focusable = true;
 		}
-		parsed.addElement(new Object[] { text, font, url, style == 0 ? null : new int[] { style } });
+		Object styleObj = style == 0 ? null : new int[] { style };
+
+//#ifndef NO_EMOJI
+		if (MP.emoji) {
+			if (emojiTable == null) {
+				emojiTable = new Hashtable();
+			}
+
+			int l = text.length();
+
+			StringBuffer sb = new StringBuffer();
+			int i = 0;
+			while (i < l) {
+				char c = text.charAt(i);
+				if (c == 0x2026) {
+					sb.append("...");
+					i++;
+					continue;
+				}
+				if (c == 0x2023) {
+					sb.append('-');
+					i++;
+					continue;
+				}
+				if (c == 0xFE0F) {
+					i++;
+					continue;
+				}
+				if (c == 0x20E3 && i != 0) {
+					int start;
+					char c2 = text.charAt(start = (i - 1));
+					if (c2 == 0xFE0F && i != 1) {
+						c2 = text.charAt(start = (i - 2));
+					}
+					if ((c2 >= '0' && c2 <= '9') || c2 == '*' || c2 == '#') {
+						sb.deleteCharAt(sb.length() - 1);
+						if (sb.length() != 0) {
+							append2(sb.toString(), font, url, styleObj);
+							sb.setLength(0);
+						}
+
+						i = appendEmoji(text, i, l, start, sb);
+						continue;
+					}
+				}
+				if (c >= 0xD800 && c <= 0xDBFF && i + 1 < l) {
+					char c2 = text.charAt(i + 1);
+					if (c2 >= 0xDC00 && c2 <= 0xDFFF) {
+						int cp = ((c - 0xD800) << 10) + (c2 - 0xDC00) + 0x10000;
+
+						if (cp >= 0x1F000 && cp <= 0x1FAFF) {
+							if (sb.length() != 0) {
+								append2(sb.toString(), font, url, styleObj);
+								sb.setLength(0);
+							}
+
+							int start = i;
+							i += 2;
+							if (cp >= 0x1F1E6 && cp <= 0x1F1FF && i + 1 < l && text.charAt(i) == 0xD83C) {
+								c2 = text.charAt(i + 1);
+								if (c2 >= 0xDDE6 && c2 <= 0xDDFF) {
+									i += 2;
+								}
+							}
+
+							i = appendEmoji(text, i, l, start, sb);
+							continue;
+						}
+					}
+				} else if ((c >= 0x2600 && c <= 0x27BF) || (c >= 0x2300 && c <= 0x23FF)
+						|| (c >= 0x2B05 && c <= 0x2B55) || (c >= 0x2190 && c <= 0x21FF)
+						|| (c >= 0x25A0 && c <= 0x25FF)
+						|| c == 0x00A9 || c == 0x00AE || c == 0x203C || c == 0x2049 || c == 0x2122
+						|| c == 0x2139 || c == 0x3030 || c == 0x303D || c == 0x3297 || c == 0x3299) {
+					if (sb.length() != 0) {
+						append2(sb.toString(), font, url, styleObj);
+						sb.setLength(0);
+					}
+
+					int start = i;
+					i++;
+					i = appendEmoji(text, i, l, start, sb);
+					continue;
+				}
+				sb.append(c);
+				i++;
+			}
+			if (sb.length() != 0) {
+				append2(sb.toString(), font, url, styleObj);
+			}
+		} else
+//#endif
+		{
+			append2(text, font, url, styleObj);
+		}
 		requestLayout();
 	}
+
+	private void append2(String text, Font font, String url, Object style) {
+		parsed.addElement(new Object[] { text, font, url, style });
+	}
+
+//#ifndef NO_EMOJI
+	private int appendEmoji(String text, int i, int l, int start, StringBuffer sb) {
+		emojiCount++;
+
+		while (i < l) {
+			char c = text.charAt(i);
+
+			if (c == 0xFE0E || c == 0xFE0F || c == 0x20E3) {
+				i++;
+			} else if (c == 0x200D && ++i < l) {
+				c = text.charAt(i);
+				if (c >= 0xD800 && c <= 0xDBFF) {
+					if (i + 1 < l && text.charAt(i + 1) >= 0xDC00 && text.charAt(i + 1) <= 0xDFFF) {
+						i += 2;
+					} else i++;
+				} else i++;
+			} else if (c == 0xD83C && i + 1 < l) {
+				char next = text.charAt(i + 1);
+				if (next >= 0xDFFB && next <= 0xDFFF) {
+					i += 2;
+				} else break;
+			} else break;
+		}
+
+		if (emojiCount < 200) {
+			String code = stringToHex(sb, text.substring(start, i));
+			sb.setLength(0);
+
+			append2(code, null, null, null);
+		}
+
+		return i;
+	}
+
+	private static String stringToHex(StringBuffer sb, String s) {
+		char[] c = s.toCharArray();
+		sb.setLength(0);
+		int l = c.length;
+		for (int i = 0; i < l; i++) {
+			if (c[i] == 0xFE0F) continue;
+			sb.append(Integer.toHexString(c[i] & 0xFFFF));
+		}
+		return sb.toString();
+	}
+//#endif
 
 	void paint(Graphics g, int x, int y, int w) {
 		if (render == null) return;
@@ -112,8 +277,56 @@ public class UILabel extends UIItem {
 				} else if ((style & STYLE_MONOSPACE) != 0) {
 					g.setColor(monospaceColor);
 				}
-				g.setFont(font);
-				g.drawString(text, tx, ty, 0);
+//#ifndef NO_EMOJI
+				if (MP.emoji && font == null) {
+					emoji: {
+						img: {
+							if (text == null || ++renderedEmojis >= MP.maxLoadedEmojis) break img;
+
+							Object img = null;
+							if (emojiTable.containsKey(text)) {
+								img = emojiTable.get(text);
+								if (img == MP.json_null) break img;
+							} else {
+								if (++loadedEmojis >= 8) break img;
+								try {
+									int s = emojiTable.size();
+									if (s > MP.maxLoadedEmojis) {
+										Enumeration e = emojiTable.keys();
+
+										int m = MP.maxLoadedEmojis >> 1;
+										while (s > m && e.hasMoreElements()) {
+											emojiTable.remove(e.nextElement());
+											s--;
+										}
+									}
+								} catch (Exception ignored) {}
+
+								emojiTable.put(text, MP.json_null);
+								MP.queueImage(text, this);
+//								try {
+//									img = Image.createImage(text);
+//								} catch (Throwable ignored) {}
+//								if (img == null) {
+//									obj[0] = null;
+//									emojiTable.put(text, MP.json_null);
+//									break img;
+//								}
+//								emojiTable.put(text, img);
+								break img;
+							}
+
+							g.drawImage((Image) img, tx, ty, 0);
+							break emoji;
+						}
+						g.fillRect(tx, ty, 16, 16);
+					}
+				} else
+//#endif
+				{
+					g.setFont(font);
+					g.drawString(text, tx, ty, 0);
+				}
 				if ((style & STYLE_STRIKETHROUGH) != 0) {
 					int ly = ty + (th >> 1) + 1;
 					g.drawLine(tx, ly, tx + tw, ly);
@@ -159,6 +372,18 @@ public class UILabel extends UIItem {
 			Font font = (Font) e[1];
 			String url = (String) e[2];
 			int style = e[3] == null ? 0 : ((int[]) e[3])[0];
+
+			if (font == null) {
+				if (fh < 16) fh = 16;
+				if (x + 18 >= width) {
+					x = 0;
+					y += fh;
+				}
+				res.addElement(new Object[] { text, null, url, new int[] {x, y + fh - 16, 16, 16, style} });
+				x += 17;
+				mw = Math.max(mw, x);
+				continue;
+			}
 
 			String url2 = url;
 			if ("!".equals(url)) url = null;
@@ -396,7 +621,7 @@ public class UILabel extends UIItem {
 				if (bounds[1] != y) break;
 				f = (Font) ((Object[]) res.elementAt(i))[1];
 			}
-			dy = f.getBaselinePosition() - font.getBaselinePosition();
+			dy = (f == null ? 16 : f.getBaselinePosition()) - font.getBaselinePosition();
 		}
 		if (ch != sl) {
 			int ew = font.substringWidth(text, ch, sl - ch);

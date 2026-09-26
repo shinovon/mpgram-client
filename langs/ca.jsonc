@@ -250,6 +250,7 @@
 	"StickerPreviewSize": "Mida de vista prèvia d'adhesiu",
 	"LegacyUISettings": "Legacy UI settings", // Untranslated
 	"j2mekeyboardSettings": "j2mekeyboard settings:", // Untranslated
+	"ShowEmoji": "Show emoji", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Espera que pàgina es carregui",

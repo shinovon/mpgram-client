@@ -250,6 +250,7 @@
 	"StickerPreviewSize": "Размер стикеров в предпросмотре",
 	"LegacyUISettings": "Настройки старого интерфейса",
 	"j2mekeyboardSettings": "Настройки j2mekeyboard:",
+	"ShowEmoji": "Показывать эмодзи",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Ждать полной загрузки",

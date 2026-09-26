@@ -13,6 +13,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/res" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/j2mekeyboard/res" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/emoji" type="java-resource" />
       <excludeFolder url="file://$MODULE_DIR$/deployed" />
       <excludeFolder url="file://$MODULE_DIR$/.processed" />
       <excludeFolder url="file://$MODULE_DIR$/.mtj.tmp" />

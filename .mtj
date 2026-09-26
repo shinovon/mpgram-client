@@ -19,6 +19,7 @@
             <symbol name="NO_NOTIFY" value="true"/>
             <symbol name="NO_FILE" value="true"/>
             <symbol name="NO_ZIP" value="true"/>
+            <symbol name="NO_EMOJI" value="true"/>
             <symbol name="NO_NOKIAUI" value="true"/>
             <symbol name="NO_RECORD" value="true"/>
          </symbolSet>

@@ -250,6 +250,7 @@
 	"StickerPreviewSize": "Sticker preview size", // Untranslated
 	"LegacyUISettings": "Legacy UI settings", // Untranslated
 	"j2mekeyboardSettings": "j2mekeyboard settings:", // Untranslated
+	"ShowEmoji": "Show emoji", // Untranslated
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Odota sivun latausta",
