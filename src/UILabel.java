@@ -288,7 +288,7 @@ public class UILabel extends UIItem implements Constants {
 								img = emojiTable.get(text);
 								if (img == MP.json_null) break img;
 							} else {
-								if (++loadedEmojis >= 8) break img;
+								if (++loadedEmojis >= 4) break img;
 								try {
 									int s = emojiTable.size();
 									if (s > MP.maxLoadedEmojis) {

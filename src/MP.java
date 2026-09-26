@@ -241,7 +241,7 @@ public class MP extends MIDlet
 //#ifndef NO_EMOJI
 	static boolean emoji;
 	static boolean emojiBundled;
-	static int maxLoadedEmojis = 128;
+	static int maxLoadedEmojis = 200;
 //#endif
 
 	private static boolean needWriteConfig;
