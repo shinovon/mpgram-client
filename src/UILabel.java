@@ -283,7 +283,7 @@ public class UILabel extends UIItem implements Constants {
 						img: {
 							if (text == null || ++renderedEmojis >= MP.maxLoadedEmojis) break img;
 
-							Object img = null;
+							Object img;
 							if (emojiTable.containsKey(text)) {
 								img = emojiTable.get(text);
 								if (img == MP.json_null) break img;

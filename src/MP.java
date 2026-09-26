@@ -1292,6 +1292,7 @@ public class MP extends MIDlet
 									if (MP.emojiBundled) {
 										img = Image.createImage('/' + (String) src + ".png");
 
+										UILabel.emojiTable.put(src, img);
 										((UILabel) target).requestPaint();
 										continue;
 									}
@@ -2058,6 +2059,7 @@ public class MP extends MIDlet
 								if (offset <= 0 || off < offset)
 									offset = off;
 							} catch (Exception ignored) {
+								//noinspection BusyWait
 								Thread.sleep(2000);
 								continue;
 							}
@@ -3076,6 +3078,7 @@ public class MP extends MIDlet
 				if (notifySound) {
 					try {
 						if (notificationPlayer == null) {
+							//noinspection DataFlowIssue
 							notificationPlayer = Manager.createPlayer(getClass().getResourceAsStream("/msg.mid"), "audio/midi");
 							notificationPlayer.realize();
 							notificationPlayer.prefetch();
@@ -3870,7 +3873,7 @@ public class MP extends MIDlet
 						i = 0;
 						imagesChoice.setSelectedIndex(i++, threadedImages);
 //#ifndef NO_CHAT_CANVAS
-						imagesChoice.setSelectedIndex(i++, lazyLoading);
+						imagesChoice.setSelectedIndex(i, lazyLoading);
 //#endif
 						imagesChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 						adv.append(imagesChoice);
@@ -4840,6 +4843,9 @@ public class MP extends MIDlet
 		}
 //#ifndef NO_CHAT_CANVAS
 		if (c == canvasBackCmd) {
+//#if ""!=""
+			if (!(d instanceof MPCanvas)) throw new RuntimeException();
+//#endif
 			((MPCanvas) d).key(-1000000011, false);
 			return;
 		}
@@ -7192,6 +7198,7 @@ public class MP extends MIDlet
 	static String[] L;
 
 	private void loadLocale(String lang) throws IOException {
+		//noinspection DataFlowIssue
 		InputStreamReader r = new InputStreamReader(getClass().getResourceAsStream("/l/".concat(lang)), encoding);
 		StringBuffer s = new StringBuffer();
 		int c;
@@ -8279,7 +8286,7 @@ public class MP extends MIDlet
 					i++;
 				}
 				str = sb.toString();
-				sb = null;
+//				sb = null;
 				return str;
 			}
 			return str.substring(1 + start, end - 1);
@@ -8298,6 +8305,7 @@ public class MP extends MIDlet
 			
 			for (int splIndex; i < end - 1; i = splIndex + 1) {
 				// skip all spaces
+				//noinspection StatementWithEmptyBody
 				for (; i < end - 1 && str.charAt(i) <= ' '; i++);
 
 				splIndex = i;
