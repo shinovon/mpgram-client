@@ -705,7 +705,7 @@ public final class Keyboard implements KeyboardConstants, Runnable {
 	public void drawOverlay(Graphics g) {
 		if (physicalType == PHYSICAL_KEYBOARD_PHONE_KEYPAD && keyboardType == KEYBOARD_DEFAULT && !hasPointerEvents) {
 			String s = abc[currentPhysicalLayout];
-			String l = langs[currentPhysicalLayout];
+			String l = langs[lang];
 			int w = textFont.stringWidth(s.toUpperCase());
 			g.setColor(0xaaaaaa);
 			g.fillRect(0, 0, w, textFontHeight);
