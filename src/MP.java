@@ -7323,7 +7323,7 @@ public class MP extends MIDlet
 	static String localizeDate(long date, int mode) {
 		long now = System.currentTimeMillis() / 1000L;
 		long d = now - date;
-		boolean ru = "ru".equals(lang);
+		boolean ru = "ru".equals(lang) || "be".equals(lang);
 
 		StringBuffer sb = new StringBuffer();
 		Calendar c = Calendar.getInstance();
