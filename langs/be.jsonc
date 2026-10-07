@@ -19,7 +19,7 @@
 	"_minutesAgo2": " хвілін таму",
 	"_hourAgo": " гадзіну таму",
 	"_hoursAgo": " гадзіны таму",
-	"_hoursAgo2": "гадзін таму",
+	"_hoursAgo2": " гадзін таму",
 	"_dayAgo": " дзень таму",
 	"_daysAgo": " дні таму",
 	"_daysAgo2": " дзён таму",
@@ -332,7 +332,7 @@
 	"SendAsVoice": "Адправіць як галасавое паведамленне",
 	"HideWithSpoiler": "Схаваць пад спойлерам",
 	"EnableHTMLFormatting": "Уключыць HTML-фарматаванне",
-	"TextField_Hint": "Напісаць паведамленне…",
+	"TextField_Hint": "Напішыце паведамленне…",
 	"Clear": "Ачысціць",
 	
 	// Alert messages
