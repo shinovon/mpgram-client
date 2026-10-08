@@ -23,6 +23,8 @@ Originally written in MIDletPascal by twsparkle in 2020 and later rewritten in J
 - Voice messages
 - Stickers
 - Folders
+- Polls
+- Emoji (disabled by default)
 - Message search
 - Contact list
 - Customization: Themes, Custom wallpapers
@@ -54,6 +56,10 @@ Does not work on most of Samsung phones.
 ### Lite version limitations
 
 - Legacy UI only
+  - No customization
+  - No read status
+  - No polls
+  - No emoji
 - No file uploads
 - No notifications
 - No chat or profile pictures
