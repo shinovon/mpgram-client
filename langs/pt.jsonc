@@ -40,8 +40,8 @@
 	"LastMonth": "mês passado", 
 	"ALongTimeAgo": "há muito tempo",
 	"Recently": "recentemente",
-	"AM": " AM", // Untranslated
-	"PM": " PM", // Untranslated
+	"AM": " AM",
+	"PM": " PM",
 	// Date suffixes
 	"on_Date": "em ",
 	"at_Time": " às",
@@ -79,15 +79,15 @@
 	"Next": "Próximo",
 	"NewSession": "Nova sessão",
 	"ImportSession": "Importar sessão",
-	"Show": "Show", // Untranslated
-	"Check": "Check", // Untranslated
+	"Show": "Mostrar",
+	"Check": "Verificar",
 
 	// Settings commands
 	"Logout": "Sair da conta",
 	"ClearCache": "Limpar cache",
-	"Locate": "Locate", // Untranslated
-	"ShowSessionCode": "Show session code", // Untranslated
-	"ResetSettings": "Reset settings", // Untranslated
+	"Locate": "Localizar",
+	"ShowSessionCode": "Mostrar código da sessão",
+	"ResetSettings": "Redefinir configurações",
 
 	// Chats list commands
 	"Folders": "Pastas",
@@ -96,7 +96,7 @@
 	"Contacts": "Contatos",
 	"Search": "Buscar",
 	"OpenByLink": "Abrir pelo link",
-	"Select_OK": "Select", // Untranslated
+	"Select_OK": "Selecionar",
 
 	// Message commands
 	"OpenChat": "Abrir conversa",
@@ -111,20 +111,20 @@
 	"Pin": "Fixar",
 	"BanMember": "Banir membro",
 	"Comments": "Comentários",
-	"Copy": "Copy", // Untranslated
-	"CopyLink": "Copy link", // Untranslated
-	"Select": "Select", // Untranslated
-	"SeenList": "Seen list", // Untranslated
-	"RetractVote": "Retract vote", // Untranslated
+	"Copy": "Copiar",
+	"CopyLink": "Copiar link",
+	"Select": "Selecionar",
+	"SeenList": "Lista de visualizações",
+	"RetractVote": "Retirar voto",
 	
 	// Item commands
-	"Link_Cmd": "Link",
+	"Link_Cmd": "Abrir link",
 	"ViewImage": "Ver imagem",
 	"Call": "Ligar",
 	"Download": "Baixar",
 	"Play_Item": "Reproduzir", 
-	"RunBotAction": "Run", // Untranslated
-	"SaveHere": "Save here", // Untranslated
+	"RunBotAction": "Executar",
+	"SaveHere": "Salvar aqui",
 	
 	// Chat form commands
 	"WriteMessage": "Escrever mensagem",
@@ -133,10 +133,12 @@
 	"Older": "Mais antigo",
 	"Newer": "Mais recente",
 	"SendSticker": "Enviar figurinha",
-	"Menu": "Menu", // Untranslated
-	"Write": "Write", // Untranslated
-	"AttachFile": "Attach file", // Untranslated
-	"SendVoiceMessage": "Send voice message", // Untranslated
+	"SendNote": "Enviar nota",
+	"SaveNote": "Salvar nota",
+	"Menu": "Menu",
+	"Write": "Escrever",
+	"AttachFile": "Anexar arquivo",
+	"SendVoiceMessage": "Enviar mensagem de voz",
 	
 	// Message writing form commands
 	"Send": "Enviar",
@@ -154,17 +156,17 @@
 	"Videos": "Vídeos",
 	"Files": "Arquivos",
 	"AudioFiles": "Áudios",
-	"VoiceMessages": "Voice messages", // Untranslated
-	"AddMember": "Add member", // Untranslated
-	"ViewInviteLink": "View invite link", // Untranslated
+	"VoiceMessages": "Mensagens de voz",
+	"AddMember": "Adicionar membro",
+	"ViewInviteLink": "Ver link de convite",
 	
 	// Dialog commands
 	"Ok": "OK",
 	"Cancel": "Cancelar",
-	"Open": "Open", // Untranslated
-	"Close": "Close", // Untranslated
-	"Start": "Start", // Untranslated
-	"Stop": "Stop", // Untranslated
+	"Open": "Abrir",
+	"Close": "Fechar",
+	"Start": "Iniciar",
+	"Stop": "Parar",
 	
 	// Pagination commands
 	"NextPage": "Próxima página",
@@ -176,9 +178,9 @@
 	"WaitingForServerResponse": "Aguardando resposta do servidor...",
 	"Sending": "Enviando",
 	"WaitingForPrevChat": "Aguardando a conversa anterior...",
-	"Downloading": "Downloading", // Untranslated
-	"Connecting": "Connecting...", // Untranslated
-	"Disconnected": "Disconnected", // Untranslated
+	"Downloading": "Baixando",
+	"Connecting": "Conectando...",
+	"Disconnected": "Desconectado",
 	
 	// Authorization process
 	"Auth_Title": "Autenticação",
@@ -205,12 +207,12 @@
 	"APIDisabled_Alert": "Esta instância não suporta API!",
 	"ClientOutdated_Alert": "Cliente desatualizado!",
 	"InvalidInstancePassword_Alert": "Senha da instância inválida!",
-	"InvalidSessionCode_Alert": "Invalid session code!", // Untranslated
+	"InvalidSessionCode_Alert": "Código de sessão inválido!",
 	"Retry": "Tentar novamente",
-	"Login_Btn": "Log in using phone number", // Untranslated
-	"LoginWithQR_Btn": "Log in using QR code", // Untranslated
-	"Advanced": "Advanced", // Untranslated
-	"QrCode_Alert": "QR code is ready", // Untranslated
+	"Login_Btn": "Entrar usando número de telefone",
+	"LoginWithQR_Btn": "Entrar usando código QR",
+	"Advanced": "Avançado",
+	"QrCode_Alert": "Código QR pronto",
 	
 	// Settings sections
 	"UI": "Interface",
@@ -218,7 +220,7 @@
 	"Images": "Imagens",
 	"Authorization": "Autenticação",
 	"Notifications": "Notificações",
-	"Advanced_Settings": "Advanced", // Untranslated
+	"Advanced_Settings": "Avançado",
 	
 	// UI Settings
 	"Language": "Idioma",
@@ -236,21 +238,21 @@
 	"ChatTextField": "Campo de texto do chat", 
 	"BuiltinImageViewer": "Visualizador de imagens embutido",
 	"LargeMusicCover": "Capa grande para música", 
-	"LegacyUI": "Legacy UI", // Untranslated
-	"FastScrolling": "Disable animations", // Untranslated
-	"Keyboard": "Keyboard", // Untranslated
-	"Auto": "Auto", // Untranslated
-	"FullscreenTextBox": "Fullscreen edit", // Untranslated
-	"Theme": "Theme", // Untranslated
-	"InputLanguages": "Input languages", // Untranslated
-	"ForceKeyInput": "Force keypad input", // Untranslated
-	"ChatAvatar": "Show avatar in chat", // Untranslated
-	"ChatWallpaper": "Chat wallpaper", // Untranslated
-	"12HourTimeFormat": "12-hour time format", // Untranslated
-	"StickerPreviewSize": "Sticker preview size", // Untranslated
-	"LegacyUISettings": "Legacy UI settings", // Untranslated
-	"j2mekeyboardSettings": "j2mekeyboard settings:", // Untranslated
-	"ShowEmoji": "Show emoji", // Untranslated
+	"LegacyUI": "Interface clássica",
+	"FastScrolling": "Desativar animações",
+	"Keyboard": "Teclado",
+	"Auto": "Automático",
+	"FullscreenTextBox": "Edição em tela cheia",
+	"Theme": "Tema",
+	"InputLanguages": "Idiomas de entrada",
+	"ForceKeyInput": "Forçar entrada pelo teclado",
+	"ChatAvatar": "Mostrar avatar na conversa",
+	"ChatWallpaper": "Papel de parede da conversa",
+	"12HourTimeFormat": "Formato de 12 horas",
+	"StickerPreviewSize": "Tamanho da prévia de figurinha",
+	"LegacyUISettings": "Configurações da interface clássica",
+	"j2mekeyboardSettings": "Configurações do teclado J2ME:",
+	"ShowEmoji": "Mostrar emojis",
 	
 	// Behaviour settings
 	"WaitForPageToLoad": "Aguardar carregamento da página",
@@ -265,27 +267,27 @@
 	"NetworkAccess": "Acesso à rede",
 	"MobileData": "Dados móveis",
 	"WiFi": "Wi-Fi",
-	"Longpoll": "Longpoll", // Untranslated
-	"UpdatesInterval": "Updates interval", // Untranslated
-	"DownloadPath": "Download path", // Untranslated
-	"DownloadMethod": "Download method", // Untranslated
-	"AlwaysAsk": "Always ask", // Untranslated
-	"InApp": "In app", // Untranslated
-	"WithBrowser": "With browser", // Untranslated
-	"PartialUpload": "Partial upload", // Untranslated
-	"PlaybackMethod": "Playback method", // Untranslated
-	"Stream": "Stream", // Untranslated
-	"CacheToFile": "Cache to file", // Untranslated
-	"PlayerCreationMethod": "Player creation method", // Untranslated
-	"PassURL": "Pass URL", // Untranslated
-	"PassConnectionStream": "Pass connection stream", // Untranslated
+	"Longpoll": "Long polling",
+	"UpdatesInterval": "Intervalo de atualização",
+	"DownloadPath": "Pasta de downloads",
+	"DownloadMethod": "Método de download",
+	"AlwaysAsk": "Perguntar sempre",
+	"InApp": "No aplicativo",
+	"WithBrowser": "Com navegador",
+	"PartialUpload": "Envio parcial",
+	"PlaybackMethod": "Método de reprodução",
+	"Stream": "Transmitir",
+	"CacheToFile": "Salvar em arquivo temporário",
+	"PlayerCreationMethod": "Método de criação do reprodutor",
+	"PassURL": "Usar URL",
+	"PassConnectionStream": "Usar fluxo da conexão",
 	
 	// Images settings
 	"LoadMediaThumbnails": "Carregar miniaturas da mídia",
 	"LoadAvatars": "Carregar avatares",
 	"MultiThreadedLoading": "Carregamento em múltiplas threads",
 	"RoundAvatars": "Avatares arredondados", 
-	"LazyLoading": "Lazy loading", // Untranslated
+	"LazyLoading": "Carregamento sob demanda",
 	
 	// Cache settings
 	"AvatarsCaching": "Cache de avatares",
@@ -300,12 +302,12 @@
 	// Notifications settings
 	"EnableNotifications": "Ativar notificações", 
 	"EnableSound": "Ativar som",
-	"EnableVibration": "Vibration", // Untranslated
+	"EnableVibration": "Vibração",
 	"NotificationMethod": "Método de notificação", 
 	"Off": "Desligado", 
 	"AlertWindow": "Janela de alerta",
-	"PushInterval": "Polling interval",
-	"PushBackgroundInterval": "Background polling interval",
+	"PushInterval": "Intervalo de consulta",
+	"PushBackgroundInterval": "Intervalo de consulta em segundo plano",
 	
 	// About
 	"AboutText": "MPGram é um cliente baseado na API do Telegram",
@@ -313,11 +315,11 @@
 	"Author": "Autor",
 	"Donate": "Doar",
 	"Chat": "Conversa",
-	"Web": "Web", // Untranslated
-	"CommunityTranslations": "Community translations:", // Untranslated
-	"License": "Released under the MIT license.\nCopyright (C) %", // Untranslated
-	"ImagelibLicense": "Contains parts of the TUBE42 imagelib, licensed under the LGPL.\nCopyright (C) %", // Untranslated
-	"GNUClasspathLicense": "Contains parts of GNU Classpath, licensed under the GPL v2\nCopyright (C) %", // Untranslated
+	"Web": "Site",
+	"CommunityTranslations": "Traduções da comunidade:",
+	"License": "Distribuído sob a licença MIT.\nCopyright (C) %",
+	"ImagelibLicense": "Contém partes da biblioteca TUBE42 imagelib, licenciada sob LGPL.\nCopyright (C) %",
+	"GNUClasspathLicense": "Contém partes do GNU Classpath, licenciado sob GPL v2.\nCopyright (C) %",
 	
 	// Write form
 	"Reply_Title": "Responder",
@@ -332,60 +334,62 @@
 	"SendAsVoice": "Enviar como voz", 
 	"HideWithSpoiler": "Ocultar com spoiler",
 	"EnableHTMLFormatting": "Ativar formatação HTML",
-	"TextField_Hint": "Write a message...", // Untranslated
-	"Clear": "Clear", // Untranslated
+	"TextField_Hint": "Escreva uma mensagem...",
+	"Clear": "Limpar",
 	
 	// Alert messages
 	"MessageSent_Alert": "Mensagem enviada",
+	"NoteSaved_Alert": "Nota salva",
+	"NoteSaveFailed_Alert": "Falha ao salvar nota",
 	"MessageDeleted_Alert": "Mensagem excluída",
 	"UpdateAvailable_Alert": "Atualização disponível",
 	"MemberBanned_Alert": "Membro banido",
 	"StickersAdded_Alert": "Figurinhas adicionadas",
 	"ChooseNetwork_Alert": "Escolher rede",
 	"FailedToLoadImage": "Erro ao carregar imagem",
-	"TextCopied_Alert": "Text copied", // Untranslated
-	"NotEnoughMemory_Alert": "Not enough memory", // Untranslated
-	"DownloadCanceled_Alert": "Download canceled", // Untranslated
-	"DownloadedTo": "Downloaded to ", // Untranslated
-	"ChooseDownloadMethod_Alert": "Choose download method", // Untranslated
-	"FailedToSaveSettings_Alert": "Failed to save settings", // Untranslated
-	"PiglerNotAvailable_Alert": "Pigler API is selected but not available, \ndownload it from https://nnproject.cc/pna", // Untranslated
-	"DeleteNMessage_Alert": "Delete % message?", // Untranslated
-	"DeleteNMessages_Alert": "Delete % messages?", // Untranslated
-	"DeleteNMessages_Alert_2": "", // Untranslated
-	"DeleteMessage_Alert": "Delete message?", // Untranslated
-	"PinMessage_Alert": "Pin message?", // Untranslated
-	"BanMember_Alert": "Ban member?", // Untranslated
-	"Logout_Alert": "Are you sure you want to log out?", // Untranslated
-	"RewriteFile_Alert": "File already exists, rewrite?", // Untranslated
-	"OpenThisLink_Alert": "Open this link?", // Untranslated
-	"Remove_Alert": "Remove \"%\"?", // Untranslated
-	"ResetSettings_Alert": "Reset settings?", // Untranslated
-	"ApplicationWillClose_Alert": "Application will close...", // Untranslated
-	"UserInvited_Alert": "User invited", // Untranslated
-	"InviteAccepted_Alert": "Invite accepted", // Untranslated
-	"VoiceConversionNotSupported_Alert": "Voice messages not supported by server", // Untranslated
-	"Ready_Alert": "Ready", // Untranslated
-	"RecorderInitFailed_Alert": "Failed to initialize voice recorder", // Untranslated
-	"Recording_Alert": "Recording...", // Untranslated
-	"VoiceMessageRecorded_Alert": "Voice message has been recorded", // Untranslated
-	"DownloadFailed_Alert": "Failed to download file", // Untranslated
-	"MessageSendFailed_Alert": "Failed to send message", // Untranslated
+	"TextCopied_Alert": "Texto copiado",
+	"NotEnoughMemory_Alert": "Memória insuficiente",
+	"DownloadCanceled_Alert": "Download cancelado",
+	"DownloadedTo": "Baixado para ",
+	"ChooseDownloadMethod_Alert": "Escolha o método de download",
+	"FailedToSaveSettings_Alert": "Falha ao salvar configurações",
+	"PiglerNotAvailable_Alert": "A API Pigler foi selecionada, mas não está disponível.\nBaixe-a em https://nnproject.cc/pna",
+	"DeleteNMessage_Alert": "Excluir % mensagem?",
+	"DeleteNMessages_Alert": "Excluir % mensagens?",
+	"DeleteNMessages_Alert_2": "",
+	"DeleteMessage_Alert": "Excluir mensagem?",
+	"PinMessage_Alert": "Fixar mensagem?",
+	"BanMember_Alert": "Banir membro?",
+	"Logout_Alert": "Tem certeza de que deseja sair da conta?",
+	"RewriteFile_Alert": "O arquivo já existe. Substituir?",
+	"OpenThisLink_Alert": "Abrir este link?",
+	"Remove_Alert": "Remover \"%\"?",
+	"ResetSettings_Alert": "Redefinir configurações?",
+	"ApplicationWillClose_Alert": "O aplicativo será fechado...",
+	"UserInvited_Alert": "Usuário convidado",
+	"InviteAccepted_Alert": "Convite aceito",
+	"VoiceConversionNotSupported_Alert": "O servidor não oferece suporte a mensagens de voz",
+	"Ready_Alert": "Pronto",
+	"RecorderInitFailed_Alert": "Falha ao iniciar o gravador de voz",
+	"Recording_Alert": "Gravando...",
+	"VoiceMessageRecorded_Alert": "Mensagem de voz gravada",
+	"DownloadFailed_Alert": "Falha ao baixar o arquivo",
+	"MessageSendFailed_Alert": "Falha ao enviar mensagem",
 	
 	// Chat form
 	"ChatMedia_Title": "Mídia",
 	"Search_TitlePrefix": "Buscar - ",
 	"OlderMessages": "Mensagens antigas",
 	"NewerMessages": "Mensagens recentes",
-	"SavedMessages": "Saved messages", // Untranslated
-	"SomeoneIsTyping": "Someone is typing...", // Untranslated
-	"Typing": "typing...", // Untranslated
-	"_isTyping": "% is typing..", // Untranslated
-	"_areTyping": "% and % are typing...", // Untranslated
-	"_peopleAreTyping": "", // Untranslated
-	"_peopleAreTyping_1": "% people are typing...", // Untranslated
+	"SavedMessages": "Mensagens salvas",
+	"SomeoneIsTyping": "Alguém está digitando...",
+	"Typing": "digitando...",
+	"_isTyping": "% está digitando...",
+	"_areTyping": "% e % estão digitando...",
+	"_peopleAreTyping": "",
+	"_peopleAreTyping_1": "% pessoas estão digitando...",
 	"_peopleAreTyping_2": "",
-	"ManyPeopleAreTyping": "Many people are typing...", // Untranslated
+	"ManyPeopleAreTyping": "Várias pessoas estão digitando...",
 	
 	// Message
 	"ForwardedFrom": "Encaminhada de ",
@@ -397,26 +401,26 @@
 	"_comment": " comentário", 
 	"_comments": " comentários",
 	"_comments2": "",
-	"ReplyTo": "Reply to ", // Untranslated
-	"_react": " react", // Untranslated
-	"_reacts": " reacts", // Untranslated
+	"ReplyTo": "Responder a ",
+	"_react": " reação",
+	"_reacts": " reações",
 	"_reacts2": "",
-	"SeenList_Title": "Seen List", // Untranslated
+	"SeenList_Title": "Lista de visualizações",
 	
 	// Message media
 	"Media": "Mídia",
 	"Poll": "Enquete",
 	"Geo": "Localização: ",
-	"Photo": "Photo", // Untranslated
-	"Video": "Video", // Untranslated
-	"VoiceMessage": "Voice message", // Untranslated
-	"AnonymousPoll": "Anonymous Poll", // Untranslated
-	"FinalResults": "Final results", // Untranslated
-	"Vote": "Vote", // Untranslated
-	"ViewResults": "View results", // Untranslated
-	"NoVotes": "No votes", // Untranslated
-	"_vote": " vote", // Untranslated
-	"_votes": " votes", // Untranslated
+	"Photo": "Foto",
+	"Video": "Vídeo",
+	"VoiceMessage": "Mensagem de voz",
+	"AnonymousPoll": "Enquete anônima",
+	"FinalResults": "Resultados finais",
+	"Vote": "VOTAR",
+	"ViewResults": "VER RESULTADOS",
+	"NoVotes": "Sem votos",
+	"_vote": " voto",
+	"_votes": " votos",
 	"_votes2": "",
 	
 	// Chat actions
@@ -441,8 +445,8 @@
 	"Stickers_Title": "Figurinhas", 
 	"Sticker": "Figurinha",
 	"AddStickers": "Adicionar figurinhas", 
-	"Remove": "Remove", // Untranslated
-	"Share": "Share", // Untranslated
+	"Remove": "Remover",
+	"Share": "Compartilhar",
 	
 	// Music player
 	"Player_Title": "Reprodutor de música", 
@@ -454,9 +458,9 @@
 	"Next_Player": "Próxima",
 	"UnknownTrack": "Faixa desconhecida",
 	"Playlist_Title": "Playlist", 
-	"Volume": "Volume", // Untranslated
-	"TogglePlaylistOrder": "Toggle order", // Untranslated
-	"VoiceMessageFrom": "Voice message from %", // Untranslated
+	"Volume": "Volume",
+	"TogglePlaylistOrder": "Alternar ordem",
+	"VoiceMessageFrom": "Mensagem de voz de %",
 	
 	// Profile/chat info
 	"Online": "online",
@@ -477,7 +481,7 @@
 	"GroupInfo": "Informações do grupo", 
 	"ChannelInfo": "Informações do canal", 
 	"TopicInfo": "Informações do tópico", 
-	"AddMember_Title": "Add Member", // Untranslated
+	"AddMember_Title": "Adicionar membro",
 	
 	"_member": " membro",
 	"_members": " membros",
