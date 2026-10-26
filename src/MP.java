@@ -66,6 +66,7 @@ public class MP extends MIDlet
 
 	// region Constants
 //#ifndef NO_LANGS
+	/** @noinspection UnnecessaryUnicodeEscape*/
 	static final String[][] LANGS = {
 		{
 			"ar",

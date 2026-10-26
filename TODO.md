@@ -104,3 +104,4 @@ Post-release todo:
 - [ ] password encryption
 - [ ] integration with mahomaps
 - [ ] switch ids from string to long
+- [ ] view avatar full-screen
