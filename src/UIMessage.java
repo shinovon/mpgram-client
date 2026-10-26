@@ -763,7 +763,7 @@ public class UIMessage extends UIItem implements LangConstants, Constants {
 				if (focus && !poll && subFocusCurrent != -1 && subFocus[subFocusCurrent] == FOCUS_MEDIA) {
 					g.setColor(ChatCanvas.colors[out ? COLOR_MESSAGE_OUT_ATTACHMENT_FOCUS_BG : COLOR_MESSAGE_ATTACHMENT_FOCUS_BG]);
 					g.drawRect(x, y + 1, photoRenderWidth, photoRenderHeight);
-					g.setColor(0);
+					g.setColor(ChatCanvas.colors[COLOR_MESSAGE_LINK_FOCUS]);
 					g.drawRect(x + 1, y + 2, photoRenderWidth - 2, photoRenderHeight - 2);
 				}
 				y += photoRenderHeight + 2;
