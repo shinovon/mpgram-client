@@ -101,6 +101,8 @@ public class ChatInfoForm extends MPForm {
 				try {
 					img.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
 				} catch (Exception ignored) {}
+				img.setDefaultCommand(MP.openImageCmd);
+				img.setItemCommandListener(MP.midlet);
 				MP.queueAvatar(id, img);
 				append(img);
 			}

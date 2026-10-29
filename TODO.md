@@ -105,3 +105,4 @@ Post-release todo:
 - [ ] integration with mahomaps
 - [ ] switch ids from string to long
 - [ ] view avatar full-screen
+- [ ] message reacts

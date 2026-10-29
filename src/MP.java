@@ -4923,6 +4923,16 @@ public class MP extends MIDlet
 				return;
 			}
 			if (c == openImageCmd) {
+				if (current instanceof ChatInfoForm) {
+					// show avatar
+					String id = ((ChatInfoForm) current).id;
+					if (useView) {
+						display(new ViewCanvas(id, null));
+					} else {
+						browseUser(FILE_URL + "?ava=" + id);
+					}
+					return;
+				}
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
 				if (useView) {

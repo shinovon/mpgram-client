@@ -28,10 +28,13 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 	private final String peer;
 	String id;
 	boolean qr;
-
+	boolean ava;
 
 	public ViewCanvas(String peer, String id) {
 		this.peer = peer;
+		if (id == null) {
+			ava = true;
+		}
 		this.id = id;
 		toDraw = null;
 		System.gc();
@@ -104,6 +107,9 @@ public class ViewCanvas extends Canvas implements Runnable, LangConstants {
 				if (qr) {
 					sb.append("qrcode.php?t=").append(id)
 							.append(s > 480 ? "&s=8" : s > 320 ? "&s=6" : "&s=4");
+				} else if (ava) {
+					sb.append(MP.FILE_URL + "?a&p=rview&ava=").append(peer)
+							.append("&s=").append(s * zoom);
 				} else {
 					sb.append(MP.FILE_URL + "?a&p=rview&c=").append(peer)
 							.append("&m=").append(id)
