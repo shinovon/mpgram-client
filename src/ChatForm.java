@@ -1311,6 +1311,9 @@ public class ChatForm extends MPForm implements MPChat, Runnable {
 				id
 		});
 	}
+
+	public void updateSending() {
+	}
 	
 	public void gc() {
 		// TODO

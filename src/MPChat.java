@@ -70,6 +70,7 @@ public interface MPChat {
 	void paginate(int dir);
 	void openTopic(int topMsgId, boolean canWrite, String title);
 	void invite(String id);
+	void updateSending();
 	
 	void load();
 	void closed(boolean destroy);

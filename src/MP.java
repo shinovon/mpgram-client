@@ -1753,6 +1753,9 @@ public class MP extends MIDlet
 				}
 			} finally {
 				sending = false;
+				if (current instanceof MPChat) {
+					((MPChat) current).updateSending();
+				}
 			}
 			break;
 		}
@@ -2164,6 +2167,9 @@ public class MP extends MIDlet
 				display(errorAlert(e), current);
 			} finally {
 				sending = false;
+				if (current instanceof MPChat) {
+					((MPChat) current).updateSending();
+				}
 				if (form.getTicker() == ticker) {
 					form.setTicker(null);
 				}
@@ -2227,6 +2233,9 @@ public class MP extends MIDlet
 				display(errorAlert(e), current);
 			} finally {
 				sending = false;
+				if (current instanceof MPChat) {
+					((MPChat) current).updateSending();
+				}
 			}
 			break;
 		}
@@ -2948,6 +2957,9 @@ public class MP extends MIDlet
 				display(errorAlert(e), current);
 			} finally {
 				sending = false;
+				if (current instanceof MPChat) {
+					((MPChat) current).updateSending();
+				}
 			}
 			break;
 		}
@@ -4263,6 +4275,10 @@ public class MP extends MIDlet
 				synchronized (this) {
 					if (sending) return;
 					sending = true;
+
+					if (current instanceof MPChat) {
+						((MPChat) current).updateSending();
+					}
 				}
 
 				display(loadingAlert(L[LSending]), d);
@@ -4733,6 +4749,11 @@ public class MP extends MIDlet
 			if (c == recorderSendCmd) {
 				closeVoiceRecorder();
 				MP.sending = true;
+
+				if (current instanceof MPChat) {
+					((MPChat) current).updateSending();
+				}
+
 				start(RUN_SEND_MESSAGE, new Object[] { "", writeTo, replyTo, null, recordPath, new boolean[] { false, false, true }, null, null });
 				return;
 			}
@@ -4772,6 +4793,10 @@ public class MP extends MIDlet
 			}
 			if (c == cancelUploadCmd) {
 				sending = false;
+
+				if (current instanceof MPChat) {
+					((MPChat) current).updateSending();
+				}
 				return;
 			}
 			if (c == okDownloadCmd) {
@@ -4956,6 +4981,10 @@ public class MP extends MIDlet
 				synchronized (this) {
 					if (sending) return;
 					sending = true;
+
+					if (current instanceof MPChat) {
+						((MPChat) current).updateSending();
+					}
 				}
 
 				if (reopenChat || !longpoll) {
@@ -5011,6 +5040,10 @@ public class MP extends MIDlet
 			synchronized (this) {
 				if (sending) return;
 				sending = true;
+
+				if (current instanceof MPChat) {
+					((MPChat) current).updateSending();
+				}
 			}
 
 			display(loadingAlert(L[LSending]), current);

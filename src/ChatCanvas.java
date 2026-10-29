@@ -708,7 +708,17 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					if (!medfont && status != null && typing[0] != 0) {
 						String status = statusRender;
 						if (status == null) {
-							statusRender = status = UILabel.ellipsis(this.status, MP.smallPlainFont, tw - 4);
+							status = this.status;
+							if (MP.sending) {
+								status = MP.L[LSending];
+							} else if (shouldUpdate && MP.longpoll) {
+								if (connecting) {
+									status = MP.L[LConnecting];
+								} else if (!update) {
+									status = MP.L[LDisconnected];
+								}
+							}
+							statusRender = status = UILabel.ellipsis(status, MP.smallPlainFont, tw - 4);
 						}
 						g.setColor(colors[COLOR_CHAT_STATUS_HIGHLIGHT_FG]);
 						g.drawString(status, tx, ty, 0);
@@ -726,7 +736,9 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 						if (status == null) {
 							status = this.defaultStatus;
 						}
-						if (shouldUpdate && MP.longpoll) {
+						if (MP.sending) {
+							status = MP.L[LSending];
+						} else if (shouldUpdate && MP.longpoll) {
 							if (connecting) {
 								status = MP.L[LConnecting];
 							} else if (!update) {
@@ -898,7 +910,6 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 							// send icon
 							int ty = iy + ((ih - 20) >> 1);
 
-							// TODO: better sending indication
 							if (MP.sending) { // disabled
 								g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
 							} else {
@@ -1522,6 +1533,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			synchronized (this) {
 				if (!MP.sending) {
 					MP.sending = true;
+					updateSending();
 					int r = Math.max(replyMsgId, topMsgId);
 					if (keyboard != null && keyboardTextUpdated) {
 						keyboardTextUpdated = false;
@@ -1663,6 +1675,11 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 
 	public void setStartBot(String s) {
 		this.startBot = s;
+	}
+
+	public void updateSending() {
+		statusRender = null;
+		queueRepaint();
 	}
 
 	//
