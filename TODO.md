@@ -92,6 +92,7 @@ Post-release todo:
 - [x] folders cache
 - [x] chats list pagination
 - [x] polls
+- [x] view avatar full-screen
 - [ ] built-in camera
 - [ ] user friendly error messages
 - [ ] file picker preview
@@ -104,5 +105,4 @@ Post-release todo:
 - [ ] password encryption
 - [ ] integration with mahomaps
 - [ ] switch ids from string to long
-- [ ] view avatar full-screen
 - [ ] message reacts
