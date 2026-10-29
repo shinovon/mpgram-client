@@ -1009,8 +1009,8 @@ public class MP extends MIDlet
 		cancelCmd = new Command(L[LCancel], Command.CANCEL, 26);
 		goCmd = new Command(L[LOk], Command.OK, 1);
 		copyCmd = new Command(L[LCopy], Command.OK, 1);
-		downloadInappCmd = new Command(L[LInApp], Command.OK, 0);
-		downloadBrowserCmd = new Command(L[LWithBrowser], Command.CANCEL, 1);
+		downloadInappCmd = new Command(L[LInApp], Command.SCREEN, 0);
+		downloadBrowserCmd = new Command(L[LWithBrowser], Command.SCREEN, 1);
 		cancelDownloadCmd = new Command(L[LCancel], Command.CANCEL, 1);
 		okDownloadCmd = new Command(L[LOk], Command.CANCEL, 1);
 		openDownloadedCmd = new Command(L[LOpen], Command.SCREEN, 2);
@@ -6003,6 +6003,7 @@ public class MP extends MIDlet
 					a.setString(L[LChooseDownloadMethod_Alert]);
 					a.addCommand(downloadInappCmd);
 					a.addCommand(downloadBrowserCmd);
+					a.addCommand(cancelCmd);
 					a.setCommandListener(this);
 					display(a, current);
 					return;
