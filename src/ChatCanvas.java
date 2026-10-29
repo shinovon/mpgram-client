@@ -877,7 +877,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 						if (!touch && !menuFocused && !keyboard.isVisible()) {
 							keyboard.show();
 						}
-						keyboard.drawTextBox(g, 10, iy, w - 40, ih);
+						keyboard.drawTextBox(g, 10, iy, w - (touch ? 50 : 20), ih);
 						if (keyboard.isVisible()) keyboard.drawOverlay(g);
 					} else if (textInputNotEmpty(false)) {
 						g.setFont(MP.smallPlainFont);
@@ -893,44 +893,48 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 						aw = topButtonWidth = inputFieldHeight;
 					}
 
-					if (textInputNotEmpty(true) || file != null || forwardMsgs != null || forwardMsg != null) {
-						// send icon
-						int ty = iy + ((ih - 20) >> 1);
+					if (touch) {
+						if (textInputNotEmpty(true) || file != null || forwardMsgs != null || forwardMsg != null) {
+							// send icon
+							int ty = iy + ((ih - 20) >> 1);
 
-						// TODO: better sending indication
-						if (MP.sending) { // disabled
-							g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
+							// TODO: better sending indication
+							if (MP.sending) { // disabled
+								g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
+							} else {
+								g.setColor(colors[COLOR_CHAT_SEND_ICON]);
+							}
+
+							int ax = w - aw + ((aw - 20) >> 1);
+
+							g.fillTriangle(ax, ty, ax + 20, ty + 10, ax, ty + 20);
+							g.setColor(colors[COLOR_CHAT_PANEL_BG]);
+							g.fillTriangle(ax, ty, ax + 2, ty + 10, ax, ty + 20);
+							g.drawLine(ax, ty + 10, ax + 10, ty + 10);
 						} else {
-							g.setColor(colors[COLOR_CHAT_SEND_ICON]);
-						}
+							// attach icon
 
-						int ax = w - aw + ((aw - 20) >> 1);
-
-						g.fillTriangle(ax, ty, ax + 20, ty + 10, ax, ty + 20);
-						g.setColor(colors[COLOR_CHAT_PANEL_BG]);
-						g.fillTriangle(ax, ty, ax + 2, ty + 10, ax, ty + 20);
-						g.drawLine(ax, ty + 10, ax + 10, ty + 10);
-					} else if (touch) {
-						// attach icon
-
-						if (attachIcon != null) {
-							int ax = w - aw + ((aw - 24) >> 1);
-							int ay = iy + ((ih - 24) >> 1);
-							g.drawImage(attachIcon, ax, ay, 0);
-						} else {
-						g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
+							if (attachIcon != null) {
+								int ax = w - aw + ((aw - 24) >> 1);
+								int ay = iy + ((ih - 24) >> 1);
+								g.drawImage(attachIcon, ax, ay, 0);
+							} else {
+								g.setColor(colors[COLOR_CHAT_INPUT_ICON]);
 //						if (largeButtons) {
 //							int ax = w - aw + ((aw - 24) >> 1);
 //							int ay = iy + ((ih - 26) >> 1);
 //							g.fillRect(ax, ay + 12, 24, 2);
 //							g.fillRect(ax + 11, ay + 1, 2, 24);
 //						} else {
-							int ax = w - aw + ((aw - 17) >> 1);
-							int ay = iy + ((ih - 24) >> 1);
-							g.fillRect(ax, ay + 12, 17, 1);
-							g.fillRect(ax + 8, ay + 4, 1, 17);
-						}
+								int ax = w - aw + ((aw - 17) >> 1);
+								int ay = iy + ((ih - 24) >> 1);
+								g.fillRect(ax, ay + 12, 17, 1);
+								g.fillRect(ax + 8, ay + 4, 1, 17);
+							}
 //						}
+						}
+					} else {
+
 					}
 
 //#ifndef NO_NOKIAUI
