@@ -236,6 +236,7 @@ public class MP extends MIDlet
 	private static String lastDownloadPath;
 	static String lastUploadPath;
 	static int playMethod; // 0: stream, 1: write to file
+	static boolean bufferedRecord;
 //#endif
 	private static boolean playlistDirection = true;
 	static boolean time12;
@@ -765,6 +766,7 @@ public class MP extends MIDlet
 //#ifndef NO_FILE
 //		chunkedUpload = (!symbian || anna) && (!s40 || checkClass("javax.microedition.location.Location"));
 		if (blackberry) textMethod = 3;
+		bufferedRecord = s40;
 //#endif
 
 //#ifndef NO_CHAT_CANVAS
@@ -868,6 +870,7 @@ public class MP extends MIDlet
 			lastDownloadPath = j.getString("lastDownloadPath", lastDownloadPath);
 			lastUploadPath = j.getString("lastUploadPath", lastUploadPath);
 			playMethod = j.getInt("playMethod", playMethod);
+			bufferedRecord = j.getBoolean("bufferedRecord", bufferedRecord);
 //#endif
 			longpoll = j.getBoolean("longpoll", longpoll);
 			playlistDirection = j.getBoolean("playlistDirection", playlistDirection);
@@ -1653,7 +1656,7 @@ public class MP extends MIDlet
 				String writeTo = (String) ((Object[]) param)[1];
 				String replyTo = (String) ((Object[]) param)[2];
 				String edit = (String) ((Object[]) param)[3];
-				String file = (String) ((Object[]) param)[4];
+				Object file = ((Object[]) param)[4];
 				String fwdPeer = (String) ((Object[]) param)[6];
 				String fwdMsg = (String) ((Object[]) param)[7];
 //#ifndef NO_CHAT_CANVAS
@@ -1678,7 +1681,7 @@ public class MP extends MIDlet
 				} catch (Exception ignored) {}
 //#endif
 
-				if (file != null && file.length() <= 8) {
+				if (file instanceof String && ((String) file).length() <= 8) {
 					file = null;
 				}
 				StringBuffer sb;
@@ -2929,16 +2932,20 @@ public class MP extends MIDlet
 					recordAlert = null;
 					return;
 				}
-				o = getAudioCacheDir().concat("temp".concat(o));
-				FileConnection fc = (FileConnection) Connector.open(o);
-				try {
-					if (fc.exists()) fc.delete();
-					fc.create();
-				} finally {
-					fc.close();
+				if (bufferedRecord) {
+					r.setRecordStream(voiceBuffer = new VoiceBufferStream("temp".concat(o)));
+				} else {
+					o = getAudioCacheDir().concat("temp".concat(o));
+					FileConnection fc = (FileConnection) Connector.open(o);
+					try {
+						if (fc.exists()) fc.delete();
+						fc.create();
+					} finally {
+						fc.close();
+					}
+					Thread.sleep(100);
+					r.setRecordLocation(recordPath = o);
 				}
-				Thread.sleep(100);
-				r.setRecordLocation(recordPath = o);
 				p.addPlayerListener(midlet);
 			} catch (Exception e) {
 				display(errorAlert(L[LRecorderInitFailed_Alert] + " \n" + e), null);
@@ -3880,6 +3887,7 @@ public class MP extends MIDlet
 								L[LUseUnicode],
 //#ifndef NO_FILE
 								L[LPartialUpload],
+								"Buffered voice recording" // TODO unlocalized
 //#endif
 						}, null);
 						advChoice.setLayout(Item.LAYOUT_EXPAND | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER);
@@ -3897,7 +3905,8 @@ public class MP extends MIDlet
 						advChoice.setSelectedIndex(i++, keepAlive);
 						advChoice.setSelectedIndex(i++, utf);
 //#ifndef NO_FILE
-						advChoice.setSelectedIndex(i, chunkedUpload);
+						advChoice.setSelectedIndex(i++, chunkedUpload);
+						advChoice.setSelectedIndex(i, bufferedRecord);
 //#endif
 
 						// images
@@ -4114,7 +4123,8 @@ public class MP extends MIDlet
 						keepAlive = advChoice.isSelected(i++);
 						utf = advChoice.isSelected(i++);
 //#ifndef NO_FILE
-						chunkedUpload = advChoice.isSelected(i);
+						chunkedUpload = advChoice.isSelected(i++);
+						bufferedRecord = advChoice.isSelected(i);
 //#endif
 
 						i = 0;
@@ -4780,7 +4790,8 @@ public class MP extends MIDlet
 					((MPChat) current).updateSending();
 				}
 
-				start(RUN_SEND_MESSAGE, new Object[] { "", writeTo, replyTo, null, recordPath, new boolean[] { false, false, true }, null, null });
+				start(RUN_SEND_MESSAGE, new Object[] { "", writeTo, replyTo, null, voiceBuffer != null ? (Object) voiceBuffer : recordPath, new boolean[] { false, false, true }, null, null });
+				voiceBuffer = null;
 				return;
 			}
 		}
@@ -5493,6 +5504,7 @@ public class MP extends MIDlet
 	private static Player recordPlayer;
 	private static Control recordControl;
 	private static String recordPath;
+	private static VoiceBufferStream voiceBuffer;
 
 	static void openVoiceRecorder(String peerId, String reply) {
 		if (!voiceConversion) {
@@ -6722,7 +6734,7 @@ public class MP extends MIDlet
 	}
 
 //#ifndef NO_FILE
-	static void postMessage(String url, String fileUrl, String text, Alert alert, boolean delete) throws IOException {
+	static void postMessage(String url, Object fileSrc, String text, Alert alert, boolean delete) throws IOException {
 		HttpConnection http = null;
 		InputStream httpIn = null;
 
@@ -6770,12 +6782,16 @@ public class MP extends MIDlet
 //			if (text != null) {
 //				contentLength += 43 + 10 + boundaryLength + text.getBytes("UTF-8").length;
 //			}
-			if (fileUrl != null) {
+			if (fileSrc != null) {
 				if (chunkedUpload) {
 					http.setRequestProperty("Transfer-Encoding", "chunked");
 				}
-				file = (FileConnection) Connector.open(fileUrl);
-				fileTotal = (int) file.fileSize();
+				if (fileSrc instanceof VoiceBufferStream) {
+					fileTotal = ((VoiceBufferStream) fileSrc).count();
+				} else {
+					file = (FileConnection) Connector.open((String) fileSrc);
+					fileTotal = (int) file.fileSize();
+				}
 //				contentLength += 55 + 1 + 10 + boundaryLength + file.getName().getBytes("UTF-8").length + fileTotal;
 			}
 //			contentLength += boundaryLength + 4;
@@ -6796,40 +6812,64 @@ public class MP extends MIDlet
 				}
 
 				if (!sending) throw cancelException;
-				if (fileUrl != null) {
-					InputStream fileIn = file.openInputStream();
-
+				if (fileSrc != null) {
 					if (alert != null && fileTotal != 0) {
 						display(alert, current);
 					} else {
 						gauge = null;
 					}
 
-					try {
-						httpOut.write(DASHDASH);
-						httpOut.write(boundary.getBytes());
-						httpOut.write(CRLF);
-						httpOut.write("Content-Disposition: form-data; name=\"file\"; filename=\"".getBytes());
+					httpOut.write(DASHDASH);
+					httpOut.write(boundary.getBytes());
+					httpOut.write(CRLF);
+					httpOut.write("Content-Disposition: form-data; name=\"file\"; filename=\"".getBytes());
+					if (file != null) {
 						httpOut.write(file.getName().getBytes("UTF-8"));
-						httpOut.write((byte) '"');
-						httpOut.write(CRLF);
-						httpOut.write(CRLF);
-						byte[] b = new byte[4096];
-						int i;
-						while ((i = fileIn.read(b)) != -1) {
-							httpOut.write(b, 0, i);
+					} else {
+						httpOut.write(((VoiceBufferStream) fileSrc).name.getBytes("UTF-8"));
+					}
+					httpOut.write((byte) '"');
+					httpOut.write(CRLF);
+					httpOut.write(CRLF);
+					if (file != null) {
+						InputStream fileIn = file.openInputStream();
+
+						try {
+							byte[] b = new byte[4096];
+							int i;
+							while ((i = fileIn.read(b)) != -1) {
+								httpOut.write(b, 0, i);
+								if (chunkedUpload) {
+									httpOut.flush();
+								}
+								fileSent += i;
+								if (gauge != null) {
+									gauge.setValue(Math.min((fileSent * 100) / fileTotal, 100));
+								}
+								if (!sending) throw cancelException;
+							}
+							httpOut.write(CRLF);
+						} finally {
+							fileIn.close();
+						}
+					} else {
+						// voice buffer
+						byte[] b = ((VoiceBufferStream) fileSrc).data();
+						while (fileSent < fileTotal) {
+							int m = fileTotal - fileSent;
+							if (m > 4096) m = 4096;
+
+							httpOut.write(b, fileSent, m);
 							if (chunkedUpload) {
 								httpOut.flush();
 							}
-							fileSent += i;
+							fileSent += m;
 							if (gauge != null) {
 								gauge.setValue(Math.min((fileSent * 100) / fileTotal, 100));
 							}
 							if (!sending) throw cancelException;
 						}
 						httpOut.write(CRLF);
-					} finally {
-						fileIn.close();
 					}
 				}
 
@@ -7709,6 +7749,7 @@ public class MP extends MIDlet
 		j.put("lastDownloadPath", lastDownloadPath);
 		j.put("lastUploadPath", lastUploadPath);
 		j.put("playMethod", playMethod);
+		j.put("bufferedRecord", bufferedRecord);
 //#endif
 		j.put("longpoll", longpoll);
 		j.put("playlistDirection", playlistDirection);
