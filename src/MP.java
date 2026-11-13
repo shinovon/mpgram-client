@@ -6409,6 +6409,21 @@ public class MP extends MIDlet
 		if (selfId != null && handleDeepLink(url, ask)) {
 			return;
 		}
+		if (url.startsWith("https://github.com/") || url.startsWith("http://github.com/") || url.startsWith("github.com/")) {
+			if (symbianext) {
+				String uid = System.getProperty("cc.nnproject.symbianext.getMidletUid:GH2ME;nnproject");
+				if (uid != null
+						&& "false".equals(System.getProperty("cc.nnproject.symbianext.isAppRunning:".concat(uid)))) {
+					if ("0".equals(System.getProperty("cc.nnproject.symbianext.launchMidlet:GH2ME;nnproject;1;-Durl=" + url))) {
+						return;
+					}
+				}
+			} else if (symbian3) {
+				try {
+					midlet.browse("localapp://jam/launch?midlet-name=GH2ME;midlet-vendor=nnproject;url=" + url(url) + ";launchfrom=mpgram");
+				} catch (Exception ignored) {}
+			}
+		}
 		if (ask) {
 			MP.confirm(RUN_OPEN_URL, url, null, L[LOpenThisLink_Alert] + " \n\n" + url);
 			return;
