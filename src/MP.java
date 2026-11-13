@@ -4765,6 +4765,7 @@ public class MP extends MIDlet
 				} catch (Exception e) {
 					closeVoiceRecorder();
 					display(errorAlert(e), null);
+					voiceBuffer = null;
 				}
 				return;
 			}
@@ -4780,6 +4781,7 @@ public class MP extends MIDlet
 			}
 			if (c == recorderCloseCmd) {
 				closeVoiceRecorder();
+				voiceBuffer = null;
 				return;
 			}
 			if (c == recorderSendCmd) {
@@ -5218,10 +5220,12 @@ public class MP extends MIDlet
 				} catch (Exception e) {
 					closeVoiceRecorder();
 					display(errorAlert(e), null);
+					voiceBuffer = null;
 				}
 				return;
 			} else if (PlayerListener.ERROR.equals(event)) {
 				closeVoiceRecorder();
+				voiceBuffer = null;
 				return;
 			}
 			return;
