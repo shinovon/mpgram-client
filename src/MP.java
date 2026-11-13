@@ -152,6 +152,9 @@ public class MP extends MIDlet
 	static Displayable current;
 	static boolean paused;
 
+	static int launchInstance;
+	static boolean launchHandled;
+
 	private static String version;
 
 	// region Settings
@@ -565,7 +568,15 @@ public class MP extends MIDlet
 
 	protected void startApp()  {
 		paused = false;
-		if (midlet != null) return;
+		if (midlet != null) {
+			String p = System.getProperty("com.nokia.mid.cmdline.instance");
+			int i;
+			if (p != null && (i = Integer.parseInt(p)) > launchInstance) {
+				launchInstance = i;
+				handleLaunch(true);
+			}
+			return;
+		}
 		midlet = this;
 
 		version = getAppProperty("MIDlet-Version");
@@ -1233,10 +1244,13 @@ public class MP extends MIDlet
 				} catch (Exception ignored) {}
 
 				openLoad(mainDisplayable = mainChatsList());
-				if (param != null) {
-					writeAuth();
-				} else {
-					start(RUN_CHECK_OTA, null);
+
+				if (!handleLaunch(false)) {
+					if (param != null) {
+						writeAuth();
+					} else {
+						start(RUN_CHECK_OTA, null);
+					}
 				}
 
 				if (keepAlive || notifications)
@@ -7758,6 +7772,42 @@ public class MP extends MIDlet
 		}
 
 		return true;
+	}
+
+	static synchronized boolean handleLaunch(boolean restart) {
+		if (restart && !launchHandled) return false;
+		if (selfId == null) return false;
+		launchHandled = true;
+		try {
+			String cmd = System.getProperty("com.nokia.mid.cmdline.instance");
+			if (cmd != null) {
+				launchInstance = Integer.parseInt(cmd);
+			}
+
+			cmd = System.getProperty("com.nokia.mid.cmdline");
+			if (cmd == null) {
+				cmd = System.getProperty("launchcmd");
+			}
+			if ("empty=1".equals(cmd)) cmd = "";
+
+			String url = null;
+			if (cmd != null && cmd.length() != 0) {
+				int i = cmd.indexOf("url=");
+				if (i != -1) {
+					int j = cmd.indexOf(';', i + 4);
+					url = cmd.substring(i + 4, j == -1 ? cmd.length() : j).trim();
+				}
+			}
+
+			if (url == null || url.length() == 0) {
+				url = System.getProperty("url");
+			}
+
+			if (url != null && url.length() != 0) {
+				return handleDeepLink(url, true);
+			}
+		} catch (Exception ignored) {}
+		return false;
 	}
 
 	// endregion

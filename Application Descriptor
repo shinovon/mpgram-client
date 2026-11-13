@@ -23,3 +23,4 @@ LGE-MIDlet-On-Screen-Keypad: no
 MIDlet-Icon: /m.png
 MicroEdition-Profile: MIDP-2.0
 MIDlet-Permissions: javax.microedition.io.Connector.http
+Nokia-MIDlet-Launch-Params: url
