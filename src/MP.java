@@ -261,6 +261,8 @@ public class MP extends MIDlet
 //#ifndef NO_CHAT_CANVAS
 	static boolean needsBackspace; // for nokiaui text editor usability on touch and type devices without softkeys
 //#endif
+	static boolean symbian3;
+	static boolean symbianext;
 
 	// endregion Settings
 
@@ -594,15 +596,19 @@ public class MP extends MIDlet
 					switch (v.charAt(2)) {
 					case '2':
 						systemName = (p.startsWith("Nokia") && p.indexOf("java_build_version=2.2") != -1) ? "Symbian Anna" : "Symbian^3";
+						symbian3 = true;
 						break;
 					case '3':
 						systemName = "Symbian Belle";
+						symbian3 = true;
 						break;
 					case '4':
 						systemName = "Symbian Belle FP1";
+						symbian3 = true;
 						break;
 					case '5':
 						systemName = "Symbian Belle FP2";
+						symbian3 = true;
 						break;
 					default:
 						systemName = "S60 5th Edition";
@@ -647,6 +653,12 @@ public class MP extends MIDlet
 				|| checkClass("com.symbian.lcdjava.io.File");
 		if (symbian && systemName == null) {
 			systemName = "Symbian";
+		}
+
+		symbianext = System.getProperty("cc.nnproject.symbianext.version") != null;
+		v = System.getProperty("cc.nnproject.symbianext.checkTLS12");
+		if (v != null && !"false".equals(v)) {
+			instanceUrl = DEFAULT_HTTPS_INSTANCE_URL;
 		}
 
 		boolean s40 = false;
@@ -1197,7 +1209,7 @@ public class MP extends MIDlet
 		switch (run) {
 		case RUN_VALIDATE_AUTH: {
 			String s = instanceUrl;
-			if (param == null && s.endsWith(".nnchan.ru/") && !"ru".equals(lang)) {
+			if (param == null && s.endsWith(".nnchan.ru/") /*&& !"ru".equals(lang)*/) {
 				int i = s.indexOf(".nnchan.ru");
 				instanceUrl = s.substring(0, i) + ".nnproject.cc/";
 				writeAuth();
@@ -6338,7 +6350,7 @@ public class MP extends MIDlet
 			if (url.indexOf(':') == -1) {
 				url = "http://".concat(url);
 			}
-			if (symbianJrt && System.getProperty("forcedomain") != null) {
+			if (symbian3 && System.getProperty("forcedomain") != null) {
 				if (url.startsWith("http")) {
 					if (System.getProperty("asd") != null) {
 						// workaround specifically for my e7 because "services" app doesn't work there

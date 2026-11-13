@@ -72,6 +72,7 @@ public interface Constants {
 
 	// URLs
 	String DEFAULT_INSTANCE_URL = "http://mp.nnproject.cc/";
+	String DEFAULT_HTTPS_INSTANCE_URL = "https://mp.nnproject.cc/";
 	String API_URL = "api.php";
 	String AVA_URL = "ava.php";
 	String FILE_URL = "file.php";
