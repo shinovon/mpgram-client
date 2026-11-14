@@ -80,6 +80,9 @@ public interface Constants {
 	String OTA_URL = "http://nnproject.cc/mp/upd.php";
 	String EMOJI_URL = "http://d.nnproject.cc/mp/e/";
 
+	String SYMEXT = "cc.nnproject.symbianext.";
+	String IPC_ID = "mpgram";
+
 	String API_VERSION = "12";
 	
 	String T_ME = "t.me/";

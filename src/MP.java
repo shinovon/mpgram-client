@@ -571,9 +571,14 @@ public class MP extends MIDlet
 		paused = false;
 		if (midlet != null) {
 			String p = System.getProperty("com.nokia.mid.cmdline.instance");
-			int i;
-			if (p != null && (i = Integer.parseInt(p)) > launchInstance) {
+			if (p != null) {
+				int i = Integer.parseInt(p);
+				if (i <= launchInstance) return;
 				launchInstance = i;
+				handleLaunch(true);
+			} else {
+				p = System.getProperty(SYMEXT + "getGlobalData:" + IPC_ID + "_launchUrl");
+				if (p == null || p.length() == 0) return;
 				handleLaunch(true);
 			}
 			return;
@@ -667,8 +672,8 @@ public class MP extends MIDlet
 			systemName = "Symbian";
 		}
 
-		symbianext = System.getProperty("cc.nnproject.symbianext.version") != null;
-		v = System.getProperty("cc.nnproject.symbianext.checkTLS12");
+		symbianext = System.getProperty(SYMEXT + "version") != null;
+		v = System.getProperty(SYMEXT + "checkTLS12");
 		if (v != null && !"false".equals(v)) {
 			instanceUrl = DEFAULT_HTTPS_INSTANCE_URL;
 		}
@@ -6411,12 +6416,17 @@ public class MP extends MIDlet
 		}
 		if (url.startsWith("https://github.com/") || url.startsWith("http://github.com/") || url.startsWith("github.com/")) {
 			if (symbianext) {
-				String uid = System.getProperty("cc.nnproject.symbianext.getMidletUid:GH2ME;nnproject");
-				if (uid != null
-						&& "false".equals(System.getProperty("cc.nnproject.symbianext.isAppRunning:".concat(uid)))) {
-					if ("0".equals(System.getProperty("cc.nnproject.symbianext.launchMidlet:GH2ME;nnproject;1;-Durl=" + url))) {
+				String uid = System.getProperty(SYMEXT + "getMidletUid:GH2ME;nnproject");
+				if (uid != null) {
+					if ("true".equals(System.getProperty(SYMEXT + "isAppRunning:".concat(uid)))) {
+						System.getProperty(SYMEXT + "setGlobalData:gh2me_launchUrl;" + url);
+						if ("0".equals(System.getProperty(SYMEXT + "bringMidletToForeground:GH2ME;nnproject"))) {
+							return;
+						}
+					} else if ("0".equals(System.getProperty(SYMEXT + "launchMidlet:GH2ME;nnproject;1;-Durl=" + url))) {
 						return;
 					}
+
 				}
 			} else if (symbian3) {
 				try {
@@ -6668,6 +6678,51 @@ public class MP extends MIDlet
 		}
 		System.out.println("Unhandled deep link: " + url);
 		return url.startsWith("tg://");
+	}
+
+	static synchronized boolean handleLaunch(boolean restart) {
+		if (restart && !launchHandled) return false;
+		if (selfId == null) return false;
+		launchHandled = true;
+		try {
+			String cmd = System.getProperty("com.nokia.mid.cmdline.instance");
+			String url = null;
+			if (cmd != null) {
+				launchInstance = Integer.parseInt(cmd);
+			} else {
+				url = System.getProperty(SYMEXT + "getGlobalData:" + IPC_ID + "_launchUrl");
+				if (url != null && url.length() != 0) {
+					System.getProperty(SYMEXT + "setGlobalData:" + IPC_ID + "_launchUrl;");
+				} else {
+					url = null;
+				}
+			}
+
+			if (url == null) {
+				cmd = System.getProperty("com.nokia.mid.cmdline");
+				if (cmd == null) {
+					cmd = System.getProperty("launchcmd");
+				}
+				if ("empty=1".equals(cmd)) cmd = "";
+
+				if (cmd != null && cmd.length() != 0) {
+					int i = cmd.indexOf("url=");
+					if (i != -1) {
+						int j = cmd.indexOf(';', i + 4);
+						url = cmd.substring(i + 4, j == -1 ? cmd.length() : j).trim();
+					}
+				}
+			}
+
+			if (url == null || url.length() == 0) {
+				url = System.getProperty("url");
+			}
+
+			if (url != null && url.length() != 0) {
+				return handleDeepLink(url, true);
+			}
+		} catch (Exception ignored) {}
+		return false;
 	}
 
 	// endregion
@@ -7832,42 +7887,6 @@ public class MP extends MIDlet
 		}
 
 		return true;
-	}
-
-	static synchronized boolean handleLaunch(boolean restart) {
-		if (restart && !launchHandled) return false;
-		if (selfId == null) return false;
-		launchHandled = true;
-		try {
-			String cmd = System.getProperty("com.nokia.mid.cmdline.instance");
-			if (cmd != null) {
-				launchInstance = Integer.parseInt(cmd);
-			}
-
-			cmd = System.getProperty("com.nokia.mid.cmdline");
-			if (cmd == null) {
-				cmd = System.getProperty("launchcmd");
-			}
-			if ("empty=1".equals(cmd)) cmd = "";
-
-			String url = null;
-			if (cmd != null && cmd.length() != 0) {
-				int i = cmd.indexOf("url=");
-				if (i != -1) {
-					int j = cmd.indexOf(';', i + 4);
-					url = cmd.substring(i + 4, j == -1 ? cmd.length() : j).trim();
-				}
-			}
-
-			if (url == null || url.length() == 0) {
-				url = System.getProperty("url");
-			}
-
-			if (url != null && url.length() != 0) {
-				return handleDeepLink(url, true);
-			}
-		} catch (Exception ignored) {}
-		return false;
 	}
 
 	// endregion
