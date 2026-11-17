@@ -1426,10 +1426,12 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 	}
 
 	public void hideNotify() {
+		super.hideNotify();
 		closeMenu();
 	}
 
 	public void showNotify() {
+		super.showNotify();
 		skipRender = false;
 		repaint();
 	}

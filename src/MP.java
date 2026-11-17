@@ -576,7 +576,7 @@ public class MP extends MIDlet
 				if (i <= launchInstance) return;
 				launchInstance = i;
 				handleLaunch(true);
-			} else {
+			} else if (symbianext) {
 				p = System.getProperty(SYMEXT + "getGlobalData:" + IPC_ID + "_launchUrl");
 				if (p == null || p.length() == 0) return;
 				handleLaunch(true);
@@ -673,6 +673,9 @@ public class MP extends MIDlet
 		}
 
 		symbianext = System.getProperty(SYMEXT + "version") != null;
+		if (symbianext) {
+			System.getProperty(SYMEXT + "createGlobalData:" + IPC_ID + "_launchUrl");
+		}
 		v = System.getProperty(SYMEXT + "checkTLS12");
 		if (v != null && !"false".equals(v)) {
 			instanceUrl = DEFAULT_HTTPS_INSTANCE_URL;
@@ -914,7 +917,7 @@ public class MP extends MIDlet
 
 		if (user == null) {
 			try {
-				user = getAppProperty("MPGram-User");
+				user = getAppProperty("mpgram-user");
 			} catch (Exception ignored) {}
 		}
 
@@ -6416,17 +6419,16 @@ public class MP extends MIDlet
 		}
 		if (url.startsWith("https://github.com/") || url.startsWith("http://github.com/") || url.startsWith("github.com/")) {
 			if (symbianext) {
-				String uid = System.getProperty(SYMEXT + "getMidletUid:GH2ME;nnproject");
-				if (uid != null) {
-					if ("true".equals(System.getProperty(SYMEXT + "isAppRunning:".concat(uid)))) {
+				String r = System.getProperty(SYMEXT + "getMidletSuiteVersion:GH2ME;nnproject");
+				if (r != null) { // TODO check version > 0.9.9
+					r = System.getProperty(SYMEXT + "launchMidlet:GH2ME;nnproject;1;-Durl=" + url);
+					if ("0".equals(r)) return;
+					if ("-11".equals(r)) {
 						System.getProperty(SYMEXT + "setGlobalData:gh2me_launchUrl;" + url);
 						if ("0".equals(System.getProperty(SYMEXT + "bringMidletToForeground:GH2ME;nnproject"))) {
 							return;
 						}
-					} else if ("0".equals(System.getProperty(SYMEXT + "launchMidlet:GH2ME;nnproject;1;-Durl=" + url))) {
-						return;
 					}
-
 				}
 			} else if (symbian3) {
 				try {
@@ -6683,6 +6685,7 @@ public class MP extends MIDlet
 	static synchronized boolean handleLaunch(boolean restart) {
 		if (restart && !launchHandled) return false;
 		if (selfId == null) return false;
+
 		launchHandled = true;
 		try {
 			String cmd = System.getProperty("com.nokia.mid.cmdline.instance");
