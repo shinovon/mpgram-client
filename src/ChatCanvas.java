@@ -153,7 +153,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		this.id = id;
 		this.topMsgId = topMsg;
 		this.forwardMsgsOnLoad = forward;
-		init(query == null);
+		init(true);
 	}
 
 	// forward one message
@@ -163,7 +163,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		this.topMsgId = topMsg;
 		this.forwardPeerOnLoad = forwardPeerId;
 		this.forwardMsgOnLoad = forwardMsgId;
-		init(query == null);
+		init(true);
 	}
 
 
@@ -1446,11 +1446,8 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 	}
 
 	public void startEdit(UIMessage item) {
-		resetInput();
-		keyboardTextUpdated = false;
-		text = item.origText;
+		startText(item.origText);
 		editMsgId = item.id;
-		focusInput(true);
 	}
 
 	public void startReply(UIMessage item) {
@@ -1471,6 +1468,14 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 		this.forwardPeer = peer;
 		this.forwardMsg = msg;
 		this.forwardMsgs = msgs;
+		focusInput(true);
+	}
+
+	public void startText(String text) {
+		resetInput();
+		keyboardTextUpdated = false;
+		MP.display(this);
+		this.text = text;
 		focusInput(true);
 	}
 

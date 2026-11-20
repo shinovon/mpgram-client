@@ -34,6 +34,7 @@ public class ChatsCanvas extends MPCanvas {
 	Hashtable table;
 	int pinnedCount;
 	String peerId, msgId;
+	String text;
 	UIMessage[] msgs;
 	boolean noAvas;
 
@@ -78,6 +79,19 @@ public class ChatsCanvas extends MPCanvas {
 		this.peerId = peerId;
 		this.msgId = "";
 		this.msgs = msgs;
+		addCommand(MP.archiveCmd);
+		addCommand(MP.cancelCmd);
+
+		if (!touch && !MP.noSelectCommand && (getWidth() > 176 || MP.series40)) {
+			addCommand(MP.canvasOkCmd);
+		}
+	}
+	public ChatsCanvas(String text) {
+		super();
+		setTitle(MP.L[LForward]);
+		setCommandListener(MP.midlet);
+		this.folder = 0;
+		this.text = text;
 		addCommand(MP.archiveCmd);
 		addCommand(MP.cancelCmd);
 
@@ -157,6 +171,20 @@ public class ChatsCanvas extends MPCanvas {
 				return;
 			}
 			MP.openLoad(new ChatCanvas(id, 0, peerId, msgId));
+			return;
+		}
+
+		if (text != null) {
+			// TODO
+			MP.deleteFromHistory(this);
+			if (MP.current instanceof ChatCanvas && id.equals(((ChatCanvas) MP.current).id)) {
+//				((ChatCanvas) MP.current).startText(text);
+				MP.display(MP.writeForm(id, null, text, null, null, null));
+				return;
+			}
+//			MP.openLoad(new ChatCanvas(id, 0, text));
+			MP.openChat(id, -1);
+			MP.display(MP.writeForm(id, null, text, null, null, null));
 			return;
 		}
 

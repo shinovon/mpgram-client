@@ -37,6 +37,7 @@ public class ChatsList extends MPList {
 	boolean noAvas;
 	boolean canBan;
 	String peerId, msgId;
+	String text;
 	int pinnedCount;
 	final Object lock = new Object();
 	boolean invite;
@@ -87,6 +88,16 @@ public class ChatsList extends MPList {
 		this.invite = true;
 		addCommand(MP.backCmd);
 		setFitPolicy(List.TEXT_WRAP_ON);
+	}
+
+	// send text mode
+	public ChatsList(String text) {
+		super(MP.L[LForward]);
+		this.folder = 0;
+		this.text = text;
+		addCommand(MP.archiveCmd);
+		addCommand(MP.cancelCmd);
+//		setFitPolicy(List.TEXT_WRAP_ON);
 	}
 
 	void loadInternal(Thread thread) throws Exception {
@@ -260,6 +271,15 @@ public class ChatsList extends MPList {
 			MP.openChat(id, 0);
 			MP.display(MP.writeForm(id, null, "", null, peerId, msgId));
 			return;
+		}
+
+		if (text != null) {
+			// send text
+			MP.deleteFromHistory(this);
+
+			// TODO topics
+			MP.openChat(id, 0);
+			MP.display(MP.writeForm(id, null, text, null, null, null));
 		}
 		
 		MP.openChat(id, -1);

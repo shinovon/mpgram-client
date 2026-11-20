@@ -6235,7 +6235,7 @@ public class MP extends MIDlet
 	}
 
 	static Alert alert(String title, String text, AlertType type) {
-		Alert a = new Alert(title == null ? (symbian ? L[Lmpgram] : "") : title);
+		Alert a = new Alert(title == null ? (symbian && !symbianJrt ? L[Lmpgram] : "") : title);
 		a.setType(type);
 		a.setString(text);
 		a.setTimeout(type == AlertType.ERROR ? 3000 : 1500);
@@ -6243,7 +6243,7 @@ public class MP extends MIDlet
 	}
 
 	static Alert loadingAlert(String s) {
-		Alert a = new Alert(symbian ? L[Lmpgram] : "", s == null ? L[LLoading] : s, null, null);
+		Alert a = new Alert(symbian && !symbianJrt ? L[Lmpgram] : "", s == null ? L[LLoading] : s, null, null);
 		a.setCommandListener(midlet);
 		a.addCommand(Alert.DISMISS_COMMAND);
 		a.setIndicator(new Gauge(null, false, Gauge.INDEFINITE, Gauge.CONTINUOUS_RUNNING));
@@ -6730,6 +6730,19 @@ public class MP extends MIDlet
 			}
 
 			if (url != null && url.length() != 0) {
+				if (url.startsWith("text:")) {
+					// TODO
+					url = url.substring(5);
+//#ifndef NO_CHAT_CANVAS
+					if (!legacyChatUI) {
+						openLoad(new ChatsCanvas(url));
+					} else
+//#endif
+					{
+						openLoad(new ChatsList(url));
+					}
+					return true;
+				}
 				return handleDeepLink(url, true);
 			}
 		} catch (Exception ignored) {}
