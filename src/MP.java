@@ -2621,6 +2621,10 @@ public class MP extends MIDlet
 						if (blackberry && blackberryNetwork == 1) {
 							url.append(";deviceside=true;interface=wifi");
 						}
+						if (symbian && !symbianJrt && url.charAt(4) == 's') {
+							// 9.2 and earlier do not support https protocol in jsr135
+							url.deleteCharAt(4);
+						}
 						p = Manager.createPlayer(url.toString());
 					}
 				}
@@ -2841,6 +2845,10 @@ public class MP extends MIDlet
 					} else { // pass url
 						if (blackberry && blackberryNetwork == 1) {
 							url.append(";deviceside=true;interface=wifi");
+						}
+						if (symbian && !symbianJrt && url.charAt(4) == 's') {
+							// 9.2 and earlier do not support https protocol in jsr135
+							url.deleteCharAt(4);
 						}
 						p = Manager.createPlayer(url.toString());
 					}
