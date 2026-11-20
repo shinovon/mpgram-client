@@ -189,6 +189,7 @@ public class Inflater {
 				
 				//this.adler.update(buf, off, more);
 				{
+					int off2 = off;
 					int len2 = more;
 					// (By Per Bothner)
 					int s1 = this.adler & 0xffff;
@@ -203,7 +204,7 @@ public class Inflater {
 							n = len2;
 						len2 -= n;
 						while (--n >= 0) {
-							s1 = s1 + (buf[off++] & 0xFF);
+							s1 = s1 + (buf[off2++] & 0xFF);
 							s2 = s2 + s1;
 						}
 						s1 %= BASE;

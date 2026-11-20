@@ -38,8 +38,8 @@ exception statement from your version. */
 
 package zip;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * This filter stream is used to decompress data compressed in the "deflate"
@@ -188,7 +188,8 @@ public class InflaterInputStream extends InputStream {
 			} catch (IOException e) {
 				throw e;
 			} catch (Exception dfe) {
-				throw new IOException("Zip: " + dfe.getMessage());
+				dfe.printStackTrace();
+				throw new IOException("Zip: " + dfe);
 			}
 
 			if (count > 0)
