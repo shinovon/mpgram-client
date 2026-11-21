@@ -1430,7 +1430,7 @@ public class MP extends MIDlet
 							}
 							if (img == null) {
 								try {
-									byte[] b = get(url);
+									byte[] b = getUniversal(url);
 //#ifndef NO_AVATARS
 									if (recordName != null) {
 										// save avatar to storage cache
@@ -4607,24 +4607,24 @@ public class MP extends MIDlet
 				((ChatCanvas) current).setFile("file:///".concat(path));
 			} else
 //#endif
-				if (fileMode == 1) {
-					// file selected
-					lastUploadPath = path;
-					path = path.concat(name);
-					commandAction(cancelCmd, d);
-					sendFile = "file:///".concat(path);
-					fileLabel.setText(L[LFile_Prefix].concat(path));
-				} else {
-					// folder selected
-					if (downloadMessage == null) {
-						// default download path selected in settings
-						downloadPathField.setString(lastDownloadPath = path);
-						goBackTo(settingsForm);
-					} else if (!downloading) {
-						// download
-						start(RUN_DOWNLOAD_DOCUMENT, downloadCurrentPath = lastDownloadPath = path);
-					}
+			if (fileMode == 1) {
+				// file selected
+				lastUploadPath = path;
+				path = path.concat(name);
+				commandAction(cancelCmd, d);
+				sendFile = "file:///".concat(path);
+				fileLabel.setText(L[LFile_Prefix].concat(path));
+			} else {
+				// folder selected
+				if (downloadMessage == null) {
+					// default download path selected in settings
+					downloadPathField.setString(lastDownloadPath = path);
+					goBackTo(settingsForm);
+				} else if (!downloading) {
+					// download
+					start(RUN_DOWNLOAD_DOCUMENT, downloadCurrentPath = lastDownloadPath = path);
 				}
+			}
 			needWriteConfig = true;
 //#endif
 			return;
