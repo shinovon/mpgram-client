@@ -334,6 +334,8 @@
 	"EnableHTMLFormatting": "HTML-форматирование",
 	"TextField_Hint": "Написать сообщение...",
 	"Clear": "Очистить",
+	"ForwardTo_Title": "Forward to...", // Untranslated
+	"Share_Title": "Share...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Сообщение отправлено",

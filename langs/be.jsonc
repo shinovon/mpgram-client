@@ -334,6 +334,8 @@
 	"EnableHTMLFormatting": "Уключыць HTML-фарматаванне",
 	"TextField_Hint": "Напішыце паведамленне…",
 	"Clear": "Ачысціць",
+	"ForwardTo_Title": "Forward to...", // Untranslated
+	"Share_Title": "Share...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Паведамленне адпраўлена",

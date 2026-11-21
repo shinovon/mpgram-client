@@ -57,7 +57,7 @@ public class ChatsCanvas extends MPCanvas {
 	// forward message mode
 	public ChatsCanvas(String peerId, String msgId) {
 		super();
-		setTitle(MP.L[LForward]);
+		setTitle(MP.L[LForwardTo_Title]);
 		setCommandListener(MP.midlet);
 		this.folder = 0;
 		this.peerId = peerId;
@@ -73,7 +73,7 @@ public class ChatsCanvas extends MPCanvas {
 	// forward messages
 	public ChatsCanvas(String peerId, UIMessage[] msgs) {
 		super();
-		setTitle(MP.L[LForward]);
+		setTitle(MP.L[LForwardTo_Title]);
 		setCommandListener(MP.midlet);
 		this.folder = 0;
 		this.peerId = peerId;
@@ -88,7 +88,7 @@ public class ChatsCanvas extends MPCanvas {
 	}
 	public ChatsCanvas(String text) {
 		super();
-		setTitle(MP.L[LForward]);
+		setTitle(MP.L[LShare_Title]);
 		setCommandListener(MP.midlet);
 		this.folder = 0;
 		this.text = text;

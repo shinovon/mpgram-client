@@ -70,7 +70,7 @@ public class ChatsList extends MPList {
 	
 	// forward message mode
 	public ChatsList(String peerId, String msgId) {
-		super(MP.L[LForward]);
+		super(MP.L[LForwardTo_Title]);
 		this.folder = 0;
 		this.peerId = peerId;
 		this.msgId = msgId;
@@ -92,12 +92,12 @@ public class ChatsList extends MPList {
 
 	// send text mode
 	public ChatsList(String text) {
-		super(MP.L[LForward]);
+		super(MP.L[LShare_Title]);
 		this.folder = 0;
 		this.text = text;
 		addCommand(MP.archiveCmd);
 		addCommand(MP.cancelCmd);
-//		setFitPolicy(List.TEXT_WRAP_ON);
+		setFitPolicy(List.TEXT_WRAP_ON);
 	}
 
 	void loadInternal(Thread thread) throws Exception {

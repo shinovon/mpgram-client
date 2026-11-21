@@ -334,6 +334,8 @@
 	"EnableHTMLFormatting": "HTML-muotoilu",
 	"TextField_Hint": "Kirjoita viesti...",
 	"Clear": "Tyhjennä",
+	"ForwardTo_Title": "Forward to...", // Untranslated
+	"Share_Title": "Share...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Viesti lähetetty",

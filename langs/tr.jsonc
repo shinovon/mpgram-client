@@ -334,6 +334,8 @@
 	"EnableHTMLFormatting": "HTML biçimlendirme",
 	"TextField_Hint": "Mesaj yaz...",
 	"Clear": "Temizle",
+	"ForwardTo_Title": "Forward to...", // Untranslated
+	"Share_Title": "Share...", // Untranslated
 
 	// Alert messages
 	"MessageSent_Alert": "Mesaj gönderildi",

@@ -334,6 +334,8 @@
 	"EnableHTMLFormatting": "فعالسازی قالب HTML",
 	"TextField_Hint": " پیامی بنویسید...",
 	"Clear": "پاکسازی",
+	"ForwardTo_Title": "Forward to...", // Untranslated
+	"Share_Title": "Share...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "پیام ارسال شد",

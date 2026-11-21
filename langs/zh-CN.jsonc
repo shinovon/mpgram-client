@@ -334,6 +334,8 @@
 	"EnableHTMLFormatting": "启用HTML排版",
 	"TextField_Hint": "输入消息...",
 	"Clear": "清空",
+	"ForwardTo_Title": "Forward to...", // Untranslated
+	"Share_Title": "Share...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "消息发送成功",

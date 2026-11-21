@@ -334,6 +334,8 @@
 	"EnableHTMLFormatting": "HTML-formatting aktivieren",
 	"TextField_Hint": "Write a message...", // Untranslated
 	"Clear": "Clear", // Untranslated
+	"ForwardTo_Title": "Forward to...", // Untranslated
+	"Share_Title": "Share...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Nachricht gesendet",

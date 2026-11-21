@@ -334,6 +334,8 @@
 	"EnableHTMLFormatting": "Activa formatació HTML",
 	"TextField_Hint": "Escriu un missatge...",
 	"Clear": "Esborra",
+	"ForwardTo_Title": "Forward to...", // Untranslated
+	"Share_Title": "Share...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Missatge enviat",

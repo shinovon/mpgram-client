@@ -384,6 +384,7 @@ public class MP extends MIDlet
 	static Command cancelCmd;
 	static Command goCmd;
 	static Command copyCmd;
+	static Command shareCmd;
 	static Command downloadInappCmd;
 	static Command downloadBrowserCmd;
 	static Command cancelDownloadCmd;
@@ -1043,6 +1044,7 @@ public class MP extends MIDlet
 		cancelCmd = new Command(L[LCancel], Command.CANCEL, 26);
 		goCmd = new Command(L[LOk], Command.OK, 1);
 		copyCmd = new Command(L[LCopy], Command.OK, 1);
+		shareCmd = new Command(L[LShare], Command.SCREEN, 3);
 		downloadInappCmd = new Command(L[LInApp], Command.SCREEN, 0);
 		downloadBrowserCmd = new Command(L[LWithBrowser], Command.SCREEN, 1);
 		cancelDownloadCmd = new Command(L[LCancel], Command.CANCEL, 1);
@@ -3269,7 +3271,7 @@ public class MP extends MIDlet
 
 					display(loadingAlert(L[LLoading]), current);
 					//noinspection DataFlowIssue
-					start(RUN_BAN_MEMBER, new String[]{((ChatsList) d).peerId, null, id});
+					start(RUN_BAN_MEMBER, new String[] { ((ChatsList) d).peerId, null, id });
 					return;
 				}
 			}
@@ -4187,7 +4189,7 @@ public class MP extends MIDlet
 //#ifndef NO_NOTIFY
 						|| d == settingsNotifForm
 //#endif
-						) {
+				) {
 					display(settingsForm, true);
 					return;
 				}
@@ -4243,7 +4245,7 @@ public class MP extends MIDlet
 
 				for (int i = 0; i < langs.length; ++i) {
 					String s = langs[i];
-					String lang = s.substring(s.lastIndexOf('[')+1,s.lastIndexOf(']'));
+					String lang = s.substring(s.lastIndexOf('[') + 1, s.lastIndexOf(']'));
 					l.append(s, null);
 
 					for (int j = 0; j < inputLanguages.length; j++) {
@@ -4268,7 +4270,7 @@ public class MP extends MIDlet
 				for (int i = 0; i < selected.length; ++i) {
 					if (selected[i]) {
 						String s = l.getString(i);
-						inputLanguages[k++] = s.substring(s.lastIndexOf('[')+1, s.lastIndexOf(']'));
+						inputLanguages[k++] = s.substring(s.lastIndexOf('[') + 1, s.lastIndexOf(']'));
 					}
 				}
 
@@ -4534,7 +4536,7 @@ public class MP extends MIDlet
 //#ifndef NO_ZIP
 					+ "\n\n" + localizeFormatted(LGNUClasspathLicense, "1999-2004 Free Software Foundation, Inc.")
 //#endif
-					);
+			);
 			s.setFont(smallPlainFont);
 			s.setLayout(Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_LEFT);
 			f.append(s);
@@ -4605,24 +4607,24 @@ public class MP extends MIDlet
 				((ChatCanvas) current).setFile("file:///".concat(path));
 			} else
 //#endif
-			if (fileMode == 1) {
-				// file selected
-				lastUploadPath = path;
-				path = path.concat(name);
-				commandAction(cancelCmd, d);
-				sendFile = "file:///".concat(path);
-				fileLabel.setText(L[LFile_Prefix].concat(path));
-			} else {
-				// folder selected
-				if (downloadMessage == null) {
-					// default download path selected in settings
-					downloadPathField.setString(lastDownloadPath = path);
-					goBackTo(settingsForm);
-				} else if (!downloading) {
-					// download
-					start(RUN_DOWNLOAD_DOCUMENT, downloadCurrentPath = lastDownloadPath = path);
+				if (fileMode == 1) {
+					// file selected
+					lastUploadPath = path;
+					path = path.concat(name);
+					commandAction(cancelCmd, d);
+					sendFile = "file:///".concat(path);
+					fileLabel.setText(L[LFile_Prefix].concat(path));
+				} else {
+					// folder selected
+					if (downloadMessage == null) {
+						// default download path selected in settings
+						downloadPathField.setString(lastDownloadPath = path);
+						goBackTo(settingsForm);
+					} else if (!downloading) {
+						// download
+						start(RUN_DOWNLOAD_DOCUMENT, downloadCurrentPath = lastDownloadPath = path);
+					}
 				}
-			}
 			needWriteConfig = true;
 //#endif
 			return;
@@ -4814,19 +4816,32 @@ public class MP extends MIDlet
 			}
 		}
 //#endif
-//#ifndef NO_NOKIAUI
-		if (c == copyCmd) {
-			try {
-				if (checkClass("com.nokia.mid.ui.Clipboard")) {
-					//noinspection DataFlowIssue
-					NokiaAPI.copy(((TextBox) d).getString());
-					display(infoAlert(L[LTextCopied_Alert]), current);
-					return;
-				}
-			} catch (Throwable ignored) {}
-			return;
-		}
+		{ // copy dialog
+			if (c == shareCmd) {
+				String text = ((TextBox) d).getString();
+//#ifndef NO_CHAT_CANVAS
+				if (!legacyChatUI) {
+					openLoad(new ChatsCanvas(text));
+				} else
 //#endif
+				{
+					openLoad(new ChatsList(text));
+				}
+			}
+//#ifndef NO_NOKIAUI
+			if (c == copyCmd) {
+				try {
+					if (checkClass("com.nokia.mid.ui.Clipboard")) {
+						//noinspection DataFlowIssue
+						NokiaAPI.copy(((TextBox) d).getString());
+						display(infoAlert(L[LTextCopied_Alert]), current);
+						return;
+					}
+				} catch (Throwable ignored) {}
+				return;
+			}
+//#endif
+		}
 //#ifndef NO_FILE
 		{ // download dialog
 			if (c == downloadInappCmd) {
@@ -6067,6 +6082,7 @@ public class MP extends MIDlet
 	static void copy(String title, String text) {
 		TextBox t = new TextBox(title, text, Math.max(2000, text.length() + 1), TextField.ANY);
 		t.addCommand(backCmd);
+		t.addCommand(shareCmd);
 //#ifndef NO_NOKIAUI
 		if (checkClass("com.nokia.mid.ui.Clipboard")) t.addCommand(copyCmd);
 //#endif
@@ -7038,7 +7054,7 @@ public class MP extends MIDlet
 		int j;
 		while ((j = in.read(buf, i, buf.length - i)) != -1) {
 			if ((i += j) >= buf.length) {
-				System.arraycopy(buf, 0, buf = new byte[i + 2048], 0, i);
+				System.arraycopy(buf, 0, buf = new byte[buf.length * 2], 0, i);
 			}
 		}
 		return new String(buf, 0, i, encoding);

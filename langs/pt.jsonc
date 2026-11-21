@@ -137,9 +137,13 @@
 	"SaveNote": "Salvar nota",
 	"Menu": "Menu",
 	"Write": "Escrever",
+	
+	// Message writing form commands
 	"AttachFile": "Anexar arquivo",
 	"SendVoiceMessage": "Enviar mensagem de voz",
 	
+	
+	// Profile/chat info commands
 	// Message writing form commands
 	"Send": "Enviar",
 	"OpenTextBox": "Abrir campo de texto",
@@ -153,6 +157,8 @@
 	"Members": "Membros",
 	"AddToContacts": "Adicionar aos contatos",
 	"Photos": "Fotos",
+	
+	// Dialog commands
 	"Videos": "Vídeos",
 	"Files": "Arquivos",
 	"AudioFiles": "Áudios",
@@ -160,8 +166,11 @@
 	"AddMember": "Adicionar membro",
 	"ViewInviteLink": "Ver link de convite",
 	
+	// Pagination commands
 	// Dialog commands
 	"Ok": "OK",
+	
+	// Loading states
 	"Cancel": "Cancelar",
 	"Open": "Abrir",
 	"Close": "Fechar",
@@ -170,6 +179,8 @@
 	
 	// Pagination commands
 	"NextPage": "Próxima página",
+	
+	// Authorization process
 	"PrevPage": "Página anterior",
 	
 	// Loading states
@@ -200,12 +211,16 @@
 	"InvalidPhoneNumber_Alert": "Número de telefone inválido!",
 	"InvalidCaptcha_Alert": "Captcha inválido!",
 	"CloudPasswordEmpty_Alert": "A senha da nuvem não pode estar vazia!",
+	
+	// Settings sections
 	"CreateNewSession_Btn": "Criar nova sessão", 
 	"ImportSession_Btn": "Importar sessão existente", 
 	"InvalidPassword_Alert": "Senha inválida!",
 	"LoginDisabled_Alert": "Esta instância não permite login pela API!",
 	"APIDisabled_Alert": "Esta instância não suporta API!",
 	"ClientOutdated_Alert": "Cliente desatualizado!",
+	
+	// UI Settings
 	"InvalidInstancePassword_Alert": "Senha da instância inválida!",
 	"InvalidSessionCode_Alert": "Código de sessão inválido!",
 	"Retry": "Tentar novamente",
@@ -236,6 +251,8 @@
 	"Medium": "Médio",
 	"FocusNewMessages": "Focar nas novas mensagens",
 	"ChatTextField": "Campo de texto do chat", 
+	
+	// Behaviour settings
 	"BuiltinImageViewer": "Visualizador de imagens embutido",
 	"LargeMusicCover": "Capa grande para música", 
 	"LegacyUI": "Interface clássica",
@@ -262,11 +279,15 @@
 	"ChatAutoUpdate": "Atualizar chat automaticamente",
 	"UpdatesTimeout": "Tempo limite de atualização", 
 	"KeepSessionAlive": "Manter sessão ativa", 
+	
+	// Images settings
 	"UseUnicode": "Usar Unicode", 
 	"UseCompression": "Usar compressão", 
 	"NetworkAccess": "Acesso à rede",
 	"MobileData": "Dados móveis",
 	"WiFi": "Wi-Fi",
+	
+	// Cache settings
 	"Longpoll": "Long polling",
 	"UpdatesInterval": "Intervalo de atualização",
 	"DownloadPath": "Pasta de downloads",
@@ -275,6 +296,8 @@
 	"InApp": "No aplicativo",
 	"WithBrowser": "Com navegador",
 	"PartialUpload": "Envio parcial",
+	
+	// Notifications settings
 	"PlaybackMethod": "Método de reprodução",
 	"Stream": "Transmitir",
 	"CacheToFile": "Salvar em arquivo temporário",
@@ -283,6 +306,8 @@
 	"PassConnectionStream": "Usar fluxo da conexão",
 	
 	// Images settings
+	
+	// About
 	"LoadMediaThumbnails": "Carregar miniaturas da mídia",
 	"LoadAvatars": "Carregar avatares",
 	"MultiThreadedLoading": "Carregamento em múltiplas threads",
@@ -293,6 +318,8 @@
 	"AvatarsCaching": "Cache de avatares",
 	"Disabled": "Desativado",
 	"HoldInRAM": "Manter na RAM",  
+	
+	// Write form
 	"Store": "Armazenar",
 	"HoldInRAMandStore": "Manter na RAM e armazenar",
 	"AvatarsCacheThreshold": "Limite de cache de avatares", 
@@ -307,6 +334,8 @@
 	"Off": "Desligado", 
 	"AlertWindow": "Janela de alerta",
 	"PushInterval": "Intervalo de consulta",
+	"ForwardTo_Title": "Forward to...", // Untranslated
+	"Share_Title": "Share...", // Untranslated
 	"PushBackgroundInterval": "Intervalo de consulta em segundo plano",
 	
 	// About

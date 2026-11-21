@@ -334,6 +334,8 @@
 	"EnableHTMLFormatting": "Enable HTML-formatting",
 	"TextField_Hint": "Write a message...",
 	"Clear": "Clear",
+	"ForwardTo_Title": "Forward to...",
+	"Share_Title": "Share...",
 	
 	// Alert messages
 	"MessageSent_Alert": "Message sent",
