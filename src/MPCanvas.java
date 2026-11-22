@@ -386,10 +386,10 @@ abstract class MPCanvas extends Canvas implements LangConstants {
 		if (width != w) {
 			layoutStart = firstItem;
 			resized();
-			if (menuFocused) {
-				menuFitsOnScreen = h <= height;
-				menuScroll = 0;
-			}
+		}
+		if (menuFocused && (width != w || height != h)) {
+			menuFitsOnScreen = menuHeight <= h;
+			menuScroll = 0;
 		}
 		width = w; height = h;
 
