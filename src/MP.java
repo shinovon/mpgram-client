@@ -7895,7 +7895,7 @@ public class MP extends MIDlet
 	}
 
 	static void normalGc() {
-		System.gc();
+		if (playerState == 0 || currentPlayer == null) System.gc();
 	}
 
 	static void emergencyGc() {
