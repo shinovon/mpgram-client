@@ -1232,12 +1232,6 @@ public class MP extends MIDlet
 //		running++;
 		switch (run) {
 		case RUN_VALIDATE_AUTH: {
-			String s = instanceUrl;
-			if (param == null && s.endsWith(".nnchan.ru/") /*&& !"ru".equals(lang)*/) {
-				int i = s.indexOf(".nnchan.ru");
-				instanceUrl = s.substring(0, i) + ".nnproject.cc/";
-				writeAuth();
-			}
 			Displayable returnTo = param == null ? authForm : current;
 			Alert alert = loadingAlert(L[LAuthorizing]);
 			if (param == null) {
@@ -1245,6 +1239,15 @@ public class MP extends MIDlet
 				alert.setCommandListener(this);
 			}
 			display(alert, param == null ? null : returnTo);
+
+			String s = instanceUrl;
+			if (param == null && s.endsWith(".nnchan.ru/") /*&& !"ru".equals(lang)*/) {
+				int i = s.indexOf(".nnchan.ru");
+				instanceUrl = s.substring(0, i) + ".nnproject.cc/";
+				instanceField.setString(instanceUrl);
+				writeAuth();
+			}
+
 			try {
 				selfId = ((JSONObject) api("me&status=1")).getString("id");
 				userState = 4;
