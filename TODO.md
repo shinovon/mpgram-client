@@ -93,6 +93,7 @@ Post-release todo:
 - [x] chats list pagination
 - [x] polls
 - [x] view avatar full-screen
+- [x] integration with gh2me
 - [ ] built-in camera
 - [ ] user friendly error messages
 - [ ] file picker preview
@@ -106,3 +107,4 @@ Post-release todo:
 - [ ] integration with mahomaps
 - [ ] switch ids from string to long
 - [ ] message reacts
+- [ ] mtm
