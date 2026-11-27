@@ -151,7 +151,7 @@
 	"Members": "Удзельнікі",
 	"AddToContacts": "Дадаць у кантакты",
 	"Photos": "Фотаздымкі",
-	"Videos": "Відэазапісы",
+	"Videos": "Відэафайлы",
 	"Files": "Файлы",
 	"AudioFiles": "Музыка",
 	"VoiceMessages": "Галасавыя павед.",
@@ -281,7 +281,7 @@
 	"PassConnectionStream": "Перадаць плынь са злучэння",
 	
 	// Images settings
-	"LoadMediaThumbnails": "Загружаць мініяцюры медыя",
+	"LoadMediaThumbnails": "Загр. мініяцюры медыя",
 	"LoadAvatars": "Загружаць аватары",
 	"MultiThreadedLoading": "Шматпаточная загрузка",
 	"RoundAvatars": "Аватары ў выгл. кола",
@@ -318,9 +318,9 @@
 	"License": "Выпушчана пад ліцэнзіяй MIT.\nАўтарскае права (C) %",
 	"ImagelibLicense": "Змяшчае часткі TUBE42 imagelib, ліцэнзавана пад LGPL.\nАўтарскае права (C) %",
 	"GNUClasspathLicense": "Змяшчае часткі GNU Classpath, ліцэнзавана пад GPL v2\nАўтарскае права (C) %",
-	"Shortcuts_Title": "Shortcuts", // Untranslated
-	"ChatShortcutsHelp": "1: Search messages\n2: Scroll up\n3: Chat info\n4: Write message\n6: Refresh\n8: Scroll down\nLeft arrow: Reply to selected message\nCall: Send", // Untranslated
-	"DialogsShortcutsHelp": "1: Search chats\n2: Scroll up\n3: Folders\n4: Contacts\n6: Refresh\n8: Scroll down\n9: Open by link", // Untranslated
+	"Shortcuts_Title": "Клавіятурныя скароты",
+	"ChatShortcutsHelp": "1: Шукаць паведамленні\n2: Прагартаць вышэй\n3: Звесткі пра чат\n4: Напісаць паведамленне\n6: Абнавіць\n8: Прагартаць ніжэй\nСтрэлка ўлева: Адказаць на выбранае паведамленне\nВыклік: Адправіць",
+	"DialogsShortcutsHelp": "1: Шукаць чаты\n2: Прагартаць вышэй\n3: Папкі\n4: Кантакты\n6: Абнавіць\n8: Прагартаць ніжэй\n9: Адкрыць па спасылцы",
 	
 	// Write form
 	"Reply_Title": "Адказ",
