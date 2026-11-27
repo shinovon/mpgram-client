@@ -510,5 +510,8 @@
 	
 	"_voiceMessage": " رسالة صوتية",
 	"_voiceMessages": "رسائل صوتية", 
-	"_voiceMessages2": ""
+	"_voiceMessages2": "",
+
+	// end of file
+	"_": ""
 }

@@ -510,5 +510,8 @@
 	
 	"_voiceMessage": " sprach Nachricht",
 	"_voiceMessages": " sprach Nachrichten",
-	"_voiceMessages2": ""
+	"_voiceMessages2": "",
+
+	// end of file
+	"_": ""
 }

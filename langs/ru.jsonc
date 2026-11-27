@@ -510,5 +510,8 @@
 	
 	"_voiceMessage": " голосовое сообщение",
 	"_voiceMessages": " голосовых сообщения",
-	"_voiceMessages2": " голосовых сообщений"
+	"_voiceMessages2": " голосовых сообщений",
+
+	// end of file
+	"_": ""
 }
