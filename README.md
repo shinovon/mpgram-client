@@ -45,6 +45,7 @@ Does not work on most of Samsung phones.
 - JSR-135 (Audio recording)
 - Nokia UI (Clipboard, Keyboard, Notifications)
 - [Pigler API](https://nproject.cc/pna) (Symbian Belle Notifications)
+- [Java patches for Symbian](https://nnproject.cc/hmidp/)
 
 ### Platform-specific versions
 
