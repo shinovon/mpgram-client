@@ -34,6 +34,7 @@ for s in en_json.keys():
         err=True
 
 if not err:
+    # write java constants
     with open("../src/LangConstants.java", "w") as f:
         f.write("// This is a generated file. Not intended for manual editing.\n")
         f.write("\n")
@@ -61,6 +62,7 @@ if not err:
 
         patch = "LocaleBase" in j
 
+        # write resource
         with open("../res/l/" + n[:-6], mode='w', encoding="utf-8") as f:
             if patch:
                 f.write("/l/")
@@ -92,9 +94,10 @@ if not err:
                         f.write(escape(en_json[s]))
                         print("Missing key:", s)
                     f.write("\n")
-        
+
+        # regenerate source using en.jsonc as template
         if not patch and n != "en.jsonc":
-            slavic = j["LocaleSlavicPlurals"] == "1"
+            slavic = j["LocaleSlavicPlurals"] == "1" # maybe use ru as base
             old_lines = lines
             lines = []
             for s in en_lines:
@@ -102,21 +105,26 @@ if not err:
                 if len(t) == 0 or t == "{" or t == "}" or t.startswith("//"):
                     lines.append(s)
                     continue
+
                 key = t.split(":")[0].split("\"")[1]
-                if not key in j.keys():
+                if not key in j.keys(): # new entry
                     print("Filled", key)
                     lines.append(s[:-1] + " // Untranslated\n")
-                else:
-                    comment = s[s.rfind("\""):]
-                    for p in old_lines:
-                        if "\"" + key + "\": " in p:
-                            comment = p[p.rfind("\""):]
-                            break
-                    if "Untranslated" in comment and (not key.endswith("_2") or not slavic):
+                    continue
+
+                comment = s[s.rfind("\""):]
+                # find old comment
+                for p in old_lines:
+                    if "\"" + key + "\": " in p:
+                        comment = p[p.rfind("\""):]
+                        break
+
+                if "Untranslated" in comment and (not key.endswith("_2") or not slavic):
+                    if j[key] != en_json[key]:
                         print("Updated", key)
-                        lines.append(s[:-1] + " // Untranslated\n")
-                    else:
-                        lines.append(s[:s.index(":")] + ": \"" + escape(j[key]) + comment)
+                    lines.append(s[:-1] + " // Untranslated\n")
+                else:
+                    lines.append(s[:s.index(":")] + ": \"" + escape(j[key]) + comment)
             
             with open(n, mode="w", encoding="utf-8") as f:
                 for s in lines:

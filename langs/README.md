@@ -6,7 +6,7 @@
 - Name the new file with your language code
 - Edit `LocaleInfo` with your language name in English and your name
 - Use UTF-8 encoding
-- Do not edit comments
+- Do not edit section comments
 
 ## Plurals
 
