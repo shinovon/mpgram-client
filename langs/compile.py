@@ -109,6 +109,9 @@ if not err:
                 key = t.split(":")[0].split("\"")[1]
                 if not key in j.keys(): # new entry
                     print("Filled", key)
+                    if key == "_":
+                        lines.append(s)
+                        continue
                     lines.append(s[:-1] + " // Untranslated\n")
                     continue
 
@@ -117,6 +120,8 @@ if not err:
                 for p in old_lines:
                     if "\"" + key + "\": " in p:
                         comment = p[p.rfind("\""):]
+                        if key != "_" and comment.endswith("\"\n") and not "//" in comment:
+                            comment = comment[:-1] + ",\n"
                         break
 
                 if "Untranslated" in comment and (not key.endswith("_2") or not slavic):
