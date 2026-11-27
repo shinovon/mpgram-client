@@ -4824,11 +4824,11 @@ public class MP extends MIDlet
 				String text = ((TextBox) d).getString();
 //#ifndef NO_CHAT_CANVAS
 				if (!legacyChatUI) {
-					openLoad(new ChatsCanvas(text));
+					openLoad(new ChatsCanvas(text, false));
 				} else
 //#endif
 				{
-					openLoad(new ChatsList(text));
+					openLoad(new ChatsList(text, false));
 				}
 			}
 //#ifndef NO_NOKIAUI
