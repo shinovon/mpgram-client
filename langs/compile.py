@@ -109,7 +109,7 @@ if not err:
                 key = t.split(":")[0].split("\"")[1]
                 if not key in j.keys(): # new entry
                     print("Filled", key)
-                    if key == "_":
+                    if key == "_" or (key.endswith("_2") and not slavic):
                         lines.append(s)
                         continue
                     lines.append(s[:-1] + " // Untranslated\n")
