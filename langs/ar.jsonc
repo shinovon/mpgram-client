@@ -97,7 +97,7 @@
 	"Search": "البحث",
 	"OpenByLink": "فتح عبر الرابط",
 	"Select_OK": "Select", // Untranslated
-		
+	
 	// Message commands
 	"OpenChat": "فتح المحادثة",
 	"Profile": "الحساب",
@@ -394,10 +394,10 @@
 	
 	// Message
 	"ForwardedFrom": "محولة من ",
-	"Action": "اجراءات",
 	"You": "انت",
 	"You_Prefix": "انت: ",
 	"ForwardedMessage": "رسالة محولة",
+	"Action": "اجراءات",
 	"Edited": "معدلة", 
 	"_comment": "تعليق", 
 	"_comments": " تعليقات",
@@ -462,7 +462,7 @@
 	"Volume": "Volume", // Untranslated
 	"TogglePlaylistOrder": "Toggle order", // Untranslated
 	"VoiceMessageFrom": "Voice message from %", // Untranslated
-	
+
 	// Profile/chat info
 	"Online": "متصل",
 	"Offline": "غير متصل",

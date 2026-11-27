@@ -18,7 +18,7 @@ def load_jsonc(f,lines=None):
     return json.loads(cleaned)
 
 def escape(s: str):
-    return s.replace("\\", "\\\\").replace("\n", "\\n")
+    return s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n")
 
 en_lines = []
 en_json = None
@@ -94,48 +94,29 @@ if not err:
                         print("Missing key:", s)
                     f.write("\n")
         
-        if not patch and n != "en.jsonc": #and len(lines) != len(en_lines):
-            #print("Filling")
-            for k in en_json.keys():
-                existing = k in j.keys()
-                #if k in j.keys():
-                #    continue
-                i = 0
-                for s in en_lines:
-                    trimmed = s.strip()
-                    if not existing:
-                        if trimmed.startswith("//") and trimmed != lines[i].strip():
-                            print(i, s.strip())
-                            #if lines[i].strip().startswith("//"):
-                            #    lines[i] = s
-                            #else:
-                            lines.insert(i, s)
-                        elif trimmed == "" and lines[i].strip() != "":
-                            lines.insert(i, s)
-                        elif trimmed.split(":")[0] == "\"" + k + "\"":
-                            print(i, trimmed)
-                            if k[0] == '_' and k[-1] == '2':
-                                lines.insert(i, s)
-                            elif n == 'en_gb.jsonc':
-                                lines.insert(i, s)
-                            else:
-                                lines.insert(i, s[:-1] + " // Untranslated\n")
+        if not patch and n != "en.jsonc":
+            slavic = j["LocaleSlavicPlurals"] == "1"
+            i = 0
+            old_lines = lines
+            lines = []
+            for s in en_lines:
+                t = s.strip()
+                if len(t) == 0 or t == "{" or t == "}" or t.startswith("//"):
+                    lines.append(s)
+                    continue
+                key = t.split(":")[0].split("\"")[1]
+                if not key in j.keys():
+                    lines.append(s[:-1] + " // Untranslated\n")
+                else:
+                    comment = s[s.rfind("\""):]
+                    for p in old_lines:
+                        if "\"" + key + "\": " in p:
+                            comment = p[p.rfind("\""):]
                             break
-                        # elif s.strip()[-1] == ',' and lines[i].strip()[-1] != ',':
-                        #     if " // " in lines[i]:
-                        #         d = lines[i].split(" // ")
-                        #         if d[0][-1] == ',':
-                        #             lines[i] = lines[i][:-1] + ",\n"
-                        #     else:
-                        #         lines[i] = lines[i][:-1] + ",\n"
-                    else: # existing key
-                        if trimmed.split(":")[0] == "\"" + k + "\"":
-                            orig = lines[i].strip()
-                            if "\"" + k + "\"" in orig and orig.endswith("// Untranslated") and orig[:-16] != trimmed and k[0] != '_' and k[-1] != '2':
-                                print("Updated", i, k)
-                                lines[i] = s[:-1] + " // Untranslated\n"
-                            break
-                    i += 1
+                    if "Untranslated" in comment and (not key.endswith("_2") or not slavic):
+                        lines.append(s[:-1] + " // Untranslated\n")
+                    else:
+                        lines.append(s[:s.index(":")] + ": \"" + escape(j[key]) + comment)
             
             with open(n, mode="w", encoding="utf-8") as f:
                 for s in lines:

@@ -462,7 +462,7 @@
 	"Volume": "Äänenvoimakkuus",
 	"TogglePlaylistOrder": "Vaihda järjestys",
 	"VoiceMessageFrom": "Voice message from %", // Untranslated
-	
+
 	// Profile/chat info
 	"Online": "paikalla",
 	"Offline": "ei paikalla",

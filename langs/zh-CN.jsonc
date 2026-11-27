@@ -448,7 +448,7 @@
 	"AddStickers": "添加贴纸",
 	"Remove": "移除",
 	"Share": "分享",
-
+	
 	// Music player
 	"Player_Title": "音乐播放器",
 	"OpenPlayer": "播放器",
@@ -462,7 +462,7 @@
 	"Volume": "音量",
 	"TogglePlaylistOrder": "切换播放顺序",
 	"VoiceMessageFrom": "Voice message from %", // Untranslated
-	
+
 	// Profile/chat info
 	"Online": "在线",
 	"Offline": "离线",

@@ -376,7 +376,7 @@
 	"VoiceMessageRecorded_Alert": "Голосовое сообщение записано",
 	"DownloadFailed_Alert": "Не удалось скачать файл",
 	"MessageSendFailed_Alert": "Не удалось отправить сообщение",
-
+	
 	// Chat form
 	"ChatMedia_Title": "Медиафайлы",
 	"Search_TitlePrefix": "Поиск - ",
@@ -462,7 +462,7 @@
 	"Volume": "Громкость",
 	"TogglePlaylistOrder": "Поменять порядок воспр.",
 	"VoiceMessageFrom": "Голосовое сообщение от %",
-	
+
 	// Profile/chat info
 	"Online": "в сети",
 	"Offline": "не в сети",

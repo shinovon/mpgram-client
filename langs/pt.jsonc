@@ -73,7 +73,7 @@
 	"Thursday": "Quinta-feira",
 	"Friday": "Sexta-feira",
 	"Saturday": "Sábado",
-
+	
 	// Auth commands
 	"Auth": "Autenticação",
 	"Next": "Próximo",
@@ -81,14 +81,14 @@
 	"ImportSession": "Importar sessão",
 	"Show": "Mostrar",
 	"Check": "Verificar",
-
+	
 	// Settings commands
 	"Logout": "Sair da conta",
 	"ClearCache": "Limpar cache",
 	"Locate": "Localizar",
 	"ShowSessionCode": "Mostrar código da sessão",
 	"ResetSettings": "Redefinir configurações",
-
+	
 	// Chats list commands
 	"Folders": "Pastas",
 	"Refresh": "Atualizar",
@@ -97,7 +97,7 @@
 	"Search": "Buscar",
 	"OpenByLink": "Abrir pelo link",
 	"Select_OK": "Selecionar",
-
+	
 	// Message commands
 	"OpenChat": "Abrir conversa",
 	"Profile": "Perfil",
@@ -133,17 +133,11 @@
 	"Older": "Mais antigo",
 	"Newer": "Mais recente",
 	"SendSticker": "Enviar figurinha",
-	"SendNote": "Enviar nota",
-	"SaveNote": "Salvar nota",
 	"Menu": "Menu",
 	"Write": "Escrever",
-	
-	// Message writing form commands
 	"AttachFile": "Anexar arquivo",
 	"SendVoiceMessage": "Enviar mensagem de voz",
 	
-	
-	// Profile/chat info commands
 	// Message writing form commands
 	"Send": "Enviar",
 	"OpenTextBox": "Abrir campo de texto",
@@ -157,8 +151,6 @@
 	"Members": "Membros",
 	"AddToContacts": "Adicionar aos contatos",
 	"Photos": "Fotos",
-	
-	// Dialog commands
 	"Videos": "Vídeos",
 	"Files": "Arquivos",
 	"AudioFiles": "Áudios",
@@ -166,11 +158,8 @@
 	"AddMember": "Adicionar membro",
 	"ViewInviteLink": "Ver link de convite",
 	
-	// Pagination commands
 	// Dialog commands
 	"Ok": "OK",
-	
-	// Loading states
 	"Cancel": "Cancelar",
 	"Open": "Abrir",
 	"Close": "Fechar",
@@ -179,8 +168,6 @@
 	
 	// Pagination commands
 	"NextPage": "Próxima página",
-	
-	// Authorization process
 	"PrevPage": "Página anterior",
 	
 	// Loading states
@@ -211,16 +198,12 @@
 	"InvalidPhoneNumber_Alert": "Número de telefone inválido!",
 	"InvalidCaptcha_Alert": "Captcha inválido!",
 	"CloudPasswordEmpty_Alert": "A senha da nuvem não pode estar vazia!",
-	
-	// Settings sections
 	"CreateNewSession_Btn": "Criar nova sessão", 
 	"ImportSession_Btn": "Importar sessão existente", 
 	"InvalidPassword_Alert": "Senha inválida!",
 	"LoginDisabled_Alert": "Esta instância não permite login pela API!",
 	"APIDisabled_Alert": "Esta instância não suporta API!",
 	"ClientOutdated_Alert": "Cliente desatualizado!",
-	
-	// UI Settings
 	"InvalidInstancePassword_Alert": "Senha da instância inválida!",
 	"InvalidSessionCode_Alert": "Código de sessão inválido!",
 	"Retry": "Tentar novamente",
@@ -251,8 +234,6 @@
 	"Medium": "Médio",
 	"FocusNewMessages": "Focar nas novas mensagens",
 	"ChatTextField": "Campo de texto do chat", 
-	
-	// Behaviour settings
 	"BuiltinImageViewer": "Visualizador de imagens embutido",
 	"LargeMusicCover": "Capa grande para música", 
 	"LegacyUI": "Interface clássica",
@@ -279,15 +260,11 @@
 	"ChatAutoUpdate": "Atualizar chat automaticamente",
 	"UpdatesTimeout": "Tempo limite de atualização", 
 	"KeepSessionAlive": "Manter sessão ativa", 
-	
-	// Images settings
 	"UseUnicode": "Usar Unicode", 
 	"UseCompression": "Usar compressão", 
 	"NetworkAccess": "Acesso à rede",
 	"MobileData": "Dados móveis",
 	"WiFi": "Wi-Fi",
-	
-	// Cache settings
 	"Longpoll": "Long polling",
 	"UpdatesInterval": "Intervalo de atualização",
 	"DownloadPath": "Pasta de downloads",
@@ -296,8 +273,6 @@
 	"InApp": "No aplicativo",
 	"WithBrowser": "Com navegador",
 	"PartialUpload": "Envio parcial",
-	
-	// Notifications settings
 	"PlaybackMethod": "Método de reprodução",
 	"Stream": "Transmitir",
 	"CacheToFile": "Salvar em arquivo temporário",
@@ -306,8 +281,6 @@
 	"PassConnectionStream": "Usar fluxo da conexão",
 	
 	// Images settings
-	
-	// About
 	"LoadMediaThumbnails": "Carregar miniaturas da mídia",
 	"LoadAvatars": "Carregar avatares",
 	"MultiThreadedLoading": "Carregamento em múltiplas threads",
@@ -318,11 +291,6 @@
 	"AvatarsCaching": "Cache de avatares",
 	"Disabled": "Desativado",
 	"HoldInRAM": "Manter na RAM",  
-	"Shortcuts_Title": "Shortcuts", // Untranslated
-	"ChatShortcutsHelp": "1: Search messages\n2: Scroll up\n3: Chat info\n4: Write message\n6: Refresh\n8: Scroll down\nLeft arrow: Reply to selected message\nCall: Send", // Untranslated
-	"DialogsShortcutsHelp": "1: Search chats\n2: Scroll up\n3: Folders\n4: Contacts\n6: Refresh\n8: Scroll down\n9: Open by link", // Untranslated
-	
-	// Write form
 	"Store": "Armazenar",
 	"HoldInRAMandStore": "Manter na RAM e armazenar",
 	"AvatarsCacheThreshold": "Limite de cache de avatares", 
@@ -337,8 +305,6 @@
 	"Off": "Desligado", 
 	"AlertWindow": "Janela de alerta",
 	"PushInterval": "Intervalo de consulta",
-	"ForwardTo_Title": "Forward to...", // Untranslated
-	"Share_Title": "Share...", // Untranslated
 	"PushBackgroundInterval": "Intervalo de consulta em segundo plano",
 	
 	// About
@@ -352,6 +318,9 @@
 	"License": "Distribuído sob a licença MIT.\nCopyright (C) %",
 	"ImagelibLicense": "Contém partes da biblioteca TUBE42 imagelib, licenciada sob LGPL.\nCopyright (C) %",
 	"GNUClasspathLicense": "Contém partes do GNU Classpath, licenciado sob GPL v2.\nCopyright (C) %",
+	"Shortcuts_Title": "Shortcuts", // Untranslated
+	"ChatShortcutsHelp": "1: Search messages\n2: Scroll up\n3: Chat info\n4: Write message\n6: Refresh\n8: Scroll down\nLeft arrow: Reply to selected message\nCall: Send", // Untranslated
+	"DialogsShortcutsHelp": "1: Search chats\n2: Scroll up\n3: Folders\n4: Contacts\n6: Refresh\n8: Scroll down\n9: Open by link", // Untranslated
 	
 	// Write form
 	"Reply_Title": "Responder",
@@ -368,11 +337,11 @@
 	"EnableHTMLFormatting": "Ativar formatação HTML",
 	"TextField_Hint": "Escreva uma mensagem...",
 	"Clear": "Limpar",
+	"ForwardTo_Title": "Forward to...", // Untranslated
+	"Share_Title": "Share...", // Untranslated
 	
 	// Alert messages
 	"MessageSent_Alert": "Mensagem enviada",
-	"NoteSaved_Alert": "Nota salva",
-	"NoteSaveFailed_Alert": "Falha ao salvar nota",
 	"MessageDeleted_Alert": "Mensagem excluída",
 	"UpdateAvailable_Alert": "Atualização disponível",
 	"MemberBanned_Alert": "Membro banido",
@@ -425,10 +394,10 @@
 	
 	// Message
 	"ForwardedFrom": "Encaminhada de ",
-	"Action": "Ação",
 	"You": "Você",
 	"You_Prefix": "Você: ",
 	"ForwardedMessage": "Mensagem encaminhada",
+	"Action": "Ação",
 	"Edited": " editada", 
 	"_comment": " comentário", 
 	"_comments": " comentários",
@@ -493,7 +462,7 @@
 	"Volume": "Volume",
 	"TogglePlaylistOrder": "Alternar ordem",
 	"VoiceMessageFrom": "Mensagem de voz de %",
-	
+
 	// Profile/chat info
 	"Online": "online",
 	"Offline": "offline",

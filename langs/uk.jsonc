@@ -462,7 +462,7 @@
 	"Volume": "Volume", // Untranslated
 	"TogglePlaylistOrder": "Toggle order", // Untranslated
 	"VoiceMessageFrom": "Voice message from %", // Untranslated
-	
+
 	// Profile/chat info
 	"Online": "онлайн",
 	"Offline": "офлайн",
@@ -491,7 +491,7 @@
 	"_subscriber": " підписник",
 	"_subscribers": " підписника",
 	"_subscribers2": " підписників",
-
+	
 	"_photo": " фото",
 	"_photos": " фото",
 	"_photos2": " фото",
