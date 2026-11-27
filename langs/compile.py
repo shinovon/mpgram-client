@@ -95,7 +95,6 @@ if not err:
         
         if not patch and n != "en.jsonc":
             slavic = j["LocaleSlavicPlurals"] == "1"
-            i = 0
             old_lines = lines
             lines = []
             for s in en_lines:
@@ -105,7 +104,7 @@ if not err:
                     continue
                 key = t.split(":")[0].split("\"")[1]
                 if not key in j.keys():
-                    print("Filled", k)
+                    print("Filled", key)
                     lines.append(s[:-1] + " // Untranslated\n")
                 else:
                     comment = s[s.rfind("\""):]
@@ -114,7 +113,7 @@ if not err:
                             comment = p[p.rfind("\""):]
                             break
                     if "Untranslated" in comment and (not key.endswith("_2") or not slavic):
-                        print("Updated", k)
+                        print("Updated", key)
                         lines.append(s[:-1] + " // Untranslated\n")
                     else:
                         lines.append(s[:s.index(":")] + ": \"" + escape(j[key]) + comment)
