@@ -1294,7 +1294,7 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 					keyboardTextUpdated = false;
 					text = keyboard.getText();
 				}
-				MP.display(MP.writeForm(id, r == 0 ? null : Integer.toString(r), text, editMsgId == 0 ? null : Integer.toString(editMsgId), null, null));
+				MP.display(MP.writeForm(id, r == 0 ? null : Integer.toString(r), text, editMsgId == 0 ? null : Integer.toString(editMsgId)));
 				resetInput();
 				break;
 			}

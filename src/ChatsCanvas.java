@@ -37,6 +37,7 @@ public class ChatsCanvas extends MPCanvas {
 	String text;
 	UIMessage[] msgs;
 	boolean noAvas;
+	boolean file;
 
 	// main mode
 	ChatsCanvas(String title, int folder) {
@@ -86,12 +87,15 @@ public class ChatsCanvas extends MPCanvas {
 			addCommand(MP.canvasOkCmd);
 		}
 	}
-	public ChatsCanvas(String text) {
+
+	// share mode
+	public ChatsCanvas(String text, boolean file) {
 		super();
 		setTitle(MP.L[LShare_Title]);
 		setCommandListener(MP.midlet);
 		this.folder = 0;
 		this.text = text;
+		this.file = file;
 		addCommand(MP.archiveCmd);
 		addCommand(MP.cancelCmd);
 
@@ -175,16 +179,23 @@ public class ChatsCanvas extends MPCanvas {
 		}
 
 		if (text != null) {
-			// TODO
 			MP.deleteFromHistory(this);
-			if (MP.current instanceof ChatCanvas && id.equals(((ChatCanvas) MP.current).id)) {
+			if (!(MP.current instanceof ChatCanvas) || !id.equals(((ChatCanvas) MP.current).id)) {
+				MP.openChat(id, -1);
+//				MP.openLoad(new ChatCanvas(id, 0, text));
+//			} else {
 //				((ChatCanvas) MP.current).startText(text);
-				MP.display(MP.writeForm(id, null, text, null, null, null));
-				return;
 			}
-//			MP.openLoad(new ChatCanvas(id, 0, text));
-			MP.openChat(id, -1);
-			MP.display(MP.writeForm(id, null, text, null, null, null));
+
+			String text = null;
+			String file = null;
+			if (this.file) {
+				file = this.text;
+			} else {
+				text = this.text;
+			}
+
+			MP.display(MP.writeForm(id, null, text, null, null, null, file));
 			return;
 		}
 

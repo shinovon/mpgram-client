@@ -3302,7 +3302,7 @@ public class MP extends MIDlet
 			}
 			if (c == writeCmd) {
 				int r = ((MPChat) d).topMsgId();
-				display(writeForm(((MPChat) d).id(), r == 0 ? null : Integer.toString(r), "", null, null, null));
+				display(writeForm(((MPChat) d).id(), r == 0 ? null : Integer.toString(r), "", null));
 				return;
 			}
 			if (c == searchMsgCmd) {
@@ -4972,7 +4972,7 @@ public class MP extends MIDlet
 			if (c == replyMsgCmd) {
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
-				display(writeForm(((ChatForm) current).id, s[1], "", null, null, null));
+				display(writeForm(((ChatForm) current).id, s[1], "", null));
 				return;
 			}
 			if (c == forwardMsgCmd) {
@@ -5034,7 +5034,7 @@ public class MP extends MIDlet
 			if (c == editMsgCmd) {
 				String[] s = (String[]) ((MPForm) current).urls.get(item);
 				if (s == null) return;
-				display(writeForm(s[0], null, (String) ((MPForm) current).urls.get(s[1]), s[1], null, null));
+				display(writeForm(s[0], null, (String) ((MPForm) current).urls.get(s[1]), s[1]));
 				return;
 			}
 			if (c == gotoMsgCmd) {
@@ -5868,7 +5868,11 @@ public class MP extends MIDlet
 		return l;
 	}
 
-	static Form writeForm(String id, String reply, String text, String editId, String fwdPeerId, String fwdMsgId) {
+	static Form writeForm(String id, String reply, String text, String editId) {
+		return writeForm(id, reply, text, editId, null, null, null);
+	}
+
+	static Form writeForm(String id, String reply, String text, String editId, String fwdPeerId, String fwdMsgId, String file) {
 		writeTo = id;
 		replyTo = "0".equals(reply) ? null : reply;
 		edit = editId;
@@ -6750,15 +6754,29 @@ public class MP extends MIDlet
 
 			if (url != null && url.length() != 0) {
 				if (url.startsWith("text:")) {
-					// TODO
 					url = url.substring(5);
 //#ifndef NO_CHAT_CANVAS
 					if (!legacyChatUI) {
-						openLoad(new ChatsCanvas(url));
+						openLoad(new ChatsCanvas(url, false));
 					} else
 //#endif
 					{
-						openLoad(new ChatsList(url));
+						openLoad(new ChatsList(url, false));
+					}
+					return true;
+				}
+				if (url.startsWith("file:")) {
+					if (!url.startsWith("file://")) {
+						// convert native path to jsr 75 url
+						url = "file:///".concat(url.substring(5).replace('\\', '/'));
+					}
+//#ifndef NO_CHAT_CANVAS
+					if (!legacyChatUI) {
+						openLoad(new ChatsCanvas(url, true));
+					} else
+//#endif
+					{
+						openLoad(new ChatsList(url, true));
 					}
 					return true;
 				}

@@ -41,6 +41,7 @@ public class ChatsList extends MPList {
 	int pinnedCount;
 	final Object lock = new Object();
 	boolean invite;
+	boolean file;
 
 	// main mode
 	public ChatsList(String title, int folder) {
@@ -90,11 +91,12 @@ public class ChatsList extends MPList {
 		setFitPolicy(List.TEXT_WRAP_ON);
 	}
 
-	// send text mode
-	public ChatsList(String text) {
+	// share mode
+	public ChatsList(String text, boolean file) {
 		super(MP.L[LShare_Title]);
 		this.folder = 0;
 		this.text = text;
+		this.file = file;
 		addCommand(MP.archiveCmd);
 		addCommand(MP.cancelCmd);
 		setFitPolicy(List.TEXT_WRAP_ON);
@@ -269,7 +271,7 @@ public class ChatsList extends MPList {
 
 			// TODO topics
 			MP.openChat(id, 0);
-			MP.display(MP.writeForm(id, null, "", null, peerId, msgId));
+			MP.display(MP.writeForm(id, null, "", null, peerId, msgId, null));
 			return;
 		}
 
@@ -279,7 +281,16 @@ public class ChatsList extends MPList {
 
 			// TODO topics
 			MP.openChat(id, 0);
-			MP.display(MP.writeForm(id, null, text, null, null, null));
+
+			String text = null;
+			String file = null;
+			if (this.file) {
+				file = this.text;
+			} else {
+				text = this.text;
+			}
+
+			MP.display(MP.writeForm(id, null, text, null, null, null, file));
 		}
 		
 		MP.openChat(id, -1);
