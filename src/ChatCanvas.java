@@ -1203,7 +1203,8 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 				showTextBox();
 			}
 			return true;
-		} else if (funcFocused && game >= 0) {
+		}
+		if (funcFocused && game >= 0) {
 			if (game == Canvas.UP) {
 				funcFocused = false;
 				keyGuide = false;
@@ -1215,7 +1216,8 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 				}
 			}
 			return true;
-		} else if (key == Canvas.KEY_NUM2 || key == Canvas.KEY_NUM8) {
+		}
+		if (key == Canvas.KEY_NUM2 || key == Canvas.KEY_NUM8) {
 			int dir = key == Canvas.KEY_NUM2 ? -1 : 1;
 			if (reverse) dir = -dir;
 			focusItem(null, 0);
@@ -1223,36 +1225,52 @@ public class ChatCanvas extends MPCanvas implements MPChat, Runnable {
 			scrollTo(scroll + ((clipHeight * 7 / 8) * dir));
 			queueRepaint();
 			return true;
-		} else if (key == Canvas.KEY_NUM1) {
+		}
+		if (key == Canvas.KEY_NUM1) {
 			// search
 			if (canWrite && hasInput) MP.midlet.commandAction(MP.searchMsgCmd, this);
 			return true;
-		} else if (key == Canvas.KEY_NUM3) {
+		}
+		if (key == Canvas.KEY_NUM3) {
 			// chat info
 			openProfile();
 			return true;
-		} else if (key == Canvas.KEY_NUM4) {
+		}
+		if (key == Canvas.KEY_NUM4) {
 			// write message
 			resetInput();
 			MP.midlet.commandAction(MP.writeCmd, this);
 			return true;
-		} else if (key == Canvas.KEY_NUM6) {
+		}
+		if (key == Canvas.KEY_NUM6) {
 			// refresh
 			MP.midlet.commandAction(MP.latestCmd, this);
 			return true;
+		}
 //#ifndef NO_RECORD
-		} else if (key == Canvas.KEY_NUM7) {
+		if (key == Canvas.KEY_NUM7) {
 			if (!MP.voiceConversion || !MP.supportsAudioRecording) return false;
 			// send voice message
 			int r = Math.max(replyMsgId, topMsgId);
 			MP.openVoiceRecorder(id, r == 0 ? null : Integer.toString(r));
 			return true;
+		}
 //#endif
-		} else if (game == -10) {
+		if (key == Canvas.KEY_STAR) {
+			// shortcuts help
+			Form f = new Form(MP.L[LShortcuts_Title]);
+			f.addCommand(MP.backCmd);
+			f.setCommandListener(MP.midlet);
+			f.append(MP.L[LChatShortcutsHelp]);
+			MP.display(f);
+			return true;
+		}
+		if (game == -10) {
 			send();
 			queueRepaint();
 			return true;
-		} else if (game == -11) {
+		}
+		if (game == -11) {
 			back();
 			return true;
 		}

@@ -21,6 +21,7 @@ SOFTWARE.
 */
 //#ifndef NO_CHAT_CANVAS
 import javax.microedition.lcdui.Canvas;
+import javax.microedition.lcdui.Form;
 import java.util.Hashtable;
 
 public class ChatsCanvas extends MPCanvas {
@@ -233,6 +234,15 @@ public class ChatsCanvas extends MPCanvas {
 		}
 		if (key == Canvas.KEY_NUM9) {
 			MP.midlet.commandAction(MP.openLinkCmd, this);
+			return true;
+		}
+		if (key == Canvas.KEY_STAR) {
+			// shortcuts help
+			Form f = new Form(MP.L[LShortcuts_Title]);
+			f.addCommand(MP.backCmd);
+			f.setCommandListener(MP.midlet);
+			f.append(MP.L[LDialogsShortcutsHelp]);
+			MP.display(f);
 			return true;
 		}
 		return false;
