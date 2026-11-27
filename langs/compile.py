@@ -82,7 +82,6 @@ if not err:
                     if s in j:
                         if j[s] == None:
                             f.write(escape(en_json[s]))
-                            #print("Missing key:", s)
                         else:
                             o = en_json[s]
                             t = j[s]
@@ -106,6 +105,7 @@ if not err:
                     continue
                 key = t.split(":")[0].split("\"")[1]
                 if not key in j.keys():
+                    print("Filled", k)
                     lines.append(s[:-1] + " // Untranslated\n")
                 else:
                     comment = s[s.rfind("\""):]
@@ -114,6 +114,7 @@ if not err:
                             comment = p[p.rfind("\""):]
                             break
                     if "Untranslated" in comment and (not key.endswith("_2") or not slavic):
+                        print("Updated", k)
                         lines.append(s[:-1] + " // Untranslated\n")
                     else:
                         lines.append(s[:s.index(":")] + ": \"" + escape(j[key]) + comment)
