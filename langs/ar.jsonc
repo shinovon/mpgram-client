@@ -244,7 +244,7 @@
 	"Theme": "Theme", // Untranslated
 	"InputLanguages": "Input languages", // Untranslated
 	"ForceKeyInput": "Force keypad input", // Untranslated
-	"ChatAvatar": "Show avatar in chat", // Untranslated
+	"ChatAvatar": "Show chat avatar", // Untranslated
 	"ChatWallpaper": "Chat wallpaper", // Untranslated
 	"12HourTimeFormat": "12-hour time format", // Untranslated
 	"StickerPreviewSize": "Sticker preview size", // Untranslated
@@ -319,7 +319,7 @@
 	"ImagelibLicense": "Contains parts of the TUBE42 imagelib, licensed under the LGPL.\nCopyright (C) %", // Untranslated
 	"GNUClasspathLicense": "Contains parts of GNU Classpath, licensed under the GPL v2\nCopyright (C) %", // Untranslated
 	"Shortcuts_Title": "Shortcuts", // Untranslated
-	"ChatShortcutsHelp": "1: Search messages\n2: Scroll up\n3: Chat info\n4: Write message\n8: Scroll down\nLeft arrow: Reply to selected message\nCall: Send", // Untranslated
+	"ChatShortcutsHelp": "1: Search messages\n2: Scroll up\n3: Chat info\n4: Write message\n6: Refresh\n8: Scroll down\nLeft arrow: Reply to selected message\nCall: Send", // Untranslated
 	"DialogsShortcutsHelp": "1: Search chats\n2: Scroll up\n3: Folders\n4: Contacts\n6: Refresh\n8: Scroll down\n9: Open by link", // Untranslated
 	
 	// Write form
@@ -354,7 +354,7 @@
 	"DownloadedTo": "Downloaded to ", // Untranslated
 	"ChooseDownloadMethod_Alert": "Choose download method", // Untranslated
 	"FailedToSaveSettings_Alert": "Failed to save settings", // Untranslated
-	"PiglerNotAvailable_Alert": "Pigler API is selected but not available, \ndownload it from https://nnproject.cc/pna", // Untranslated
+	"PiglerNotAvailable_Alert": "Pigler API is selected but not available, \ndownload it at https://nnproject.cc/pna", // Untranslated
 	"DeleteNMessage_Alert": "Delete % message?", // Untranslated
 	"DeleteNMessages_Alert": "Delete % messages?", // Untranslated
 	"DeleteNMessages_Alert_2": "", // Untranslated
@@ -362,7 +362,7 @@
 	"PinMessage_Alert": "Pin message?", // Untranslated
 	"BanMember_Alert": "Ban member?", // Untranslated
 	"Logout_Alert": "Are you sure you want to log out?", // Untranslated
-	"RewriteFile_Alert": "File already exists, rewrite?", // Untranslated
+	"RewriteFile_Alert": "File already exists, overwrite?", // Untranslated
 	"OpenThisLink_Alert": "Open this link?", // Untranslated
 	"Remove_Alert": "Remove \"%\"?", // Untranslated
 	"ResetSettings_Alert": "Reset settings?", // Untranslated
@@ -417,8 +417,8 @@
 	"VoiceMessage": "Voice message", // Untranslated
 	"AnonymousPoll": "Anonymous Poll", // Untranslated
 	"FinalResults": "Final results", // Untranslated
-	"Vote": "Vote", // Untranslated
-	"ViewResults": "View results", // Untranslated
+	"Vote": "VOTE", // Untranslated
+	"ViewResults": "VIEW RESULTS", // Untranslated
 	"NoVotes": "No votes", // Untranslated
 	"_vote": " vote", // Untranslated
 	"_votes": " votes", // Untranslated

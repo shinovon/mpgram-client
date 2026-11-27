@@ -319,7 +319,7 @@
 	"ImagelibLicense": "Contains parts of the TUBE42 imagelib, licensed under the LGPL.\nCopyright (C) %", // Untranslated
 	"GNUClasspathLicense": "Contains parts of GNU Classpath, licensed under the GPL v2\nCopyright (C) %", // Untranslated
 	"Shortcuts_Title": "Shortcuts", // Untranslated
-	"ChatShortcutsHelp": "1: Search messages\n2: Scroll up\n3: Chat info\n4: Write message\n8: Scroll down\nLeft arrow: Reply to selected message\nCall: Send", // Untranslated
+	"ChatShortcutsHelp": "1: Search messages\n2: Scroll up\n3: Chat info\n4: Write message\n6: Refresh\n8: Scroll down\nLeft arrow: Reply to selected message\nCall: Send", // Untranslated
 	"DialogsShortcutsHelp": "1: Search chats\n2: Scroll up\n3: Folders\n4: Contacts\n6: Refresh\n8: Scroll down\n9: Open by link", // Untranslated
 	
 	// Write form
@@ -417,8 +417,8 @@
 	"VoiceMessage": "语音",
 	"AnonymousPoll": "Anonymous Poll", // Untranslated
 	"FinalResults": "Final results", // Untranslated
-	"Vote": "Vote", // Untranslated
-	"ViewResults": "View results", // Untranslated
+	"Vote": "VOTE", // Untranslated
+	"ViewResults": "VIEW RESULTS", // Untranslated
 	"NoVotes": "No votes", // Untranslated
 	"_vote": " vote", // Untranslated
 	"_votes": " votes", // Untranslated
